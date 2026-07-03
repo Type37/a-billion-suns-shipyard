@@ -368,9 +368,7 @@ function builderView(state: AppState): string {
     ${list.emblemImage ? `<button class="emblem-choice" data-action="clear-emblem-image" title="Remove the uploaded image">${icon("close", 16)}</button>` : ""}`;
 
   const limitControl = list.freePlay
-    ? `<label class="inline-field">Credits limit
-        <input class="limit-input" type="number" min="1" value="${list.fleet.creditsLimit}" data-action="set-limit-free" />
-      </label>`
+    ? `<input class="limit-input" type="number" min="1" value="${list.fleet.creditsLimit}" data-action="set-limit-free" />`
     : `<div class="segment" role="group" aria-label="Credits limit">
         ${[300, 400, 500]
           .map(
@@ -380,35 +378,45 @@ function builderView(state: AppState): string {
           .join("")}
       </div>`;
 
+  const factionControl = list.freePlay
+    ? '<span class="freeplay-badge">All ships unlocked</span>'
+    : `<details class="faction-switch">
+        <summary>${faction ? escapeHtml(faction.name) : "Choose faction"}</summary>
+        <div class="faction-switch-panel">
+          <div class="faction-plaques">${factionOptions(eraFactions)}</div>
+          ${otherFactions.length ? `<p class="muted picker-note">From other eras, allowed by the rulebook:</p><div class="faction-plaques">${factionOptions(otherFactions)}</div>` : ""}
+        </div>
+      </details>`;
+
   return `
   ${topbar()}
-  <section class="commission-band ${remaining < 0 ? "over" : ""}">
-    <div class="commission-left">
-      <p class="band-eyebrow">${list.freePlay ? "Free Play" : MODE_LABEL[list.mode]}${faction && !list.freePlay ? ` / ${escapeHtml(faction.name)}` : ""}</p>
-      <input class="fleet-name-input" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Name this fleet" data-action="fleet-name" />
-      <div class="emblem-picker">${emblemPicker}</div>
+  <section class="setup-band ${remaining < 0 ? "over" : ""}">
+    <div class="setup-head">
+      <div class="setup-identity">
+        <p class="band-eyebrow">${list.freePlay ? "Free Play" : MODE_LABEL[list.mode]}</p>
+        <input class="fleet-name-input" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Name this fleet" data-action="fleet-name" />
+      </div>
+      <div class="band-readout">
+        <div class="readout"><span class="readout-label">Limit</span><span class="readout-value">${credits(list.fleet.creditsLimit)}</span></div>
+        <div class="readout"><span class="readout-label">Committed</span><span class="readout-value">${credits(total)}</span></div>
+        <div class="readout"><span class="readout-label">Remaining</span><span class="readout-value ${remaining < 0 ? "negative" : ""}">${remaining < 0 ? "&#8722;" : ""}${credits(Math.abs(remaining))}</span></div>
+      </div>
     </div>
-    <div class="band-readout">
-      <div class="readout"><span class="readout-label">Limit</span><span class="readout-value">${credits(list.fleet.creditsLimit)}</span></div>
-      <div class="readout"><span class="readout-label">Committed</span><span class="readout-value">${credits(total)}</span></div>
-      <div class="readout"><span class="readout-label">Remaining</span><span class="readout-value ${remaining < 0 ? "negative" : ""}">${remaining < 0 ? "&#8722;" : ""}${credits(Math.abs(remaining))}</span></div>
+    <div class="setup-controls">
+      <div class="control-group">
+        <span class="control-label">Credits limit</span>
+        ${limitControl}
+      </div>
+      <div class="control-group">
+        <span class="control-label">Faction</span>
+        ${factionControl}
+      </div>
+      <div class="control-group control-group-emblem">
+        <span class="control-label">Emblem</span>
+        <div class="emblem-picker">${emblemPicker}</div>
+      </div>
     </div>
   </section>
-
-  <div class="controls-band">
-    ${limitControl}
-    ${
-      list.freePlay
-        ? '<span class="freeplay-badge">Everything unlocked: any ships, any counts, no rules checks.</span>'
-        : `<details class="faction-switch">
-            <summary>Change faction</summary>
-            <div class="faction-switch-panel">
-              <div class="faction-plaques">${factionOptions(eraFactions)}</div>
-              ${otherFactions.length ? `<p class="muted picker-note">From other eras, allowed by the rulebook:</p><div class="faction-plaques">${factionOptions(otherFactions)}</div>` : ""}
-            </div>
-          </details>`
-    }
-  </div>
 
   <main class="workspace">
     <section class="catalog">

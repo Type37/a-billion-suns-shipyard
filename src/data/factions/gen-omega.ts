@@ -1,7 +1,7 @@
 import type { Faction } from "../../types.ts";
 import { w } from "../_helpers.ts";
 
-// Gen Ω — Armageddon faction (rules p.168-169).
+// Gen Ω - Armageddon faction (rules p.168-169).
 export const GEN_OMEGA: Faction = {
   id: "gen-omega",
   name: "Gen Ω",

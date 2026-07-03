@@ -1,7 +1,7 @@
 import type { Faction } from "../../types.ts";
 import { w } from "../_helpers.ts";
 
-// AEGIS — Armageddon faction (rules p.164-165). HVP are called "Protocol Shards".
+// AEGIS - Armageddon faction (rules p.164-165). HVP are called "Protocol Shards".
 export const AEGIS: Faction = {
   id: "aegis",
   name: "AEGIS",

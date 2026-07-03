@@ -39,7 +39,7 @@ function tryImportShare(): boolean {
   });
 
   // Keep the address bar in step. This fires hashchange, which re-derives the
-  // same route below — harmless and idempotent.
+  // same route below - harmless and idempotent.
   location.replace(`#/list/${decoded.list.id}`);
   return true;
 }

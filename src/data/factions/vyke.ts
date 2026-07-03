@@ -1,7 +1,7 @@
 import type { Faction } from "../../types.ts";
 import { w } from "../_helpers.ts";
 
-// The Vyke — Armageddon faction (rules p.162-163).
+// The Vyke - Armageddon faction (rules p.162-163).
 export const VYKE: Faction = {
   id: "vyke",
   name: "The Vyke",

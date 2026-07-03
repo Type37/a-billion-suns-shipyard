@@ -69,7 +69,7 @@ export interface ShipClass {
   primary: Weapon[];
   /** Auxiliary weapon systems (180° arc). Empty if the aux slot holds Utility Bays or nothing. */
   auxiliary: Weapon[];
-  /** True if a weapon slot is "Utility Bays" — makes the ship a Utility Ship (p.58). */
+  /** True if a weapon slot is "Utility Bays" - makes the ship a Utility Ship (p.58). */
   utilityBays: boolean;
   /** True when the primary slot specifically holds Utility Bays (for spec-table rendering). */
   primaryUtility?: boolean;
@@ -152,7 +152,7 @@ export interface FleetHvp {
   customName?: string;
 }
 
-/** Fleet List — the pre-built list used by Armageddon, Age of Unity, Combat Simulator. */
+/** Fleet List - the pre-built list used by Armageddon, Age of Unity, Combat Simulator. */
 export interface Fleet {
   name?: string;
   factionId: string;
@@ -175,7 +175,7 @@ export interface ShipyardEntry {
 }
 
 /**
- * Shipyard — Hypergrowth's builder shape (p.122): "fill it up with ships
+ * Shipyard - Hypergrowth's builder shape (p.122): "fill it up with ships
  * totalling no more than ¢300bn. You are buying ships; you don't have to
  * organise them into units until you requisition them during the game."
  */
@@ -184,7 +184,7 @@ export interface Shipyard {
   factionId: string;
   /** Fixed at 300 in the rules; kept adjustable for the Unlimited Shipyards option and campaigns. */
   creditsLimit: number;
-  /** Advanced Option — Unlimited Shipyards (p.124): no pre-built pool at all. */
+  /** Advanced Option - Unlimited Shipyards (p.124): no pre-built pool at all. */
   unlimited?: boolean;
   ships: ShipyardEntry[];
   /** Chosen after missions are rolled (p.125), but stored with the shipyard. */
@@ -211,7 +211,7 @@ export interface OutfitShip {
 }
 
 /**
- * Outfit — Junkspace's builder shape (p.201): "You get ¢30k with which to buy
+ * Outfit - Junkspace's builder shape (p.201): "You get ¢30k with which to buy
  * ships, and you can buy up to a maximum of 5 ships." In Junkspace, all units
  * consist of exactly one ship (p.195).
  */
@@ -254,7 +254,7 @@ export interface Mission {
   blurb?: string;
   /** Verbatim setup instructions. */
   setup: string;
-  /** Scoring lines resolved in each End Phase — feeds the 4-round scorepad. */
+  /** Scoring lines resolved in each End Phase - feeds the 4-round scorepad. */
   scoringPerRound?: string[];
   /** Scoring lines resolved at the end of the game. */
   scoringEndGame?: string[];

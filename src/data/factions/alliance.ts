@@ -1,7 +1,7 @@
 import type { Faction } from "../../types.ts";
 import { w } from "../_helpers.ts";
 
-// The Alliance of Non-Human Worlds — Armageddon faction (rules p.170-171).
+// The Alliance of Non-Human Worlds - Armageddon faction (rules p.170-171).
 // Fractious Coalition: every unit must declare a species (Rannari / Yynnx / Gorgronti).
 export const ALLIANCE: Faction = {
   id: "alliance",

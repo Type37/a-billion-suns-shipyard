@@ -848,6 +848,64 @@ button { font-family: inherit; }
   .comp-filters .control-group { flex: 1 1 100%; }
 }
 
+/* ============================================================ ROSTER ROWS + MODAL */
+
+/* Compact clickable unit rows (override the old article styling). */
+.roster { }
+.roster-sheet .roster-unit {
+  width: 100%; text-align: left; cursor: pointer; background: var(--paper);
+  display: grid; grid-template-columns: 30px 1fr auto 20px; align-items: center; gap: 12px;
+  padding: 12px 20px; border: none; border-bottom: 1px solid var(--hair-soft);
+  border-left: 3px solid transparent; font-family: inherit; color: var(--color-ink);
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.roster-sheet .roster-unit:hover { background: var(--blue-wash); border-left-color: var(--color-action); }
+.roster-sheet .roster-unit.unresolved { background: var(--red-wash); }
+.ru-main { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ru-name { font-family: var(--display); font-weight: 700; font-size: 15px; line-height: 1.1; }
+.ru-sub { font-size: 12px; color: var(--ink-2); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.ru-x { font-family: var(--mono); font-weight: 600; color: var(--ink); }
+.ru-carry { display: inline-flex; align-items: center; gap: 2px; font-family: var(--mono); font-weight: 600; color: var(--color-action); }
+.ru-go { color: var(--ink-3); }
+.roster-sheet .roster-unit:hover .ru-go { color: var(--color-accent); }
+
+/* Modal system (after the Dropfleet builder): overlay, chamfered panel,
+   header / body / footer. Industrial framing, mono title. */
+.modal-root { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(10, 14, 20, 0.55); }
+.modal-panel {
+  position: relative; z-index: 1; width: min(560px, 100%); max-height: 90vh; overflow-y: auto;
+  background: var(--paper); border: 2px solid var(--color-line);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%);
+}
+.modal-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; background: var(--color-action); color: #fff; }
+.modal-title { font-family: var(--mono); font-weight: 700; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
+.modal-close { background: transparent; border: 1px solid #3a5aa0; color: #fff; cursor: pointer; display: inline-flex; padding: 6px; }
+.modal-close:hover { background: #fff; color: var(--color-action); }
+.modal-body { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+.modal-footer { display: flex; justify-content: space-between; gap: 12px; padding: 14px 20px; border-top: 2px solid var(--color-line); }
+.modal-field { display: flex; flex-direction: column; gap: 8px; font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.modal-name { font-family: var(--display); font-weight: 700; font-size: 20px; letter-spacing: -0.01em; color: var(--color-ink); border: 1px solid var(--hair); padding: 10px 12px; text-transform: none; }
+.modal-name:focus { outline: none; border-color: var(--color-accent); }
+.modal-spec { display: grid; grid-template-columns: auto 1fr; gap: 14px; padding: 14px; border: 1px solid var(--hair); border-left: 3px solid var(--color-action); background: #f8f9fc; }
+.spec-glyph { color: var(--color-action); }
+.spec-name { font-family: var(--display); font-weight: 800; font-size: 17px; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; text-transform: none; letter-spacing: 0; }
+.spec-cost { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--color-action); }
+.spec-body .ship-weapons { text-transform: none; letter-spacing: 0; font-weight: 400; }
+.modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+@media (max-width: 520px) { .modal-grid { grid-template-columns: 1fr; } }
+.modal-sub { font-size: 11px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--ink-3); }
+.stepper.big button { padding: 9px 12px; }
+.stepper.big .stepper-count { font-size: 15px; line-height: 32px; padding: 0 16px; }
+.carry-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.carry-toggle {
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  font-family: var(--sans); font-size: 12px; font-weight: 600; letter-spacing: 0; text-transform: none;
+  padding: 8px 12px; border: 1px solid var(--hair); background: var(--paper); color: var(--ink-2);
+}
+.carry-toggle:hover { border-color: var(--color-line); }
+.carry-toggle.on { background: var(--color-action); border-color: var(--color-action); color: #fff; }
+
 /* ============================================================ PRINT MEDIA */
 
 @media print {

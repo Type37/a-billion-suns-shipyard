@@ -390,6 +390,91 @@ function catalogShipRow(ship: ShipClass, ownerFaction: Faction, composite: boole
   </article>`;
 }
 
+// The unit configuration modal (Dropfleet-style): one enclosed surface that
+// groups everything about a unit, opened on demand from its roster row.
+function unitModal(state: AppState, list: SavedList, faction: Faction | undefined, customs: Faction[]): string {
+  const m = state.ui.modal;
+  if (!m || m.kind !== "unit") return "";
+  const u = list.fleet.units.find((x) => x.id === m.unitId);
+  if (!u) return "";
+  const r = resolveShip(u.shipClassId, faction, customs);
+  const ship = r?.ship;
+  const shipName = ship?.name ?? u.shipClassId;
+  const maxCount = list.freePlay || list.mode === "hypergrowth" ? 99 : ship?.mass === 3 ? 1 : 3;
+  const cost = ship ? ship.cost * u.count : 0;
+  const shipNameInputs = Array.from({ length: u.count })
+    .map(
+      (_, i) =>
+        `<input class="ship-name-input" type="text" value="${escapeHtml(u.shipNames?.[i] ?? "")}" placeholder="Ship ${i + 1}" data-action="ship-name" data-unit="${u.id}" data-index="${i}" />`,
+    )
+    .join("");
+  const carryToggles = list.fleet.hvp
+    .map((sel, i) => {
+      const def = hvpById(sel.hvpId, faction);
+      const on = sel.assignedUnitId === u.id;
+      return `<button class="carry-toggle ${on ? "on" : ""}" data-action="toggle-carry" data-unit="${u.id}" data-index="${i}">${icon(on ? "check" : "plus", 14)} ${escapeHtml(def?.name ?? sel.hvpId)}</button>`;
+    })
+    .join("");
+
+  return `
+  <div class="modal-root">
+    <div class="modal-backdrop" data-action="close-modal"></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-label="Unit configuration">
+      <header class="modal-header">
+        <h2 class="modal-title">Unit</h2>
+        <button class="modal-close" data-action="close-modal" aria-label="Close">${icon("close", 18)}</button>
+      </header>
+      <div class="modal-body">
+        <label class="modal-field">Unit name
+          <input class="modal-name" type="text" value="${escapeHtml(u.name ?? "")}" placeholder="${escapeHtml(shipName)} unit" data-action="unit-name" data-unit="${u.id}" />
+        </label>
+        ${
+          ship
+            ? `<div class="modal-spec">
+                <div class="spec-glyph">${massGlyph(ship.mass, 30)}</div>
+                <div class="spec-body">
+                  <p class="spec-name">${escapeHtml(ship.name)}<span class="spec-cost">${credits(ship.cost)} / ship</span></p>
+                  <p class="ship-stats">${statChips(ship)}</p>
+                  <p class="ship-weapons"><span class="slot-label">Primary</span> ${primarySlotText(ship)}</p>
+                  <p class="ship-weapons"><span class="slot-label">Auxiliary</span> ${auxSlotText(ship)}</p>
+                </div>
+              </div>`
+            : '<p class="issue-error">This ship class is not in the faction roster.</p>'
+        }
+        <div class="modal-grid">
+          <div class="modal-field">
+            <span class="control-label">Ships in unit</span>
+            <span class="stepper big">
+              <button data-action="unit-count" data-unit="${u.id}" data-delta="-1" title="Fewer">${icon("minus", 16)}</button>
+              <span class="stepper-count">${u.count}</span>
+              <button data-action="unit-count" data-unit="${u.id}" data-delta="1" ${u.count >= maxCount ? "disabled" : ""} title="More">${icon("plus", 16)}</button>
+            </span>
+            <span class="modal-sub">Unit cost ${credits(cost)}</span>
+          </div>
+          ${faction?.requiresSpecies && !list.freePlay ? `<div class="modal-field">${speciesSelect(u)}</div>` : ""}
+        </div>
+        <div class="modal-field">
+          <span class="control-label">Ship names</span>
+          <div class="ship-names-panel">${shipNameInputs}</div>
+        </div>
+        ${
+          list.fleet.hvp.length
+            ? `<div class="modal-field">
+                <span class="control-label">Carried personnel</span>
+                <div class="carry-list">${carryToggles}</div>
+                <span class="modal-sub">Personnel ride a unit of Mass 1 or higher.</span>
+              </div>`
+            : ""
+        }
+      </div>
+      <footer class="modal-footer">
+        <button class="bar-btn danger" data-action="remove-unit" data-unit="${u.id}">${icon("trash", 16)} Remove unit</button>
+        <button class="cta-btn" data-action="close-modal">Done</button>
+      </footer>
+    </div>
+  </div>`;
+}
+
 function builderView(state: AppState): string {
   const list = activeList(state);
   if (!list)
@@ -471,42 +556,25 @@ function builderView(state: AppState): string {
     : GENERIC_HVP.map((h) => personnelCard(h, "Generic")).join("");
 
   // Roster units.
+  // Compact, clickable unit rows. Deep editing happens in the unit modal, so
+  // the roster stays a legible manifest (uniform connectedness: one row, one
+  // unit) and adding stays a one-click act (paradox of the active user).
   const unitRows = list.fleet.units
     .map((u) => {
       const r = resolveShip(u.shipClassId, faction, customs);
       const shipName = r?.ship.name ?? u.shipClassId;
-      const maxCount = list.freePlay || list.mode === "hypergrowth" ? 99 : r?.ship.mass === 3 ? 1 : 3;
       const cost = r ? r.ship.cost * u.count : 0;
-      const namesOpen = state.ui.openShipNames === u.id;
-      const shipNameInputs = Array.from({ length: u.count })
-        .map(
-          (_, i) => `
-          <input class="ship-name-input" type="text" value="${escapeHtml(u.shipNames?.[i] ?? "")}"
-            placeholder="Name ship ${i + 1}" data-action="ship-name" data-unit="${u.id}" data-index="${i}" />`,
-        )
-        .join("");
+      const carried = list.fleet.hvp.filter((h) => h.assignedUnitId === u.id).length;
       return `
-      <article class="roster-unit ${r ? "" : "unresolved"}">
-        <div class="roster-unit-head">
-          <span class="roster-unit-glyph">${r ? massGlyph(r.ship.mass, 22) : icon("warning", 20)}</span>
-          <input class="unit-name-input" type="text" value="${escapeHtml(u.name ?? "")}" placeholder="${escapeHtml(shipName)} unit" data-action="unit-name" data-unit="${u.id}" />
-          <span class="roster-unit-cost">${credits(cost)}</span>
-        </div>
-        <div class="roster-unit-sub">
-          <span class="roster-unit-class">${escapeHtml(shipName)}${r && list.freePlay ? ` <span class="muted">${escapeHtml(r.owner.name)}</span>` : ""}</span>
-          <span class="stepper">
-            <button data-action="unit-count" data-unit="${u.id}" data-delta="-1" title="One ship fewer">${icon("minus", 14)}</button>
-            <span class="stepper-count">${u.count} ${u.count === 1 ? "ship" : "ships"}</span>
-            <button data-action="unit-count" data-unit="${u.id}" data-delta="1" ${u.count >= maxCount ? "disabled" : ""} title="One ship more">${icon("plus", 14)}</button>
-          </span>
-        </div>
-        <div class="roster-unit-tools">
-          ${faction?.requiresSpecies && !list.freePlay ? speciesSelect(u) : ""}
-          <button class="ghost-btn" data-action="toggle-ship-names" data-unit="${u.id}">${icon("pencil", 14)} ${namesOpen ? "Hide ship names" : "Name the ships"}</button>
-          <button class="ghost-btn danger" data-action="remove-unit" data-unit="${u.id}">${icon("trash", 14)} Remove</button>
-        </div>
-        ${namesOpen ? `<div class="ship-names-panel">${shipNameInputs}</div>` : ""}
-      </article>`;
+      <button class="roster-unit ${r ? "" : "unresolved"}" data-action="open-unit" data-unit="${u.id}">
+        <span class="roster-unit-glyph">${r ? massGlyph(r.ship.mass, 22) : icon("warning", 20)}</span>
+        <span class="ru-main">
+          <span class="ru-name">${escapeHtml(u.name || `${shipName} unit`)}</span>
+          <span class="ru-sub">${escapeHtml(shipName)} <span class="ru-x">×${u.count}</span>${carried ? ` <span class="ru-carry">${icon("personnel", 12)}${carried}</span>` : ""}${r && list.freePlay ? ` <span class="muted">${escapeHtml(r.owner.name)}</span>` : ""}</span>
+        </span>
+        <span class="roster-unit-cost">${credits(cost)}</span>
+        <span class="ru-go">${icon("chevronRight", 16)}</span>
+      </button>`;
     })
     .join("");
 
@@ -664,6 +732,7 @@ function builderView(state: AppState): string {
       </div>
     </aside>
   </main>
+  ${unitModal(state, list, faction, customs)}
   ${toast(state)}
   ${footer()}`;
 }

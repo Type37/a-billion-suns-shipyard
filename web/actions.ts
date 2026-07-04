@@ -324,17 +324,43 @@ function handleClick(e: MouseEvent): void {
       );
       break;
     }
+    case "open-unit": {
+      const unitId = target.dataset["unit"];
+      if (!unitId) return;
+      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "unit", unitId } } }));
+      break;
+    }
+    case "close-modal": {
+      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined } }));
+      break;
+    }
+    case "toggle-carry": {
+      const id = currentListId();
+      const unitId = target.dataset["unit"];
+      const index = Number(target.dataset["index"]);
+      if (!id || !unitId || !Number.isInteger(index)) return;
+      store.setState((s) =>
+        updateFleet(s, id, (f) => ({
+          ...f,
+          hvp: f.hvp.map((h, i) =>
+            i === index ? { ...h, assignedUnitId: h.assignedUnitId === unitId ? undefined : unitId } : h,
+          ),
+        })),
+      );
+      break;
+    }
     case "remove-unit": {
       const id = currentListId();
       const unitId = target.dataset["unit"];
       if (!id || !unitId) return;
-      store.setState((s) =>
-        updateFleet(s, id, (f) => ({
+      store.setState((s) => ({
+        ...updateFleet(s, id, (f) => ({
           ...f,
           units: f.units.filter((u) => u.id !== unitId),
           hvp: f.hvp.map((h) => (h.assignedUnitId === unitId ? { ...h, assignedUnitId: undefined } : h)),
         })),
-      );
+        ui: { ...s.ui, modal: undefined },
+      }));
       break;
     }
     case "unit-count": {

@@ -137,6 +137,8 @@ export interface AppState {
     shipFilter?: ShipFilter;
     /** The Create-army panel is open on the Fleets page. */
     showCreate?: boolean;
+    /** An open modal dialog, e.g. the unit configuration panel. */
+    modal?: { kind: "unit"; unitId: string };
   };
 }
 

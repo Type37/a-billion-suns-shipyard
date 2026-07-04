@@ -225,10 +225,16 @@ function tutorialCallout(state: AppState): string {
   <aside class="onboard">
     <div class="onboard-main">
       <p class="onboard-title">New to A Billion Suns?</p>
-      <p class="onboard-note">Basic Training loads a ready-made fleet and walks you through a game, step by step. Learn by playing.</p>
-      <div class="onboard-actions">
-        <button class="bar-btn" data-action="new-training" data-mode="combat-simulator">${icon("book", 14)} Combat Simulator</button>
-        <button class="bar-btn" data-action="new-training" data-mode="management-training">${icon("book", 14)} Management Training</button>
+      <p class="onboard-note">Basic Training loads a ready-made fleet and walks you through a game, step by step. Start with the Combat Simulator.</p>
+      <div class="onboard-options">
+        <button class="onboard-opt" data-action="new-training" data-mode="combat-simulator">
+          <span class="oo-name">${icon("book", 15)} Combat Simulator</span>
+          <span class="oo-desc">Learn the core game. A quick skirmish with a ready-made fleet: move, shoot, and activate your battlegroups.</span>
+        </button>
+        <button class="onboard-opt" data-action="new-training" data-mode="management-training">
+          <span class="oo-name">${icon("book", 15)} Management Training</span>
+          <span class="oo-desc">Learn the economy. Buy a Shipyard, then requisition and jump ships into play as the game unfolds.</span>
+        </button>
       </div>
     </div>
     <button class="onboard-close" data-action="dismiss-tutorials" aria-label="Dismiss">${icon("close", 16)}</button>

@@ -267,6 +267,12 @@ button { font-family: inherit; }
 .onboard-title { font-family: var(--display); font-weight: 800; font-size: 18px; }
 .onboard-note { font-size: 14px; color: var(--ink-2); margin-top: 4px; max-width: 62ch; }
 .onboard-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.onboard-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+@media (max-width: 620px) { .onboard-options { grid-template-columns: 1fr; } }
+.onboard-opt { text-align: left; cursor: pointer; background: var(--paper); border: 1px solid var(--hair); border-left: 3px solid var(--color-action); padding: 12px 14px; display: flex; flex-direction: column; gap: 5px; transition: background 0.12s ease, border-color 0.12s ease; }
+.onboard-opt:hover { background: var(--blue-wash); border-left-color: var(--color-accent); }
+.oo-name { display: inline-flex; align-items: center; gap: 7px; font-family: var(--display); font-weight: 700; font-size: 14px; color: var(--color-ink); }
+.oo-desc { font-size: 12.5px; line-height: 1.4; color: var(--ink-2); }
 .onboard-close { background: transparent; border: 1px solid var(--hair); color: var(--ink-3); cursor: pointer; display: inline-flex; padding: 7px; flex-shrink: 0; }
 .onboard-close:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
 

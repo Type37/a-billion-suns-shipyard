@@ -249,9 +249,12 @@ function homeView(state: AppState): string {
   ${topbar()}
   <header class="nameplate">
     <div class="nameplate-inner">
-      <p class="np-kicker">A Billion Suns / Second Edition</p>
-      <h1 class="np-title">Shipyard</h1>
-      <p class="np-standfirst">A fleet builder and ship reference for the tabletop game by Mike Hutchinson.</p>
+      <h1 class="wordmark-hero">
+        <span class="wm-edition">Second Edition</span>
+        <span class="wm-lockup"><svg class="wm-delta" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6 L95 94 L5 94 Z" fill="none" stroke="currentColor" stroke-width="9"/><path d="M27 68 H73" stroke="currentColor" stroke-width="9"/></svg><span class="wm-billion">Billion</span><span class="wm-suns">Suns</span></span>
+        <span class="wm-tag">Interstellar Fleet Battles</span>
+        <span class="wm-sub">Fleet builder and ship reference</span>
+      </h1>
     </div>
   </header>
   <main class="index-wrap">

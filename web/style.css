@@ -47,6 +47,9 @@
   --color-feedback-warning: #b4520a;
   --color-feedback-ok: #0b6b3a;
   --color-line: #0a0e14;
+  /* Brand chrome, from the official Second Edition identity. */
+  --color-brand: #1e5f58;
+  --color-brand-deep: #16453f;
 
   --shell: 1340px;
   --tap: 44px;
@@ -176,7 +179,7 @@ button { font-family: inherit; }
   gap: 24px;
   padding: 0 clamp(16px, 4vw, 40px);
   height: 64px;
-  background: var(--blue);
+  background: var(--color-brand);
   color: #fff;
   border-bottom: 3px solid var(--red);
 }
@@ -185,13 +188,13 @@ button { font-family: inherit; }
 .wordmark-text { font-family: var(--display); font-weight: 900; font-size: 18px; letter-spacing: 0.02em; text-transform: uppercase; }
 .wordmark-sub {
   font-family: var(--sans); font-weight: 600; font-size: 10px; letter-spacing: 0.16em;
-  text-transform: uppercase; color: #bcd0f2; padding-left: 12px; margin-left: 2px; border-left: 1px solid #35569f;
+  text-transform: uppercase; color: #bcd0f2; padding-left: 12px; margin-left: 2px; border-left: 1px solid #3f8078;
 }
 .topnav { display: flex; gap: 6px; }
 .topnav a {
   display: inline-flex; align-items: center; gap: 7px; color: #fff;
   font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
-  padding: 9px 14px; border: 1px solid #35569f;
+  padding: 9px 14px; border: 1px solid #3f8078;
 }
 .topnav a:hover { background: #fff; color: var(--blue); text-decoration: none; }
 
@@ -244,13 +247,18 @@ button { font-family: inherit; }
 
 /* ------------------------------------------------------------- hub + fleets */
 
-/* Restrained nameplate: a title band, not an oversized hero, and no vanity
-   metrics. Flush-left, factual standfirst, red keyline. */
-.nameplate { background: var(--blue); color: #fff; border-bottom: 3px solid var(--red); }
-.nameplate-inner { max-width: var(--shell); margin: 0 auto; padding: clamp(26px, 4vw, 44px) clamp(16px, 4vw, 40px) clamp(22px, 3vw, 30px); }
-.np-kicker { font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #bcd0f2; margin-bottom: 8px; }
-.np-title { font-family: var(--display); font-weight: 900; font-size: clamp(40px, 7vw, 72px); line-height: 0.9; letter-spacing: -0.03em; text-transform: uppercase; }
-.np-standfirst { margin-top: 12px; max-width: 56ch; font-size: 15px; color: #d0def4; }
+/* The official Second Edition wordmark, recreated: spaced SECOND EDITION, a
+   delta-A with solid BILLION and outlined SUNS, spaced INTERSTELLAR FLEET
+   BATTLES, on the brand teal. Compact so the index sits near the fold. */
+.nameplate { background: var(--color-brand); color: #fff; border-bottom: 3px solid var(--red); }
+.nameplate-inner { max-width: var(--shell); margin: 0 auto; padding: clamp(22px, 3vw, 36px) clamp(16px, 4vw, 40px) clamp(20px, 3vw, 28px); }
+.wordmark-hero { display: flex; flex-direction: column; }
+.wm-edition { font-family: var(--display); font-weight: 600; font-size: clamp(11px, 2.4vw, 17px); letter-spacing: 0.52em; text-transform: uppercase; color: #a9d6d0; padding-left: 0.52em; margin-bottom: 6px; }
+.wm-lockup { display: flex; align-items: center; font-family: var(--display); font-weight: 900; font-size: clamp(40px, 9.5vw, 104px); line-height: 0.82; text-transform: uppercase; letter-spacing: -0.02em; }
+.wm-delta { width: 0.8em; height: 0.8em; margin-right: 0.06em; color: #fff; flex-shrink: 0; }
+.wm-suns { color: transparent; -webkit-text-stroke: 2.5px #fff; margin-left: 0.06em; }
+.wm-tag { font-family: var(--display); font-weight: 600; font-size: clamp(10px, 2.1vw, 16px); letter-spacing: 0.38em; text-transform: uppercase; color: #d6f1ec; padding-left: 0.38em; margin-top: 8px; }
+.wm-sub { font-family: var(--mono); font-size: 12px; font-weight: 500; color: #8dc0ba; margin-top: 12px; }
 
 /* First-run tutorial nudge: a bordered callout with a red index tick, not a
    floating toast. Retires itself after the second visit. */
@@ -267,11 +275,11 @@ button { font-family: inherit; }
    edge, the number bay inverts, and the whole row advances with a hard shadow.
    Deliberately not flat, not static: the interaction is the point. */
 .index-wrap { max-width: var(--shell); margin: 0 auto; padding: clamp(20px, 3vw, 34px) clamp(16px, 4vw, 40px) 0; }
-.index { border-top: 3px solid var(--ink); display: flex; flex-direction: column; gap: 8px; }
+.index { border-top: 3px solid var(--ink); display: flex; flex-direction: column; gap: 6px; }
 .index-row {
   position: relative; isolation: isolate; overflow: hidden;
-  display: grid; grid-template-columns: 68px 1fr 40px; align-items: center; gap: 18px;
-  padding: 22px 20px; border: 1px solid var(--hair); color: var(--ink);
+  display: grid; grid-template-columns: 60px 1fr 36px; align-items: center; gap: 16px;
+  padding: 15px 18px; border: 1px solid var(--hair); color: var(--ink);
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%);
   transition: transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.16s ease, border-color 0.16s;
 }

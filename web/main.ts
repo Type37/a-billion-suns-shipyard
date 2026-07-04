@@ -13,10 +13,28 @@ if (!rootEl) throw new Error("Missing #app root element.");
 const root: HTMLElement = rootEl;
 
 function paint(): void {
-  // Text fields commit on `change` (blur), not `input`, so typing never triggers
-  // a re-render and there is no focus to preserve mid-keystroke. A plain replace
-  // is enough. Scroll position is kept because we swap innerHTML, not the node.
+  // Most text fields commit on `change` (blur), so typing does not re-render.
+  // The compendium search is the exception: it filters live on `input`, so we
+  // preserve focus and caret for any focused element that carries an id.
+  const active = document.activeElement;
+  const activeId = active instanceof HTMLElement && active.id ? active.id : null;
+  const caret = active instanceof HTMLInputElement ? active.selectionStart : null;
+
   root.innerHTML = render(store.getState());
+
+  if (activeId) {
+    const restored = document.getElementById(activeId);
+    if (restored instanceof HTMLElement) {
+      restored.focus();
+      if (restored instanceof HTMLInputElement && caret !== null) {
+        try {
+          restored.setSelectionRange(caret, caret);
+        } catch {
+          // Some input types do not support selection ranges; ignore.
+        }
+      }
+    }
+  }
 }
 
 // A share link carries the whole list (and any custom faction) in the hash. Import

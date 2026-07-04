@@ -5,6 +5,7 @@ import type { SavedOutfit } from "./storage.ts";
 import {
   createList,
   createOutfit,
+  EMPTY_SHIP_FILTER,
   nextOutfitShipId,
   nextUnitIdFor,
   routeHash,
@@ -13,7 +14,7 @@ import {
   updateList,
   updateOutfit,
 } from "./state.ts";
-import type { LastRoll } from "./state.ts";
+import type { LastRoll, ShipFilter } from "./state.ts";
 import { RANDOM_BEHAVIOUR, GLITCH_BLIP, type RollRow } from "../src/data/junkspace-solo.ts";
 import { shareUrl } from "./share.ts";
 
@@ -448,6 +449,12 @@ function handleClick(e: MouseEvent): void {
       break;
     }
 
+    // ---- Ship compendium --------------------------------------------------
+    case "ship-filter-clear": {
+      store.setState((s) => ({ ...s, ui: { ...s.ui, shipFilter: { ...EMPTY_SHIP_FILTER } } }));
+      break;
+    }
+
     // ---- Foundry ----------------------------------------------------------
     case "new-faction": {
       const faction: Faction = {
@@ -696,6 +703,17 @@ function handleChange(e: Event): void {
       break;
     }
 
+    // ---- Ship compendium --------------------------------------------------
+    case "ship-filter":
+    case "ship-search": {
+      const field = (action === "ship-search" ? "q" : target.dataset["field"]) as keyof ShipFilter;
+      store.setState((s) => {
+        const current = s.ui.shipFilter ?? { ...EMPTY_SHIP_FILTER };
+        return { ...s, ui: { ...s.ui, shipFilter: { ...current, [field]: inputValue } } };
+      });
+      break;
+    }
+
     // ---- Foundry ----------------------------------------------------------
     case "cf-field": {
       const fid = currentFoundryId();
@@ -863,4 +881,10 @@ function handleChange(e: Event): void {
 export function wireActions(root: HTMLElement): void {
   root.addEventListener("click", handleClick);
   root.addEventListener("change", handleChange);
+  // Live-filter the compendium search as the user types. Only this field is
+  // routed on input; it carries an id, so focus and caret survive re-render.
+  root.addEventListener("input", (e) => {
+    const t = e.target as HTMLElement | null;
+    if (t?.dataset?.["action"] === "ship-search") handleChange(e);
+  });
 }

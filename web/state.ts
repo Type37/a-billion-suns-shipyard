@@ -49,6 +49,7 @@ export type Route =
   | { view: "foundry"; factionId?: string }
   | { view: "solo" }
   | { view: "solo-outfit"; outfitId: string }
+  | { view: "ships" }
   | { view: "changelog" };
 
 export function parseRoute(hash: string): Route {
@@ -58,6 +59,7 @@ export function parseRoute(hash: string): Route {
   if (parts[0] === "print" && parts[1]) return { view: "print", listId: parts[1] };
   if (parts[0] === "foundry") return parts[1] ? { view: "foundry", factionId: parts[1] } : { view: "foundry" };
   if (parts[0] === "solo") return parts[1] ? { view: "solo-outfit", outfitId: parts[1] } : { view: "solo" };
+  if (parts[0] === "ships") return { view: "ships" };
   if (parts[0] === "changelog") return { view: "changelog" };
   return { view: "home" };
 }
@@ -76,9 +78,19 @@ export function routeHash(route: Route): string {
       return "#/solo";
     case "solo-outfit":
       return `#/solo/${route.outfitId}`;
+    case "ships":
+      return "#/ships";
     case "changelog":
       return "#/changelog";
   }
+}
+
+export interface ShipFilter {
+  era: string;
+  faction: string;
+  mass: string;
+  q: string;
+  sort: string;
 }
 
 export type SoloTab = "outfit" | "play" | "campaign" | "reference";
@@ -113,8 +125,12 @@ export interface AppState {
     soloTab?: SoloTab;
     /** Result of the most recent solo dice roll, shown in the roller. */
     lastRoll?: LastRoll;
+    /** Filters on the ship compendium. */
+    shipFilter?: ShipFilter;
   };
 }
+
+export const EMPTY_SHIP_FILTER: ShipFilter = { era: "", faction: "", mass: "", q: "", sort: "faction" };
 
 export function initialState(): AppState {
   return {

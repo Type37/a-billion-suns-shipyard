@@ -366,8 +366,12 @@ button { font-family: inherit; }
 .ship-row-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .ship-name { font-family: var(--display); font-weight: 700; font-size: 17px; letter-spacing: -0.01em; }
 .ship-cost { font-family: var(--display); font-weight: 800; font-size: 16px; font-variant-numeric: tabular-nums; color: var(--blue); white-space: nowrap; }
-.ship-stats { margin: 6px 0 10px; font-size: 12px; font-weight: 600; letter-spacing: 0.02em; color: var(--ink-2); display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.ship-stats { margin: 6px 0 10px; }
 .stat-sep { display: inline-block; width: 4px; height: 4px; background: var(--red); }
+.stat-chips { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.stat-chip { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--hair-soft); padding: 3px 8px 3px 6px; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stat-ico { color: var(--blue); }
+.stat-val { color: var(--ink); }
 .ship-weapons { font-size: 12.5px; line-height: 1.45; color: var(--ink); margin-bottom: 2px; }
 .slot-label { display: inline-block; min-width: 68px; font-size: 9px; font-weight: 800; color: var(--ink-3); }
 
@@ -509,6 +513,34 @@ button { font-family: inherit; }
 .empty-state { max-width: 600px; margin: 80px auto; text-align: center; font-size: 16px; }
 .empty-state a { font-weight: 700; }
 
+/* ============================================================ COMPENDIUM */
+
+.compendium { max-width: var(--shell); margin: 0 auto; padding: clamp(24px, 4vw, 44px) clamp(16px, 4vw, 40px) 0; }
+.comp-head { margin-bottom: 20px; }
+.comp-filters {
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 18px;
+  padding: 16px 0; border-top: 2px solid var(--hair); border-bottom: 1px solid var(--hair-soft);
+}
+.comp-filters select, .comp-search { min-width: 130px; }
+.comp-search { min-width: 200px; }
+.comp-count { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); margin: 14px 0 8px; }
+.comp-scroll { border: 1px solid var(--hair); }
+.comp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.comp-table thead th {
+  position: sticky; top: 0; background: var(--ink); color: #fff; text-align: left;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+  padding: 9px 12px; white-space: nowrap;
+}
+.comp-table thead th.comp-stat { text-align: center; }
+.comp-table thead th.comp-stat .stat-ico { color: #fff; }
+.comp-table tbody td { padding: 9px 12px; border-top: 1px solid var(--hair-soft); vertical-align: top; }
+.comp-table tbody tr:hover { background: var(--blue-wash); }
+.comp-name { font-family: var(--display); font-weight: 700; font-size: 14px; white-space: nowrap; }
+.comp-era { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+.comp-num { text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.comp-cost { color: var(--blue); }
+.comp-weap { font-family: var(--serif); font-size: 12.5px; min-width: 170px; }
+
 /* ============================================================ SOLO / JUNKSPACE */
 
 .solo-hero { background: var(--ink); color: #fff; border-bottom: 3px solid var(--red); }
@@ -575,6 +607,54 @@ button { font-family: inherit; }
 .ref-item h4 { font-family: var(--display); font-size: 15px; margin-bottom: 4px; }
 .ref-item p { font-family: var(--serif); font-size: 13px; line-height: 1.5; color: var(--ink-2); }
 .ref-sub { font-family: var(--sans); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin: 16px 0 8px; color: var(--blue); }
+
+/* Grid/flex children must be allowed to shrink below their content's
+   min-content, or nested auto-fill grids force the page wider than the
+   viewport. */
+.home-main > section,
+.workspace > *,
+.solo-grid > *,
+.setup-controls > * { min-width: 0; }
+.faction-plaques { grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr)); }
+
+/* ============================================================ MOBILE */
+
+@media (max-width: 760px) {
+  /* Roster and dock are static on mobile (below), so clipping stray sub-pixel
+     overflow here is safe and does not disturb desktop sticky positioning. */
+  body { overflow-x: hidden; }
+
+  /* Topbar: wordmark on top, nav scrolls horizontally beneath it. */
+  .topbar { height: auto; min-height: 54px; flex-wrap: wrap; padding: 9px clamp(12px, 4vw, 16px); gap: 8px 10px; }
+  .wordmark-sub { display: none; }
+  .topnav { width: 100%; flex-wrap: nowrap; overflow-x: auto; gap: 6px; padding-bottom: 2px; }
+  .topnav a { white-space: nowrap; padding: 8px 10px; font-size: 11px; }
+
+  .hero-inner { padding-top: 40px; padding-bottom: 32px; }
+  .band-readout { width: 100%; }
+  .readout { flex: 1; text-align: left; }
+
+  .setup-controls { gap: 14px; }
+  .control-group-emblem { min-width: 0; width: 100%; }
+
+  .solo-tabs { overflow-x: auto; flex-wrap: nowrap; }
+  .solo-tab { white-space: nowrap; flex: 0 0 auto; }
+
+  .comp-filters { gap: 10px 12px; }
+  .comp-filters .control-group { flex: 1 1 45%; }
+  .comp-filters select, .comp-search { min-width: 0; width: 100%; }
+
+  .roster { position: static; }
+  .fleet-dock { position: static; }
+
+  .foundry-main, .changelog-main, .compendium, .solo-body { padding-left: 14px; padding-right: 14px; }
+}
+
+@media (max-width: 420px) {
+  .hero-title { font-size: 48px; }
+  .segment button { padding: 10px 14px; }
+  .comp-filters .control-group { flex: 1 1 100%; }
+}
 
 /* ============================================================ PRINT MEDIA */
 

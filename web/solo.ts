@@ -25,7 +25,7 @@ import {
   PERKS_BY_CLASS,
 } from "../src/data/junkspace-solo.ts";
 import { auxSlotText, escapeHtml, formatDate, primarySlotText } from "./format.ts";
-import { emblem, emblemMark, icon, massGlyph } from "./icons.ts";
+import { emblem, emblemMark, icon, massGlyph, statChips } from "./icons.ts";
 import type { AppState, SoloTab } from "./state.ts";
 import { activeOutfit } from "./state.ts";
 import type { SavedOutfit } from "./storage.ts";
@@ -116,7 +116,7 @@ function soloShipCatalog(): string {
           <h4 class="ship-name">${escapeHtml(s.name)}</h4>
           <span class="ship-cost">${ck(s.cost)}</span>
         </div>
-        <p class="ship-stats">Mass ${s.mass} <span class="stat-sep"></span> Thrust ${s.thrust}" <span class="stat-sep"></span> Silhouette ${s.silhouette} <span class="stat-sep"></span> Shields ${s.shields}</p>
+        <p class="ship-stats">${statChips(s)}</p>
         <p class="ship-weapons"><span class="slot-label">Primary</span> ${primarySlotText(s)}</p>
         <p class="ship-weapons"><span class="slot-label">Auxiliary</span> ${s.auxiliaryFitting ? escapeHtml(s.auxiliaryFitting) : auxSlotText(s)}</p>
       </div>

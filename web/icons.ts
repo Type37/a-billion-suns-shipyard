@@ -25,6 +25,13 @@ const PATHS: Record<string, string> = {
   upload: '<path d="M12 15 V4"/><polyline points="7 8.5 12 3.5 17 8.5"/><path d="M4 15 V20 H20 V15"/>',
   download: '<path d="M12 4 V15"/><polyline points="7 10.5 12 15.5 17 10.5"/><path d="M4 15 V20 H20 V15"/>',
   personnel: '<circle cx="12" cy="8" r="4"/><path d="M4 21 C4 16.5 7.5 14 12 14 C16.5 14 20 16.5 20 21"/>',
+  filter: '<path d="M3 5 H21 L14 13 V20 L10 18 V13 Z"/>',
+  compare: '<line x1="6" y1="4" x2="6" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/><rect x="3" y="9" width="6" height="7"/><rect x="15" y="7" width="6" height="9"/>',
+  // ship-stat glyphs, drawn on the 24 grid to sit inline with numbers
+  "stat-mass": '<path fill="currentColor" stroke="none" d="M12 2 21 7 21 17 12 22 3 17 3 7 Z"/>',
+  "stat-thrust": '<path d="M3 7 10 12 3 17 Z" fill="currentColor" stroke="none"/><path d="M12 7 19 12 12 17 Z" fill="currentColor" stroke="none"/>',
+  "stat-silhouette": '<circle cx="12" cy="12" r="7"/><line x1="12" y1="1.5" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22.5" y2="12"/>',
+  "stat-shields": '<path d="M12 3 20 6 V11 C20 16 16.5 19.5 12 21 C7.5 19.5 4 16 4 11 V6 Z"/>',
   // ship silhouettes by Mass class: filled geometric hulls, not stroked
   mass0: '<path fill="currentColor" stroke="none" d="M12 4 20 20 12 16 4 20 Z"/>',
   mass1: '<path fill="currentColor" stroke="none" d="M12 3 15 9 15 17 18 21 6 21 9 17 9 9 Z"/>',
@@ -57,6 +64,13 @@ export function emblem(name: string, size = 28, cls = ""): string {
 
 export function massGlyph(mass: number, size = 20): string {
   return icon(`mass${Math.max(0, Math.min(3, mass))}`, size, "mass-glyph");
+}
+
+/** Four labelled stat chips (Mass, Thrust, Silhouette, Shields) for a ship. */
+export function statChips(s: { mass: number; thrust: number; silhouette: number; shields: number }): string {
+  const chip = (name: string, val: string, label: string) =>
+    `<span class="stat-chip" title="${label}">${icon(name, 14, "stat-ico")}<span class="stat-val">${val}</span></span>`;
+  return `<span class="stat-chips">${chip("stat-mass", String(s.mass), "Mass")}${chip("stat-thrust", `${s.thrust}"`, "Thrust")}${chip("stat-silhouette", String(s.silhouette), "Silhouette")}${chip("stat-shields", String(s.shields), "Shields")}</span>`;
 }
 
 /** Render an uploaded image if present, otherwise fall back to a built-in emblem glyph. */

@@ -2,9 +2,10 @@ import type { Era, Faction, FleetUnit, GameMode, Hvp, ShipClass } from "../src/t
 import { ALLIANCE_SPECIES } from "../src/types.ts";
 import { validateFleet, type ValidationIssue } from "../src/validation.ts";
 import { GENERIC_HVP } from "../src/data/index.ts";
+import { JUNKSPACE_SHIPS } from "../src/data/junkspace.ts";
 import { allFactions, factionsByEra, findFaction, makeCatalog, ERA_ORDER } from "./catalog.ts";
 import { auxSlotText, credits, escapeHtml, formatDate, primarySlotText } from "./format.ts";
-import { emblem, emblemMark, EMBLEM_IDS, icon, massGlyph } from "./icons.ts";
+import { emblem, emblemMark, EMBLEM_IDS, icon, massGlyph, statChips } from "./icons.ts";
 import { CHANGELOG } from "./changelog.ts";
 import type { AppState } from "./state.ts";
 import { activeList } from "./state.ts";
@@ -72,6 +73,7 @@ function topbar(): string {
   <header class="topbar">
     <a class="wordmark" href="#/">${icon("logo", 26)}<span class="wordmark-text">A Billion Suns</span><span class="wordmark-sub">Shipyard</span></a>
     <nav class="topnav">
+      <a href="#/ships">${icon("compare", 16)} Compendium</a>
       <a href="#/solo">${icon("flag", 16)} Solo / Junkspace</a>
       <a href="#/foundry">${icon("wrench", 16)} Faction Foundry</a>
       <a href="#/changelog">${icon("scroll", 16)} Changelog</a>
@@ -164,6 +166,11 @@ function homeView(state: AppState): string {
         <p class="panel-note">Junkspace: a full solo game in the ruins of Jura. Build an outfit, run the roller for the automated enemy, and clear your debt across a campaign.</p>
         <a class="cta-btn" href="#/solo">${icon("flag", 18)} Enter Junkspace</a>
       </section>
+      <section class="era-block freeplay-block">
+        <h3 class="era-title">Reference</h3>
+        <p class="panel-note">The Ship Compendium: every ship in the game in one table. Filter by era, faction, or mass and sort by any stat to compare.</p>
+        <a class="cta-btn" href="#/ships">${icon("compare", 18)} Open the compendium</a>
+      </section>
     </section>
 
     <section class="fleet-dock">
@@ -213,7 +220,7 @@ function catalogShipRow(ship: ShipClass, ownerFaction: Faction, composite: boole
         <h4 class="ship-name">${escapeHtml(ship.name)}</h4>
         <span class="ship-cost">${credits(ship.cost)}</span>
       </div>
-      <p class="ship-stats">Mass ${ship.mass} <span class="stat-sep"></span> Thrust ${ship.thrust}" <span class="stat-sep"></span> Silhouette ${ship.silhouette} <span class="stat-sep"></span> Shields ${ship.shields}</p>
+      <p class="ship-stats">${statChips(ship)}</p>
       <p class="ship-weapons"><span class="slot-label">Primary</span> ${primarySlotText(ship)}</p>
       <p class="ship-weapons"><span class="slot-label">Auxiliary</span> ${auxSlotText(ship)}</p>
     </div>
@@ -801,6 +808,177 @@ function changelogView(): string {
 }
 
 // ---------------------------------------------------------------------------
+// Ship compendium (reference tool)
+// ---------------------------------------------------------------------------
+
+interface CompRow {
+  name: string;
+  factionName: string;
+  factionKey: string;
+  era: string;
+  mass: number;
+  thrust: number;
+  silhouette: number;
+  shields: number;
+  primary: string;
+  auxiliary: string;
+  cost: number;
+  costLabel: string;
+}
+
+function shipsView(state: AppState): string {
+  const customs = state.customFactions;
+  const f = state.ui.shipFilter ?? { era: "", faction: "", mass: "", q: "", sort: "faction" };
+
+  const rows: CompRow[] = [];
+  for (const fac of allFactions(customs)) {
+    for (const s of fac.ships) {
+      rows.push({
+        name: s.name,
+        factionName: fac.name,
+        factionKey: fac.id,
+        era: fac.era,
+        mass: s.mass,
+        thrust: s.thrust,
+        silhouette: s.silhouette,
+        shields: s.shields,
+        primary: primarySlotText(s),
+        auxiliary: s.auxiliaryFitting ? escapeHtml(s.auxiliaryFitting) : auxSlotText(s),
+        cost: s.cost,
+        costLabel: credits(s.cost),
+      });
+    }
+  }
+  for (const s of JUNKSPACE_SHIPS) {
+    rows.push({
+      name: s.name,
+      factionName: "Junkspace (solo)",
+      factionKey: "__junkspace__",
+      era: "Junkspace",
+      mass: s.mass,
+      thrust: s.thrust,
+      silhouette: s.silhouette,
+      shields: s.shields,
+      primary: primarySlotText(s),
+      auxiliary: s.auxiliaryFitting ? escapeHtml(s.auxiliaryFitting) : auxSlotText(s),
+      cost: s.cost,
+      costLabel: `&cent;${s.cost}k`,
+    });
+  }
+
+  const q = f.q.trim().toLowerCase();
+  let shown = rows.filter(
+    (r) =>
+      (!f.era || r.era === f.era) &&
+      (!f.faction || r.factionKey === f.faction) &&
+      (!f.mass || String(r.mass) === f.mass) &&
+      (!q || r.name.toLowerCase().includes(q) || r.factionName.toLowerCase().includes(q)),
+  );
+  const eraRank = (e: string) => ["Hypergrowth", "Age of Unity", "Armageddon", "Junkspace"].indexOf(e);
+  shown = shown.sort((a, b) => {
+    switch (f.sort) {
+      case "cost":
+        return b.cost - a.cost || a.name.localeCompare(b.name);
+      case "mass":
+        return a.mass - b.mass || a.name.localeCompare(b.name);
+      case "silhouette":
+        return b.silhouette - a.silhouette || a.name.localeCompare(b.name);
+      case "thrust":
+        return b.thrust - a.thrust || a.name.localeCompare(b.name);
+      case "shields":
+        return b.shields - a.shields || a.name.localeCompare(b.name);
+      case "name":
+        return a.name.localeCompare(b.name);
+      default:
+        return eraRank(a.era) - eraRank(b.era) || a.factionName.localeCompare(b.factionName) || a.mass - b.mass;
+    }
+  });
+
+  const facOptions = [
+    ...allFactions(customs).map((x) => `<option value="${x.id}" ${f.faction === x.id ? "selected" : ""}>${escapeHtml(x.name)}</option>`),
+    `<option value="__junkspace__" ${f.faction === "__junkspace__" ? "selected" : ""}>Junkspace (solo)</option>`,
+  ].join("");
+  const eraOptions = ["Hypergrowth", "Age of Unity", "Armageddon", "Junkspace"]
+    .map((e) => `<option value="${e}" ${f.era === e ? "selected" : ""}>${e}</option>`)
+    .join("");
+  const massOptions = [0, 1, 2, 3]
+    .map((m) => `<option value="${m}" ${f.mass === String(m) ? "selected" : ""}>Mass ${m}</option>`)
+    .join("");
+  const sortOptions = [
+    ["faction", "Era and faction"],
+    ["name", "Name"],
+    ["cost", "Cost (high to low)"],
+    ["mass", "Mass (low to high)"],
+    ["silhouette", "Silhouette (high to low)"],
+    ["thrust", "Thrust (high to low)"],
+    ["shields", "Shields (high to low)"],
+  ]
+    .map(([v, l]) => `<option value="${v}" ${f.sort === v ? "selected" : ""}>${l}</option>`)
+    .join("");
+
+  const statH = (name: string, label: string) => `<th class="comp-stat" title="${label}">${icon(name, 15, "stat-ico")}</th>`;
+  const body = shown
+    .map(
+      (r) => `
+      <tr>
+        <td class="comp-name">${escapeHtml(r.name)}</td>
+        <td>${escapeHtml(r.factionName)}</td>
+        <td class="comp-era">${escapeHtml(r.era)}</td>
+        <td class="comp-num">${r.mass}</td>
+        <td class="comp-num">${r.thrust}"</td>
+        <td class="comp-num">${r.silhouette}</td>
+        <td class="comp-num">${r.shields}</td>
+        <td class="comp-weap">${r.primary || '<span class="muted">None</span>'}</td>
+        <td class="comp-weap">${r.auxiliary || '<span class="muted">None</span>'}</td>
+        <td class="comp-num comp-cost">${r.costLabel}</td>
+      </tr>`,
+    )
+    .join("");
+
+  return `
+  ${topbar()}
+  <main class="compendium">
+    <header class="comp-head">
+      <div>
+        <p class="hero-eyebrow">Reference</p>
+        <h1 class="page-title">Ship Compendium</h1>
+        <p class="panel-note">Every ship in the game, side by side. Filter by era, faction, or mass, search by name, and sort by any stat to compare.</p>
+      </div>
+    </header>
+
+    <div class="comp-filters">
+      <label class="control-group"><span class="control-label">Search</span>
+        <input id="ship-search" class="limit-input comp-search" type="text" value="${escapeHtml(f.q)}" placeholder="Ship or faction" data-action="ship-search" /></label>
+      <label class="control-group"><span class="control-label">Era</span>
+        <select data-action="ship-filter" data-field="era"><option value="">All eras</option>${eraOptions}</select></label>
+      <label class="control-group"><span class="control-label">Faction</span>
+        <select data-action="ship-filter" data-field="faction"><option value="">All factions</option>${facOptions}</select></label>
+      <label class="control-group"><span class="control-label">Mass</span>
+        <select data-action="ship-filter" data-field="mass"><option value="">All masses</option>${massOptions}</select></label>
+      <label class="control-group"><span class="control-label">Sort</span>
+        <select data-action="ship-filter" data-field="sort">${sortOptions}</select></label>
+      ${f.era || f.faction || f.mass || f.q ? '<button class="ghost-btn" data-action="ship-filter-clear">Clear filters</button>' : ""}
+    </div>
+
+    <p class="comp-count">${shown.length} of ${rows.length} ships</p>
+    <div class="table-scroll comp-scroll">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>Ship</th><th>Faction</th><th>Era</th>
+            ${statH("stat-mass", "Mass")}${statH("stat-thrust", "Thrust")}${statH("stat-silhouette", "Silhouette")}${statH("stat-shields", "Shields")}
+            <th>Primary</th><th>Auxiliary</th><th>Cost</th>
+          </tr>
+        </thead>
+        <tbody>${body || '<tr><td colspan="10" class="muted" style="padding:20px">No ships match these filters.</td></tr>'}</tbody>
+      </table>
+    </div>
+  </main>
+  ${toast(state)}
+  ${footer()}`;
+}
+
+// ---------------------------------------------------------------------------
 // Root
 // ---------------------------------------------------------------------------
 
@@ -818,6 +996,8 @@ export function render(state: AppState): string {
       return `${topbar()}${soloListView(state)}${toast(state)}${footer()}`;
     case "solo-outfit":
       return `${topbar()}${soloOutfitView(state)}${toast(state)}${footer()}`;
+    case "ships":
+      return shipsView(state);
     case "changelog":
       return changelogView();
   }

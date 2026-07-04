@@ -5,7 +5,9 @@ import type { SavedOutfit } from "./storage.ts";
 import {
   createList,
   createOutfit,
+  createTrainingList,
   EMPTY_SHIP_FILTER,
+  freshPlayState,
   nextOutfitShipId,
   nextUnitIdFor,
   routeHash,
@@ -97,7 +99,7 @@ function showToast(message: string): void {
 
 function currentListId(): string | null {
   const r = store.getState().route;
-  return r.view === "builder" || r.view === "print" ? r.listId : null;
+  return r.view === "builder" || r.view === "print" || r.view === "play" ? r.listId : null;
 }
 
 function editFaction(factionId: string, fn: (f: Faction) => Faction): void {
@@ -452,6 +454,94 @@ function handleClick(e: MouseEvent): void {
     // ---- Ship compendium --------------------------------------------------
     case "ship-filter-clear": {
       store.setState((s) => ({ ...s, ui: { ...s.ui, shipFilter: { ...EMPTY_SHIP_FILTER } } }));
+      break;
+    }
+
+    // ---- Basic Training ---------------------------------------------------
+    case "new-training": {
+      const mode = target.dataset["mode"] as "combat-simulator" | "management-training";
+      const list = createTrainingList(mode);
+      store.setState((s) => {
+        const lists = [...s.lists, list];
+        persistLists(lists);
+        return { ...s, lists };
+      });
+      location.hash = routeHash({ view: "builder", listId: list.id });
+      break;
+    }
+
+    // ---- Play mode ----------------------------------------------------------
+    case "play-phase":
+    case "play-next":
+    case "play-round":
+    case "play-cmd":
+    case "play-vp":
+    case "play-oppvp":
+    case "play-reset": {
+      const id = currentListId();
+      if (!id) return;
+      const delta = Number(target.dataset["delta"] ?? 0);
+      const phaseTo = Number(target.dataset["phase"] ?? -1);
+      store.setState((s) =>
+        updateList(s, id, (l) => {
+          const faction = findFaction(l.fleet.factionId, s.customFactions);
+          const p = l.play ?? freshPlayState(faction);
+          const maxRound = l.mode === "management-training" ? 3 : 4;
+          switch (action) {
+            case "play-phase":
+              return { ...l, play: { ...p, phase: Math.max(0, Math.min(3, phaseTo)) } };
+            case "play-next": {
+              // Advancing past the End Phase rolls into the next round and
+              // refreshes the CMD counter from the faction value.
+              if (p.phase >= 3) {
+                const cmd = faction ? Number(faction.cmdTokens) || p.cmd : p.cmd;
+                return { ...l, play: { ...p, phase: 0, round: Math.min(maxRound, p.round + 1), cmd } };
+              }
+              return { ...l, play: { ...p, phase: p.phase + 1 } };
+            }
+            case "play-round":
+              return { ...l, play: { ...p, round: Math.max(1, Math.min(maxRound, p.round + delta)) } };
+            case "play-cmd":
+              return { ...l, play: { ...p, cmd: Math.max(0, p.cmd + delta) } };
+            case "play-vp":
+              return { ...l, play: { ...p, vp: Math.max(0, p.vp + delta) } };
+            case "play-oppvp":
+              return { ...l, play: { ...p, oppVp: Math.max(0, p.oppVp + delta) } };
+            case "play-reset":
+              return confirm("Reset the round, phase, CMD, and scores for this game?")
+                ? { ...l, play: freshPlayState(faction) }
+                : l;
+            default:
+              return l;
+          }
+        }),
+      );
+      break;
+    }
+    case "play-initiative": {
+      const spec = target.dataset["dice"] ?? "3D6";
+      const m = /(\d+)\s*D6/i.exec(spec);
+      const n = m ? Math.max(1, Number(m[1])) : 3;
+      const rolls: number[] = [];
+      let successes = 0;
+      for (let i = 0; i < n; i++) {
+        const v = d(6);
+        rolls.push(v);
+        if (v === 1) successes += 2;
+        else if (v === 2 || v === 3) successes += 1;
+      }
+      store.setState((s) => ({
+        ...s,
+        ui: {
+          ...s.ui,
+          lastRoll: {
+            table: `Initiative check (${n}D6)`,
+            value: successes,
+            result: `${successes} ${successes === 1 ? "success" : "successes"}`,
+            detail: `Rolled ${rolls.join(", ")}. A 2 or 3 is one success; a 1 is two successes.`,
+          },
+        },
+      }));
       break;
     }
 

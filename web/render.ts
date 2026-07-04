@@ -31,6 +31,101 @@ const MODE_ERA: Partial<Record<GameMode, Era>> = {
 };
 
 // ---------------------------------------------------------------------------
+// Basic Training guided tutorials (rules p.62-68), shown above the builder
+// for the two training modes and inside Play Mode.
+// ---------------------------------------------------------------------------
+
+interface GuideStep {
+  title: string;
+  text: string;
+}
+
+const TRAINING_GUIDES: Partial<Record<GameMode, { intro: string; steps: GuideStep[] }>> = {
+  "combat-simulator": {
+    intro:
+      "Your first game of A Billion Suns. It plays like Armageddon and teaches the basics of activating your fleet: moving and attacking. Your Training Fleet is already loaded on the right; every entry is a single unit.",
+    steps: [
+      {
+        title: "Set up the table",
+        text: 'Clear a play area roughly 4 feet by 3 feet. Pick or roll a D6 for a Central Objective and place it in the middle of the board: 1-2 a ComSat, 3-4 a Facility, 5-6 a Planetoid. Each player deploys 3 Jump Points: the flank points 24" apart and 15" in from each short edge, the central point 5" from your own edge.',
+      },
+      {
+        title: "Place your High-Value Personnel",
+        text: "Gather three HVP tokens that are distinguishable as yours and place them on friendly ships of Mass 1 or higher. All three of your HVP are Seasoned Captains: units in their battlegroup can use the Red Alert command for 0 CMD, once per Round.",
+      },
+      {
+        title: "Load your squadrons",
+        text: "When you deploy your Heavy Cruiser or Frigate, you can load units of Fighters and Bombers into them, or deploy those units directly. A unit can carry Squadrons up to twice its Combined Mass: the Heavy Cruiser carries up to six wings, the Frigate four, and a unit of three Corvettes up to six.",
+      },
+      {
+        title: "Play four rounds",
+        text: "Your Initiative Value is 3D6. Rapid Ingress applies: all units Jump In during the Round 1 Jump Phase. Each round runs Command, Jump, Tactical, End.",
+      },
+      {
+        title: "Score in each End Phase",
+        text: "Gain 2VP for each enemy flank Jump Point you are blockading, 5VP if you are blockading the enemy's central Jump Point, and 3VP if you are blockading the central objective. Blockading means having the greatest Combined Mass of friendly ships within 6\" of it.",
+      },
+      {
+        title: "Game end",
+        text: "At the end of the game, gain 2VP for each enemy HVP token you are carrying. The game ends at the end of Round 4 and the player with the most VP is the winner.",
+      },
+    ],
+  },
+  "management-training": {
+    intro:
+      "Your second game, once you have played the Combat Simulator. It plays like Hypergrowth and teaches resource management: requisitioning and jumping in ships as and where you need them, across two Sectors. Your Training Fleet starts in your Shipyard, not in play.",
+    steps: [
+      {
+        title: "Set up two Sectors",
+        text: "Divide your play area into two roughly equal sections, or use two different surfaces, to represent two separate Sectors of space. You cannot fly ships between them; you have to Jump Hop.",
+      },
+      {
+        title: "Deploy ComSats and gather Jump Points",
+        text: "Deploy 3 ComSats: the first anywhere on the first Sector and the other two anywhere on the other Sector. Each player starts with 3 Jump Points in their supply. Then begin Round 1.",
+      },
+      {
+        title: "Requisition units from your Shipyard",
+        text: "You start with no units in play, nothing in Reserve, and 0 credits. In the Jump Phase, spend 1 CMD to use the Requisition command: form a new unit from any ships in your Shipyard, of any size you like, pay their cost in credits (going into debt at first), and jump them into play. Your Heavy Cruiser can carry two units of Mass 0 ships when requisitioned; the Frigate one.",
+      },
+      {
+        title: "Reinforcements",
+        text: "When a ship is destroyed it returns to your Shipyard and can be requisitioned again as a reinforcement. If you are prepared to keep paying, you can keep deploying: just watch your balance sheet.",
+      },
+      {
+        title: "Earn credits in each End Phase",
+        text: "Secure Sectors: gain ¢20bn for each Sector you control (most ships there; ties go to the greatest Combined Mass). Infowar: gain ¢20bn for each ComSat you are Blockading. There is a maximum of ¢100bn available to earn each round.",
+      },
+      {
+        title: "Game end",
+        text: "Your Initiative Value is 3D6. At the end of the third game round, the game ends and the player with the most credits is the winner.",
+      },
+    ],
+  },
+};
+
+function trainingGuide(mode: GameMode): string {
+  const g = TRAINING_GUIDES[mode];
+  if (!g) return "";
+  const steps = g.steps
+    .map(
+      (s, i) => `
+      <details class="guide-step" ${i === 0 ? "open" : ""}>
+        <summary><span class="guide-step-n">${i + 1}</span>${escapeHtml(s.title)}</summary>
+        <p>${escapeHtml(s.text)}</p>
+      </details>`,
+    )
+    .join("");
+  return `
+  <section class="guide-band">
+    <div class="guide-inner">
+      <h3 class="guide-title">${icon("book", 16)} Guided tutorial</h3>
+      <p class="guide-intro">${escapeHtml(g.intro)}</p>
+      ${steps}
+    </div>
+  </section>`;
+}
+
+// ---------------------------------------------------------------------------
 // Composite ship class ids: Free Play units may borrow from any faction, so
 // their shipClassId is stored as "factionId/shipId".
 // ---------------------------------------------------------------------------
@@ -167,6 +262,14 @@ function homeView(state: AppState): string {
         <a class="cta-btn" href="#/solo">${icon("flag", 18)} Enter Junkspace</a>
       </section>
       <section class="era-block freeplay-block">
+        <h3 class="era-title">Basic Training</h3>
+        <p class="panel-note">Two guided tutorial scenarios with the pre-set Training Fleet loaded for you. Play the Combat Simulator first to learn moving and shooting, then Management Training to learn requisition and jumping between Sectors.</p>
+        <div class="training-row">
+          <button class="cta-btn" data-action="new-training" data-mode="combat-simulator">${icon("book", 18)} Combat Simulator</button>
+          <button class="cta-btn" data-action="new-training" data-mode="management-training">${icon("book", 18)} Management Training</button>
+        </div>
+      </section>
+      <section class="era-block freeplay-block">
         <h3 class="era-title">Reference</h3>
         <p class="panel-note">The Ship Compendium: every ship in the game in one table. Filter by era, faction, or mass and sort by any stat to compare.</p>
         <a class="cta-btn" href="#/ships">${icon("compare", 18)} Open the compendium</a>
@@ -245,8 +348,17 @@ function builderView(state: AppState): string {
   let valid = true;
   if (!list.freePlay && faction) {
     const result = validateFleet(list.fleet, makeCatalog(customs));
-    issues =
-      list.mode === "hypergrowth" ? result.issues.filter((i) => i.code !== "UNIT_SIZE_EXCEEDED") : result.issues;
+    // Mode-specific relaxations: shipyard modes buy loose ships (no unit-size
+    // limit at build time) and Management Training selects no HVP (p.65).
+    // The Combat Simulator's three HVP are all Seasoned Captains (p.63), so
+    // the duplicate check does not apply there.
+    const drop = new Set<string>();
+    if (list.mode === "hypergrowth" || list.mode === "management-training") {
+      drop.add("UNIT_SIZE_EXCEEDED");
+    }
+    if (list.mode === "management-training") drop.add("HVP_COUNT");
+    if (list.mode === "combat-simulator") drop.add("HVP_DUPLICATE");
+    issues = result.issues.filter((i) => !drop.has(i.code));
     valid = !issues.some((i) => i.severity === "error");
   }
 
@@ -431,6 +543,7 @@ function builderView(state: AppState): string {
       </div>
     </div>
   </section>
+  ${trainingGuide(list.mode)}
 
   <main class="workspace">
     <section class="catalog">
@@ -480,6 +593,7 @@ function builderView(state: AppState): string {
 
         <div class="roster-actions">
           <a class="cta-btn" href="#/print/${list.id}">${icon("print", 17)} Print roster</a>
+          <a class="bar-btn" href="#/play/${list.id}">${icon("flag", 16)} Play mode</a>
           <button class="bar-btn" data-action="share-list" data-id="${list.id}">${icon("link", 16)} Copy share link</button>
           <button class="bar-btn" data-action="duplicate-list" data-id="${list.id}">${icon("duplicate", 16)} Duplicate</button>
           <button class="bar-btn danger" data-action="delete-list" data-id="${list.id}">${icon("trash", 16)} Delete</button>
@@ -808,6 +922,128 @@ function changelogView(): string {
 }
 
 // ---------------------------------------------------------------------------
+// Play mode: a table companion for the fleet game
+// ---------------------------------------------------------------------------
+
+const PHASES: { name: string; text: string }[] = [
+  { name: "Command Phase", text: "Gain your faction's CMD tokens, then all players make an Initiative Check. A 2 or 3 is one success; a 1 is two successes. The winner chooses who has Initiative this round; the players who did not win gain 1 extra CMD token each." },
+  { name: "Jump Phase", text: "Taking turns clockwise from the player with Initiative: open a Jump Point, Jump In a unit from Reserve, or pass. The phase ends once all players have passed." },
+  { name: "Tactical Phase", text: "Taking turns clockwise from the player with Initiative, Drag to Select a battlegroup (lead unit plus unactivated friendly units at least partly within 6\", Combined Mass 10 or less) and activate its units. Ends when every in-play unit has activated." },
+  { name: "End Phase", text: "Check the scoring conditions on your missions, clear all Activated tokens, resolve any other End Phase effects, discard unused CMD tokens, and begin a new round." },
+];
+
+/** End Phase scoring reminders by mode, from the relevant rules pages. */
+const SCORING_NOTES: Partial<Record<GameMode, string[]>> = {
+  "combat-simulator": [
+    "Each End Phase: 2VP per enemy flank Jump Point you are blockading; 5VP for the enemy's central Jump Point; 3VP for the central objective.",
+    "Game end (end of Round 4): 2VP per enemy HVP token you are carrying.",
+  ],
+  armageddon: [
+    "Each End Phase (core mission): 2VP per enemy flank Jump Point you are blockading; 5VP for the enemy's central Jump Point; 3VP for the central objective.",
+    "Game end (end of Round 4): 2VP per enemy HVP token you are carrying. Check your chosen mission for exact scoring.",
+  ],
+  "management-training": [
+    "Each End Phase: ¢20bn per Sector you control (most ships there; ties by Combined Mass) and ¢20bn per ComSat you are Blockading.",
+    "The game ends after Round 3; most credits wins.",
+  ],
+  hypergrowth: [
+    "Each End Phase: collect the Revenue your two rolled missions award for their objectives.",
+    "Game end (end of Round 4): highest Credits wins; ties go to the player carrying the most HVP tokens.",
+  ],
+  "age-of-unity": [
+    "Each End Phase: score the VP listed on the two rolled missions (Attacker and Defender briefings differ).",
+    "Game end (end of Round 4): most VP wins; check each mission's end-of-game scoring.",
+  ],
+};
+
+function playView(state: AppState): string {
+  const list = activeList(state);
+  if (!list)
+    return `${topbar()}<main class="empty-state"><p>That fleet was not found.</p><p><a href="#/">Back to the register</a></p></main>`;
+  const customs = state.customFactions;
+  const faction = findFaction(list.fleet.factionId, customs);
+  const play = list.play ?? { round: 1, phase: 0, cmd: faction ? Number(faction.cmdTokens) || 0 : 0, vp: 0, oppVp: 0 };
+  const maxRound = list.mode === "management-training" ? 3 : 4;
+  const isCredits = list.mode === "hypergrowth" || list.mode === "management-training";
+  const scoreLabel = isCredits ? "Credits" : "Victory points";
+  const last = state.ui.lastRoll;
+
+  const phaseBtns = PHASES.map(
+    (p, i) => `
+    <button class="phase-step ${play.phase === i ? "selected" : ""}" data-action="play-phase" data-phase="${i}">
+      <span class="phase-n">${i + 1}</span>${p.name.replace(" Phase", "")}
+    </button>`,
+  ).join("");
+
+  const counter = (label: string, value: number, action: string, step = 1) => `
+    <div class="play-counter">
+      <span class="control-label">${label}</span>
+      <div class="round-control">
+        <button class="stepper-btn" data-action="${action}" data-delta="${-step}">${icon("minus", 16)}</button>
+        <span class="round-value">${value}</span>
+        <button class="stepper-btn" data-action="${action}" data-delta="${step}">${icon("plus", 16)}</button>
+      </div>
+    </div>`;
+
+  const notes = (SCORING_NOTES[list.mode] ?? []).map((n) => `<li>${escapeHtml(n)}</li>`).join("");
+
+  return `
+  ${topbar()}
+  <section class="setup-band">
+    <div class="setup-head">
+      <div class="setup-identity">
+        <p class="band-eyebrow"><a href="#/list/${list.id}">${escapeHtml(list.fleet.name || "Unnamed fleet")}</a> / Play mode</p>
+        <h1 class="page-title" style="margin:0">Round ${play.round} of ${maxRound}</h1>
+      </div>
+      <div class="band-readout">
+        <div class="readout"><span class="readout-label">${scoreLabel}</span><span class="readout-value">${play.vp}</span></div>
+        <div class="readout"><span class="readout-label">Opponent</span><span class="readout-value">${play.oppVp}</span></div>
+        <div class="readout"><span class="readout-label">CMD</span><span class="readout-value">${play.cmd}</span></div>
+      </div>
+    </div>
+  </section>
+  <main class="solo-body">
+    <div class="phase-track">${phaseBtns}</div>
+    <p class="phase-text">${escapeHtml(PHASES[play.phase]?.text ?? "")}</p>
+
+    <div class="solo-grid" style="margin-top:20px">
+      <section class="solo-card">
+        <h3 class="roster-section">Counters</h3>
+        <div class="play-counters">
+          ${counter("Round", play.round, "play-round")}
+          ${counter("CMD tokens", play.cmd, "play-cmd")}
+          ${counter(scoreLabel, play.vp, "play-vp")}
+          ${counter("Opponent " + scoreLabel.toLowerCase(), play.oppVp, "play-oppvp")}
+        </div>
+        <div class="roster-actions" style="padding:14px 0 0">
+          <button class="bar-btn" data-action="play-next">${icon("chevronRight", 16)} Next phase</button>
+          <button class="ghost-btn danger" data-action="play-reset">Reset the game</button>
+        </div>
+      </section>
+
+      <section class="solo-card">
+        <h3 class="roster-section">Initiative check</h3>
+        <p class="panel-note">${faction ? `${escapeHtml(faction.name)} rolls ${escapeHtml(faction.initiative)}.` : ""} A 2 or 3 counts as one success; a 1 counts as two. Most successes chooses who has Initiative; non-winners gain 1 CMD token.</p>
+        <button class="bar-btn" data-action="play-initiative" data-dice="${faction ? escapeHtml(faction.initiative) : "3D6"}">Roll ${faction ? escapeHtml(faction.initiative) : "3D6"}</button>
+        ${
+          last && last.table.startsWith("Initiative check")
+            ? `<div class="roll-result"><div class="roll-die">${last.value}</div><div class="roll-body"><p class="roll-table">${escapeHtml(last.table)}</p><p class="roll-headline">${escapeHtml(last.result)}</p>${last.detail ? `<p class="roll-detail">${escapeHtml(last.detail)}</p>` : ""}</div></div>`
+            : ""
+        }
+      </section>
+
+      <section class="solo-card">
+        <h3 class="roster-section">Scoring reminders</h3>
+        ${notes ? `<ul class="rule-list">${notes}</ul>` : '<p class="muted">Check your mission sheet for scoring.</p>'}
+        ${faction ? `<h4 class="ref-sub">${escapeHtml(faction.rule.name)}</h4><p class="rule-card-text">${escapeHtml(faction.rule.text)}</p>` : ""}
+      </section>
+    </div>
+  </main>
+  ${toast(state)}
+  ${footer()}`;
+}
+
+// ---------------------------------------------------------------------------
 // Ship compendium (reference tool)
 // ---------------------------------------------------------------------------
 
@@ -998,6 +1234,8 @@ export function render(state: AppState): string {
       return `${topbar()}${soloOutfitView(state)}${toast(state)}${footer()}`;
     case "ships":
       return shipsView(state);
+    case "play":
+      return playView(state);
     case "changelog":
       return changelogView();
   }

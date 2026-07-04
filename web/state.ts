@@ -50,6 +50,7 @@ export type Route =
   | { view: "solo" }
   | { view: "solo-outfit"; outfitId: string }
   | { view: "ships" }
+  | { view: "play"; listId: string }
   | { view: "changelog" };
 
 export function parseRoute(hash: string): Route {
@@ -60,6 +61,7 @@ export function parseRoute(hash: string): Route {
   if (parts[0] === "foundry") return parts[1] ? { view: "foundry", factionId: parts[1] } : { view: "foundry" };
   if (parts[0] === "solo") return parts[1] ? { view: "solo-outfit", outfitId: parts[1] } : { view: "solo" };
   if (parts[0] === "ships") return { view: "ships" };
+  if (parts[0] === "play" && parts[1]) return { view: "play", listId: parts[1] };
   if (parts[0] === "changelog") return { view: "changelog" };
   return { view: "home" };
 }
@@ -80,6 +82,8 @@ export function routeHash(route: Route): string {
       return `#/solo/${route.outfitId}`;
     case "ships":
       return "#/ships";
+    case "play":
+      return `#/play/${route.listId}`;
     case "changelog":
       return "#/changelog";
   }
@@ -151,8 +155,65 @@ export const store = createStore<AppState>(initialState());
 
 export function activeList(state: AppState): SavedList | undefined {
   const r = state.route;
-  if (r.view !== "builder" && r.view !== "print") return undefined;
+  if (r.view !== "builder" && r.view !== "print" && r.view !== "play") return undefined;
   return state.lists.find((l) => l.id === r.listId);
+}
+
+export function freshPlayState(faction?: { cmdTokens: string }): import("./storage.ts").PlayState {
+  // Seed the CMD counter from the faction's per-round value where it is a
+  // plain number ("7"); dice values ("D12") start at 0 and are set by hand.
+  const cmd = faction ? Number(faction.cmdTokens) || 0 : 0;
+  return { round: 1, phase: 0, cmd, vp: 0, oppVp: 0 };
+}
+
+/**
+ * The two Basic Training scenarios ship as pre-built, loadable lists using the
+ * Training Fleet (p.60): "each bullet point in the list above is a single
+ * unit". Management Training starts the same hulls in a Shipyard instead
+ * (p.65, no Light Utility Ships) and selects no HVP.
+ */
+export function createTrainingList(mode: "combat-simulator" | "management-training"): SavedList {
+  const now = new Date().toISOString();
+  const u = (id: string, shipClassId: string, count: number) => ({ id, shipClassId, count });
+  const units =
+    mode === "combat-simulator"
+      ? [
+          u("u1", "heavy-cruiser", 1),
+          u("u2", "frigate", 1),
+          u("u3", "corvette", 3),
+          u("u4", "gunship", 3),
+          u("u5", "light-utility-ship", 3),
+          u("u6", "fighter-wing", 3),
+          u("u7", "bomber-wing", 3),
+        ]
+      : [
+          u("u1", "heavy-cruiser", 1),
+          u("u2", "frigate", 1),
+          u("u3", "corvette", 3),
+          u("u4", "gunship", 3),
+          u("u5", "fighter-wing", 3),
+          u("u6", "bomber-wing", 3),
+        ];
+  // Combat Simulator: "All three of your HVP are 'Seasoned Captains'" (p.63).
+  const hvp =
+    mode === "combat-simulator"
+      ? [{ hvpId: "seasoned-captain" }, { hvpId: "seasoned-captain" }, { hvpId: "seasoned-captain" }]
+      : [];
+  return {
+    id: newId("fl"),
+    mode,
+    freePlay: false,
+    emblem: "ring",
+    fleet: {
+      name: mode === "combat-simulator" ? "Combat Simulator" : "Management Training",
+      factionId: "training-fleet",
+      creditsLimit: 300,
+      units,
+      hvp,
+    },
+    createdAt: now,
+    updatedAt: now,
+  };
 }
 
 export function createList(mode: GameMode, factionId: string, freePlay: boolean): SavedList {

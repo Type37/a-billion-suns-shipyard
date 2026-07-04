@@ -1,6 +1,7 @@
 import type { Era, Faction, Hvp } from "../src/types.ts";
 import type { Catalog } from "../src/data/index.ts";
 import { GENERIC_HVP } from "../src/data/index.ts";
+import { TRAINING_FLEET } from "../src/data/training-fleet.ts";
 
 // The web catalog discovers every faction data file at build time, so newly
 // transcribed factions appear in the app the moment their file exists. Custom
@@ -72,6 +73,9 @@ export function factionsByEra(customs: Faction[]): Map<Era, Faction[]> {
 }
 
 export function findFaction(id: string, customs: Faction[]): Faction | undefined {
+  // The Training Fleet resolves for Basic Training lists but stays out of the
+  // faction pickers: it is a tutorial roster, not a faction you choose.
+  if (id === TRAINING_FLEET.id) return TRAINING_FLEET;
   return allFactions(customs).find((f) => f.id === id);
 }
 

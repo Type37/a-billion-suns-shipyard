@@ -9,6 +9,30 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.4.0",
+    date: "2026-07-03",
+    title: "Basic Training and the table companion",
+    items: [
+      "Basic Training: the two tutorial scenarios from the rulebook are now loadable lists. Combat Simulator arrives with the full Training Fleet (seven units) and three Seasoned Captains aboard; Management Training arrives with the six-unit Shipyard version and no personnel, exactly as the book sets them up.",
+      "Guided tutorials: training lists show a step-by-step walkthrough above the builder covering setup, squadron carrying, special rules, scoring, and game end, written from the Basic Training chapter.",
+      "Play mode: every fleet list now has a table companion. A phase track for the round (Command, Jump, Tactical, End) with the full rule for each phase, counters for round, CMD tokens, and both players' scores, an initiative-check roller that rolls your faction's dice and counts successes, and End Phase scoring reminders for each game mode.",
+      "The Ship Compendium: every ship in the game in one sortable table, with filters for era, faction, and mass and a live name search.",
+      "Ship stats across the app now read as labelled chips with icons for Mass, Thrust, Silhouette, and Shields.",
+      "A full mobile pass: the whole app now works at phone widths, with no horizontal scrolling.",
+    ],
+  },
+  {
+    version: "0.3.0",
+    date: "2026-07-03",
+    title: "The Shipyard and the ruins of Jura",
+    items: [
+      "Renamed to A Billion Suns Shipyard.",
+      "Solo play: the complete Junkspace mode. Build an outfit of up to five ships within thirty thousand, each with a pilot class, then run the roller for the automated enemy and track the debt campaign across eight games, with pilot perks for survivors.",
+      "The builder controls now sit together in one labelled row: credits limit, faction, and emblem.",
+      "Upload your own emblem image for any fleet, outfit, or custom faction.",
+    ],
+  },
+  {
     version: "0.2.0",
     date: "2026-07-02",
     title: "The full register",

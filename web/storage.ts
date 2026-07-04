@@ -7,6 +7,16 @@ const LISTS_KEY = "abs2.lists.v1";
 const FACTIONS_KEY = "abs2.customFactions.v1";
 const OUTFITS_KEY = "abs2.outfits.v1";
 
+/** Live table-companion state for a fleet list, persisted with it. */
+export interface PlayState {
+  round: number;
+  /** 0 Command, 1 Jump, 2 Tactical, 3 End. */
+  phase: number;
+  cmd: number;
+  vp: number;
+  oppVp: number;
+}
+
 export interface SavedList {
   id: string;
   mode: GameMode;
@@ -17,6 +27,7 @@ export interface SavedList {
   /** Optional uploaded image (downscaled data URL). Takes priority over emblem. */
   emblemImage?: string;
   fleet: Fleet;
+  play?: PlayState;
   createdAt: string;
   updatedAt: string;
 }

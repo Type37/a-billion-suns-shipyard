@@ -21,6 +21,7 @@ function paint(): void {
   const caret = active instanceof HTMLInputElement ? active.selectionStart : null;
 
   root.innerHTML = render(store.getState());
+  enhanceNav();
 
   if (activeId) {
     const restored = document.getElementById(activeId);
@@ -61,6 +62,36 @@ function tryImportShare(): boolean {
   location.replace(`#/list/${decoded.list.id}`);
   return true;
 }
+
+// A single highlight that slides between the top-right nav items. It rests on
+// the item matching the current route and follows the pointer on hover, easing
+// on Fluent's decelerate curve (set in CSS). Re-wired after every re-render.
+function enhanceNav(): void {
+  const nav = document.querySelector<HTMLElement>(".topnav");
+  const pill = nav?.querySelector<HTMLElement>(".nav-pill");
+  if (!nav || !pill) return;
+  const links = Array.from(nav.querySelectorAll<HTMLAnchorElement>("a"));
+  const path = location.hash.replace(/^#/, "") || "/";
+  const active = links.find((a) => {
+    const h = a.getAttribute("href")?.replace(/^#/, "") ?? "";
+    return h !== "/" && (path === h || path.startsWith(h + "/"));
+  });
+  const place = (el?: HTMLElement): void => {
+    if (!el) {
+      pill.style.opacity = "0";
+      pill.style.width = "0";
+      return;
+    }
+    pill.style.opacity = "1";
+    pill.style.width = `${el.offsetWidth}px`;
+    pill.style.transform = `translateX(${el.offsetLeft}px)`;
+  };
+  place(active);
+  links.forEach((a) => a.addEventListener("mouseenter", () => place(a)));
+  nav.addEventListener("mouseleave", () => place(active));
+}
+
+window.addEventListener("resize", enhanceNav);
 
 window.addEventListener("hashchange", () => {
   store.setState((s) => ({ ...s, route: parseRoute(location.hash) }));

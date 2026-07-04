@@ -169,6 +169,7 @@ function topbar(): string {
   <header class="topbar">
     <a class="wordmark" href="#/">${icon("logo", 26)}<span class="wordmark-text">A Billion Suns</span><span class="wordmark-sub">Shipyard</span></a>
     <nav class="topnav">
+      <span class="nav-pill" aria-hidden="true"></span>
       <a href="#/fleets">${icon("flag", 16)} Fleets</a>
       <a href="#/ships">${icon("compare", 16)} Compendium</a>
       <a href="#/solo">${icon("book", 16)} Solo</a>
@@ -261,7 +262,7 @@ function homeView(state: AppState): string {
     <div class="nameplate-inner">
       <h1 class="wordmark-hero">
         <span class="wm-edition">Second Edition</span>
-        <span class="wm-lockup"><svg class="wm-delta" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6 L95 94 L5 94 Z" fill="none" stroke="currentColor" stroke-width="9"/><path d="M27 68 H73" stroke="currentColor" stroke-width="9"/></svg><span class="wm-billion">Billion</span><span class="wm-suns">Suns</span></span>
+        <span class="wm-lockup"><svg class="wm-delta" viewBox="0 0 116 104" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="10.5" stroke-linejoin="miter"><path d="M58 8 L108 96 L8 96 Z"/><path d="M31 71 H85"/></svg><span class="wm-billion">Billion</span><span class="wm-suns">Suns</span></span>
         <span class="wm-tag">Interstellar Fleet Battles</span>
         <span class="wm-sub">Fleet builder and ship reference</span>
       </h1>

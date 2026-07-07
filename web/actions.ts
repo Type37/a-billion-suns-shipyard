@@ -126,6 +126,29 @@ function downloadJson(filename: string, data: unknown): void {
   URL.revokeObjectURL(url);
 }
 
+// Import a faction from a JSON string (file or clipboard). Assigns a fresh id
+// so imports never collide with an existing custom faction, then persists.
+function importFactionJson(text: string, notFactionMessage: string): void {
+  let parsed: Faction;
+  try {
+    parsed = JSON.parse(text) as Faction;
+  } catch {
+    showToast("That could not be read as a faction.");
+    return;
+  }
+  if (typeof parsed.name !== "string" || !Array.isArray(parsed.ships) || !Array.isArray(parsed.hvp)) {
+    showToast(notFactionMessage);
+    return;
+  }
+  parsed.id = newId("cf");
+  store.setState((s) => {
+    const customFactions = [...s.customFactions, parsed];
+    persistCustomFactions(customFactions);
+    return { ...s, customFactions };
+  });
+  showToast(`Imported "${parsed.name}".`);
+}
+
 // Read an uploaded image, downscale it to a square emblem, and return a compact
 // data URL. Keeping it small (240px, JPEG) means it survives localStorage and
 // does not bloat the app. Rejects non-images.
@@ -762,6 +785,16 @@ function handleClick(e: MouseEvent): void {
       downloadJson(`${faction.name.toLowerCase().replace(/\s+/g, "-")}.faction.json`, faction);
       break;
     }
+    case "copy-faction": {
+      const id = target.dataset["id"];
+      const faction = state.customFactions.find((f) => f.id === id);
+      if (!faction) return;
+      navigator.clipboard
+        .writeText(JSON.stringify(faction, null, 2))
+        .then(() => showToast(`Copied "${faction.name}" to the clipboard. Paste it to share.`))
+        .catch(() => showToast("Could not copy. Try the download button instead."));
+      break;
+    }
     case "cf-ship-add": {
       const fid = currentFoundryId();
       if (!fid) return;
@@ -1122,25 +1155,21 @@ function handleChange(e: Event): void {
     case "import-faction": {
       const file = target.files?.[0];
       if (!file) return;
-      file.text().then((text) => {
-        try {
-          const parsed = JSON.parse(text) as Faction;
-          if (typeof parsed.name !== "string" || !Array.isArray(parsed.ships) || !Array.isArray(parsed.hvp)) {
-            showToast("That file does not look like a faction.");
+      file.text().then((text) => importFactionJson(text, "That file does not look like a faction."));
+      target.value = "";
+      break;
+    }
+    case "paste-faction": {
+      navigator.clipboard
+        .readText()
+        .then((text) => {
+          if (!text.trim()) {
+            showToast("The clipboard is empty. Copy a faction's JSON first.");
             return;
           }
-          parsed.id = newId("cf");
-          store.setState((s) => {
-            const customFactions = [...s.customFactions, parsed];
-            persistCustomFactions(customFactions);
-            return { ...s, customFactions };
-          });
-          showToast(`Imported "${parsed.name}".`);
-        } catch {
-          showToast("That file could not be read as a faction.");
-        }
-      });
-      target.value = "";
+          importFactionJson(text, "The clipboard does not hold a faction.");
+        })
+        .catch(() => showToast("Could not read the clipboard. Use Import from a file instead."));
       break;
     }
   }

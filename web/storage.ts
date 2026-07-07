@@ -1,4 +1,5 @@
 import type { Faction, Fleet, GameMode, OutfitShip } from "../src/types.ts";
+import { SEED_FACTIONS } from "./seed-factions.ts";
 
 // localStorage persistence. One key per concern, JSON payloads, versioned so a
 // future format change can migrate instead of clobber.
@@ -6,6 +7,7 @@ import type { Faction, Fleet, GameMode, OutfitShip } from "../src/types.ts";
 const LISTS_KEY = "abs2.lists.v1";
 const FACTIONS_KEY = "abs2.customFactions.v1";
 const OUTFITS_KEY = "abs2.outfits.v1";
+const SEEDS_APPLIED_KEY = "abs2.seedsApplied.v1";
 
 /** Live table-companion state for a fleet list, persisted with it. */
 export interface PlayState {
@@ -61,7 +63,23 @@ export function persistLists(lists: SavedList[]): void {
 }
 
 export function loadCustomFactions(): Faction[] {
-  return read<Faction[]>(FACTIONS_KEY, []);
+  const stored = read<Faction[]>(FACTIONS_KEY, []);
+  return applySeeds(stored);
+}
+
+// Seed factions ship as ready-made custom factions. Each seed is added at most
+// once per browser: we record every seed id we have ever applied, so once a
+// user deletes a seeded faction it does not reappear on the next visit.
+function applySeeds(stored: Faction[]): Faction[] {
+  const applied = new Set(read<string[]>(SEEDS_APPLIED_KEY, []));
+  const additions = SEED_FACTIONS.filter((seed) => !applied.has(seed.id) && !stored.some((f) => f.id === seed.id));
+  if (additions.length === 0) return stored;
+
+  const merged = [...stored, ...additions];
+  write(FACTIONS_KEY, merged);
+  for (const seed of SEED_FACTIONS) applied.add(seed.id);
+  write(SEEDS_APPLIED_KEY, [...applied]);
+  return merged;
 }
 
 export function persistCustomFactions(factions: Faction[]): void {

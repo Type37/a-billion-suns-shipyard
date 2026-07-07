@@ -255,7 +255,7 @@ button { font-family: inherit; }
 .wm-edition { font-family: var(--display); font-weight: 600; font-size: clamp(11px, 2.4vw, 17px); letter-spacing: 0.52em; text-transform: uppercase; color: #bcd0f2; padding-left: 0.52em; margin-bottom: 6px; }
 /* The official lockup is oblique (slanted right); the A is a leaning triangle.
    Skew the whole line to match, rather than an upright delta. */
-.wm-lockup { display: flex; align-items: center; font-family: var(--display); font-weight: 900; font-size: clamp(40px, 9.5vw, 104px); line-height: 0.82; text-transform: uppercase; letter-spacing: -0.02em; transform: skewX(-10deg); transform-origin: left bottom; }
+.wm-lockup { display: flex; align-items: center; font-family: var(--display); font-weight: 900; font-size: clamp(40px, 9.5vw, 104px); line-height: 0.82; text-transform: uppercase; letter-spacing: -0.02em; }
 .wm-delta { height: 0.86em; width: auto; margin-right: 0.04em; color: #fff; flex-shrink: 0; }
 .wm-suns { color: transparent; -webkit-text-stroke: 2.5px #fff; margin-left: 0.06em; }
 .wm-tag { font-family: var(--display); font-weight: 600; font-size: clamp(10px, 2.1vw, 16px); letter-spacing: 0.38em; text-transform: uppercase; color: #d6e2f6; padding-left: 0.38em; margin-top: 12px; }

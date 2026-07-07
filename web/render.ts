@@ -253,7 +253,7 @@ function homeView(state: AppState): string {
     <div class="nameplate-inner">
       <h1 class="wordmark-hero">
         <span class="wm-edition">Second Edition</span>
-        <span class="wm-lockup"><svg class="wm-delta" viewBox="0 0 104 104" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="11" stroke-linejoin="miter"><path d="M52 7 L92 97 L12 97 Z"/><path d="M30 72 H74"/></svg><span class="wm-billion">Billion</span><span class="wm-suns">Suns</span></span>
+        <span class="wm-lockup"><svg class="wm-delta" viewBox="0 0 104 104" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="10" stroke-linejoin="round" stroke-linecap="round"><path d="M52 13 L96 93 L8 93 Z"/></svg><span class="wm-billion">Billion</span><span class="wm-suns">Suns</span></span>
         <span class="wm-tag">Interstellar Fleet Battles</span>
       </h1>
     </div>
@@ -935,6 +935,7 @@ function foundryListView(state: AppState): string {
         <td class="cell-num">${f.ships.length} ship classes</td>
         <td class="cell-num">${f.hvp.length} personnel</td>
         <td class="cell-actions">
+          <button class="ghost-btn" data-action="copy-faction" data-id="${f.id}" title="Copy as JSON to share">${icon("duplicate", 16)}</button>
           <button class="ghost-btn" data-action="export-faction" data-id="${f.id}" title="Download as a file">${icon("download", 16)}</button>
           <button class="ghost-btn danger" data-action="delete-faction" data-id="${f.id}" title="Delete">${icon("trash", 16)}</button>
         </td>
@@ -952,6 +953,7 @@ function foundryListView(state: AppState): string {
       <label class="bar-btn file-btn">${icon("upload", 16)} Import from a file
         <input type="file" accept="application/json" data-action="import-faction" hidden />
       </label>
+      <button class="bar-btn" data-action="paste-faction">${icon("duplicate", 16)} Paste from clipboard</button>
     </div>
     ${
       state.customFactions.length === 0

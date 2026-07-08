@@ -9,6 +9,15 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.6.3",
+    date: "2026-07-08",
+    title: "Emblem picker out of the way, tighter builder",
+    items: [
+      "The emblem picker is now a single button showing your current mark; the full set of marks, the library, upload, and random open in a popover instead of filling a row in the setup bar.",
+      "Tightened the setup bar and faction summary so the builder takes less vertical space and needs less scrolling.",
+    ],
+  },
+  {
     version: "0.6.2",
     date: "2026-07-08",
     title: "A pack of new vector emblems",

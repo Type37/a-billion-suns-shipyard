@@ -6,7 +6,7 @@ import { JUNKSPACE_SHIPS } from "../src/data/junkspace.ts";
 import { allFactions, factionsByEra, findFaction, makeCatalog, ERA_ORDER } from "./catalog.ts";
 import { auxSlotText, credits, escapeHtml, formatDate, primarySlotText } from "./format.ts";
 import { emblem, emblemMark, EMBLEM_IDS, icon, initiativeDice, massGlyph, statChips } from "./icons.ts";
-import { iconLibraryControls, libraryUrl } from "./emblems.ts";
+import { iconLibraryControls, iconLibraryGrid, libraryUrl } from "./emblems.ts";
 import { CHANGELOG } from "./changelog.ts";
 import type { AppState } from "./state.ts";
 import { activeList } from "./state.ts";
@@ -680,18 +680,24 @@ function builderView(state: AppState): string {
     })
     .join("");
 
+  // One button showing the current mark; the whole picker lives in a popover so
+  // it stops eating a row in the setup band.
   const listImg = list.emblemImage ?? libraryUrl(list.emblemLib);
   const emblemPicker = `
-    ${EMBLEM_IDS.map(
-      (id) =>
-        `<button class="emblem-choice ${list.emblem === id && !listImg ? "selected" : ""}" data-action="set-emblem" data-emblem="${id}" title="Use this emblem">${emblem(id, 24)}</button>`,
-    ).join("")}
-    <label class="emblem-choice emblem-upload ${list.emblemImage ? "selected" : ""}" title="Upload your own image">
-      ${icon("upload", 18)}
-      <input type="file" accept="image/*" data-action="emblem-upload" hidden />
-    </label>
-    ${iconLibraryControls("set-emblem-lib", "random-emblem", list.emblemLib)}
-    ${listImg ? `<span class="emblem-choice emblem-current selected" title="Current icon">${emblemMark(list.emblem, listImg, 24)}</span><button class="emblem-choice" data-action="clear-emblem-image" title="Clear the chosen image">${icon("close", 16)}</button>` : ""}`;
+    <details class="emblem-menu">
+      <summary class="emblem-current-btn" title="Choose an emblem">${emblemMark(list.emblem, listImg, 24)}${icon("chevronDown", 14, "emblem-caret")}</summary>
+      <div class="emblem-menu-panel">
+        <div class="emblem-menu-tools">
+          <label class="bar-btn file-btn">${icon("upload", 14)} Upload<input type="file" accept="image/*" data-action="emblem-upload" hidden /></label>
+          <button class="bar-btn" data-action="random-emblem">${icon("shuffle", 14)} Random</button>
+          ${listImg ? `<button class="bar-btn danger" data-action="clear-emblem-image">${icon("close", 14)} Clear image</button>` : ""}
+        </div>
+        <div class="lib-cat"><h5 class="lib-cat-title">Basic marks</h5><div class="lib-grid">
+          ${EMBLEM_IDS.map((id) => `<button class="lib-icon ${list.emblem === id && !listImg ? "selected" : ""}" data-action="set-emblem" data-emblem="${id}" title="${escapeHtml(id)}">${emblem(id, 22)}</button>`).join("")}
+        </div></div>
+        ${iconLibraryGrid("set-emblem-lib", list.emblemLib)}
+      </div>
+    </details>`;
 
   const limitIsPreset = [300, 400, 500].includes(list.fleet.creditsLimit);
   const limitControl = `<div class="segment segment-limit" role="group" aria-label="Credits limit">

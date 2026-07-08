@@ -400,7 +400,7 @@ button { font-family: inherit; }
 .setup-band {
   border-bottom: 2px solid var(--hair);
   background: var(--paper);
-  max-width: var(--shell); margin: 0 auto; padding: 20px clamp(16px, 4vw, 40px);
+  max-width: var(--shell); margin: 0 auto; padding: 12px clamp(16px, 4vw, 40px) 14px;
 }
 .setup-band.over { border-bottom-color: var(--red); }
 .setup-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
@@ -410,12 +410,12 @@ button { font-family: inherit; }
 
 /* One grouped control row: emblem, limit, faction sit together, each labelled. */
 .setup-controls {
-  display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 22px;
-  margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--hair-soft);
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 20px;
+  margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--hair-soft);
 }
-.control-group { display: flex; flex-direction: column; gap: 6px; }
+.control-group { display: flex; flex-direction: column; gap: 5px; }
 .control-label { font-size: 10px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); }
-.control-group-emblem { flex: 1; min-width: 220px; }
+.control-group-emblem { flex: 0 0 auto; min-width: 0; }
 .fleet-name-input {
   font-family: var(--display); font-weight: 800; font-size: clamp(24px, 4vw, 38px);
   letter-spacing: -0.02em; color: var(--ink); border: none; border-bottom: 2px solid transparent;
@@ -424,7 +424,26 @@ button { font-family: inherit; }
 .fleet-name-input::placeholder { color: #b4bcc8; }
 .fleet-name-input:focus { outline: none; border-bottom-color: var(--red); }
 
-.emblem-picker { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+.emblem-picker { display: flex; gap: 6px; flex-wrap: wrap; }
+.setup-controls .emblem-picker { margin-top: 0; }
+
+/* Collapsed emblem control: one button showing the current mark; the whole
+   picker opens in a popover so it no longer clutters the setup band. */
+.emblem-menu { position: relative; }
+.emblem-menu > summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 5px 8px 5px 6px; border: 1px solid var(--hair); background: var(--paper); }
+.emblem-menu > summary::-webkit-details-marker { display: none; }
+.emblem-menu > summary:hover { border-color: var(--ink); }
+.emblem-current-btn .emblem, .emblem-current-btn .emblem-img { width: 24px; height: 24px; color: var(--blue); }
+.emblem-caret { color: var(--ink-3); }
+.emblem-menu[open] > summary { border-color: var(--blue); }
+.emblem-menu-panel {
+  position: absolute; top: calc(100% + 4px); left: 0; z-index: 40;
+  width: 320px; max-height: 360px; overflow-y: auto;
+  background: var(--paper); border: 1px solid var(--ink); padding: 12px;
+  box-shadow: 0 12px 32px rgba(11, 22, 51, 0.18);
+}
+.emblem-menu-tools { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.emblem-menu-panel .lib-cat:first-of-type { margin-top: 0; }
 .emblem-choice { width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center; background: var(--paper); border: 1px solid var(--hair-soft); color: var(--ink-2); cursor: pointer; }
 .emblem-choice:hover { border-color: var(--ink); color: var(--ink); }
 .emblem-choice.selected { background: var(--blue); border-color: var(--blue); color: #fff; }
@@ -529,10 +548,10 @@ button { font-family: inherit; }
 .rule-card-text { font-family: var(--serif); font-size: 15px; line-height: 1.55; color: var(--ink); }
 /* The two numbers a player checks every round, pulled up top and made loud.
    Sized to their content, not stretched across the whole panel. */
-.rule-card-stats { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
-.rc-stat { flex: 0 1 auto; min-width: 96px; background: #fff; border: 1px solid var(--blue); border-top: 3px solid var(--blue); padding: 6px 14px 8px; }
+.rule-card-stats { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.rc-stat { flex: 0 1 auto; min-width: 92px; background: #fff; border: 1px solid var(--blue); border-top: 3px solid var(--blue); padding: 5px 14px 7px; }
 .rc-stat-label { display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
-.rc-stat-val { display: block; font-family: var(--display); font-weight: 800; font-size: 26px; line-height: 1.1; color: var(--blue-deep); font-variant-numeric: tabular-nums; }
+.rc-stat-val { display: block; font-family: var(--display); font-weight: 800; font-size: 22px; line-height: 1.1; color: var(--blue-deep); font-variant-numeric: tabular-nums; }
 /* One die glyph per die in the Initiative pool: 2D6 shows two, 3D6 shows three. */
 .init-dice { display: inline-flex; gap: 2px; vertical-align: middle; margin-left: 8px; }
 .init-die { color: var(--red); }

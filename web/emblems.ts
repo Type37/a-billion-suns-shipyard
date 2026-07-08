@@ -69,17 +69,24 @@ export function randomIconId(): string | undefined {
  * categorised picker. Action names are passed so fleets, outfits, and custom
  * factions can reuse it.
  */
+/** Just the categorised icon grids (no wrapper/controls), for embedding. */
+export function iconLibraryGrid(actLib: string, currentLib?: string): string {
+  return (
+    ICON_CATEGORIES.map((cat) => {
+      const inCat = ICON_LIBRARY.filter((i) => i.category === cat);
+      const items = inCat
+        .map(
+          (i) =>
+            `<button class="lib-icon ${currentLib === i.id ? "selected" : ""}" data-action="${actLib}" data-lib="${escapeHtml(i.id)}" title="${escapeHtml(i.label)}"><img loading="lazy" src="${i.url}" alt="${escapeHtml(i.label)}" /></button>`,
+        )
+        .join("");
+      return `<div class="lib-cat"><h5 class="lib-cat-title">${escapeHtml(categoryLabel(cat))} <span class="muted">${inCat.length}</span></h5><div class="lib-grid">${items}</div></div>`;
+    }).join("") || '<p class="muted">No icons in the library yet.</p>'
+  );
+}
+
 export function iconLibraryControls(actLib: string, actRandom: string, currentLib?: string): string {
-  const cats = ICON_CATEGORIES.map((cat) => {
-    const inCat = ICON_LIBRARY.filter((i) => i.category === cat);
-    const items = inCat
-      .map(
-        (i) =>
-          `<button class="lib-icon ${currentLib === i.id ? "selected" : ""}" data-action="${actLib}" data-lib="${escapeHtml(i.id)}" title="${escapeHtml(i.label)}"><img loading="lazy" src="${i.url}" alt="${escapeHtml(i.label)}" /></button>`,
-      )
-      .join("");
-    return `<div class="lib-cat"><h5 class="lib-cat-title">${escapeHtml(categoryLabel(cat))} <span class="muted">${inCat.length}</span></h5><div class="lib-grid">${items}</div></div>`;
-  }).join("");
+  const cats = iconLibraryGrid(actLib, currentLib);
   return `
     <button class="emblem-choice" data-action="${actRandom}" title="Random icon from the library">${icon("shuffle", 18)}</button>
     <details class="icon-library">

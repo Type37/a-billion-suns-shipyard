@@ -663,13 +663,16 @@ function builderView(state: AppState): string {
       const cost = r ? r.ship.cost * u.count : 0;
       const carried = list.fleet.hvp.filter((h) => h.assignedUnitId === u.id).length;
       const maxCount = list.freePlay || list.mode === "hypergrowth" ? 99 : r?.ship.mass === 3 ? 1 : 3;
+      const wp = r ? primarySlotText(r.ship).replace(/<br \/>/g, ", ") : "";
+      const wa = r ? auxSlotText(r.ship).replace(/<br \/>/g, ", ") : "";
+      const weapons = r ? [wp === "None" ? "" : wp, wa === "None" ? "" : wa].filter(Boolean).join("; ") : "";
       return `
       <div class="roster-unit ${r ? "" : "unresolved"}">
         <button class="ru-open" data-action="open-unit" data-unit="${u.id}" title="Rename, name ships, assign personnel">
           <span class="roster-unit-glyph">${r ? massGlyph(r.ship.mass, 22) : icon("warning", 20)}</span>
           <span class="ru-main">
             <span class="ru-name">${escapeHtml(u.name || `${shipName} unit`)}</span>
-            <span class="ru-sub">${escapeHtml(shipName)}${carried ? ` <span class="ru-carry">${icon("personnel", 12)}${carried}</span>` : ""}${r && list.freePlay ? ` <span class="muted">${escapeHtml(r.owner.name)}</span>` : ""}</span>
+            <span class="ru-sub">${escapeHtml(shipName)}${r && list.freePlay ? ` <span class="muted">${escapeHtml(r.owner.name)}</span>` : ""}${carried ? ` <span class="ru-carry">${icon("personnel", 12)}${carried}</span>` : ""}</span>
           </span>
         </button>
         ${
@@ -683,6 +686,14 @@ function builderView(state: AppState): string {
         }
         <span class="roster-unit-cost">${credits(cost)}</span>
         <button class="ru-remove" data-action="remove-unit" data-unit="${u.id}" title="Remove this unit">${icon("trash", 14)}</button>
+        ${
+          r
+            ? `<div class="ru-details">
+                ${statChips(r.ship, true)}
+                ${weapons ? `<span class="ru-weap">${weapons}</span>` : `<span class="ru-weap muted">No weapons</span>`}
+              </div>`
+            : ""
+        }
       </div>`;
     })
     .join("");

@@ -76,7 +76,7 @@ test("empty fleet is invalid", () => {
 
 // --- credits limit ---------------------------------------------------------
 
-test("non-standard limit warns but does not invalidate", () => {
+test("a non-standard limit is allowed with no warning", () => {
   const f = fleet({
     factionId: "vyke",
     creditsLimit: 350,
@@ -85,20 +85,7 @@ test("non-standard limit warns but does not invalidate", () => {
   });
   const r = validateFleet(f);
   assert.equal(r.valid, true);
-  assert.ok(hasCode(r, "LIMIT_NONSTANDARD"));
-  assert.equal(r.warnings.length, 1);
-});
-
-test("standard limits do not warn", () => {
-  for (const limit of [300, 400, 500]) {
-    const f = fleet({
-      factionId: "vyke",
-      creditsLimit: limit,
-      units: [u("a", "king-crab", 1)],
-      hvp: THREE_HVP.map((x) => h(x.hvpId, "a")),
-    });
-    assert.ok(!hasCode(validateFleet(f), "LIMIT_NONSTANDARD"), `limit ${limit}`);
-  }
+  assert.equal(r.warnings.length, 0);
 });
 
 test("invalid limits are errors", () => {

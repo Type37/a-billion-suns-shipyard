@@ -12,7 +12,6 @@ export type IssueCode =
   | "FACTION_UNKNOWN"
   | "FLEET_EMPTY"
   | "LIMIT_INVALID"
-  | "LIMIT_NONSTANDARD"
   | "OVER_BUDGET"
   | "UNIT_ID_DUPLICATE"
   | "UNIT_NOT_IN_ROSTER"
@@ -88,13 +87,9 @@ export function validateFleet(fleet: Fleet, catalog: Catalog = defaultCatalog): 
       severity: "error",
       message: `Credits limit must be a positive whole number (got ${String(limit)}).`,
     });
-  } else if (!STANDARD_LIMITS.includes(limit)) {
-    add({
-      code: "LIMIT_NONSTANDARD",
-      severity: "warning",
-      message: `Credits limit ${limit} is non-standard. Armageddon games use ${STANDARD_LIMITS.join(", ")}.`,
-    });
   }
+  // Any positive whole-number limit is allowed; non-standard values are not
+  // flagged (players agree their own limit).
 
   // --- Empty fleet ----------------------------------------------------------
   if (fleet.units.length === 0) {

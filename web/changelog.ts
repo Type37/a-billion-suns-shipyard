@@ -9,6 +9,15 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.7.7",
+    date: "2026-07-08",
+    title: "Full unit stats in the roster, any credits limit allowed",
+    items: [
+      "Each roster unit now shows its full stat line and weapons right in the row, so you can read a unit without opening it.",
+      "Any credits limit is accepted without a warning; the non-standard-limit flag has been removed.",
+    ],
+  },
+  {
     version: "0.7.6",
     date: "2026-07-08",
     title: "Colour your vector marks, fuller faction stats, tidier mobile nav",

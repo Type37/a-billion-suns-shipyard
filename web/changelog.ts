@@ -9,6 +9,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.6.2",
+    date: "2026-07-08",
+    title: "A pack of new vector emblems",
+    items: [
+      "Twenty-six new vector emblems in a Fleet Marks set at the top of the emblem picker: atoms, a chess knight, a ship's wheel, crossed swords, a chemical hazard, news marks, and more, several rotated or flipped to taste.",
+      "Emblem thumbnails now fill their tile evenly, so small vector marks read at the same size as the rest.",
+      "Emblem categories show readable names instead of raw folder names.",
+    ],
+  },
+  {
     version: "0.6.1",
     date: "2026-07-08",
     title: "Add ships inline, redrawn emblems",

@@ -42,8 +42,21 @@ export function libraryUrl(id: string | undefined): string | undefined {
 }
 
 export const ICON_CATEGORIES: string[] = [...new Set(ICON_LIBRARY.map((i) => i.category))].sort((a, b) =>
-  a === "General" ? -1 : b === "General" ? 1 : a.localeCompare(b),
+  a === "abs" ? -1 : b === "abs" ? 1 : a === "General" ? -1 : b === "General" ? 1 : a.localeCompare(b),
 );
+
+// Folder names are terse; show a readable label in the picker. Unmapped folders
+// are title-cased.
+const CATEGORY_LABELS: Record<string, string> = {
+  abs: "Fleet Marks",
+  vg: "Insignia",
+  human: "Human Sphere",
+  corpo: "Corporate",
+  authoritarian: "Authoritarian",
+};
+function categoryLabel(cat: string): string {
+  return CATEGORY_LABELS[cat] ?? cat.replace(/[_-]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
 /** A random library icon id (Math.random is fine in app code). */
 export function randomIconId(): string | undefined {
@@ -65,7 +78,7 @@ export function iconLibraryControls(actLib: string, actRandom: string, currentLi
           `<button class="lib-icon ${currentLib === i.id ? "selected" : ""}" data-action="${actLib}" data-lib="${escapeHtml(i.id)}" title="${escapeHtml(i.label)}"><img loading="lazy" src="${i.url}" alt="${escapeHtml(i.label)}" /></button>`,
       )
       .join("");
-    return `<div class="lib-cat"><h5 class="lib-cat-title">${escapeHtml(cat)} <span class="muted">${inCat.length}</span></h5><div class="lib-grid">${items}</div></div>`;
+    return `<div class="lib-cat"><h5 class="lib-cat-title">${escapeHtml(categoryLabel(cat))} <span class="muted">${inCat.length}</span></h5><div class="lib-grid">${items}</div></div>`;
   }).join("");
   return `
     <button class="emblem-choice" data-action="${actRandom}" title="Random icon from the library">${icon("shuffle", 18)}</button>

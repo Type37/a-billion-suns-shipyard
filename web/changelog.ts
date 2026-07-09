@@ -9,6 +9,15 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.7.10",
+    date: "2026-07-08",
+    title: "Builder uses far more of the page",
+    items: [
+      "The builder (setup band, training guide, roster and catalogue) now spans a wider shell with tighter side margins, so it actually uses a normal monitor instead of stopping at the site's article width.",
+      "The roster is substantially wider as a result: on a 1920px display it grows from about 810px to about 1230px.",
+    ],
+  },
+  {
     version: "0.7.9",
     date: "2026-07-08",
     title: "Experimental: Columns view for ship classes",

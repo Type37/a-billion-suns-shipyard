@@ -60,6 +60,10 @@
   --color-brand-deep: #062a6b;
 
   --shell: 1340px;
+  /* The builder alone (setup band, training guide, roster + catalog) uses
+     this wider shell and tighter side padding, so the roster gets real room
+     on a normal monitor instead of stopping at the site's article width. */
+  --shell-wide: 1760px;
   --tap: 44px;
 }
 
@@ -412,7 +416,7 @@ button { font-family: inherit; }
 .setup-band {
   border-bottom: 2px solid var(--hair);
   background: var(--paper);
-  max-width: var(--shell); margin: 0 auto; padding: 12px clamp(16px, 4vw, 40px) 14px;
+  max-width: var(--shell-wide); margin: 0 auto; padding: 12px clamp(14px, 2vw, 24px) 14px;
 }
 .setup-band.over { border-bottom-color: var(--red); }
 .setup-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
@@ -562,13 +566,14 @@ button { font-family: inherit; }
 /* ------------------------------------------------------------ workspace */
 
 .workspace {
-  max-width: var(--shell); margin: 0 auto;
-  padding: clamp(16px, 2.4vw, 28px) clamp(16px, 4vw, 40px) 0;
-  /* Roster (order:-1, left) is the primary pane and gets the room; the ship
-     picker sits in a narrower support column on the right. */
-  display: grid; grid-template-columns: minmax(440px, 1fr) minmax(300px, 420px); gap: clamp(18px, 2.4vw, 32px); align-items: start;
+  max-width: var(--shell-wide); margin: 0 auto;
+  padding: clamp(12px, 1.6vw, 20px) clamp(14px, 2vw, 24px) 0;
+  /* Roster (order:-1, left) is the primary pane and gets substantially more
+     room; the ship picker is a narrower support column on the right. */
+  display: grid; grid-template-columns: minmax(640px, 1.6fr) minmax(320px, 460px); gap: clamp(14px, 1.6vw, 24px); align-items: start;
 }
-@media (max-width: 1080px) { .workspace { grid-template-columns: 1fr; } }
+@media (max-width: 1200px) { .workspace { grid-template-columns: minmax(0, 1fr) minmax(300px, 400px); } }
+@media (max-width: 900px) { .workspace { grid-template-columns: 1fr; } }
 
 /* Experimental "Columns view": roster shrinks to a slim left rail, ship
    classes get the room to lay out as Mass columns instead of one long list. */
@@ -862,7 +867,7 @@ button { font-family: inherit; }
 .training-row { display: flex; flex-wrap: wrap; gap: 10px; }
 
 .guide-band { border-bottom: 2px solid var(--hair); background: var(--blue-wash); }
-.guide-inner { max-width: var(--shell); margin: 0 auto; padding: 18px clamp(16px, 4vw, 40px) 22px; }
+.guide-inner { max-width: var(--shell-wide); margin: 0 auto; padding: 18px clamp(14px, 2vw, 24px) 22px; }
 .guide-title { font-family: var(--sans); font-size: 12px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: var(--blue-deep); display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .guide-intro { font-family: var(--serif); font-size: 14px; line-height: 1.55; color: var(--ink); max-width: 78ch; margin-bottom: 14px; }
 .guide-step { border: 1px solid var(--hair-soft); background: var(--paper); margin-bottom: 6px; }

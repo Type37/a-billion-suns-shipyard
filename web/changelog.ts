@@ -9,6 +9,20 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.0",
+    date: "2026-07-10",
+    title: "The builder becomes a manifest, Play Mode becomes a real tutorial",
+    items: [
+      "The builder is rebuilt as a flat manifest ledger instead of a setup-band-plus-two-column layout: a masthead with a live budget meter, a sticky fleet manifest, and a ship/personnel yard. No SaaS-style cards, no truncation anywhere - full weapon stats and personnel rules are always visible.",
+      "The ship catalog is a single click target per row (whole row adds a unit, with an always-visible ADD cue and an owned-count tag), and gets a new Compare view: a bar chart ranking every ship class in the faction by cost, mass, thrust, silhouette, or shields.",
+      "Personnel are one self-contained card each: adding one opens its carried-by assigner immediately, in the same click, with zero layout shift. Only one of each HVP type may ride in a fleet (designer-confirmed); duplicates are blocked and flagged.",
+      "A new segmented switcher (sliding highlight, one bordered track) replaces plain button rows anywhere there are 2 or more mutually exclusive options: the ship-classes view, the New Fleet era picker, and the Play Mode phase tracker.",
+      "The Foundry's \"Forge a new faction\" now opens a picker of every existing faction, official or custom, to start from and rename - not just a blank sheet.",
+      "Play Mode is a real tutorial now: each of the four round phases is a genuine checklist you tick off at the table (not a paragraph to interpret yourself), the primary action (Next phase) is a real call-to-action, and two original diagrams - a measured table/deployment layout and a firing-arc illustration - replace text-only description for the two hardest-to-picture concepts. Small firing-arc glyphs also sit permanently next to every ship's Primary/Auxiliary weapon stats.",
+      "Home page rows are narrower with a \"Get the rulebook\" link alongside them; typography across the app was rebalanced so decorative labels stop competing with buttons and real content for attention.",
+    ],
+  },
+  {
     version: "0.7.11",
     date: "2026-07-08",
     title: "Columns view goes full width",

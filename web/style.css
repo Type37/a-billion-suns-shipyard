@@ -42,6 +42,8 @@
   --display: "Archivo", "Libre Franklin", Arial, sans-serif;
   --sans: "Libre Franklin", "Helvetica Neue", Arial, sans-serif;
   --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  /* Easy, common, friendly: the fleet-name field only, not the whole app's type system. */
+  --ios: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
   /* Semantic colour tokens. Colour signals function, not decoration:
      action = primary/interactive, accent = attention/keyline, and the three
@@ -261,7 +263,7 @@ button { font-family: inherit; }
   max-width: var(--shell); margin: 0 auto;
   padding: clamp(40px, 7vw, 88px) clamp(16px, 4vw, 40px) clamp(36px, 5vw, 64px);
 }
-.hero-eyebrow { font-size: 12px; font-weight: 700; color: var(--red); margin-bottom: 14px; }
+.hero-eyebrow { font-size: 12px; font-weight: 600; color: var(--red); margin-bottom: 14px; }
 .hero-eyebrow::before { content: ""; display: inline-block; width: 30px; height: 3px; background: var(--red); vertical-align: middle; margin-right: 12px; }
 .hero-title {
   font-family: var(--display); font-weight: 900;
@@ -302,40 +304,34 @@ button { font-family: inherit; }
 .onboard-close { background: transparent; border: 1px solid var(--hair); color: var(--ink-3); cursor: pointer; display: inline-flex; padding: 7px; flex-shrink: 0; }
 .onboard-close:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
 
-/* Home index as a command console (after COMP/CON). Angular chamfered rows;
-   on hover a skewed colour field sweeps across, a red tab strikes the leading
-   edge, the number bay inverts, and the whole row advances with a hard shadow.
-   Deliberately not flat, not static: the interaction is the point. */
-.index-wrap { max-width: var(--shell); margin: 0 auto; padding: clamp(20px, 3vw, 34px) clamp(16px, 4vw, 40px) 0; }
-.index { border-top: 3px solid var(--ink); display: flex; flex-direction: column; gap: 6px; }
+/* Home index: flat, solid rows - no chamfers, no skewed sweeps. The rows sit
+   in a narrower left column so they don't run the full content width; the
+   right column is reserved for the rulebook link. */
+.index-wrap {
+  max-width: var(--shell); margin: 0 auto; padding: clamp(20px, 3vw, 34px) clamp(16px, 4vw, 40px) 0;
+  display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(220px, 300px); gap: 32px; align-items: start;
+}
+@media (max-width: 860px) { .index-wrap { grid-template-columns: 1fr; } }
+.index-book { position: sticky; top: 20px; }
+.index-book-link {
+  display: flex; align-items: center; justify-content: center; height: 100%; min-height: 120px; padding: 22px;
+  background: var(--blue); color: #fff; border: 1px solid var(--blue-deep); text-decoration: none;
+  transition: background 0.12s ease;
+}
+.index-book-link:hover { background: var(--blue-deep); text-decoration: none; }
+.index-book-cta { display: inline-flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 800; font-size: clamp(16px, 1.8vw, 20px); text-transform: uppercase; letter-spacing: 0.01em; text-align: center; }
+@media (max-width: 860px) { .index-book { position: static; margin-top: 20px; } }
+.index { border-top: 2px solid var(--ink); display: flex; flex-direction: column; gap: 6px; }
 .index-row {
-  position: relative; isolation: isolate; overflow: hidden; width: 100%;
-  display: grid; grid-template-columns: 60px 1fr 36px; align-items: center; gap: 16px;
-  padding: 15px 18px; border: 1px solid var(--hair); color: var(--ink); background: var(--paper);
-  font-family: inherit; text-align: left; cursor: pointer;
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%);
-  transition: transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.16s ease, border-color 0.16s;
+  width: 100%; display: grid; grid-template-columns: 60px 1fr 36px; align-items: center; gap: 16px;
+  padding: 15px 18px; border: 1px solid var(--hair); border-left: 3px solid transparent;
+  color: var(--ink); background: var(--paper); font-family: inherit; text-align: left; cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease, transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.index-row::before {
-  content: ""; position: absolute; inset: -2px -2px -2px -14px; z-index: -2;
-  background: var(--blue); transform-origin: left;
-  transform: translateX(-102%) skewX(-9deg);
-  transition: transform 0.3s cubic-bezier(0.16, 0.84, 0.44, 1);
-}
-.index-row::after {
-  content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 0; z-index: -1;
-  background: var(--red); transition: width 0.16s ease;
-}
-.index-row:hover {
-  text-decoration: none; color: #fff; border-color: var(--blue-deep);
-  transform: translateX(10px);
-  filter: drop-shadow(-9px 7px 0 rgba(11, 61, 145, 0.22));
-}
-.index-row:hover::before { transform: translateX(0) skewX(-9deg); }
-.index-row:hover::after { width: 7px; }
+.index-row:hover { text-decoration: none; background: var(--blue); border-color: var(--blue-deep); border-left-color: var(--red); color: #fff; transform: translateX(8px); }
 .index-num {
   display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px;
-  border: 2px solid var(--line-2, #c8ccd3);
+  border: 1px solid var(--line-2, #c8ccd3);
   font-family: var(--display); font-weight: 900; font-size: 22px; color: var(--red);
   font-variant-numeric: tabular-nums;
   transition: color 0.16s, background 0.16s, border-color 0.16s;
@@ -365,7 +361,7 @@ button { font-family: inherit; }
 }
 @media (max-width: 940px) { .home-main { grid-template-columns: 1fr; } }
 
-.panel-title { font-size: 12px; font-weight: 700; color: var(--blue); margin-bottom: 6px; }
+.panel-title { font-size: 12px; font-weight: 600; color: var(--blue); margin-bottom: 6px; }
 .panel-note { color: var(--ink-2); font-size: 14px; margin-bottom: 24px; max-width: 62ch; }
 
 .era-block { margin-bottom: 34px; }
@@ -421,7 +417,7 @@ button { font-family: inherit; }
 .setup-band.over { border-bottom-color: var(--red); }
 .setup-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
 .setup-identity { min-width: 0; flex: 1; }
-.band-eyebrow { font-size: 11px; font-weight: 700; color: var(--blue); margin-bottom: 8px; }
+.band-eyebrow { font-size: 11px; font-weight: 600; color: var(--blue); margin-bottom: 8px; }
 .setup-band.over .band-eyebrow { color: var(--red-deep); }
 
 /* One grouped control row: emblem, limit, faction sit together, each labelled. */
@@ -430,7 +426,7 @@ button { font-family: inherit; }
   margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--hair-soft);
 }
 .control-group { display: flex; flex-direction: column; gap: 5px; }
-.control-label { font-size: 10px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); }
+.control-label { font-size: 10px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); }
 .control-group-emblem { flex: 0 0 auto; min-width: 0; }
 .fleet-name-input {
   font-family: var(--display); font-weight: 800; font-size: clamp(18px, 2.4vw, 24px);
@@ -465,11 +461,8 @@ button { font-family: inherit; }
 .emblem-choice.selected { background: var(--blue); border-color: var(--blue); color: #fff; }
 .emblem-upload { cursor: pointer; }
 .emblem-img { object-fit: cover; display: block; }
-/* Emblem art renders black and white, so the whole set reads as one monochrome
-   family regardless of the source logo's colours. (Ship art is unaffected.) */
-.emblem-img, .lib-icon img { filter: grayscale(1) contrast(1.05); }
-/* The "vg" insignia set keeps its original colour in the picker. */
-.lib-icon[data-cat="vg"] img { filter: none; }
+/* Emblem art renders in full colour, in the picker and everywhere it lands. */
+.emblem-img, .lib-icon img { filter: none; }
 .emblem-chip .emblem-img { width: 34px; height: 34px; }
 .roster-emblem .emblem-img, .sheet-emblem .emblem-img { border: 1px solid rgba(255, 255, 255, 0.5); }
 .cf-emblem-row { display: flex; align-items: center; gap: 10px; margin-top: 5px; flex-wrap: wrap; }
@@ -493,9 +486,9 @@ button { font-family: inherit; }
   background: var(--paper); border: 2px solid var(--ink); padding: 14px;
 }
 .lib-cat { margin-bottom: 14px; }
-.lib-cat-title { font-family: var(--sans); font-size: 10px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--hair-soft); }
+.lib-cat-title { font-family: var(--sans); font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--hair-soft); }
 .lib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); gap: 6px; }
-.lib-icon { padding: 4px; border: 1px solid var(--hair-soft); background: #9aa1ab; cursor: pointer; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+.lib-icon { padding: 4px; border: 1px solid var(--hair-soft); background: var(--paper); cursor: pointer; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
 .lib-icon:hover { border-color: var(--ink); }
 .lib-icon.selected { border-color: var(--blue); box-shadow: inset 0 0 0 2px var(--blue); }
 .lib-icon img { width: 100%; height: 100%; object-fit: contain; }
@@ -512,9 +505,16 @@ button { font-family: inherit; }
 .band-readout { display: flex; gap: 0; border: 1px solid var(--hair); }
 .readout { padding: 10px 20px; text-align: right; border-left: 1px solid var(--hair-soft); }
 .readout:first-child { border-left: none; }
-.readout-label { display: block; font-size: 10px; font-weight: 700; color: var(--ink-3); margin-bottom: 3px; }
+.readout-label { display: block; font-size: 10px; font-weight: 600; color: var(--ink-3); margin-bottom: 3px; }
 .readout-value { font-family: var(--display); font-weight: 800; font-size: 22px; font-variant-numeric: tabular-nums; color: var(--ink); }
 .readout-value.negative { color: var(--red-deep); }
+/* Three numbers of very different importance were reading as one flat row:
+   your score is what you're actually tracking, CMD is the resource you
+   spend (so it gets the "interactive" blue), the opponent's score is pure
+   reference. */
+.readout-primary .readout-value { font-size: 26px; }
+.readout-accent .readout-value { color: var(--blue); }
+.readout-quiet .readout-value { font-size: 18px; font-weight: 600; color: var(--ink-2); }
 
 /* --------------------------------------------------------- controls band */
 
@@ -548,7 +548,7 @@ button { font-family: inherit; }
 .segment button:first-child { border-left: none; }
 .segment button:hover { background: var(--blue-wash); color: var(--blue); }
 .segment button.selected { background: var(--blue); color: #fff; }
-.inline-field { display: inline-flex; flex-direction: column; gap: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.inline-field { display: inline-flex; flex-direction: column; gap: 4px; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
 .inline-field select, .limit-input { font-family: var(--sans); font-size: 14px; font-weight: 600; padding: 8px 10px; border: 1px solid var(--hair); background: var(--paper); color: var(--ink); }
 .limit-input { width: 120px; font-variant-numeric: tabular-nums; }
 .freeplay-badge { font-size: 11px; font-weight: 700; color: var(--red-deep); background: var(--red-wash); padding: 8px 14px; border-left: 3px solid var(--red); letter-spacing: 0.04em; }
@@ -575,14 +575,9 @@ button { font-family: inherit; }
 @media (max-width: 1200px) { .workspace { grid-template-columns: minmax(0, 1fr) minmax(300px, 400px); } }
 @media (max-width: 900px) { .workspace { grid-template-columns: 1fr; } }
 
-/* Experimental "Columns view": full width, no shell cap. Roster takes the
-   left third, ship classes (as Mass columns) take the remaining two-thirds. */
-.workspace.mass-mode { max-width: none; margin: 0; padding-left: 14px; padding-right: 14px; grid-template-columns: 1fr 2fr; }
-@media (max-width: 900px) { .workspace.mass-mode { grid-template-columns: 1fr; } }
-.layout-toggle { margin-left: auto; font-size: 10px; padding: 5px 10px; text-transform: none; letter-spacing: normal; }
 .mass-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; align-items: start; margin-bottom: 12px; }
 .mass-col { border: 1px solid var(--hair-soft); }
-.mass-col-title { font-family: var(--sans); font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); padding: 8px 10px; background: var(--paper); border-bottom: 1px solid var(--hair-soft); display: flex; justify-content: space-between; }
+.mass-col-title { font-family: var(--sans); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); padding: 8px 10px; background: var(--paper); border-bottom: 1px solid var(--hair-soft); display: flex; justify-content: space-between; }
 .mass-col-body .ship-row { padding: 7px 8px; }
 
 /* catalog (left) */
@@ -591,7 +586,7 @@ button { font-family: inherit; }
 .rule-card-text { font-family: var(--serif); font-size: 13px; line-height: 1.4; color: var(--ink); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 /* Initiative + CMD as a single compact prominent line, not two tall boxes. */
 .rule-card-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; margin-bottom: 7px; font-size: 12px; }
-.rcm-k { font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; font-size: 10px; color: var(--ink-2); }
+.rcm-k { font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; font-size: 10px; color: var(--ink-2); }
 .rcm-v { font-family: var(--display); font-weight: 800; font-size: 16px; color: var(--blue-deep); font-variant-numeric: tabular-nums; }
 .rcm-gap { width: 14px; }
 .rule-card-meta .init-dice { margin-left: 4px; }
@@ -599,13 +594,13 @@ button { font-family: inherit; }
    Sized to their content, not stretched across the whole panel. */
 .rule-card-stats { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
 .rc-stat { flex: 0 1 auto; min-width: 92px; background: #fff; border: 1px solid var(--blue); border-top: 3px solid var(--blue); padding: 5px 14px 7px; }
-.rc-stat-label { display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+.rc-stat-label { display: block; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
 .rc-stat-val { display: block; font-family: var(--display); font-weight: 800; font-size: 22px; line-height: 1.1; color: var(--blue-deep); font-variant-numeric: tabular-nums; }
 /* One die glyph per die in the Initiative pool: 2D6 shows two, 3D6 shows three. */
 .init-dice { display: inline-flex; gap: 2px; vertical-align: middle; margin-left: 8px; }
 .init-die { color: var(--red); }
 
-.catalog-title { position: relative; font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: var(--ink); padding: 0 0 7px 18px; margin: 20px 0 12px; border-bottom: 2px solid var(--color-line); display: flex; justify-content: space-between; align-items: baseline; text-transform: uppercase; }
+.catalog-title { position: relative; font-family: var(--sans); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; color: var(--ink); padding: 0 0 7px 18px; margin: 20px 0 12px; border-bottom: 2px solid var(--color-line); display: flex; justify-content: space-between; align-items: baseline; text-transform: uppercase; }
 .catalog-title::before { content: ""; position: absolute; left: 0; top: 3px; width: 10px; height: 10px; background: var(--color-accent); }
 .catalog-title:first-child, .catalog-title:first-of-type { margin-top: 0; }
 .catalog-title .muted { text-transform: none; letter-spacing: 0; font-size: 11px; }
@@ -629,15 +624,17 @@ button { font-family: inherit; }
    weapons line under it. Deliberately dense so a faction's ships fit with
    little or no scrolling. */
 .ship-row {
-  display: grid; grid-template-columns: 26px 1fr auto; gap: 9px; align-items: center; padding: 7px 12px;
+  display: grid; grid-template-columns: 44px 1fr auto; gap: 9px; align-items: center; padding: 7px 12px;
   border-bottom: 1px solid var(--hair-soft); border-left: 3px solid transparent; background: var(--paper);
   transition: border-color 0.12s ease, background 0.12s ease;
 }
 .catalog-list > .ship-row:last-child { border-bottom: none; }
 .ship-row:hover { border-color: var(--color-line); border-left-color: var(--color-action); background: var(--blue-wash); }
-.ship-row-glyph { color: var(--blue); }
-.ship-thumb { display: block; object-fit: cover; border: 1px solid var(--hair-soft); }
-.ship-row.has-art .ship-thumb { width: 44px; height: 28px; }
+/* The glyph column is now sized for ship art (44px), so a mass-glyph icon
+   (which is much smaller) needs centering rather than sitting flush-left. */
+.ship-row-glyph { color: var(--blue); display: flex; align-items: center; justify-content: center; }
+.ship-thumb { display: block; object-fit: cover; border: 1px solid var(--ink-3); background: var(--ground); }
+.ship-row.has-art .ship-thumb { width: 44px; height: 32px; }
 .modal-spec.has-art .ship-thumb { width: 72px; height: 44px; }
 .ship-row-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 .ship-name { flex: 1 1 auto; min-width: 0; font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: -0.01em; white-space: normal; }
@@ -656,15 +653,34 @@ button { font-family: inherit; }
    add button. Full rule is on the row's tooltip and in the unit modal. */
 .personnel-grid { display: grid; grid-template-columns: 1fr; gap: 6px; }
 .personnel-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; padding: 6px 8px 6px 10px; border: 1px solid var(--hair-soft); background: var(--paper); }
+/* Chosen is the same shape and height as the option row it just was -
+   clicking Add never shifts anything below it. Rename and carrier
+   assignment live in a popover (position: absolute), not inline growth. */
 .personnel-row.chosen { border-color: var(--blue); border-left: 3px solid var(--blue); background: var(--blue-wash); }
 .personnel-body { min-width: 0; }
+.personnel-actions { display: flex; align-items: center; gap: 4px; }
+.personnel-config { position: relative; }
+.personnel-config > summary { list-style: none; }
+.personnel-config > summary::-webkit-details-marker { display: none; }
+.personnel-config > summary.is-set { border-color: var(--blue); color: var(--blue); }
+.personnel-config[open] > summary { background: var(--ink); border-color: var(--ink); color: #fff; }
+.personnel-config-panel {
+  position: absolute; z-index: 20; top: calc(100% + 6px); right: 0; width: 240px;
+  background: var(--paper); border: 2px solid var(--hair); padding: 12px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.personnel-config-panel .inline-field { display: flex; flex-direction: column; gap: 4px; font-size: 11px; font-weight: 600; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.03em; }
+.personnel-rename { font-family: var(--sans); font-size: 13px; font-weight: 600; text-transform: none; letter-spacing: normal; border: 1px solid var(--hair-soft); padding: 6px 8px; background: var(--paper); color: var(--ink); }
+.personnel-rename::placeholder { color: var(--ink-3); font-style: italic; font-weight: 400; }
+.personnel-rename:focus { outline: none; border-color: var(--blue); }
+.personnel-config-panel select { font-family: var(--sans); font-size: 13px; font-weight: 600; padding: 6px 8px; border: 1px solid var(--hair-soft); background: var(--paper); color: var(--ink); }
 .personnel-name { display: block; font-family: var(--display); font-weight: 700; font-size: 13px; white-space: normal; }
+/* Generic personnel (any faction can take them) read quieter than a faction's
+   own named HVPs, so the two pools are distinguishable at a glance. */
+.personnel-name.is-generic { font-family: var(--sans); font-weight: 600; color: var(--ink-2); }
 .personnel-rule { display: block; font-size: 11px; line-height: 1.35; color: var(--ink-3); white-space: normal; }
 .add-btn-mini { padding: 5px; }
 .add-btn-mini span { display: none; }
-.stepper-mini { height: 26px; }
-.stepper-mini .stepper-count { line-height: 24px; padding: 0 8px; min-width: 20px; text-align: center; font-size: 12px; }
-.stepper-mini button { padding: 4px 7px; }
 
 /* roster (right) */
 /* Roster lives on the left and stays visible: pinned to the top, capped to the
@@ -674,15 +690,14 @@ button { font-family: inherit; }
 .roster-head { display: flex; align-items: center; gap: 14px; padding: 18px 20px; background: var(--blue); color: #fff; }
 .roster-emblem { color: #fff; }
 .roster-title { font-family: var(--display); font-weight: 800; font-size: 21px; letter-spacing: -0.01em; line-height: 1.1; }
-.roster-subtitle { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #bcd0f2; margin-top: 3px; }
-.roster-section { position: relative; font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: var(--ink); margin: 0; padding: 12px 20px 8px 34px; display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--hair-soft); text-transform: uppercase; }
+.roster-subtitle { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #bcd0f2; margin-top: 3px; }
+.roster-section { position: relative; font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: var(--ink); margin: 0; padding: 12px 20px 8px 34px; display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--hair-soft); text-transform: uppercase; }
 .roster-section::before { content: ""; position: absolute; left: 20px; top: 15px; width: 8px; height: 8px; background: var(--color-accent); }
 .roster-section .muted { font-variant-numeric: tabular-nums; }
 .roster-hint { padding: 14px 20px; font-size: 13px; color: var(--ink-3); font-style: italic; }
 
-.roster-unit, .roster-personnel { padding: 13px 20px; border-bottom: 1px solid var(--hair-soft); }
+.roster-unit { padding: 13px 20px; border-bottom: 1px solid var(--hair-soft); }
 .roster-unit.unresolved { background: var(--red-wash); }
-.roster-unit-head { display: flex; align-items: center; gap: 10px; }
 .roster-unit-glyph { color: var(--blue); flex-shrink: 0; }
 .unit-name-input { flex: 1; min-width: 0; font-family: var(--display); font-weight: 700; font-size: 15px; border: none; border-bottom: 1px solid transparent; padding: 3px 0; background: transparent; color: var(--ink); }
 .unit-name-input::placeholder { color: #aab2be; font-weight: 600; }
@@ -701,7 +716,6 @@ button { font-family: inherit; }
 .roster-unit-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; align-items: center; }
 .ship-names-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
 .ship-name-input, .inline-field select { font-family: var(--sans); font-size: 13px; padding: 7px 9px; border: 1px solid var(--hair-soft); background: var(--paper); color: var(--ink); }
-.roster-personnel-title { font-family: var(--serif); font-size: 13px; font-weight: 600; color: var(--ink-2); margin: 6px 0 8px; }
 
 /* inspection report */
 .inspection { padding: 14px 20px 18px; border-top: 2px solid var(--hair); }
@@ -740,6 +754,10 @@ button { font-family: inherit; }
 .pc-stats td { font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; padding: 2px 12px 2px 0; }
 .pc-weap { font-size: 11.5px; line-height: 1.35; color: var(--ink-2); margin-top: 2px; }
 .pc-wlabel { font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-3); display: inline-block; margin-right: 4px; }
+/* Small, always-there firing-arc glyph beside the Primary/Auxiliary label -
+   a permanent reminder of the fixed 45/180 degree geometry, not a stat that
+   varies per ship. */
+.slot-arc { vertical-align: -2px; margin-right: 3px; color: var(--blue); }
 .pc-carry { font-size: 11px; font-style: italic; color: var(--ink-2); margin-top: 4px; }
 .pc-track { margin-top: 6px; display: flex; flex-direction: column; gap: 3px; }
 .pc-track-row { display: flex; align-items: center; gap: 6px; }
@@ -768,12 +786,12 @@ button { font-family: inherit; }
 .sheet-emblem { color: var(--blue); flex-shrink: 0; }
 .sheet-title-block { flex: 1; }
 .sheet-title { font-family: var(--display); font-weight: 900; font-size: clamp(28px, 5vw, 44px); letter-spacing: -0.02em; text-transform: uppercase; line-height: 0.95; }
-.sheet-subtitle { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin-top: 6px; }
+.sheet-subtitle { font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin-top: 6px; }
 .sheet-totals { text-align: right; }
 .sheet-total-line { font-family: var(--display); font-weight: 800; font-size: 20px; font-variant-numeric: tabular-nums; }
 .sheet-date { font-size: 11px; color: var(--ink-3); margin-top: 4px; }
 
-.sheet-section { font-family: var(--sans); font-size: 12px; font-weight: 800; color: #fff; background: var(--ink); padding: 6px 12px; margin: 26px 0 14px; }
+.sheet-section { font-family: var(--sans); font-size: 12px; font-weight: 600; color: #fff; background: var(--ink); padding: 6px 12px; margin: 26px 0 14px; }
 .print-rule { margin-top: 20px; border-left: 4px solid var(--blue); padding: 4px 0 4px 16px; }
 .print-rule h3 { font-family: var(--display); font-size: 16px; margin-bottom: 5px; }
 .print-rule p { font-family: var(--serif); font-size: 14px; line-height: 1.55; }
@@ -824,14 +842,27 @@ button { font-family: inherit; }
 
 .foundry-main, .changelog-main { max-width: 960px; margin: 0 auto; padding: clamp(28px, 4vw, 52px) clamp(16px, 4vw, 40px) 0; }
 .page-title { font-family: var(--display); font-weight: 900; font-size: clamp(32px, 6vw, 56px); letter-spacing: -0.02em; text-transform: uppercase; margin-bottom: 12px; }
-.breadcrumb { font-size: 11px; font-weight: 700; color: var(--ink-3); margin-bottom: 10px; }
+.breadcrumb { font-size: 11px; font-weight: 600; color: var(--ink-3); margin-bottom: 10px; }
 .breadcrumb a { color: var(--blue); }
-.foundry-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 20px 0 30px; }
+.foundry-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 20px 0 30px; align-items: flex-start; }
 .file-btn { cursor: pointer; }
+
+/* "Forge a new faction" opens onto existing factions as starting points,
+   on the same footing as a blank sheet - so cloning is never the harder path. */
+.cf-new-picker { position: relative; }
+.cf-new-picker > summary { list-style: none; }
+.cf-new-picker > summary::-webkit-details-marker { display: none; }
+.cf-new-picker[open] > summary { background: var(--blue-deep); border-color: var(--blue-deep); }
+.cf-new-panel {
+  position: absolute; z-index: 20; top: calc(100% + 8px); left: 0;
+  width: min(720px, 90vw); max-height: 70vh; overflow-y: auto;
+  background: var(--paper); border: 2px solid var(--hair); padding: 16px;
+}
+.faction-plaque-blank { border-style: dashed; margin-bottom: 12px; width: 100%; }
 
 .cf-section { margin-bottom: 36px; border-top: 2px solid var(--hair); padding-top: 20px; }
 .cf-grid, .cf-ship-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-.field-block { display: flex; flex-direction: column; gap: 5px; font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.field-block { display: flex; flex-direction: column; gap: 5px; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
 .field-block.wide { grid-column: 1 / -1; }
 .field-block input, .field-block select, .field-block textarea,
 .cf-hvp input, .cf-hvp textarea, .weapon-edit-row input, .weapon-edit-row select {
@@ -842,7 +873,7 @@ button { font-family: inherit; }
 .cf-ship { border: 1px solid var(--hair); padding: 18px; margin-bottom: 14px; }
 .cf-slots { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 16px 0; }
 @media (max-width: 720px) { .cf-slots { grid-template-columns: 1fr; } }
-.cf-slot h5 { font-family: var(--sans); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.cf-slot h5 { font-family: var(--sans); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .check-inline { font-size: 10px; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--ink-2); display: inline-flex; gap: 5px; align-items: center; }
 .weapon-edit-row { display: grid; grid-template-columns: 2fr 60px 80px 60px 60px auto; gap: 6px; margin-bottom: 6px; align-items: center; }
 .cf-hvp { display: grid; grid-template-columns: 220px 1fr auto; gap: 8px; align-items: start; margin-bottom: 10px; }
@@ -868,21 +899,45 @@ button { font-family: inherit; }
 
 .guide-band { border-bottom: 2px solid var(--hair); background: var(--blue-wash); }
 .guide-inner { max-width: var(--shell-wide); margin: 0 auto; padding: 18px clamp(14px, 2vw, 24px) 22px; }
-.guide-title { font-family: var(--sans); font-size: 12px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: var(--blue-deep); display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.guide-title { font-family: var(--sans); font-size: 12px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--blue-deep); display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .guide-intro { font-family: var(--serif); font-size: 14px; line-height: 1.55; color: var(--ink); max-width: 78ch; margin-bottom: 14px; }
 .guide-step { border: 1px solid var(--hair-soft); background: var(--paper); margin-bottom: 6px; }
 .guide-step > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 10px 14px; font-family: var(--display); font-weight: 700; font-size: 14px; }
 .guide-step > summary::-webkit-details-marker { display: none; }
 .guide-step[open] > summary { border-bottom: 1px solid var(--hair-soft); }
 .guide-step-n { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: var(--blue); color: #fff; font-size: 12px; font-weight: 800; flex-shrink: 0; }
-.guide-step > p { font-family: var(--serif); font-size: 14px; line-height: 1.55; padding: 12px 14px 14px 46px; color: var(--ink); }
+.guide-step-body { padding: 12px 14px 14px 46px; }
+/* Notes have no numbered badge (they're not a step in the sequence), so the
+   body text shouldn't be indented as if a number were sitting to its left. */
+.guide-step-note .guide-step-body { padding-left: 14px; }
+.guide-notes-title { font-family: var(--display); font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-2); margin: 18px 0 2px; padding-top: 14px; border-top: 1px solid var(--hair-soft); }
+.guide-notes-sub { font-size: 12px; color: var(--ink-3); margin-bottom: 8px; }
+.guide-step-body p { font-family: var(--serif); font-size: 14px; line-height: 1.55; color: var(--ink); margin: 0; }
+/* Original diagrams for the two most spatially-confusing tutorial concepts
+   (table setup, weapon arcs) - not reproductions of any published artwork,
+   just this app's own house style illustrating the same rules concepts the
+   text above already describes in words. */
+.tut-diagram { display: block; width: 100%; max-width: 340px; height: auto; margin-top: 12px; color: var(--ink); }
 
-.phase-track { display: flex; gap: 6px; flex-wrap: wrap; }
-.phase-step { flex: 1 1 120px; display: flex; align-items: center; gap: 9px; border: 1px solid var(--hair); background: var(--paper); padding: 12px 14px; cursor: pointer; font-family: var(--sans); font-size: 12px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-2); min-height: var(--tap); }
-.phase-step:hover { border-color: var(--ink); color: var(--ink); }
-.phase-step.selected { background: var(--blue); border-color: var(--blue); color: #fff; }
-.phase-n { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border: 1px solid currentColor; font-size: 11px; flex-shrink: 0; }
-.phase-text { font-family: var(--serif); font-size: 14px; line-height: 1.55; color: var(--ink-2); margin-top: 12px; max-width: 88ch; }
+.phase-track .switcher-opt { text-transform: uppercase; letter-spacing: 0.05em; font-size: 12px; }
+.phase-n { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border: 1px solid currentColor; font-size: 10px; flex-shrink: 0; }
+
+/* Play-mode walkthrough: each phase is a real checklist you tick off at the
+   table, not a paragraph you read once and interpret yourself. One rule
+   above the title carries the section break; the rows below lean on
+   whitespace, not a divider under every single line. */
+/* The checklist is the one thing on this screen you're meant to act on right
+   now - everything below it (Counters, Initiative, Scoring) is either a
+   once-in-a-while tool or pure reference. A tinted background and a blue
+   accent edge give it a visual claim the plain cards below don't have. */
+.phase-checklist { margin-top: 14px; max-width: 62ch; background: var(--blue-wash); border-left: 3px solid var(--blue); padding: 14px 18px; }
+.phase-checklist-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-bottom: 6px; }
+.phase-checklist-title { font-family: var(--display); font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink); }
+.phase-checklist-count { font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.phase-check { display: flex; align-items: flex-start; gap: 10px; padding: 6px 2px; cursor: pointer; font-family: var(--serif); font-size: 14px; line-height: 1.45; color: var(--ink); }
+.phase-check input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--blue); cursor: pointer; flex-shrink: 0; }
+.phase-check.done { color: var(--ink-3); }
+.phase-check.done span { text-decoration: line-through; text-decoration-color: var(--hair); }
 .play-counters { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
 .play-counter { display: flex; flex-direction: column; gap: 6px; }
 
@@ -896,7 +951,7 @@ button { font-family: inherit; }
 }
 .comp-filters select, .comp-search { min-width: 130px; }
 .comp-search { min-width: 200px; }
-.comp-count { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); margin: 14px 0 8px; }
+.comp-count { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); margin: 14px 0 8px; }
 .comp-scroll { border: 1px solid var(--hair); }
 .comp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .comp-table thead th {
@@ -916,7 +971,7 @@ button { font-family: inherit; }
 .comp-table tbody td { padding: 9px 12px; border-top: 1px solid var(--hair-soft); vertical-align: top; }
 .comp-table tbody tr:hover { background: var(--blue-wash); }
 .comp-name { font-family: var(--display); font-weight: 700; font-size: 14px; white-space: nowrap; }
-.comp-era { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+.comp-era { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
 .comp-fac { font-size: 12px; color: var(--ink-2); white-space: nowrap; }
 .comp-num { text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .comp-cost { color: var(--blue); }
@@ -928,8 +983,8 @@ button { font-family: inherit; }
   position: sticky; top: 34px; z-index: 1;
 }
 .comp-group .cg-name { font-family: var(--display); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 0.01em; }
-.comp-group .cg-era { margin-left: 12px; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #9fb2d6; }
-.comp-group .cg-count { float: right; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #9fb2d6; }
+.comp-group .cg-era { margin-left: 12px; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #9fb2d6; }
+.comp-group .cg-count { float: right; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #9fb2d6; }
 .comp-table.grouped tbody td { border-top: 1px solid var(--hair-soft); }
 .comp-table.grouped .comp-group + tr td { border-top: none; }
 
@@ -948,9 +1003,19 @@ button { font-family: inherit; }
 .solo-tab.selected { color: var(--blue); border-bottom-color: var(--red); }
 
 .solo-body { max-width: var(--shell); margin: 0 auto; padding: clamp(20px, 3vw, 32px) clamp(16px, 4vw, 40px) 0; }
-.solo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; align-items: start; }
-.solo-card { border: 2px solid var(--hair); padding: 18px 20px; }
-.solo-card .roster-section { padding: 0 0 10px; border-bottom: 1px solid var(--hair-soft); margin-bottom: 14px; }
+.solo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; align-items: start; }
+/* A single top rule marks where each card starts, instead of boxing the
+   whole thing on all four sides - the heading's own weight (bold, uppercase,
+   from .roster-section) carries the separation from here down. */
+.solo-card { border: none; border-top: 2px solid var(--hair); padding: 14px 0 0; }
+.solo-card .roster-section { padding: 0 0 10px; border-bottom: none; margin-bottom: 10px; }
+/* All three cards read as equally important before, when only one (Counters,
+   holding the Next Phase button) is what you touch every phase; Initiative
+   only matters once a round, and Scoring is pure reference. */
+.solo-card-primary { border-top-color: var(--blue); border-top-width: 3px; }
+.solo-card-primary .roster-section { color: var(--blue); }
+.solo-card-quiet .roster-section { color: var(--ink-3); }
+.solo-card-quiet .panel-note, .solo-card-quiet .rule-list { color: var(--ink-3); }
 .solo-readout { margin: 12px 0 0; }
 .solo-readout.over { border-color: var(--red); }
 
@@ -970,7 +1035,7 @@ button { font-family: inherit; }
 .roller-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 4px; }
 .roll-result { display: flex; gap: 16px; align-items: center; margin-top: 16px; border: 2px solid var(--blue); padding: 14px; background: var(--blue-wash); }
 .roll-die { font-family: var(--display); font-weight: 900; font-size: 44px; line-height: 1; color: var(--blue); min-width: 54px; text-align: center; }
-.roll-table { font-size: 10px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); }
+.roll-table { font-size: 10px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); }
 .roll-headline { font-family: var(--display); font-weight: 800; font-size: 18px; margin-top: 2px; }
 .roll-detail { font-family: var(--serif); font-size: 13px; color: var(--ink-2); margin-top: 4px; }
 
@@ -998,7 +1063,7 @@ button { font-family: inherit; }
 .ref-item { border-left: 3px solid var(--blue); padding: 2px 0 2px 14px; }
 .ref-item h4 { font-family: var(--display); font-size: 15px; margin-bottom: 4px; }
 .ref-item p { font-family: var(--serif); font-size: 13px; line-height: 1.5; color: var(--ink-2); }
-.ref-sub { font-family: var(--sans); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin: 16px 0 8px; color: var(--blue); }
+.ref-sub { font-family: var(--sans); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin: 16px 0 8px; color: var(--blue); }
 
 /* Grid/flex children must be allowed to shrink below their content's
    min-content, or nested auto-fill grids force the page wider than the
@@ -1045,7 +1110,6 @@ button { font-family: inherit; }
   .foundry-main, .changelog-main, .compendium, .solo-body { padding-left: 14px; padding-right: 14px; }
 
   .index-row { grid-template-columns: 44px 1fr 22px; gap: 12px; padding: 16px 14px; }
-  .index-row:hover { transform: translateX(6px); }
   .index-num { width: 40px; height: 40px; font-size: 18px; }
 }
 
@@ -1083,22 +1147,228 @@ button { font-family: inherit; }
 .ru-remove:hover { color: var(--red); }
 .roster-sheet .roster-unit:hover .ru-go { color: var(--color-accent); }
 
-/* Modal system (after the Dropfleet builder): overlay, chamfered panel,
+/* ===========================================================================
+   MANIFEST BUILDER — the working surface as one ruled document, not a
+   dashboard. No header band, no cards, no progress bars, no candy buttons.
+   Hierarchy is type weight and hairline rules; data sits in tabular figures;
+   actions are marginal marks and plain text. Palette unchanged.
+   =========================================================================== */
+.builder { max-width: var(--shell-wide); margin: 0 auto; padding: 0 clamp(14px, 3vw, 34px) 64px; }
+
+/* masthead: document title + stark tally, ruled off, no fill */
+.mf-head { padding: 20px 0 12px; border-bottom: 2px solid var(--hair); }
+.mf-headline { display: flex; align-items: center; gap: 16px; }
+.mf-emblem { flex-shrink: 0; }
+.mf-emblem .emblem-current-btn { border: none; padding: 0; background: none; }
+.mf-emblem .emblem-caret { display: none; }
+.mf-name {
+  flex: 1 1 auto; min-width: 0; border: none; background: none; padding: 2px 0;
+  font-family: var(--ios); font-weight: 600; font-size: clamp(22px, 3vw, 34px);
+  letter-spacing: -0.01em; text-transform: none; line-height: 1.15; color: var(--ink);
+  border-bottom: 2px dotted var(--hair-soft);
+}
+.mf-name::placeholder { color: #c7cdd6; font-weight: 400; }
+/* Dotted underline at rest signals "editable text" the same way the credits
+   cap and faction switcher already do - without it this reads as a plain
+   heading, not a field, until you happen to click it. */
+.mf-name:hover { border-bottom-color: var(--ink-3); }
+.mf-name:focus { outline: none; border-bottom-style: solid; border-bottom-color: var(--blue); }
+.mf-tally { display: flex; align-items: baseline; gap: 7px; white-space: nowrap; font-family: var(--display); font-variant-numeric: tabular-nums; }
+.mf-tally-now { font-size: clamp(26px, 3.4vw, 42px); font-weight: 900; color: var(--ink); }
+.mf-tally-free { margin-left: 8px; font-family: var(--display); font-size: 17px; font-weight: 900; color: var(--go); }
+.builder.is-over .mf-tally-now, .builder.is-over .mf-tally-free { color: var(--red); }
+
+.mf-meter { margin-top: 10px; height: 7px; background: var(--ground); border: 1px solid var(--hair-soft); }
+.mf-meter-fill { display: block; height: 100%; background: var(--blue); }
+.builder.is-over .mf-meter-fill { background: var(--red); }
+
+.mf-subline { display: flex; align-items: center; gap: 12px; margin-top: 12px; min-height: 28px; }
+.mf-sep { color: var(--ink); font-weight: 900; }
+.mf-era { font-family: var(--display); font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 0; color: var(--ink); }
+/* faction reads as an inline mark, not a filled button */
+.mf-fac .faction-switch > summary,
+.mf-fac .freeplay-badge {
+  border: none; background: none; padding: 0; list-style: none;
+  font-family: var(--display); font-weight: 900; font-size: 15px; text-transform: uppercase; letter-spacing: 0;
+  color: var(--blue); cursor: pointer; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 3px;
+}
+.mf-fac .faction-switch > summary::-webkit-details-marker { display: none; }
+.mf-fac .faction-switch[open] > summary { color: var(--red); }
+
+/* Credits cap: the "/500" itself is the control. Click it for a popover with
+   the presets and a custom field, instead of a standing row of buttons. */
+.limit-switch { position: relative; display: inline-block; }
+.limit-switch > summary {
+  list-style: none; cursor: pointer; font-size: 22px; font-weight: 800; color: var(--ink);
+  border-bottom: 2px dotted var(--ink-3);
+}
+.limit-switch > summary::-webkit-details-marker { display: none; }
+.limit-switch:hover > summary, .limit-switch[open] > summary { color: var(--blue); border-bottom-color: var(--blue); }
+.limit-switch-panel {
+  position: absolute; z-index: 20; top: calc(100% + 8px); left: 0;
+  background: var(--paper); border: 2px solid var(--hair); padding: 10px;
+}
+.limit-switch-panel .segment { border: 1px solid var(--hair); }
+
+/* body: two flush regions, one vertical rule between; no cards */
+.mf-body { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: start; }
+/* The manifest is what you're building; it follows you down the page while
+   the yard (ships, personnel) scrolls past on the right. */
+.mf-manifest {
+  min-width: 0; padding-right: 28px; border-right: 2px solid var(--hair);
+  position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto;
+}
+.mf-yard { min-width: 0; padding-left: 28px; }
+
+.mf-h {
+  display: flex; align-items: baseline; gap: 12px;
+  font-family: var(--display); font-weight: 800; font-size: 19px; text-transform: uppercase; letter-spacing: 0.01em;
+  color: var(--ink); padding: 26px 0 8px; border-bottom: 2px solid var(--hair);
+}
+.mf-h-count { font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: 0; color: var(--ink); font-variant-numeric: tabular-nums; }
+/* A segmented switcher for any number of mutually exclusive options: one
+   bordered track, a sliding highlight bar that glides to the selected option
+   on click, instead of N separate boxed buttons or plain underlined links
+   swapping colour abruptly. Flat, square corners throughout - no shadow or
+   gradient does the "satisfying" work here, the motion does. Count and
+   position come from --switcher-count/--switcher-selected custom properties
+   set inline per instance, so this is one ruleset for 2, 3, 4, or more. */
+.switcher { position: relative; display: grid; grid-template-columns: repeat(var(--switcher-count), 1fr); border: 1px solid var(--hair); }
+.mf-h .switcher { margin-left: auto; }
+.switcher-thumb {
+  position: absolute; inset: 0; width: calc(100% / var(--switcher-count)); background: var(--blue);
+  transform: translateX(calc(var(--switcher-selected) * 100%));
+  transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.switcher-opt {
+  position: relative; z-index: 1; border: none; background: none; border-left: 1px solid var(--hair);
+  font-family: var(--sans); font-weight: 700; font-size: 13px; padding: 9px 14px; cursor: pointer;
+  color: var(--ink-2); text-align: center; white-space: nowrap; transition: color 0.15s ease; min-height: var(--tap);
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+}
+.switcher-opt:first-child { border-left: none; }
+.switcher-opt:hover:not(.selected) { color: var(--blue); }
+.switcher-opt.selected { color: #fff; }
+
+/* Stat comparison chart: pick a stat, every ship class ranked as a bar. */
+.chart-picker { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 6px; }
+.chart-picker-btn {
+  display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--hair); background: var(--paper);
+  color: var(--ink-2); font-family: var(--sans); font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.03em; padding: 5px 9px; cursor: pointer;
+}
+.chart-picker-btn:hover { border-color: var(--ink); color: var(--ink); }
+.chart-picker-btn.selected { background: var(--ink); border-color: var(--ink); color: #fff; }
+.chart { display: flex; flex-direction: column; padding: 4px 0 14px; }
+.chart-row { display: grid; grid-template-columns: minmax(90px, 1fr) minmax(0, 2fr) auto; align-items: center; gap: 10px; padding: 5px 2px; border-bottom: 1px solid var(--hair-soft); }
+.chart-label { font-family: var(--display); font-weight: 700; font-size: 12.5px; color: var(--ink); }
+.chart-track { display: block; height: 16px; background: var(--ground); }
+.chart-bar { display: block; height: 100%; background: var(--blue); }
+.chart-val { font-family: var(--display); font-weight: 800; font-size: 12px; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; min-width: 44px; }
+.mf-empty { padding: 16px 2px; font-size: 14px; font-weight: 600; color: var(--ink); }
+
+/* every list is the same ledger: flush, hairline-separated, no borders */
+.mf-list > .roster-unit { padding: 10px 2px; border-bottom: 1px solid var(--hair-soft); }
+.mf-manifest .mf-list .roster-unit {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto auto; align-items: center; gap: 8px 16px;
+  border-left: 3px solid transparent; background: none; transition: border-color .12s ease;
+}
+/* the stat + weapon line moves inline into the row's open middle, not a wasted
+   full-width strip below */
+.mf-manifest .mf-list .roster-unit .ru-details {
+  grid-column: auto; margin-top: 0; padding-top: 0; border-top: none; align-self: center;
+}
+.mf-manifest .mf-list .roster-unit:hover { border-left-color: var(--blue); }
+.mf-manifest .mf-list .roster-unit.unresolved { background: var(--red-wash); }
+
+.mf-yard .ship-row { background: none; border-left: 3px solid transparent; border-bottom: 1px solid var(--hair-soft); padding: 8px 2px; }
+.mf-yard .ship-row:hover { background: var(--blue-wash); border-color: var(--hair-soft); border-left-color: var(--blue); }
+.mf-yard .personnel-grid { gap: 0; }
+.mf-yard .personnel-row { border: none; border-bottom: 1px solid var(--hair-soft); border-left: 3px solid transparent; background: none; padding: 8px 2px; }
+.mf-yard .personnel-row.chosen { background: var(--blue-wash); border-left-color: var(--blue); }
+
+/* clickable options: the whole row is the add target, and the ADD cue stands
+   even without hover so it is always obvious what can be picked. */
+.mf-yard .is-option { cursor: pointer; }
+.mf-yard .is-option:hover { background: var(--blue-wash); border-left-color: var(--blue); }
+.add-cue {
+  display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; align-self: center;
+  font-family: var(--display); font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.02em;
+  color: var(--blue); border: 2px solid var(--blue); padding: 5px 10px;
+}
+.is-option:hover .add-cue { background: var(--blue); color: #fff; }
+.add-cue.is-off { color: var(--ink-2); border-color: var(--hair-soft); }
+.personnel-row.is-full { opacity: 0.55; }
+.owned-tag { font-family: var(--display); font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--go); white-space: nowrap; }
+
+/* stat chips lose their boxes here: a heavy black tabular stat line */
+.builder .stat-chip { border: none; padding: 0 7px 0 0; gap: 4px; font-size: 14px; font-weight: 800; }
+.builder .stat-val { color: var(--ink); font-weight: 800; }
+.builder .stat-lbl { color: var(--ink); font-weight: 800; }
+/* data text stays black and readable, never gray-and-thin */
+.builder .ship-weapons, .builder .ru-weap { color: var(--ink); font-size: 13px; font-weight: 500; line-height: 1.4; }
+.builder .ru-sub { color: var(--ink); font-weight: 600; }
+.builder .ru-name, .builder .ship-name, .builder .personnel-name { font-size: 16px; }
+.builder .personnel-rule { color: var(--ink); font-size: 13px; font-weight: 500; line-height: 1.4; }
+
+/* add marks: a ghost square [+], never a filled blue button */
+.builder .add-btn {
+  border: 1px solid var(--hair); background: none; color: var(--ink);
+  min-width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center;
+}
+.builder .add-btn:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+.builder .add-btn:disabled { border-color: var(--hair-soft); color: var(--ink-3); background: none; }
+
+/* faction rule: ruled prose, not a card */
+.mf-rule { padding: 12px 0 14px; border-bottom: 2px solid var(--hair); }
+.mf-rule-meta { display: flex; align-items: center; gap: 6px; font-family: var(--display); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.01em; color: var(--ink); }
+.mf-rule-meta b { color: var(--blue); }
+.mf-rule-name { font-family: var(--display); font-weight: 800; font-size: 18px; color: var(--blue); margin-top: 5px; }
+.mf-rule-text { font-family: var(--serif); font-size: 14.5px; line-height: 1.45; font-weight: 500; color: var(--ink); margin-top: 4px; }
+
+/* inspection: a heavy ruled statement, not a colored panel */
+.mf-inspect { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 14px 2px; border-top: 2px solid var(--hair); font-size: 15px; font-weight: 700; color: var(--ink); }
+.mf-inspect.pass { color: var(--go); }
+.mf-inspect.freeplay { color: var(--ink); font-weight: 600; }
+.mf-inspect.fail { flex-direction: column; align-items: stretch; color: var(--red-deep); }
+.mf-inspect-h { font-family: var(--display); font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.01em; margin-bottom: 8px; }
+.builder .issue-list li { font-size: 14px; font-weight: 600; }
+.builder .issue-error { color: var(--red-deep); }
+.builder .issue-warning { color: var(--amber); }
+
+/* notes + utilities: bold text, not chrome */
+.mf-notes { margin-top: 6px; border-top: 2px solid var(--hair); }
+.mf-notes > summary { list-style: none; cursor: pointer; padding: 12px 2px; font-family: var(--display); font-weight: 800; font-size: 16px; text-transform: uppercase; letter-spacing: 0.01em; color: var(--ink); }
+.mf-notes > summary::-webkit-details-marker { display: none; }
+.mf-notes .notes-input { border: 1px solid var(--hair); padding: 10px; font-weight: 500; color: var(--ink); }
+.mf-utils { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 20px; padding-top: 16px; border-top: 2px solid var(--hair); }
+.mf-utils a, .mf-utils button { display: inline-flex; align-items: center; gap: 6px; border: none; background: none; padding: 0; cursor: pointer; font-family: var(--display); font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.01em; color: var(--blue); text-decoration: none; }
+.mf-utils a:hover, .mf-utils button:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 2px; }
+.mf-utils .danger { color: var(--red-deep); }
+
+@media (max-width: 900px) {
+  .mf-body { grid-template-columns: 1fr; }
+  /* Stacked single-column: the manifest reads top-to-bottom with everything
+     else, so it must not pin itself over content further down the page. */
+  .mf-manifest { position: static; max-height: none; overflow-y: visible; border-right: none; padding-right: 0; }
+  .mf-yard { padding-left: 0; border-top: 2px solid var(--hair); margin-top: 8px; }
+}
+
+/* Modal system (after the Dropfleet builder): overlay, solid panel,
    header / body / footer. Industrial framing, mono title. */
 .modal-root { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding: 20px; }
 .modal-backdrop { position: absolute; inset: 0; background: rgba(10, 14, 20, 0.55); }
 .modal-panel {
   position: relative; z-index: 1; width: min(560px, 100%); max-height: 90vh; overflow-y: auto;
   background: var(--paper); border: 2px solid var(--color-line);
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%);
 }
 .modal-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; background: var(--color-action); color: #fff; }
-.modal-title { font-family: var(--sans); font-weight: 700; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
+.modal-title { font-family: var(--sans); font-weight: 600; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
 .modal-close { background: transparent; border: 1px solid #3a5aa0; color: #fff; cursor: pointer; display: inline-flex; padding: 6px; }
 .modal-close:hover { background: #fff; color: var(--color-action); }
 .modal-body { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
 .modal-footer { display: flex; justify-content: space-between; gap: 12px; padding: 14px 20px; border-top: 2px solid var(--color-line); }
-.modal-field { display: flex; flex-direction: column; gap: 8px; font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.modal-field { display: flex; flex-direction: column; gap: 8px; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
 .modal-name { font-family: var(--display); font-weight: 700; font-size: 20px; letter-spacing: -0.01em; color: var(--color-ink); border: 1px solid var(--hair); padding: 10px 12px; text-transform: none; }
 .modal-name:focus { outline: none; border-color: var(--color-accent); }
 .modal-spec { display: grid; grid-template-columns: auto 1fr; gap: 14px; padding: 14px; border: 1px solid var(--hair); border-left: 3px solid var(--color-action); background: #f8f9fc; }
@@ -1150,13 +1420,19 @@ button { font-family: inherit; }
    right (its ships, rule, and personnel). */
 .nf-modal .nf-body { display: grid; grid-template-columns: 1.05fr 1fr; gap: 22px; align-items: start; }
 .nf-controls { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+/* A fixed height, not max-height: switching era or toggling "More" changes
+   how much content is inside, but the box itself must never resize - that's
+   what actually stops it from shifting anything below. */
+.nf-faction-scroll { height: 320px; overflow-y: auto; padding-right: 4px; }
+.nf-alt { display: flex; flex-direction: column; gap: 10px; padding-top: 16px; border-top: 1px solid var(--hair-soft); }
+.nf-alt-opts { display: flex; flex-wrap: wrap; gap: 8px; }
 .nf-detail-col { min-width: 0; border-left: 1px solid var(--hair-soft); padding-left: 22px; }
 .nf-detail-empty { display: flex; align-items: center; justify-content: center; min-height: 220px; text-align: center; }
 .nfd-title { font-family: var(--display); font-weight: 800; font-size: 20px; margin-bottom: 8px; text-transform: none; letter-spacing: -0.01em; color: var(--ink); }
 .nfd-rule { font-size: 13px; line-height: 1.5; color: var(--ink-2); margin-bottom: 8px; font-weight: 400; letter-spacing: normal; text-transform: none; }
 .nfd-rule-name { font-weight: 700; color: var(--ink); }
 .nfd-playstyle { font-size: 12.5px; font-style: italic; color: var(--ink-3); margin-bottom: 6px; font-weight: 400; letter-spacing: normal; text-transform: none; }
-.nfd-h { font-family: var(--sans); font-size: 10px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin: 18px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--hair-soft); }
+.nfd-h { font-family: var(--sans); font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin: 18px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--hair-soft); }
 .nfd-ships { width: 100%; border-collapse: collapse; }
 .nfd-ships td { border-bottom: 1px solid var(--hair-soft); padding: 6px 4px; font-size: 12px; vertical-align: top; text-transform: none; letter-spacing: normal; font-weight: 400; color: var(--ink-2); }
 .nfd-ship { width: 40%; }
@@ -1176,8 +1452,6 @@ button { font-family: inherit; }
   display: grid; grid-auto-flow: column; grid-template-rows: repeat(4, auto);
   grid-auto-columns: minmax(190px, 1fr); gap: 8px; overflow-x: auto; padding-bottom: 6px;
 }
-.nf-alt { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 16px; border-top: 1px solid var(--hair-soft); }
-.nf-alt .control-label { margin-right: 4px; }
 .cta-btn[disabled] { background: var(--paper); color: var(--ink-3); border-color: var(--hair); cursor: default; }
 .cta-btn[disabled]:hover { background: var(--paper); color: var(--ink-3); border-color: var(--hair); }
 

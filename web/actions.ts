@@ -286,7 +286,14 @@ function handleClick(e: MouseEvent): void {
         persistLists(lists);
         return { ...s, lists };
       });
-      showToast("Fleet duplicated.");
+      // From the Fleets table, stay put - the toast is enough, the row shows up
+      // below. From inside the builder, a silent copy sitting off-screen in the
+      // list looks like the button did nothing, so jump straight to the copy.
+      if (currentListId() === id) {
+        location.hash = routeHash({ view: "builder", listId: copy.id });
+      } else {
+        showToast("Fleet duplicated.");
+      }
       break;
     }
     case "delete-list": {
@@ -310,12 +317,24 @@ function handleClick(e: MouseEvent): void {
         ? findFaction(list.fleet.factionId, state.customFactions)
         : undefined;
       const url = shareUrl(list, cf);
-      navigator.clipboard
-        .writeText(url)
-        .then(() => showToast("Share link copied to the clipboard."))
-        .catch(() => {
+      // window.prompt() itself can throw in some embedded/mobile contexts, so
+      // it is wrapped: whatever happens, the user gets a toast either way.
+      const manualFallback = () => {
+        try {
           prompt("Copy this link:", url);
-        });
+        } catch {
+          // No prompt available either; the toast below is the only feedback left.
+        }
+        showToast("Copy the link from the box above.");
+      };
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard
+          .writeText(url)
+          .then(() => showToast("Share link copied to the clipboard."))
+          .catch(manualFallback);
+      } else {
+        manualFallback();
+      }
       break;
     }
     case "set-emblem": {
@@ -513,10 +532,21 @@ function handleClick(e: MouseEvent): void {
       break;
     }
     case "add-hvp": {
+      // Only one of each HVP type may ride in a fleet at a time, so this is a
+      // no-op if that type is already selected (guards a stale/replayed click).
       const id = currentListId();
       const hvpId = target.dataset["hvp"];
       if (!id || !hvpId) return;
-      store.setState((s) => updateFleet(s, id, (f) => ({ ...f, hvp: [...f.hvp, { hvpId }] })));
+      store.setState((s) =>
+        updateFleet(s, id, (f) => (f.hvp.some((h) => h.hvpId === hvpId) ? f : { ...f, hvp: [...f.hvp, { hvpId }] })),
+      );
+      // The store re-renders synchronously, so the chosen card (with its
+      // still-closed config popover) already exists in the DOM by this line.
+      // Open it immediately - the assigner should be visible the instant you
+      // add someone, not wait for a second click on the pencil icon. The
+      // popover is position: absolute, so opening it never touches layout.
+      const opened = document.querySelector<HTMLDetailsElement>(`.personnel-config[data-hvp="${hvpId}"]`);
+      if (opened) opened.open = true;
       break;
     }
     case "remove-hvp": {
@@ -526,42 +556,25 @@ function handleClick(e: MouseEvent): void {
       store.setState((s) => updateFleet(s, id, (f) => ({ ...f, hvp: f.hvp.filter((_, i) => i !== index) })));
       break;
     }
-    case "remove-hvp-one": {
-      // Removes one instance of this HVP from the catalog card's stepper.
-      // Prefers an unassigned copy so an already-placed captain is not
-      // silently unassigned; falls back to the last copy overall.
-      const id = currentListId();
-      const hvpId = target.dataset["hvp"];
-      if (!id || !hvpId) return;
-      store.setState((s) =>
-        updateFleet(s, id, (f) => {
-          let idx = -1;
-          for (let i = f.hvp.length - 1; i >= 0; i--) {
-            if (f.hvp[i].hvpId === hvpId && !f.hvp[i].assignedUnitId) {
-              idx = i;
-              break;
-            }
-          }
-          if (idx === -1) {
-            for (let i = f.hvp.length - 1; i >= 0; i--) {
-              if (f.hvp[i].hvpId === hvpId) {
-                idx = i;
-                break;
-              }
-            }
-          }
-          if (idx === -1) return f;
-          return { ...f, hvp: f.hvp.filter((_, i) => i !== idx) };
-        }),
-      );
-      break;
-    }
     case "do-print": {
       window.print();
       break;
     }
-    case "toggle-mass-layout": {
-      store.setState((s) => ({ ...s, ui: { ...s.ui, massLayout: !s.ui.massLayout } }));
+    case "set-catalog-view": {
+      // Clicking the already-active view returns to the plain list, so each
+      // button is a real on/off toggle rather than a one-way switch.
+      const view = target.dataset["view"];
+      const next = view === "mass" || view === "chart" ? view : undefined;
+      store.setState((s) => ({
+        ...s,
+        ui: { ...s.ui, catalogView: s.ui.catalogView === next ? undefined : next },
+      }));
+      break;
+    }
+    case "set-chart-stat": {
+      const stat = target.dataset["stat"];
+      if (stat !== "cost" && stat !== "mass" && stat !== "thrust" && stat !== "silhouette" && stat !== "shields") return;
+      store.setState((s) => ({ ...s, ui: { ...s.ui, catalogChartStat: stat } }));
       break;
     }
     case "print-format": {
@@ -830,16 +843,18 @@ function handleClick(e: MouseEvent): void {
           const p = l.play ?? freshPlayState(faction);
           const maxRound = l.mode === "management-training" ? 3 : 4;
           switch (action) {
+            // Each phase is its own checklist walkthrough, not a running log,
+            // so moving to a (possibly different) phase clears the ticks.
             case "play-phase":
-              return { ...l, play: { ...p, phase: Math.max(0, Math.min(3, phaseTo)) } };
+              return { ...l, play: { ...p, phase: Math.max(0, Math.min(3, phaseTo)), checks: [] } };
             case "play-next": {
               // Advancing past the End Phase rolls into the next round and
               // refreshes the CMD counter from the faction value.
               if (p.phase >= 3) {
                 const cmd = faction ? Number(faction.cmdTokens) || p.cmd : p.cmd;
-                return { ...l, play: { ...p, phase: 0, round: Math.min(maxRound, p.round + 1), cmd } };
+                return { ...l, play: { ...p, phase: 0, round: Math.min(maxRound, p.round + 1), cmd, checks: [] } };
               }
-              return { ...l, play: { ...p, phase: p.phase + 1 } };
+              return { ...l, play: { ...p, phase: p.phase + 1, checks: [] } };
             }
             case "play-round":
               return { ...l, play: { ...p, round: Math.max(1, Math.min(maxRound, p.round + delta)) } };
@@ -856,6 +871,21 @@ function handleClick(e: MouseEvent): void {
             default:
               return l;
           }
+        }),
+      );
+      break;
+    }
+    case "play-check-step": {
+      const id = currentListId();
+      const index = Number(target.dataset["index"]);
+      if (!id || !Number.isInteger(index)) return;
+      store.setState((s) =>
+        updateList(s, id, (l) => {
+          const faction = findFaction(l.fleet.factionId, s.customFactions);
+          const p = l.play ?? freshPlayState(faction);
+          const checks = [...(p.checks ?? [])];
+          checks[index] = !checks[index];
+          return { ...l, play: { ...p, checks } };
         }),
       );
       break;
@@ -884,6 +914,20 @@ function handleClick(e: MouseEvent): void {
           },
         },
       }));
+      // Ties the roll to its checklist step (index 1: "Roll your Initiative
+      // Check"), but only while actually in the Command Phase - this button
+      // is always on screen, this checklist item only means something there.
+      const id = currentListId();
+      if (id) {
+        store.setState((s) =>
+          updateList(s, id, (l) => {
+            if (!l.play || l.play.phase !== 0) return l;
+            const checks = [...(l.play.checks ?? [])];
+            checks[1] = true;
+            return { ...l, play: { ...l.play, checks } };
+          }),
+        );
+      }
       break;
     }
 
@@ -899,6 +943,22 @@ function handleClick(e: MouseEvent): void {
         ships: [],
         hvp: [],
       };
+      store.setState((s) => {
+        const customFactions = [...s.customFactions, faction];
+        persistCustomFactions(customFactions);
+        return { ...s, customFactions };
+      });
+      location.hash = routeHash({ view: "foundry", factionId: faction.id });
+      break;
+    }
+    case "clone-faction": {
+      // Starting from an existing faction (official or custom) is offered
+      // alongside a blank slate in the same picker, so cloning-then-renaming
+      // is the path of least resistance rather than something explained.
+      const sourceId = target.dataset["source"];
+      const source = sourceId ? findFaction(sourceId, state.customFactions) : undefined;
+      if (!source) return;
+      const faction: Faction = { ...structuredClone(source), id: newId("cf"), name: `${source.name} (Copy)` };
       store.setState((s) => {
         const customFactions = [...s.customFactions, faction];
         persistCustomFactions(customFactions);

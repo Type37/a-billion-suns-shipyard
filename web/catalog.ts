@@ -57,7 +57,18 @@ export const BUILT_IN_FACTIONS: Faction[] = discovered.sort(
   (a, b) => bookRank(a.id) - bookRank(b.id) || a.name.localeCompare(b.name),
 );
 
+// Seed factions that ship as ready-made test content (see seed-factions.ts)
+// but shouldn't clutter every faction picker. Hidden from selection, browsing,
+// and cloning - but still resolvable by id, so a fleet someone already built
+// with one keeps working, and it stays visible/manageable in the Foundry list
+// (which reads state.customFactions directly, not this function).
+const HIDDEN_FACTION_IDS = new Set<string>(["cf-covenant"]);
+
 export function allFactions(customs: Faction[]): Faction[] {
+  return [...BUILT_IN_FACTIONS, ...customs].filter((f) => !HIDDEN_FACTION_IDS.has(f.id));
+}
+
+function allFactionsUnfiltered(customs: Faction[]): Faction[] {
   return [...BUILT_IN_FACTIONS, ...customs];
 }
 
@@ -76,7 +87,8 @@ export function findFaction(id: string, customs: Faction[]): Faction | undefined
   // The Training Fleet resolves for Basic Training lists but stays out of the
   // faction pickers: it is a tutorial roster, not a faction you choose.
   if (id === TRAINING_FLEET.id) return TRAINING_FLEET;
-  return allFactions(customs).find((f) => f.id === id);
+  // Unfiltered: a fleet already built with a hidden faction must keep resolving.
+  return allFactionsUnfiltered(customs).find((f) => f.id === id);
 }
 
 export function makeCatalog(customs: Faction[]): Catalog {

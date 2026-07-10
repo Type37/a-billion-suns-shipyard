@@ -5,7 +5,7 @@ import { GENERIC_HVP } from "../src/data/index.ts";
 import { JUNKSPACE_SHIPS } from "../src/data/junkspace.ts";
 import { allFactions, factionsByEra, findFaction, makeCatalog, ERA_ORDER } from "./catalog.ts";
 import { auxSlotText, credits, escapeHtml, formatDate, primarySlotText } from "./format.ts";
-import { emblemMark, icon, initiativeDice, massGlyph, statChips } from "./icons.ts";
+import { emblemMark, icon, initiativeDice, massGlyph, statChips, tacticalDiagram } from "./icons.ts";
 import { iconLibraryControls, iconLibraryGrid, libraryUrl } from "./emblems.ts";
 import { CHANGELOG } from "./changelog.ts";
 import type { AppState } from "./state.ts";
@@ -40,24 +40,23 @@ const MODE_ERA: Partial<Record<GameMode, Era>> = {
 interface GuideStep {
   title: string;
   text: string;
+  diagram?: "deployment" | "arcs";
 }
 
-const TRAINING_GUIDES: Partial<Record<GameMode, { intro: string; steps: GuideStep[] }>> = {
+const TRAINING_GUIDES: Partial<Record<GameMode, { intro: string; steps: GuideStep[]; notes: GuideStep[] }>> = {
   "combat-simulator": {
     intro:
       "Your first game of A Billion Suns. It plays like Armageddon and teaches the basics of activating your fleet: moving and attacking. Your Training Fleet is already loaded.",
+    // What you actually DO, once, in order, before and during the game.
     steps: [
       {
         title: "Set up the table",
         text: 'Clear a play area roughly 4 feet by 3 feet. Pick or roll a D6 for a Central Objective and place it in the middle of the board: 1-2 a ComSat, 3-4 a Facility, 5-6 a Planetoid. Each player deploys 3 Jump Points: the flank points 24" apart and 15" in from each short edge, the central point 5" from your own edge.',
+        diagram: "deployment",
       },
       {
         title: "Place your High-Value Personnel",
         text: "Gather three HVP tokens that are distinguishable as yours and place them on friendly ships of Mass 1 or higher. All three of your HVP are Seasoned Captains: units in their battlegroup can use the Red Alert command for 0 CMD, once per Round.",
-      },
-      {
-        title: "Load your squadrons",
-        text: "When you deploy your Heavy Cruiser or Frigate, you can load units of Fighters and Bombers into them, or deploy those units directly. A unit can carry Squadrons up to twice its Combined Mass: the Heavy Cruiser carries up to six wings, the Frigate four, and a unit of three Corvettes up to six.",
       },
       {
         title: "Play four rounds",
@@ -70,6 +69,16 @@ const TRAINING_GUIDES: Partial<Record<GameMode, { intro: string; steps: GuideSte
       {
         title: "Game end",
         text: "At the end of the game, gain 2VP for each enemy HVP token you are carrying. The game ends at the end of Round 4 and the player with the most VP is the winner.",
+      },
+    ],
+    // Good-to-know rules that apply throughout, not a moment you act on once -
+    // "Load your squadrons" used to sit in the numbered sequence above like it
+    // was step 3 of setup, when it's really a standing reminder about how
+    // carrying capacity works whenever you deploy those two hulls.
+    notes: [
+      {
+        title: "Loading squadrons",
+        text: "When you deploy your Heavy Cruiser or Frigate, you can load units of Fighters and Bombers into them, or deploy those units directly. A unit can carry Squadrons up to twice its Combined Mass: the Heavy Cruiser carries up to six wings, the Frigate four, and a unit of three Corvettes up to six.",
       },
     ],
   },
@@ -90,10 +99,6 @@ const TRAINING_GUIDES: Partial<Record<GameMode, { intro: string; steps: GuideSte
         text: "You start with no units in play, nothing in Reserve, and 0 credits. In the Jump Phase, spend 1 CMD to use the Requisition command: form a new unit from any ships in your Shipyard, of any size you like, pay their cost in credits (going into debt at first), and jump them into play. Your Heavy Cruiser can carry two units of Mass 0 ships when requisitioned; the Frigate one.",
       },
       {
-        title: "Reinforcements",
-        text: "When a ship is destroyed it returns to your Shipyard and can be requisitioned again as a reinforcement. If you are prepared to keep paying, you can keep deploying: just watch your balance sheet.",
-      },
-      {
         title: "Earn credits in each End Phase",
         text: "Secure Sectors: gain ¢20bn for each Sector you control (most ships there; ties go to the greatest Combined Mass). Infowar: gain ¢20bn for each ComSat you are Blockading. There is a maximum of ¢100bn available to earn each round.",
       },
@@ -102,27 +107,44 @@ const TRAINING_GUIDES: Partial<Record<GameMode, { intro: string; steps: GuideSte
         text: "Your Initiative Value is 3D6. At the end of the third game round, the game ends and the player with the most credits is the winner.",
       },
     ],
+    // Same fix as Combat Simulator: this was sitting in the numbered sequence
+    // as if it were a discrete action, when it's really a standing rule about
+    // what happens whenever a ship dies over the course of the game.
+    notes: [
+      {
+        title: "Reinforcements",
+        text: "When a ship is destroyed it returns to your Shipyard and can be requisitioned again as a reinforcement. If you are prepared to keep paying, you can keep deploying: just watch your balance sheet.",
+      },
+    ],
   },
 };
 
 function trainingGuide(mode: GameMode): string {
   const g = TRAINING_GUIDES[mode];
   if (!g) return "";
-  const steps = g.steps
-    .map(
-      (s, i) => `
-      <details class="guide-step" ${i === 0 ? "open" : ""}>
-        <summary><span class="guide-step-n">${i + 1}</span>${escapeHtml(s.title)}</summary>
-        <p>${escapeHtml(s.text)}</p>
-      </details>`,
-    )
-    .join("");
+  const stepHtml = (s: GuideStep, n?: number) => `
+      <details class="guide-step ${n ? "" : "guide-step-note"}" ${n === 1 ? "open" : ""}>
+        <summary>${n ? `<span class="guide-step-n">${n}</span>` : ""}${escapeHtml(s.title)}</summary>
+        <div class="guide-step-body">
+          <p>${escapeHtml(s.text)}</p>
+          ${s.diagram ? tacticalDiagram(s.diagram) : ""}
+        </div>
+      </details>`;
+  const steps = g.steps.map((s, i) => stepHtml(s, i + 1)).join("");
+  const notes = g.notes.map((s) => stepHtml(s)).join("");
   return `
   <section class="guide-band">
     <div class="guide-inner">
       <h3 class="guide-title">${icon("book", 16)} Guided tutorial</h3>
       <p class="guide-intro">${escapeHtml(g.intro)}</p>
       ${steps}
+      ${
+        notes
+          ? `<h4 class="guide-notes-title">Good to know</h4>
+             <p class="guide-notes-sub">Rules that apply throughout the game, not a step you take once.</p>
+             ${notes}`
+          : ""
+      }
     </div>
   </section>`;
 }
@@ -275,14 +297,21 @@ function homeView(state: AppState): string {
     </div>
   </header>
   <main class="index-wrap">
-    ${tutorialCallout(state)}
-    <nav class="index">
-      ${row("01", "#/fleets", "Fleets", "Build, save, print, and share army lists for any faction and era.")}
-      ${row("02", "#/solo", "Solo Play", "Junkspace: build an outfit, roll for the enemy, run the debt campaign.")}
-      ${row("03", "#/ships", "Ship Compendium", "Every ship in the game in one filterable, sortable table.")}
-      ${row("04", "#/fleets", "Learn to Play", "A guided tutorial battle: the Training Fleet loaded, walked through setup, every phase, and scoring.", "new-training", 'data-mode="combat-simulator"')}
-      ${row("05", "#/foundry", "Custom Rules", "Design your own factions, ship classes, and personnel.")}
-    </nav>
+    <div class="index-col">
+      ${tutorialCallout(state)}
+      <nav class="index">
+        ${row("01", "#/fleets", "Fleets", "Build, save, print, and share army lists for any faction and era.")}
+        ${row("02", "#/solo", "Solo Play", "Junkspace: build an outfit, roll for the enemy, run the debt campaign.")}
+        ${row("03", "#/ships", "Ship Compendium", "Every ship in the game in one filterable, sortable table.")}
+        ${row("04", "#/fleets", "Learn to Play", "A guided tutorial battle: the Training Fleet loaded, walked through setup, every phase, and scoring.", "new-training", 'data-mode="combat-simulator"')}
+        ${row("05", "#/foundry", "Custom Rules", "Design your own factions, ship classes, and personnel.")}
+      </nav>
+    </div>
+    <aside class="index-book">
+      <a class="index-book-link" href="https://planetsmashergames.com/a-billion-suns/" target="_blank" rel="noopener">
+        <span class="index-book-cta">${icon("book", 20)} Get the rulebook</span>
+      </a>
+    </aside>
   </main>
   ${newFleetModal(state, state.customFactions)}
   ${toast(state)}
@@ -390,8 +419,6 @@ function newFleetModal(state: AppState, customs: Faction[]): string {
       const cb = customIds.has(b.id) ? 1 : 0;
       return ca - cb || ERA_ORDER.indexOf(a.era) - ERA_ORDER.indexOf(b.era) || a.name.localeCompare(b.name);
     });
-  const eraBtn = (era: Era) =>
-    `<button class="nf-opt ${m.era === era ? "on" : ""}" data-action="nf-era" data-era="${era}">${era}</button>`;
   const sizeBtn = (n: number) =>
     `<button class="nf-opt ${m.limit === n ? "on" : ""}" data-action="nf-size" data-limit="${n}">${credits(n)}</button>`;
   const plaque = (f: Faction) =>
@@ -414,7 +441,13 @@ function newFleetModal(state: AppState, customs: Faction[]): string {
         <div class="nf-controls">
           <div class="modal-field">
             <span class="control-label">1 / Era</span>
-            <div class="nf-opts">${ERA_ORDER.map(eraBtn).join("")}</div>
+            ${switcher(
+              "Era",
+              "nf-era",
+              "era",
+              ERA_ORDER.map((era) => [era, era] as [string, string]),
+              m.era,
+            )}
           </div>
           <div class="modal-field">
             <span class="control-label">2 / Credits limit</span>
@@ -426,14 +459,26 @@ function newFleetModal(state: AppState, customs: Faction[]): string {
           </div>
           <div class="modal-field">
             <span class="control-label">3 / Faction</span>
-            <div class="faction-plaques">${eraFactions.map(plaque).join("")}</div>
-            <button class="nf-more" data-action="nf-toggle-all">${m.showAll ? "Show fewer" : `${icon("plus", 13)} More — other eras &amp; custom`}</button>
-            ${m.showAll ? `<p class="muted picker-note">Any faction may be fielded in any era. Other eras first, then your custom factions.</p><div class="faction-plaques nf-all">${others.map(plaque).join("")}</div>` : ""}
+            <!-- Fixed-height frame: switching era or toggling "More" changes how
+                 many plaques there are, but never the modal's outer layout - it
+                 scrolls inside this box instead of shoving everything below it. -->
+            <div class="nf-faction-scroll">
+              <div class="faction-plaques">${eraFactions.map(plaque).join("")}</div>
+              <button class="nf-more" data-action="nf-toggle-all">${m.showAll ? "Show fewer" : `${icon("plus", 13)} More — other eras &amp; custom`}</button>
+              ${
+                m.showAll
+                  ? `<p class="muted picker-note">Any faction may be fielded in any era. Other eras first, then your custom factions.</p>
+                     <div class="faction-plaques nf-all">${others.map(plaque).join("")}</div>`
+                  : ""
+              }
+            </div>
           </div>
           <div class="nf-alt">
             <span class="control-label">Or try a tutorial</span>
-            <button class="bar-btn" data-action="new-training" data-mode="combat-simulator">${icon("book", 14)} Combat Simulator</button>
-            <button class="bar-btn" data-action="new-training" data-mode="management-training">${icon("book", 14)} Management Training</button>
+            <div class="nf-alt-opts">
+              <button class="bar-btn" data-action="new-training" data-mode="combat-simulator">${icon("book", 14)} Combat Simulator</button>
+              <button class="bar-btn" data-action="new-training" data-mode="management-training">${icon("book", 14)} Management Training</button>
+            </div>
           </div>
         </div>
         <div class="nf-detail-col">
@@ -469,33 +514,63 @@ function speciesSelect(unit: FleetUnit): string {
     </label>`;
 }
 
-function catalogShipRow(ship: ShipClass, ownerFaction: Faction, composite: boolean): string {
+// A segmented switcher with a sliding highlight, for any number of mutually
+// exclusive options - one bordered track instead of N independent boxes,
+// rather than N buttons each carrying its own border (which is exactly how
+// the old 4-box phase tracker turned into a wall of lines). The highlight is
+// a single absolutely-positioned bar sized and moved via CSS custom
+// properties, so it generalises to any option count with no per-N CSS.
+function switcher(
+  groupLabel: string,
+  action: string,
+  dataKey: string,
+  opts: readonly [value: string, label: string][],
+  selectedValue: string,
+): string {
+  const selectedIndex = Math.max(
+    0,
+    opts.findIndex(([value]) => value === selectedValue),
+  );
+  return `<div class="switcher" role="group" aria-label="${escapeHtml(groupLabel)}" style="--switcher-count:${opts.length};--switcher-selected:${selectedIndex}">
+    <span class="switcher-thumb" aria-hidden="true"></span>
+    ${opts
+      .map(
+        ([value, label], i) =>
+          `<button class="switcher-opt ${i === selectedIndex ? "selected" : ""}" data-action="${action}" data-${dataKey}="${escapeHtml(value)}">${escapeHtml(label)}</button>`,
+      )
+      .join("")}
+  </div>`;
+}
+
+function catalogShipRow(ship: ShipClass, ownerFaction: Faction, composite: boolean, owned = 0): string {
   const addId = composite ? `${ownerFaction.id}/${ship.id}` : ship.id;
   const wp = primarySlotText(ship).replace(/<br \/>/g, ", ");
   const wa = auxSlotText(ship).replace(/<br \/>/g, ", ");
   const weapons = [wp === "None" ? "" : wp, wa === "None" ? "" : wa].filter(Boolean).join("; ") || "No weapons";
-  // Name and cost on their own line so a long name never gets cut; full
-  // stats and weapons always visible on the line below, no tooltip-only text.
+  // The whole row is the click target (add a unit), with a standing ADD cue on
+  // the right so the affordance is never hover-only. Name and cost on their own
+  // line so a long name never gets cut; full stats and weapons always visible.
   return `
-  <article class="ship-row ${ship.image ? "has-art" : ""}">
+  <article class="ship-row is-option ${ship.image ? "has-art" : ""}" data-action="add-unit" data-ship="${addId}" role="button" title="Add a unit of ${escapeHtml(ship.name)}">
     <div class="ship-row-glyph">${ship.image ? `<img class="ship-thumb" src="${ship.image}" alt="" loading="lazy" />` : massGlyph(ship.mass, 22)}</div>
     <div class="ship-row-body">
       <div class="ship-row-head">
         <h4 class="ship-name">${escapeHtml(ship.name)}</h4>
         <span class="ship-cost">${credits(ship.cost)}</span>
+        ${owned > 0 ? `<span class="owned-tag">${owned} in fleet</span>` : ""}
       </div>
       <div class="ship-row-details">
         ${statChips(ship, true)}
         <span class="ship-weapons">${escapeHtml(weapons)}</span>
       </div>
     </div>
-    <button class="add-btn" data-action="add-unit" data-ship="${addId}" title="Add a unit of ${escapeHtml(ship.name)}">${icon("plus", 18)}</button>
+    <span class="add-cue">${icon("plus", 15)}<span>Add</span></span>
   </article>`;
 }
 
 // Experimental: ship classes grouped into Mass columns instead of one flat
 // list, so a faction's whole roster is visible with less vertical scrolling.
-function catalogColumnsByMass(faction: Faction): string {
+function catalogColumnsByMass(faction: Faction, owned: (addId: string) => number): string {
   const groups = [0, 1, 2, 3]
     .map((mass) => ({ mass, ships: faction.ships.filter((s) => s.mass === mass) }))
     .filter((g) => g.ships.length > 0);
@@ -504,9 +579,50 @@ function catalogColumnsByMass(faction: Faction): string {
       (g) => `
       <div class="mass-col">
         <h4 class="mass-col-title">Mass ${g.mass} <span class="muted">${g.ships.length}</span></h4>
-        <div class="mass-col-body">${g.ships.map((s) => catalogShipRow(s, faction, false)).join("")}</div>
+        <div class="mass-col-body">${g.ships.map((s) => catalogShipRow(s, faction, false, owned(s.id))).join("")}</div>
       </div>`,
     )
+    .join("")}</div>`;
+}
+
+// Stat comparison chart: every ship class in the faction as a horizontal bar,
+// ranked by a chosen stat, so a build decision ("which is the cheapest Mass 2
+// hull?") is a glance instead of scanning a dozen rows by eye.
+type ChartStatKey = "cost" | "mass" | "thrust" | "silhouette" | "shields";
+const CHART_STATS: Record<ChartStatKey, { label: string; icon: string; get: (s: ShipClass) => number; fmt: (n: number) => string }> = {
+  cost: { label: "Cost", icon: "", get: (s) => s.cost, fmt: (n) => credits(n) },
+  mass: { label: "Mass", icon: "stat-mass", get: (s) => s.mass, fmt: (n) => String(n) },
+  thrust: { label: "Thrust", icon: "stat-thrust", get: (s) => s.thrust, fmt: (n) => `${n}"` },
+  silhouette: { label: "Sil", icon: "stat-silhouette", get: (s) => s.silhouette, fmt: (n) => String(n) },
+  shields: { label: "Shields", icon: "stat-shields", get: (s) => s.shields, fmt: (n) => String(n) },
+};
+
+function catalogChartPicker(stat: ChartStatKey): string {
+  return `<div class="chart-picker" role="group" aria-label="Compare ship classes by">
+    ${(Object.keys(CHART_STATS) as ChartStatKey[])
+      .map((key) => {
+        const m = CHART_STATS[key];
+        return `<button class="chart-picker-btn ${stat === key ? "selected" : ""}" data-action="set-chart-stat" data-stat="${key}">${m.icon ? icon(m.icon, 13) : ""}${m.label}</button>`;
+      })
+      .join("")}
+  </div>`;
+}
+
+function catalogChart(faction: Faction, stat: ChartStatKey): string {
+  const meta = CHART_STATS[stat];
+  const rows = [...faction.ships].sort((a, b) => meta.get(b) - meta.get(a));
+  const max = Math.max(1, ...rows.map(meta.get));
+  return `<div class="chart">${rows
+    .map((s) => {
+      const v = meta.get(s);
+      const pct = Math.max(2, Math.round((v / max) * 100));
+      return `
+      <div class="chart-row">
+        <span class="chart-label">${escapeHtml(s.name)}</span>
+        <span class="chart-track"><span class="chart-bar" style="width:${pct}%"></span></span>
+        <span class="chart-val">${meta.fmt(v)}</span>
+      </div>`;
+    })
     .join("")}</div>`;
 }
 
@@ -555,8 +671,8 @@ function unitModal(state: AppState, list: SavedList, faction: Faction | undefine
                 <div class="spec-body">
                   <p class="spec-name">${escapeHtml(ship.name)}<span class="spec-cost">${credits(ship.cost)} / ship</span></p>
                   <p class="ship-stats">${statChips(ship)}</p>
-                  <p class="ship-weapons"><span class="slot-label">Primary</span> ${primarySlotText(ship)}</p>
-                  <p class="ship-weapons"><span class="slot-label">Auxiliary</span> ${auxSlotText(ship)}</p>
+                  <p class="ship-weapons"><span class="slot-label">${icon("arc-primary", 13, "slot-arc")} Primary</span> ${primarySlotText(ship)}</p>
+                  <p class="ship-weapons"><span class="slot-label">${icon("arc-aux", 13, "slot-arc")} Auxiliary</span> ${auxSlotText(ship)}</p>
                 </div>
               </div>`
             : '<p class="issue-error">This ship class is not in the faction roster.</p>'
@@ -604,7 +720,8 @@ function builderView(state: AppState): string {
   const faction = findFaction(list.fleet.factionId, customs);
   const { total, remaining } = listTotals(list, customs);
   const era = MODE_ERA[list.mode];
-  const massLayout = !!state.ui.massLayout;
+  const catalogView = state.ui.catalogView;
+  const chartStat = state.ui.catalogChartStat ?? "cost";
 
   // Validation: the full engine for rules play, none for Free Play. The
   // Hypergrowth shipyard has no unit-size limits at build time (rules p.122),
@@ -639,6 +756,10 @@ function builderView(state: AppState): string {
       )
       .join("");
 
+  // How many units of a given class the fleet already holds, keyed by the id we
+  // add with. Shown on each option so the picker reads like a live tally.
+  const ownedCount = (addId: string) => list.fleet.units.filter((u) => u.shipClassId === addId).length;
+
   // Catalog: one faction in rules play; every faction grouped in Free Play.
   let catalogHtml = "";
   if (list.freePlay) {
@@ -647,37 +768,74 @@ function builderView(state: AppState): string {
         (f, i) => `
         <details class="catalog-group" ${i === 0 ? "open" : ""}>
           <summary>${escapeHtml(f.name)} <span class="muted">${f.era}</span></summary>
-          ${f.ships.map((s) => catalogShipRow(s, f, true)).join("")}
+          ${f.ships.map((s) => catalogShipRow(s, f, true, ownedCount(`${f.id}/${s.id}`))).join("")}
         </details>`,
       )
       .join("");
   } else if (faction) {
-    catalogHtml = faction.ships.map((s) => catalogShipRow(s, faction, false)).join("");
+    catalogHtml = faction.ships.map((s) => catalogShipRow(s, faction, false, ownedCount(s.id))).join("");
   }
 
-  // Personnel catalog. Duplicates are allowed, so a chosen card becomes a
-  // stepper (remove one / count / add another) rather than a dead-ended
-  // disabled button - there must always be a way back out.
+  // Personnel catalog. Turning one on is the whole interaction: the card you
+  // just clicked becomes its own complete record, holding the carried-by
+  // assignment and a rename field right there. Nothing lives in a second
+  // place, so there is no separate roster-personnel list to keep in sync.
   const hvpMax = list.freePlay ? 99 : (faction?.hvpMax ?? 3);
   const hvpMin = faction?.hvpMin ?? 3;
   const atHvpCap = list.fleet.hvp.length >= hvpMax;
+  const carrierOptions = (assignedId?: string) =>
+    list.fleet.units
+      .map((u) => {
+        const r = resolveShip(u.shipClassId, faction, customs);
+        const label = u.name || r?.ship.name || u.shipClassId;
+        return `<option value="${u.id}" ${assignedId === u.id ? "selected" : ""}>${escapeHtml(label)}</option>`;
+      })
+      .join("");
   const personnelCard = (h: Hvp, source: string) => {
-    const count = list.fleet.hvp.filter((sel) => sel.hvpId === h.id).length;
-    return `
-    <article class="personnel-row ${count > 0 ? "chosen" : ""}" title="${escapeHtml(h.rule)}">
-      <div class="personnel-body">
-        <span class="personnel-name">${escapeHtml(h.name)}</span>
+    const selIndex = list.fleet.hvp.findIndex((sel) => sel.hvpId === h.id);
+    const isChosen = selIndex !== -1;
+    const isGeneric = source === "Generic";
+    const body = `<div class="personnel-body">
+        <span class="personnel-name ${isGeneric ? "is-generic" : ""}">${escapeHtml(h.name)}</span>
         <span class="personnel-rule">${escapeHtml(h.rule)}</span>
-      </div>
-      ${
-        count > 0
-          ? `<span class="stepper stepper-mini">
-              <button data-action="remove-hvp-one" data-hvp="${h.id}" title="Remove one ${escapeHtml(h.name)}">${icon("minus", 14)}</button>
-              <span class="stepper-count">${count}</span>
-              <button data-action="add-hvp" data-hvp="${h.id}" ${atHvpCap ? "disabled" : ""} title="Add another ${escapeHtml(h.name)}">${icon("plus", 14)}</button>
-            </span>`
-          : `<button class="add-btn add-btn-mini" data-action="add-hvp" data-hvp="${h.id}" ${atHvpCap ? "disabled" : ""} title="Select ${escapeHtml(h.name)}">${icon("plus", 16)}</button>`
-      }
+      </div>`;
+    if (isChosen) {
+      const sel = list.fleet.hvp[selIndex]!;
+      // The chosen row must stay exactly the height of the option row it just
+      // was - clicking Add can never itself shift anything below it. Rename
+      // and carrier assignment live in a popover (position: absolute), the
+      // same pattern as every other picker in this app, instead of growing
+      // the row inline.
+      return `
+      <article class="personnel-row chosen">
+        ${body}
+        <span class="personnel-actions">
+          <details class="personnel-config" data-hvp="${h.id}">
+            <summary class="ghost-btn ${sel.assignedUnitId || sel.customName ? "is-set" : ""}" title="Rename or assign a carrier">${icon("pencil", 15)}</summary>
+            <div class="personnel-config-panel">
+              <label class="inline-field">Name
+                <input class="personnel-rename" type="text" value="${escapeHtml(sel.customName ?? "")}"
+                  placeholder="Name this person" data-action="hvp-name" data-index="${selIndex}" />
+              </label>
+              <label class="inline-field">Carried by
+                <select data-action="hvp-assign" data-index="${selIndex}">
+                  <option value="">Not assigned yet</option>
+                  ${carrierOptions(sel.assignedUnitId)}
+                </select>
+              </label>
+            </div>
+          </details>
+          <button class="ghost-btn danger" data-action="remove-hvp" data-index="${selIndex}" title="Remove ${escapeHtml(h.name)}">${icon("close", 16)}</button>
+        </span>
+      </article>`;
+    }
+    if (atHvpCap) {
+      return `<article class="personnel-row is-full">${body}<span class="add-cue is-off">Full</span></article>`;
+    }
+    return `
+    <article class="personnel-row is-option" data-action="add-hvp" data-hvp="${h.id}" role="button" title="Add ${escapeHtml(h.name)}">
+      ${body}
+      <span class="add-cue">${icon("plus", 15)}<span>Add</span></span>
     </article>`;
   };
   const personnelCatalog = faction
@@ -710,6 +868,14 @@ function builderView(state: AppState): string {
         </button>
         ${
           r
+            ? `<div class="ru-details">
+                ${statChips(r.ship, true)}
+                ${weapons ? `<span class="ru-weap">${weapons}</span>` : `<span class="ru-weap muted">No weapons</span>`}
+              </div>`
+            : ""
+        }
+        ${
+          r
             ? `<span class="stepper ru-stepper">
                 <button class="${u.count <= 1 ? "will-remove" : ""}" data-action="unit-count" data-unit="${u.id}" data-delta="-1" title="${u.count <= 1 ? "Remove this unit" : "One fewer ship"}">${icon("minus", 14)}</button>
                 <span class="stepper-count">${u.count}</span>
@@ -719,46 +885,7 @@ function builderView(state: AppState): string {
         }
         <span class="roster-unit-cost">${credits(cost)}</span>
         <button class="ru-remove" data-action="remove-unit" data-unit="${u.id}" title="Remove this unit">${icon("trash", 14)}</button>
-        ${
-          r
-            ? `<div class="ru-details">
-                ${statChips(r.ship, true)}
-                ${weapons ? `<span class="ru-weap">${weapons}</span>` : `<span class="ru-weap muted">No weapons</span>`}
-              </div>`
-            : ""
-        }
       </div>`;
-    })
-    .join("");
-
-  // Roster personnel.
-  const carrierOptions = (assignedId?: string) =>
-    list.fleet.units
-      .map((u) => {
-        const r = resolveShip(u.shipClassId, faction, customs);
-        const label = u.name || r?.ship.name || u.shipClassId;
-        return `<option value="${u.id}" ${assignedId === u.id ? "selected" : ""}>${escapeHtml(label)}</option>`;
-      })
-      .join("");
-  const hvpRows = list.fleet.hvp
-    .map((sel, i) => {
-      const def = hvpById(sel.hvpId, faction);
-      return `
-      <article class="roster-personnel">
-        <div class="roster-unit-head">
-          <span class="roster-unit-glyph">${icon("personnel", 20)}</span>
-          <input class="unit-name-input" type="text" value="${escapeHtml(sel.customName ?? "")}"
-            placeholder="Name this person" data-action="hvp-name" data-index="${i}" />
-          <button class="ghost-btn danger" data-action="remove-hvp" data-index="${i}" title="Remove">${icon("close", 16)}</button>
-        </div>
-        <p class="roster-personnel-title">${escapeHtml(def?.name ?? sel.hvpId)}</p>
-        <label class="inline-field">Carried by
-          <select data-action="hvp-assign" data-index="${i}">
-            <option value="">Not assigned yet</option>
-            ${carrierOptions(sel.assignedUnitId)}
-          </select>
-        </label>
-      </article>`;
     })
     .join("");
 
@@ -790,15 +917,22 @@ function builderView(state: AppState): string {
     </details>`;
 
   const limitIsPreset = [300, 400, 500].includes(list.fleet.creditsLimit);
-  const limitControl = `<div class="segment segment-limit" role="group" aria-label="Credits limit">
-      ${[300, 400, 500]
-        .map(
-          (n) =>
-            `<button class="${list.fleet.creditsLimit === n ? "selected" : ""}" data-action="set-limit" data-limit="${n}">${credits(n)}</button>`,
-        )
-        .join("")}
-      <input class="limit-input ${limitIsPreset ? "" : "selected"}" type="number" min="1" step="10" value="${limitIsPreset ? "" : list.fleet.creditsLimit}" placeholder="Custom" data-action="set-limit-free" aria-label="Custom credits limit" />
-    </div>`;
+  // The cap lives inline as "/500" in the tally itself, not a standing row of
+  // buttons — click the cap to change it in a popover.
+  const limitControl = `<details class="limit-switch">
+      <summary class="mf-tally-cap">/${credits(list.fleet.creditsLimit)}</summary>
+      <div class="limit-switch-panel">
+        <div class="segment segment-limit" role="group" aria-label="Credits limit">
+          ${[300, 400, 500]
+            .map(
+              (n) =>
+                `<button class="${list.fleet.creditsLimit === n ? "selected" : ""}" data-action="set-limit" data-limit="${n}">${credits(n)}</button>`,
+            )
+            .join("")}
+          <input class="limit-input ${limitIsPreset ? "" : "selected"}" type="number" min="1" step="10" value="${limitIsPreset ? "" : list.fleet.creditsLimit}" placeholder="Custom" data-action="set-limit-free" aria-label="Custom credits limit" />
+        </div>
+      </div>
+    </details>`;
 
   const factionControl = list.freePlay
     ? '<span class="freeplay-badge">All ships unlocked</span>'
@@ -810,109 +944,99 @@ function builderView(state: AppState): string {
         </div>
       </details>`;
 
+  const unitWord = list.fleet.units.length === 1 ? "unit" : "units";
+  const hvpCount = list.freePlay
+    ? `${list.fleet.hvp.length}`
+    : hvpMin === hvpMax
+      ? `${list.fleet.hvp.length}/${hvpMax}`
+      : `${list.fleet.hvp.length}/${hvpMin}–${hvpMax}`;
+
   return `
   ${topbar()}
-  <section class="setup-band ${remaining < 0 ? "over" : ""}">
-    <div class="setup-head">
-      <div class="setup-identity">
-        <input class="fleet-name-input" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Name this fleet" data-action="fleet-name" />
-      </div>
-      <div class="budget ${remaining < 0 ? "over" : ""}">
-        <div class="budget-head">
-          <span class="budget-now">${credits(total)}</span>
-          <span class="budget-cap">/ ${credits(list.fleet.creditsLimit)}</span>
-          <span class="budget-free">${remaining < 0 ? `OVER ${credits(-remaining)}` : `${credits(remaining)} FREE`}</span>
-        </div>
-        <div class="budget-track"><span class="budget-fill" style="width:${list.fleet.creditsLimit > 0 ? Math.min(100, (total / list.fleet.creditsLimit) * 100) : 0}%"></span></div>
-      </div>
-    </div>
-    <div class="setup-controls">
-      <div class="control-group">
-        <span class="control-label">Credits limit</span>
-        ${limitControl}
-      </div>
-      <div class="control-group">
-        <span class="control-label">Faction</span>
-        ${factionControl}
-      </div>
-      <div class="control-group control-group-emblem">
-        <span class="control-label">Emblem</span>
-        <div class="emblem-picker">${emblemPicker}</div>
-      </div>
-    </div>
-  </section>
   ${trainingGuide(list.mode)}
 
-  <main class="workspace ${massLayout ? "mass-mode" : ""}">
-    <section class="catalog">
-      ${
-        faction && !list.freePlay
-          ? `<article class="rule-card">
-              <p class="rule-card-meta"><span class="rcm-k">Initiative</span> <span class="rcm-v">${escapeHtml(faction.initiative)}</span>${initiativeDice(faction.initiative, 14)}<span class="rcm-gap"></span><span class="rcm-k">CMD / round</span> <span class="rcm-v">${escapeHtml(faction.cmdTokens)}</span></p>
-              <h3 class="rule-card-title">${escapeHtml(faction.rule.name)}</h3>
-              <p class="rule-card-text">${escapeHtml(faction.rule.text)}</p>
-            </article>`
-          : ""
-      }
-      <div class="catalog-title">Ship classes ${
-        faction && !list.freePlay
-          ? `<button class="bar-btn layout-toggle" data-action="toggle-mass-layout">${massLayout ? "List view" : "Columns view (test)"}</button>`
-          : ""
-      }</div>
-      ${
-        massLayout && faction && !list.freePlay
-          ? catalogColumnsByMass(faction)
-          : `<div class="catalog-list">${catalogHtml || '<p class="muted">Pick a faction to see its ships.</p>'}</div>`
-      }
-      <details class="catalog-fold" ${list.fleet.hvp.length > 0 ? "open" : ""}>
-        <summary class="catalog-title">High-Value Personnel <span class="muted">${list.freePlay ? `${list.fleet.hvp.length}` : hvpMin === hvpMax ? `${list.fleet.hvp.length}/${hvpMax}` : `${list.fleet.hvp.length}/${hvpMin}–${hvpMax}`}</span></summary>
-        <div class="catalog-list personnel-grid">${personnelCatalog}</div>
-      </details>
-    </section>
+  <main class="builder ${remaining < 0 ? "is-over" : ""}">
+    <header class="mf-head">
+      <div class="mf-headline">
+        <span class="mf-emblem">${emblemPicker}</span>
+        <input class="mf-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled fleet" data-action="fleet-name" />
+        <span class="mf-tally">
+          <span class="mf-tally-now">${credits(total)}</span>${limitControl}
+          <span class="mf-tally-free">${remaining < 0 ? `${credits(-remaining)} over` : `${credits(remaining)} free`}</span>
+        </span>
+      </div>
+      <div class="mf-meter"><span class="mf-meter-fill" style="width:${list.fleet.creditsLimit > 0 ? Math.min(100, (total / list.fleet.creditsLimit) * 100) : 0}%"></span></div>
+      <div class="mf-subline">
+        <span class="mf-fac">${factionControl}</span>
+        ${era ? `<span class="mf-sep">/</span><span class="mf-era">${escapeHtml(era)}</span>` : ""}
+      </div>
+    </header>
 
-    <aside class="roster">
-      <div class="roster-sheet">
-        <header class="roster-head">
-          <span class="roster-emblem">${listEmblem(list, 52)}</span>
-          <div>
-            <h2 class="roster-title">${escapeHtml(list.fleet.name || "Unnamed fleet")}</h2>
-            <p class="roster-subtitle">${escapeHtml(faction?.name ?? "Mixed forces")}${era ? `, ${era}` : ""}</p>
-          </div>
-        </header>
-
-        <h3 class="roster-section">Units <span class="muted">${list.fleet.units.length}</span></h3>
-        ${unitRows || '<p class="muted roster-hint">Add ships from the catalogue on the left. Each addition starts a new unit.</p>'}
-
-        <h3 class="roster-section">High-Value Personnel <span class="muted">${list.fleet.hvp.length}${list.freePlay ? "" : ` of ${hvpMax}`}</span></h3>
-        ${hvpRows || '<p class="muted roster-hint">Select personnel from the catalogue. They ride units of Mass 1 or higher.</p>'}
+    <div class="mf-body">
+      <section class="mf-manifest">
+        <h3 class="mf-h">Fleet manifest <span class="mf-h-count">${list.fleet.units.length} ${unitWord}</span></h3>
+        <div class="mf-list">
+          ${unitRows || '<p class="mf-empty">Nothing requisitioned yet. Add classes from the yard on the right.</p>'}
+        </div>
 
         ${
           list.freePlay
-            ? '<div class="inspection freeplay"><p>Free Play: the rules inspector is off. Build whatever you like.</p></div>'
-            : `<div class="inspection ${valid ? "pass" : "fail"}">
-                <h3 class="roster-section">Inspection report</h3>
-                ${
-                  issues.length === 0
-                    ? `<p class="inspection-pass">${icon("check", 16)} This fleet list is legal and ready for the table.</p>`
-                    : `<ul class="issue-list">${issues.map(issueLine).join("")}</ul>`
-                }
-              </div>`
+            ? '<p class="mf-inspect freeplay">Free Play. The rules inspector is off.</p>'
+            : issues.length === 0
+              ? `<p class="mf-inspect pass">${icon("check", 15)} Legal and ready for the table.</p>`
+              : `<div class="mf-inspect fail"><span class="mf-inspect-h">${issues.length} to resolve</span><ul class="issue-list">${issues.map(issueLine).join("")}</ul></div>`
         }
 
-        <details class="roster-notes" ${list.fleet.notes ? "open" : ""}>
-          <summary class="roster-section">Notes${list.fleet.notes ? ` <span class="muted">${list.fleet.notes.trim().length} chars</span>` : ""}</summary>
+        <details class="mf-notes" ${list.fleet.notes ? "open" : ""}>
+          <summary>Notes${list.fleet.notes ? ` <span class="mf-h-count">${list.fleet.notes.trim().length} chars</span>` : ""}</summary>
           <textarea class="notes-input" rows="3" placeholder="Tactics, list rationale, reminders..." data-action="fleet-notes">${escapeHtml(list.fleet.notes ?? "")}</textarea>
         </details>
 
-        <div class="roster-actions">
-          <a class="cta-btn" href="#/print/${list.id}">${icon("print", 17)} Print setup</a>
-          <a class="bar-btn" href="#/play/${list.id}">${icon("flag", 16)} Play mode</a>
-          <button class="bar-btn" data-action="share-list" data-id="${list.id}">${icon("link", 16)} Copy share link</button>
-          <button class="bar-btn" data-action="duplicate-list" data-id="${list.id}">${icon("duplicate", 16)} Duplicate</button>
-          <button class="bar-btn danger" data-action="delete-list" data-id="${list.id}">${icon("trash", 16)} Delete</button>
-        </div>
-      </div>
-    </aside>
+        <nav class="mf-utils">
+          <a href="#/print/${list.id}">${icon("print", 15)} Print setup</a>
+          <a href="#/play/${list.id}">${icon("flag", 15)} Play mode</a>
+          <button data-action="share-list" data-id="${list.id}">${icon("link", 15)} Share link</button>
+          <button data-action="duplicate-list" data-id="${list.id}">${icon("duplicate", 15)} Duplicate</button>
+          <button class="danger" data-action="delete-list" data-id="${list.id}">${icon("trash", 15)} Delete</button>
+        </nav>
+      </section>
+
+      <section class="mf-yard">
+        ${
+          faction && !list.freePlay
+            ? `<div class="mf-rule">
+                <div class="mf-rule-meta">Init <b>${escapeHtml(faction.initiative)}</b> ${initiativeDice(faction.initiative, 13)} <span class="mf-sep">/</span> CMD <b>${escapeHtml(faction.cmdTokens)}</b>/rd</div>
+                <div class="mf-rule-name">${escapeHtml(faction.rule.name)}</div>
+                <div class="mf-rule-text">${escapeHtml(faction.rule.text)}</div>
+              </div>`
+            : ""
+        }
+        <h3 class="mf-h">Ship classes ${
+          faction && !list.freePlay
+            ? switcher(
+                "Ship classes view",
+                "set-catalog-view",
+                "view",
+                [
+                  ["list", "List"],
+                  ["mass", "By mass"],
+                  ["chart", "Compare"],
+                ],
+                catalogView ?? "list",
+              )
+            : ""
+        }</h3>
+        ${
+          catalogView === "mass" && faction && !list.freePlay
+            ? catalogColumnsByMass(faction, ownedCount)
+            : catalogView === "chart" && faction && !list.freePlay
+              ? `${catalogChartPicker(chartStat)}${catalogChart(faction, chartStat)}`
+              : `<div class="mf-list">${catalogHtml || '<p class="mf-empty">Pick a faction to see its ships.</p>'}</div>`
+        }
+        <h3 class="mf-h">Personnel pool <span class="mf-h-count">${hvpCount}</span></h3>
+        <div class="mf-list personnel-grid">${personnelCatalog}</div>
+      </section>
+    </div>
   </main>
   ${unitModal(state, list, faction, customs)}
   ${toast(state)}
@@ -1023,8 +1147,8 @@ function printView(state: AppState): string {
         <table class="pc-stats"><tbody>
           <tr><th>Thrust</th><td>${ship.thrust}"</td><th>Silhouette</th><td>${ship.silhouette}</td><th>Shields</th><td>${ship.shields}</td></tr>
         </tbody></table>
-        <p class="pc-weap"><span class="pc-wlabel">Primary</span> ${primarySlotText(ship)}</p>
-        <p class="pc-weap"><span class="pc-wlabel">Auxiliary</span> ${auxSlotText(ship)}</p>
+        <p class="pc-weap"><span class="pc-wlabel">${icon("arc-primary", 11, "slot-arc")} Primary</span> ${primarySlotText(ship)}</p>
+        <p class="pc-weap"><span class="pc-wlabel">${icon("arc-aux", 11, "slot-arc")} Auxiliary</span> ${auxSlotText(ship)}</p>
         ${carried.length ? `<p class="pc-carry">Carrying: ${escapeHtml(carried.join("; "))}</p>` : ""}
         ${opts.trackers ? `<div class="pc-track">${Array.from({ length: u.count }, () => `<span class="pc-track-row"><span class="pc-track-label">Hull</span>${hpBoxes(ship.silhouette)}</span>`).join("")}</div>` : ""}
       </article>`;
@@ -1151,13 +1275,35 @@ function foundryListView(state: AppState): string {
     )
     .join("");
 
+  // Starting from an existing faction sits right alongside a blank slate, on
+  // equal footing in the same picker, so cloning-then-renaming is at least as
+  // easy as starting from nothing.
+  const startPlaques = allFactions(state.customFactions)
+    .map(
+      (f) => `
+      <button class="faction-plaque" data-action="clone-faction" data-source="${f.id}">
+        <span class="faction-plaque-name">${escapeHtml(f.name)}</span>
+        <span class="faction-plaque-rule">${escapeHtml(f.rule.name)}</span>
+      </button>`,
+    )
+    .join("");
+
   return `
   ${topbar()}
   <main class="foundry-main">
     <h1 class="page-title">Custom Rules</h1>
-    <p class="panel-note">Create your own factions: a faction rule, ship classes with full weapon fits, and High-Value Personnel. They appear in every faction picker and ride along inside share links.</p>
+    <p class="panel-note">You can use this section to <strong>create your own factions</strong>. It may be easiest to just take an existing faction and rename certain elements; for example, taking the Unity and renaming them to "The Empire."</p>
     <div class="foundry-actions">
-      <button class="cta-btn" data-action="new-faction">${icon("plus", 18)} Forge a new faction</button>
+      <details class="cf-new-picker">
+        <summary class="cta-btn">${icon("plus", 18)} Forge a new faction</summary>
+        <div class="cf-new-panel">
+          <button class="faction-plaque faction-plaque-blank" data-action="new-faction">
+            <span class="faction-plaque-name">${icon("plus", 15)} Start from a blank sheet</span>
+            <span class="faction-plaque-rule">No ships, no rule, no personnel yet</span>
+          </button>
+          <div class="faction-plaques">${startPlaques}</div>
+        </div>
+      </details>
       <label class="bar-btn file-btn">${icon("upload", 16)} Import from a file
         <input type="file" accept="application/json" data-action="import-faction" hidden />
       </label>
@@ -1337,11 +1483,53 @@ function changelogView(): string {
 // Play mode: a table companion for the fleet game
 // ---------------------------------------------------------------------------
 
-const PHASES: { name: string; text: string }[] = [
-  { name: "Command Phase", text: "Gain your faction's CMD tokens, then all players make an Initiative Check. A 2 or 3 is one success; a 1 is two successes. The winner chooses who has Initiative this round; the players who did not win gain 1 extra CMD token each." },
-  { name: "Jump Phase", text: "Taking turns clockwise from the player with Initiative: open a Jump Point, Jump In a unit from Reserve, or pass. The phase ends once all players have passed." },
-  { name: "Tactical Phase", text: "Taking turns clockwise from the player with Initiative, Drag to Select a battlegroup (lead unit plus unactivated friendly units at least partly within 6\", Combined Mass 10 or less) and activate its units. Ends when every in-play unit has activated." },
-  { name: "End Phase", text: "Check the scoring conditions on your missions, clear all Activated tokens, resolve any other End Phase effects, discard unused CMD tokens, and begin a new round." },
+// Each phase as a real checklist rather than a paragraph to read and
+// interpret yourself - the player ticks steps off as they do them at the
+// table. The Initiative step (index 1 of Command Phase) auto-ticks when the
+// player uses the Roll button below, since that's an unambiguous 1:1 link;
+// everything else is self-reported, because this is a physical miniatures
+// game and the app cannot see the table.
+interface PhaseGuide {
+  name: string;
+  steps: string[];
+}
+const PHASES: PhaseGuide[] = [
+  {
+    name: "Command Phase",
+    steps: [
+      "Gain your faction's CMD tokens for the round.",
+      "Roll your Initiative Check.",
+      "Compare successes — the winner picks who has Initiative this round.",
+      "Everyone who didn't win Initiative gains 1 extra CMD token.",
+    ],
+  },
+  {
+    name: "Jump Phase",
+    steps: [
+      "Starting with whoever has Initiative, take turns clockwise.",
+      "On your turn: open a Jump Point, Jump In a unit from Reserve, or pass.",
+      "Once everyone has passed in a row, the phase ends.",
+    ],
+  },
+  {
+    name: "Tactical Phase",
+    steps: [
+      "Starting with whoever has Initiative, take turns clockwise.",
+      'Drag to Select a battlegroup: a lead unit, plus any unactivated friendly units within 6" of it (Combined Mass 10 or less).',
+      "Activate every unit in that battlegroup, then pass to the next player.",
+      "The phase ends once every unit in play has activated.",
+    ],
+  },
+  {
+    name: "End Phase",
+    steps: [
+      "Check your mission(s) for anything you scored this round.",
+      "Clear every Activated token.",
+      "Resolve any other End Phase effects your mission or faction calls for.",
+      "Discard any unused CMD tokens.",
+      "Start the next round.",
+    ],
+  },
 ];
 
 /** End Phase scoring reminders by mode, from the relevant rules pages. */
@@ -1380,12 +1568,35 @@ function playView(state: AppState): string {
   const scoreLabel = isCredits ? "Credits" : "Victory points";
   const last = state.ui.lastRoll;
 
-  const phaseBtns = PHASES.map(
-    (p, i) => `
-    <button class="phase-step ${play.phase === i ? "selected" : ""}" data-action="play-phase" data-phase="${i}">
-      <span class="phase-n">${i + 1}</span>${p.name.replace(" Phase", "")}
-    </button>`,
-  ).join("");
+  const currentPhase = PHASES[play.phase];
+  const checks = play.checks ?? [];
+  const doneCount = checks.filter(Boolean).length;
+  const phaseDone = currentPhase !== undefined && doneCount === currentPhase.steps.length;
+
+  // A bespoke instance of the switcher pattern (one bordered track, a
+  // sliding highlight) rather than the plain switcher() helper, since this
+  // one needs a per-option checkmark once that phase's checklist is clear -
+  // the four-separate-boxes version this replaced was the single biggest
+  // contributor to "too many lines" on this page.
+  const phaseBtns = `<div class="switcher" role="group" aria-label="Round phase" style="--switcher-count:${PHASES.length};--switcher-selected:${play.phase}">
+    <span class="switcher-thumb" aria-hidden="true"></span>
+    ${PHASES.map(
+      (p, i) => `
+      <button class="switcher-opt ${play.phase === i ? "selected" : ""}" data-action="play-phase" data-phase="${i}">
+        <span class="phase-n">${play.phase === i && phaseDone ? icon("check", 13) : i + 1}</span>${p.name.replace(" Phase", "")}
+      </button>`,
+    ).join("")}
+  </div>`;
+
+  const checklistHtml = (currentPhase?.steps ?? [])
+    .map(
+      (step, i) => `
+    <label class="phase-check ${checks[i] ? "done" : ""}">
+      <input type="checkbox" data-action="play-check-step" data-index="${i}" ${checks[i] ? "checked" : ""} />
+      <span>${escapeHtml(step)}</span>
+    </label>`,
+    )
+    .join("");
 
   const counter = (label: string, value: number, action: string, step = 1) => `
     <div class="play-counter">
@@ -1408,18 +1619,29 @@ function playView(state: AppState): string {
         <h1 class="page-title" style="margin:0">Round ${play.round} of ${maxRound}</h1>
       </div>
       <div class="band-readout">
-        <div class="readout"><span class="readout-label">${scoreLabel}</span><span class="readout-value">${play.vp}</span></div>
-        <div class="readout"><span class="readout-label">Opponent</span><span class="readout-value">${play.oppVp}</span></div>
-        <div class="readout"><span class="readout-label">CMD</span><span class="readout-value">${play.cmd}</span></div>
+        <div class="readout readout-primary"><span class="readout-label">${scoreLabel}</span><span class="readout-value">${play.vp}</span></div>
+        <div class="readout readout-quiet"><span class="readout-label">Opponent</span><span class="readout-value">${play.oppVp}</span></div>
+        <div class="readout readout-accent"><span class="readout-label">CMD</span><span class="readout-value">${play.cmd}</span></div>
       </div>
     </div>
   </section>
   <main class="solo-body">
     <div class="phase-track">${phaseBtns}</div>
-    <p class="phase-text">${escapeHtml(PHASES[play.phase]?.text ?? "")}</p>
+    <div class="phase-checklist">
+      <div class="phase-checklist-head">
+        <h3 class="phase-checklist-title">${escapeHtml(currentPhase?.name ?? "")}</h3>
+        <span class="phase-checklist-count">${doneCount} of ${currentPhase?.steps.length ?? 0}</span>
+      </div>
+      ${checklistHtml}
+      ${
+        play.phase === 2
+          ? `<p class="phase-diagram-caption">Primary weapons only fire in the narrow cone dead ahead; auxiliary weapons cover the whole front half.</p>${tacticalDiagram("arcs")}`
+          : ""
+      }
+    </div>
 
     <div class="solo-grid" style="margin-top:20px">
-      <section class="solo-card">
+      <section class="solo-card solo-card-primary">
         <h3 class="roster-section">Counters</h3>
         <div class="play-counters">
           ${counter("Round", play.round, "play-round")}
@@ -1428,12 +1650,12 @@ function playView(state: AppState): string {
           ${counter("Opponent " + scoreLabel.toLowerCase(), play.oppVp, "play-oppvp")}
         </div>
         <div class="roster-actions" style="padding:14px 0 0">
-          <button class="bar-btn" data-action="play-next">${icon("chevronRight", 16)} Next phase</button>
+          <button class="cta-btn" data-action="play-next">${icon("chevronRight", 16)} Next phase</button>
           <button class="ghost-btn danger" data-action="play-reset">Reset the game</button>
         </div>
       </section>
 
-      <section class="solo-card">
+      <section class="solo-card solo-card-quiet">
         <h3 class="roster-section">Initiative check</h3>
         <p class="panel-note">${faction ? `${escapeHtml(faction.name)} rolls ${escapeHtml(faction.initiative)}.` : ""} A 2 or 3 counts as one success; a 1 counts as two. Most successes chooses who has Initiative; non-winners gain 1 CMD token.</p>
         <button class="bar-btn" data-action="play-initiative" data-dice="${faction ? escapeHtml(faction.initiative) : "3D6"}">Roll ${faction ? escapeHtml(faction.initiative) : "3D6"}</button>
@@ -1444,7 +1666,7 @@ function playView(state: AppState): string {
         }
       </section>
 
-      <section class="solo-card">
+      <section class="solo-card solo-card-quiet">
         <h3 class="roster-section">Scoring reminders</h3>
         ${notes ? `<ul class="rule-list">${notes}</ul>` : '<p class="muted">Check your mission sheet for scoring.</p>'}
         ${faction ? `<h4 class="ref-sub">${escapeHtml(faction.rule.name)}</h4><p class="rule-card-text">${escapeHtml(faction.rule.text)}</p>` : ""}

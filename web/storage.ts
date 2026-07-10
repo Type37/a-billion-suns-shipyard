@@ -17,6 +17,9 @@ export interface PlayState {
   cmd: number;
   vp: number;
   oppVp: number;
+  /** Which of the current phase's checklist steps are ticked. Reset every
+   * time the phase changes - it is a per-phase walkthrough, not a log. */
+  checks?: boolean[];
 }
 
 export interface SavedList {

@@ -148,9 +148,11 @@ export interface AppState {
     tour?: { tourId: string; step: number };
     /** Print-setup options for the print view (never persisted). */
     print?: { format: "roster" | "cards"; trackers: boolean };
-    /** Experimental builder layout: ship classes grouped into Mass columns
-     * instead of one flat list, to test cutting down scrolling. */
-    massLayout?: boolean;
+    /** Ship-classes catalog view: undefined is the flat list, "mass" groups
+     * into Mass columns, "chart" is a bar-chart stat comparison. */
+    catalogView?: "mass" | "chart";
+    /** Which stat the chart view is currently comparing. */
+    catalogChartStat?: "cost" | "mass" | "thrust" | "silhouette" | "shields";
   };
 }
 

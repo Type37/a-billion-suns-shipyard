@@ -21,6 +21,7 @@ export type IssueCode =
   | "UNIT_SPECIES_INVALID"
   | "UNIT_SPECIES_UNEXPECTED"
   | "HVP_COUNT"
+  | "HVP_DUPLICATE"
   | "HVP_NOT_AVAILABLE"
   | "HVP_ASSIGN_UNKNOWN_UNIT"
   | "HVP_ASSIGN_MASS0"
@@ -221,8 +222,18 @@ export function validateFleet(fleet: Fleet, catalog: Catalog = defaultCatalog): 
       });
     }
 
-    // The same HVP may be taken more than once (nothing in the build rules
-    // forbids duplicates), so there is no uniqueness check here.
+    // Only one of each HVP type may ride in a fleet at a time. The builder UI
+    // already prevents this, but a hand-edited or older shared list could
+    // still carry a duplicate, so it is still flagged here.
+    if (fleet.hvp.findIndex((other) => other.hvpId === sel.hvpId) !== hvpIndex) {
+      add({
+        code: "HVP_DUPLICATE",
+        severity: "error",
+        message: `"${def?.name ?? sel.hvpId}" is selected more than once; only one of each HVP type is allowed.`,
+        hvpIndex,
+        hvpId: sel.hvpId,
+      });
+    }
 
     // Assignment (optional at build time, but validated when present).
     if (sel.assignedUnitId !== undefined) {

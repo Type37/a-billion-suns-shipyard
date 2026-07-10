@@ -9,6 +9,19 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.2",
+    date: "2026-07-10",
+    title: "The builder works on a phone now",
+    items: [
+      "Mobile builder rebuilt: each unit in the manifest now stacks into a legible card (name, then stats and weapons on their own lines, then a controls row with the ship-count stepper and cost), instead of five kinds of data crushed into one unreadable line. Nothing is clipped and there is no more sideways scrolling.",
+      "Carried personnel are tappable everywhere they appear on a unit: tap a name like \"Seasoned Captain\" to see exactly what they do, in a popover that shifts nothing.",
+      "The fleet header is reorganised: the budget sits on its own line under the name so the big figure never gets clipped, and a single dots (More) menu now holds Print, Share link, Duplicate, and Delete.",
+      "Play Mode is now a full-width call-to-action at the foot of the manifest - the clear next step - with Notes tucked below it.",
+      "The New Fleet dialog's faction preview is now just the summary and signature ability, not a full ship-and-personnel dump. The era switcher fits and slides cleanly on a phone.",
+      "Faction pickers are grouped by era (Hypergrowth, Age of Unity, Armageddon) with custom factions gathered at the bottom, and every faction box is now the same size, so long names like The Alliance of Non-Human Worlds no longer blow out the grid.",
+    ],
+  },
+  {
     version: "0.8.1",
     date: "2026-07-10",
     title: "Unit and personnel modals are gone",

@@ -390,32 +390,25 @@ function fleetsView(state: AppState): string {
 // all" reveals the rest, since any faction may be played in any era (p.141).
 // This is steps 1 and 2 of the rulebook build sequence.
 // The detail pane shown on the right of the new-fleet dialog once a faction is
-// picked: its rule, every ship with weapons and cost, and its personnel.
+// picked: its summary and signature ability only - not a full ship/personnel
+// dump. The point at pick-time is "who are these people and what do they do",
+// which the builder itself lays out in full once you commit.
 function factionDetailPane(f: Faction): string {
-  const ships = f.ships
-    .map(
-      (s) => `
-      <tr>
-        <td class="nfd-ship"><span class="nfd-ship-name">${escapeHtml(s.name)}</span>${statChips(s, true)}</td>
-        <td class="nfd-w">${primarySlotText(s)}${auxSlotText(s) ? `<br />${auxSlotText(s)}` : ""}</td>
-        <td class="nfd-cost">${credits(s.cost)}</td>
-      </tr>`,
-    )
-    .join("");
-  const hvp = f.hvp
-    .map(
-      (h) => `<li><span class="nfd-hvp-name">${escapeHtml(h.name)}</span><span class="nfd-hvp-rule">${escapeHtml(h.rule)}</span></li>`,
-    )
-    .join("");
   return `
     <div class="nf-detail">
       <h3 class="nfd-title">${escapeHtml(f.name)}</h3>
-      <p class="nfd-rule"><span class="nfd-rule-name">${escapeHtml(f.rule.name)}.</span> ${escapeHtml(f.rule.text)}</p>
+      <p class="nfd-era-tag">${escapeHtml(f.era)}</p>
       ${f.playstyle ? `<p class="nfd-playstyle">${escapeHtml(f.playstyle)}</p>` : ""}
-      <h4 class="nfd-h">Ships <span class="muted">${f.ships.length}</span></h4>
-      <table class="nfd-ships"><tbody>${ships}</tbody></table>
-      <h4 class="nfd-h">High-Value Personnel <span class="muted">${f.hvp.length}</span></h4>
-      <ul class="nfd-hvp">${hvp}</ul>
+      <div class="nfd-ability">
+        <h4 class="nfd-h">Signature ability</h4>
+        <p class="nfd-rule"><span class="nfd-rule-name">${escapeHtml(f.rule.name)}.</span> ${escapeHtml(f.rule.text)}</p>
+      </div>
+      <dl class="nfd-stats">
+        <div><dt>Initiative</dt><dd>${escapeHtml(f.initiative)}</dd></div>
+        <div><dt>CMD / round</dt><dd>${escapeHtml(f.cmdTokens)}</dd></div>
+        <div><dt>Ship classes</dt><dd>${f.ships.length}</dd></div>
+        <div><dt>Personnel</dt><dd>${f.hvp.length}</dd></div>
+      </dl>
     </div>`;
 }
 
@@ -674,20 +667,29 @@ function builderView(state: AppState): string {
     valid = !issues.some((i) => i.severity === "error");
   }
 
-  // Faction picker: the list's era first, everything else behind the same panel.
+  // Faction picker: every faction, grouped by era in reading order, with custom
+  // factions gathered in their own section at the bottom.
   const byEra = factionsByEra(customs);
-  const eraFactions = era ? (byEra.get(era) ?? []) : allFactions(customs);
-  const otherFactions = allFactions(customs).filter((f) => !eraFactions.includes(f));
-  const factionOptions = (fs: Faction[]) =>
-    fs
-      .map(
-        (f) => `
+  const customIds = new Set(customs.map((c) => c.id));
+  const factionOption = (f: Faction) => `
       <button class="faction-plaque ${f.id === list.fleet.factionId && !list.freePlay ? "selected" : ""}" data-action="set-faction" data-faction="${f.id}">
         <span class="faction-plaque-name">${escapeHtml(f.name)}</span>
         <span class="faction-plaque-rule">${escapeHtml(f.rule.name)}</span>
-      </button>`,
-      )
-      .join("");
+      </button>`;
+  const factionSection = (label: string, fs: Faction[]) =>
+    fs.length
+      ? `<div class="faction-era-group">
+          <p class="faction-era-label">${escapeHtml(label)}</p>
+          <div class="faction-plaques">${fs.map(factionOption).join("")}</div>
+        </div>`
+      : "";
+  const factionPickerBody =
+    ERA_ORDER.map((e) =>
+      factionSection(
+        e,
+        (byEra.get(e) ?? []).filter((f) => !customIds.has(f.id)),
+      ),
+    ).join("") + factionSection("Custom", allFactions(customs).filter((f) => customIds.has(f.id)));
 
   // How many units of a given class the fleet already holds, keyed by the id we
   // add with. Shown on each option so the picker reads like a live tally.
@@ -770,21 +772,34 @@ function builderView(state: AppState): string {
       const r = resolveShip(u.shipClassId, faction, customs);
       const unitName = autoUnitName(u.id);
       const cost = r ? r.ship.cost * u.count : 0;
-      const carriedNames = list.fleet.hvp
+      const carried = list.fleet.hvp
         .filter((h) => h.assignedUnitId === u.id)
-        .map((h) => hvpById(h.hvpId, faction)?.name ?? h.hvpId);
+        .map((h) => {
+          const def = hvpById(h.hvpId, faction);
+          return { name: def?.name ?? h.hvpId, rule: def?.rule ?? "" };
+        });
       const maxCount = list.freePlay || list.mode === "hypergrowth" ? 99 : r?.ship.mass === 3 ? 1 : 3;
       const wp = r ? primarySlotText(r.ship).replace(/<br \/>/g, ", ") : "";
       const wa = r ? auxSlotText(r.ship).replace(/<br \/>/g, ", ") : "";
       const weapons = r ? [wp === "None" ? "" : wp, wa === "None" ? "" : wa].filter(Boolean).join("; ") : "";
       const showSpecies = faction?.requiresSpecies && !list.freePlay;
+      // Each carried person is a tap target: the title shows, a popover reveals
+      // the rule. Popover is position:absolute, so opening it shifts nothing.
+      const carryMarkup = carried.length
+        ? `<span class="ru-carry">${icon("personnel", 12)}${carried
+            .map(
+              (c) => `<details class="hvp-pop"><summary title="What does ${escapeHtml(c.name)} do?">${escapeHtml(c.name)}</summary><span class="hvp-pop-panel"><span class="hvp-pop-name">${escapeHtml(c.name)}</span><span class="hvp-pop-rule">${escapeHtml(c.rule)}</span></span></details>`,
+            )
+            .join('<span class="ru-carry-sep">,</span> ')}</span>`
+        : "";
+      const subline = carried.length || (r && list.freePlay);
       return `
       <div class="roster-unit ${r ? "" : "unresolved"}">
         <span class="ru-id">
           <span class="roster-unit-glyph">${r ? massGlyph(r.ship.mass, 22) : icon("warning", 20)}</span>
           <span class="ru-main">
             <input class="unit-name-input" type="text" value="${escapeHtml(u.name ?? "")}" placeholder="${escapeHtml(unitName)}" data-action="unit-name" data-unit="${u.id}" />
-            ${carriedNames.length || (r && list.freePlay) ? `<span class="ru-sub">${r && list.freePlay ? `<span class="muted">${escapeHtml(r.owner.name)}</span>` : ""}${carriedNames.length ? ` <span class="ru-carry">${icon("personnel", 12)}${escapeHtml(carriedNames.join(", "))}</span>` : ""}</span>` : ""}
+            ${subline ? `<span class="ru-sub">${r && list.freePlay ? `<span class="muted">${escapeHtml(r.owner.name)}</span>` : ""}${carryMarkup}</span>` : ""}
             ${showSpecies ? speciesSelect(u) : ""}
           </span>
         </span>
@@ -796,17 +811,19 @@ function builderView(state: AppState): string {
               </div>`
             : ""
         }
-        ${
-          r
-            ? `<span class="stepper ru-stepper">
-                <button class="${u.count <= 1 ? "will-remove" : ""}" data-action="unit-count" data-unit="${u.id}" data-delta="-1" title="${u.count <= 1 ? "Remove this unit" : "One fewer ship"}">${icon("minus", 14)}</button>
-                <span class="stepper-count">${u.count}</span>
-                <button data-action="unit-count" data-unit="${u.id}" data-delta="1" ${u.count >= maxCount ? "disabled" : ""} title="One more ship">${icon("plus", 14)}</button>
-              </span>`
-            : ""
-        }
-        <span class="roster-unit-cost">${credits(cost)}</span>
-        <button class="ru-remove" data-action="remove-unit" data-unit="${u.id}" title="Remove this unit">${icon("trash", 14)}</button>
+        <div class="ru-controls">
+          ${
+            r
+              ? `<span class="stepper ru-stepper">
+                  <button class="${u.count <= 1 ? "will-remove" : ""}" data-action="unit-count" data-unit="${u.id}" data-delta="-1" title="${u.count <= 1 ? "Remove this unit" : "One fewer ship"}">${icon("minus", 14)}</button>
+                  <span class="stepper-count">${u.count}</span>
+                  <button data-action="unit-count" data-unit="${u.id}" data-delta="1" ${u.count >= maxCount ? "disabled" : ""} title="One more ship">${icon("plus", 14)}</button>
+                </span>`
+              : ""
+          }
+          <span class="roster-unit-cost">${credits(cost)}</span>
+          <button class="ru-remove" data-action="remove-unit" data-unit="${u.id}" title="Remove this unit">${icon("trash", 14)}</button>
+        </div>
       </div>`;
     })
     .join("");
@@ -860,11 +877,23 @@ function builderView(state: AppState): string {
     ? '<span class="freeplay-badge">All ships unlocked</span>'
     : `<details class="faction-switch">
         <summary>${faction ? escapeHtml(faction.name) : "Choose faction"}</summary>
-        <div class="faction-switch-panel">
-          <div class="faction-plaques">${factionOptions(eraFactions)}</div>
-          ${otherFactions.length ? `<p class="muted picker-note">From other eras, allowed by the rulebook:</p><div class="faction-plaques">${factionOptions(otherFactions)}</div>` : ""}
-        </div>
+        <div class="faction-switch-panel">${factionPickerBody}</div>
       </details>`;
+
+  // Overflow menu for the secondary fleet actions (print, share, duplicate,
+  // delete). A position:absolute popover so opening it shifts nothing. Play
+  // Mode is deliberately NOT in here - it is the primary action and gets its
+  // own button at the foot of the manifest.
+  const moreMenu = `
+    <details class="mf-menu">
+      <summary class="mf-menu-btn" title="More actions" aria-label="More actions">${icon("more", 20)}</summary>
+      <div class="mf-menu-panel">
+        <a href="#/print/${list.id}">${icon("print", 16)} Print setup</a>
+        <button data-action="share-list" data-id="${list.id}">${icon("link", 16)} Share link</button>
+        <button data-action="duplicate-list" data-id="${list.id}">${icon("duplicate", 16)} Duplicate</button>
+        <button class="danger" data-action="delete-list" data-id="${list.id}">${icon("trash", 16)} Delete fleet</button>
+      </div>
+    </details>`;
 
   const unitWord = list.fleet.units.length === 1 ? "unit" : "units";
   const hvpCount = list.freePlay
@@ -882,12 +911,15 @@ function builderView(state: AppState): string {
       <div class="mf-headline">
         <span class="mf-emblem">${emblemPicker}</span>
         <input class="mf-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled fleet" data-action="fleet-name" />
+        ${moreMenu}
+      </div>
+      <div class="mf-budget">
         <span class="mf-tally">
           <span class="mf-tally-now">${credits(total)}</span>${limitControl}
           <span class="mf-tally-free">${remaining < 0 ? `${credits(-remaining)} over` : `${credits(remaining)} free`}</span>
         </span>
+        <div class="mf-meter"><span class="mf-meter-fill" style="width:${list.fleet.creditsLimit > 0 ? Math.min(100, (total / list.fleet.creditsLimit) * 100) : 0}%"></span></div>
       </div>
-      <div class="mf-meter"><span class="mf-meter-fill" style="width:${list.fleet.creditsLimit > 0 ? Math.min(100, (total / list.fleet.creditsLimit) * 100) : 0}%"></span></div>
       <div class="mf-subline">
         <span class="mf-fac">${factionControl}</span>
         ${era ? `<span class="mf-sep">/</span><span class="mf-era">${escapeHtml(era)}</span>` : ""}
@@ -909,18 +941,12 @@ function builderView(state: AppState): string {
               : `<div class="mf-inspect fail"><span class="mf-inspect-h">${issues.length} to resolve</span><ul class="issue-list">${issues.map(issueLine).join("")}</ul></div>`
         }
 
+        <a class="mf-play-cta" href="#/play/${list.id}">${icon("flag", 18)} Enter Play Mode</a>
+
         <details class="mf-notes" ${list.fleet.notes ? "open" : ""}>
           <summary>Notes${list.fleet.notes ? ` <span class="mf-h-count">${list.fleet.notes.trim().length} chars</span>` : ""}</summary>
           <textarea class="notes-input" rows="3" placeholder="Tactics, list rationale, reminders..." data-action="fleet-notes">${escapeHtml(list.fleet.notes ?? "")}</textarea>
         </details>
-
-        <nav class="mf-utils">
-          <a href="#/print/${list.id}">${icon("print", 15)} Print setup</a>
-          <a href="#/play/${list.id}">${icon("flag", 15)} Play mode</a>
-          <button data-action="share-list" data-id="${list.id}">${icon("link", 15)} Share link</button>
-          <button data-action="duplicate-list" data-id="${list.id}">${icon("duplicate", 15)} Duplicate</button>
-          <button class="danger" data-action="delete-list" data-id="${list.id}">${icon("trash", 15)} Delete</button>
-        </nav>
       </section>
 
       <section class="mf-yard">

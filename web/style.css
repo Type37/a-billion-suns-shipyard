@@ -371,11 +371,15 @@ button { font-family: inherit; }
   display: flex; align-items: baseline; justify-content: space-between;
 }
 
-.faction-plaques { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+/* Uniform plaques: every box is the same min height and the name is sized to
+   fit even the longest faction ("The Alliance of Non-Human Worlds") in two
+   lines, so the grid reads as one even set of cards, not a ragged wall. */
+.faction-plaques { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
 .faction-plaque {
   text-align: left; cursor: pointer; background: var(--paper);
   border: 1px solid var(--hair-soft); border-left: 3px solid var(--blue);
-  padding: 13px 15px; display: flex; flex-direction: column; gap: 3px;
+  padding: 9px 12px; display: flex; flex-direction: column; justify-content: center; gap: 2px;
+  min-height: 54px;
   transition: border-color 0.12s ease, background 0.12s ease, transform 0.06s ease;
 }
 .faction-plaque:hover { border-color: var(--hair); border-left-color: var(--color-action); background: var(--blue-wash); }
@@ -383,8 +387,17 @@ button { font-family: inherit; }
 .faction-plaque.selected { background: var(--blue); border-color: var(--blue); border-left-color: var(--red); }
 .faction-plaque.selected .faction-plaque-name { color: #fff; }
 .faction-plaque.selected .faction-plaque-rule { color: #bcd0f2; }
-.faction-plaque-name { font-family: var(--display); font-weight: 700; font-size: 16px; letter-spacing: -0.01em; color: var(--ink); }
-.faction-plaque-rule { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
+.faction-plaque-name { font-family: var(--display); font-weight: 700; font-size: 14px; line-height: 1.15; letter-spacing: -0.01em; color: var(--ink); }
+.faction-plaque-rule { font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
+
+/* Faction picker grouped by era, custom last: a small ruled subheading over
+   each block of plaques. */
+.faction-era-group + .faction-era-group { margin-top: 14px; }
+.faction-era-label {
+  font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--ink-3); margin-bottom: 7px; padding-bottom: 3px;
+  border-bottom: 1px solid var(--hair-soft);
+}
 
 .freeplay-block { border: 2px solid var(--hair); padding: 22px; }
 .freeplay-block .era-title { border-bottom-color: var(--red); }
@@ -1120,7 +1133,23 @@ button { font-family: inherit; }
 .ru-name { font-family: var(--display); font-weight: 700; font-size: 15px; line-height: 1.1; }
 .ru-main .unit-name-input { width: 100%; }
 .ru-sub { font-size: 12px; color: var(--ink-2); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.ru-carry { display: inline-flex; align-items: center; gap: 2px; font-family: var(--sans); font-weight: 600; color: var(--color-action); }
+.ru-carry { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 2px 3px; font-family: var(--sans); font-weight: 600; color: var(--color-action); }
+.ru-carry-sep { color: var(--ink-3); margin-left: -2px; }
+/* Each carried person is a tap target that reveals their rule in a popover.
+   position:absolute panel, so opening one never nudges the row. */
+.hvp-pop { position: relative; display: inline-block; }
+.hvp-pop > summary { list-style: none; cursor: pointer; color: var(--color-action); text-decoration: underline dotted; text-underline-offset: 2px; }
+.hvp-pop > summary::-webkit-details-marker { display: none; }
+.hvp-pop[open] > summary { color: var(--red); }
+.hvp-pop-panel {
+  position: absolute; z-index: 40; top: calc(100% + 5px); left: 0; width: min(280px, 80vw);
+  background: var(--paper); border: 1px solid var(--ink); padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 4px;
+  box-shadow: 0 10px 28px rgba(11, 22, 51, 0.18);
+  font-weight: 400; text-transform: none; letter-spacing: normal;
+}
+.hvp-pop-name { font-family: var(--display); font-weight: 800; font-size: 13px; color: var(--ink); text-transform: none; }
+.hvp-pop-rule { font-size: 12.5px; line-height: 1.4; color: var(--ink-2); }
 /* Full-width detail line: stat chips + weapons, so the whole unit is legible
    without opening it. */
 .ru-details { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 3px; padding-top: 6px; border-top: 1px dashed var(--hair-soft); }
@@ -1139,9 +1168,12 @@ button { font-family: inherit; }
    =========================================================================== */
 .builder { max-width: var(--shell-wide); margin: 0 auto; padding: 0 clamp(14px, 3vw, 34px) 64px; }
 
-/* masthead: document title + stark tally, ruled off, no fill */
+/* masthead: document title on top, the budget (tally + meter) as its own band
+   beneath it, ruled off, no fill. Splitting the tally onto its own row keeps
+   the big budget figure from fighting the fleet name for width - and stops it
+   overflowing on a phone. */
 .mf-head { padding: 20px 0 12px; border-bottom: 2px solid var(--hair); }
-.mf-headline { display: flex; align-items: center; gap: 16px; }
+.mf-headline { display: flex; align-items: center; gap: 14px; }
 .mf-emblem { flex-shrink: 0; }
 .mf-emblem .emblem-current-btn { border: none; padding: 0; background: none; }
 .mf-emblem .emblem-caret { display: none; }
@@ -1157,14 +1189,48 @@ button { font-family: inherit; }
    heading, not a field, until you happen to click it. */
 .mf-name:hover { border-bottom-color: var(--ink-3); }
 .mf-name:focus { outline: none; border-bottom-style: solid; border-bottom-color: var(--blue); }
-.mf-tally { display: flex; align-items: baseline; gap: 7px; white-space: nowrap; font-family: var(--display); font-variant-numeric: tabular-nums; }
+
+.mf-budget { margin-top: 12px; }
+.mf-tally { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 7px; font-family: var(--display); font-variant-numeric: tabular-nums; }
 .mf-tally-now { font-size: clamp(26px, 3.4vw, 42px); font-weight: 900; color: var(--ink); }
-.mf-tally-free { margin-left: 8px; font-family: var(--display); font-size: 17px; font-weight: 900; color: var(--go); }
+.mf-tally-free { margin-left: 6px; font-family: var(--display); font-size: 17px; font-weight: 900; color: var(--go); }
 .builder.is-over .mf-tally-now, .builder.is-over .mf-tally-free { color: var(--red); }
 
-.mf-meter { margin-top: 10px; height: 7px; background: var(--ground); border: 1px solid var(--hair-soft); }
+.mf-meter { margin-top: 8px; height: 7px; background: var(--ground); border: 1px solid var(--hair-soft); }
 .mf-meter-fill { display: block; height: 100%; background: var(--blue); }
 .builder.is-over .mf-meter-fill { background: var(--red); }
+
+/* Overflow menu: a dots button that opens a small action list. position:absolute
+   panel means opening it never moves the header. */
+.mf-menu { position: relative; flex-shrink: 0; }
+.mf-menu > summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--hair); background: var(--paper); color: var(--ink); }
+.mf-menu > summary::-webkit-details-marker { display: none; }
+.mf-menu > summary:hover { border-color: var(--ink); }
+.mf-menu[open] > summary { border-color: var(--blue); color: var(--blue); }
+.mf-menu-panel {
+  position: absolute; z-index: 40; top: calc(100% + 6px); right: 0; width: 210px;
+  background: var(--paper); border: 1px solid var(--ink); padding: 6px;
+  display: flex; flex-direction: column; gap: 2px;
+  box-shadow: 0 12px 32px rgba(11, 22, 51, 0.18);
+}
+.mf-menu-panel a, .mf-menu-panel button {
+  display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+  border: none; background: none; cursor: pointer; padding: 10px 10px; min-height: var(--tap);
+  font-family: var(--sans); font-size: 14px; font-weight: 600; color: var(--ink); text-decoration: none;
+}
+.mf-menu-panel a:hover, .mf-menu-panel button:hover { background: var(--blue-wash); }
+.mf-menu-panel .danger { color: var(--red-deep); }
+.mf-menu-panel .danger:hover { background: var(--red-wash); }
+
+/* Play Mode: the primary next step once a fleet is built, so it is a real
+   filled call-to-action at the foot of the manifest, not a text link. */
+.mf-play-cta {
+  display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 18px;
+  padding: 14px 18px; background: var(--blue); color: #fff; text-decoration: none;
+  font-family: var(--display); font-weight: 800; font-size: 16px; text-transform: uppercase; letter-spacing: 0.03em;
+  border: 2px solid var(--blue); transition: background 0.12s ease, border-color 0.12s ease;
+}
+.mf-play-cta:hover { background: var(--blue-deep); border-color: var(--blue-deep); }
 
 .mf-subline { display: flex; align-items: center; gap: 12px; margin-top: 12px; min-height: 28px; }
 .mf-sep { color: var(--ink); font-weight: 900; }
@@ -1253,10 +1319,13 @@ button { font-family: inherit; }
 .chart-val { font-family: var(--display); font-weight: 800; font-size: 12px; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; min-width: 44px; }
 .mf-empty { padding: 16px 2px; font-size: 14px; font-weight: 600; color: var(--ink); }
 
-/* every list is the same ledger: flush, hairline-separated, no borders */
+/* every list is the same ledger: flush, hairline-separated, no borders.
+   Three zones: identity (glyph + name), details (stats + weapons), and the
+   controls cluster (stepper + cost + remove). Wrapping the controls into one
+   cell is what lets the whole row collapse cleanly on a phone. */
 .mf-list > .roster-unit { padding: 10px 2px; border-bottom: 1px solid var(--hair-soft); }
 .mf-manifest .mf-list .roster-unit {
-  display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto auto; align-items: center; gap: 8px 16px;
+  display: grid; grid-template-columns: minmax(130px, auto) minmax(0, 1fr) auto; align-items: center; gap: 8px 16px;
   border-left: 3px solid transparent; background: none; transition: border-color .12s ease;
 }
 /* the stat + weapon line moves inline into the row's open middle, not a wasted
@@ -1264,6 +1333,7 @@ button { font-family: inherit; }
 .mf-manifest .mf-list .roster-unit .ru-details {
   grid-column: auto; margin-top: 0; padding-top: 0; border-top: none; align-self: center;
 }
+.ru-controls { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
 .mf-manifest .mf-list .roster-unit:hover { border-left-color: var(--blue); }
 .mf-manifest .mf-list .roster-unit.unresolved { background: var(--red-wash); }
 
@@ -1323,15 +1393,11 @@ button { font-family: inherit; }
 .builder .issue-error { color: var(--red-deep); }
 .builder .issue-warning { color: var(--amber); }
 
-/* notes + utilities: bold text, not chrome */
-.mf-notes { margin-top: 6px; border-top: 2px solid var(--hair); }
+/* notes: sits at the very foot of the manifest, below Play Mode */
+.mf-notes { margin-top: 18px; border-top: 2px solid var(--hair); }
 .mf-notes > summary { list-style: none; cursor: pointer; padding: 12px 2px; font-family: var(--display); font-weight: 800; font-size: 16px; text-transform: uppercase; letter-spacing: 0.01em; color: var(--ink); }
 .mf-notes > summary::-webkit-details-marker { display: none; }
-.mf-notes .notes-input { border: 1px solid var(--hair); padding: 10px; font-weight: 500; color: var(--ink); }
-.mf-utils { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 20px; padding-top: 16px; border-top: 2px solid var(--hair); }
-.mf-utils a, .mf-utils button { display: inline-flex; align-items: center; gap: 6px; border: none; background: none; padding: 0; cursor: pointer; font-family: var(--display); font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.01em; color: var(--blue); text-decoration: none; }
-.mf-utils a:hover, .mf-utils button:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 2px; }
-.mf-utils .danger { color: var(--red-deep); }
+.mf-notes .notes-input { border: 1px solid var(--hair); padding: 10px; font-weight: 500; color: var(--ink); width: 100%; }
 
 @media (max-width: 900px) {
   .mf-body { grid-template-columns: 1fr; }
@@ -1339,6 +1405,44 @@ button { font-family: inherit; }
      else, so it must not pin itself over content further down the page. */
   .mf-manifest { position: static; max-height: none; overflow-y: visible; border-right: none; padding-right: 0; }
   .mf-yard { padding-left: 0; border-top: 2px solid var(--hair); margin-top: 8px; }
+}
+
+/* Phones: the three-zone roster row was crushing five kinds of data into one
+   ~360px line (that "scrunched, unreadable" screenshot). Stack the zones so
+   each unit reads as a small card: name, then stats/weapons on their own
+   lines, then a controls row with the stepper on the left and cost + remove
+   on the right. Nothing is clipped; the row grows in height instead. */
+@media (max-width: 600px) {
+  .mf-manifest .mf-list .roster-unit {
+    grid-template-columns: 1fr;
+    align-items: stretch; gap: 8px;
+    padding: 12px 2px;
+  }
+  .mf-manifest .mf-list .roster-unit .ru-details {
+    gap: 6px 14px;
+  }
+  .ru-details .stat-chips { gap: 4px 10px; }
+  .ru-controls { justify-content: space-between; border-top: 1px dashed var(--hair-soft); padding-top: 8px; }
+  .ru-stepper { height: 36px; }
+  .roster-unit-cost { margin-left: auto; }
+  /* Roomier tap targets for the count steppers on touch. */
+  .ru-stepper button { padding: 8px 12px; }
+
+  /* Header: emblem + name + dots stay on one row; the big budget figure lives
+     on its own line and can wrap without clipping. */
+  .mf-tally-now { font-size: clamp(30px, 10vw, 40px); }
+  .faction-switch-panel { width: min(720px, calc(100vw - 28px)); }
+
+  /* Era switcher: let long labels ("Age of Unity", "Armageddon") shrink and
+     wrap inside their equal cells instead of overflowing and clipping. The
+     sliding thumb stays aligned because it is sized from the option count. */
+  .switcher-opt { padding: 8px 5px; font-size: 12px; white-space: normal; line-height: 1.1; gap: 4px; }
+
+  /* Credits-cap popover: the preset segment is too wide for a phone, so cap
+     the panel width and let the presets wrap - it opens rightward from the
+     cap and stays on screen instead of pushing the page sideways. */
+  .limit-switch-panel { width: min(200px, calc(100vw - 28px)); }
+  .limit-switch-panel .segment-limit { flex-wrap: wrap; }
 }
 
 /* Modal system (after the Dropfleet builder): overlay, solid panel,
@@ -1395,21 +1499,16 @@ button { font-family: inherit; }
 .nf-alt-opts { display: flex; flex-wrap: wrap; gap: 8px; }
 .nf-detail-col { min-width: 0; border-left: 1px solid var(--hair-soft); padding-left: 22px; }
 .nf-detail-empty { display: flex; align-items: center; justify-content: center; min-height: 220px; text-align: center; }
-.nfd-title { font-family: var(--display); font-weight: 800; font-size: 20px; margin-bottom: 8px; text-transform: none; letter-spacing: -0.01em; color: var(--ink); }
-.nfd-rule { font-size: 13px; line-height: 1.5; color: var(--ink-2); margin-bottom: 8px; font-weight: 400; letter-spacing: normal; text-transform: none; }
-.nfd-rule-name { font-weight: 700; color: var(--ink); }
-.nfd-playstyle { font-size: 12.5px; font-style: italic; color: var(--ink-3); margin-bottom: 6px; font-weight: 400; letter-spacing: normal; text-transform: none; }
+.nfd-title { font-family: var(--display); font-weight: 800; font-size: 22px; margin-bottom: 2px; text-transform: none; letter-spacing: -0.01em; color: var(--ink); }
+.nfd-era-tag { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-bottom: 12px; }
+.nfd-playstyle { font-size: 14px; line-height: 1.5; color: var(--ink); margin-bottom: 4px; font-weight: 500; letter-spacing: normal; text-transform: none; }
 .nfd-h { font-family: var(--sans); font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin: 18px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--hair-soft); }
-.nfd-ships { width: 100%; border-collapse: collapse; }
-.nfd-ships td { border-bottom: 1px solid var(--hair-soft); padding: 6px 4px; font-size: 12px; vertical-align: top; text-transform: none; letter-spacing: normal; font-weight: 400; color: var(--ink-2); }
-.nfd-ship { width: 40%; }
-.nfd-ship-name { font-weight: 700; display: block; color: var(--ink); }
-.nfd-ship-mass { font-size: 10px; color: var(--ink-3); }
-.nfd-w { line-height: 1.4; }
-.nfd-cost { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink); }
-.nfd-hvp { list-style: none; display: flex; flex-direction: column; gap: 9px; }
-.nfd-hvp-name { font-weight: 700; font-size: 12.5px; display: block; color: var(--ink); text-transform: none; letter-spacing: normal; }
-.nfd-hvp-rule { font-size: 12px; color: var(--ink-2); line-height: 1.4; font-weight: 400; text-transform: none; letter-spacing: normal; }
+.nfd-rule { font-size: 13.5px; line-height: 1.5; color: var(--ink-2); font-weight: 400; letter-spacing: normal; text-transform: none; }
+.nfd-rule-name { font-weight: 700; color: var(--ink); }
+.nfd-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; margin-top: 18px; }
+.nfd-stats div { display: flex; flex-direction: column; gap: 2px; }
+.nfd-stats dt { font-family: var(--sans); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.nfd-stats dd { font-family: var(--display); font-weight: 800; font-size: 17px; color: var(--ink); font-variant-numeric: tabular-nums; }
 @media (max-width: 720px) {
   .nf-modal .nf-body { grid-template-columns: 1fr; }
   .nf-detail-col { border-left: none; padding-left: 0; border-top: 1px solid var(--hair-soft); padding-top: 16px; }

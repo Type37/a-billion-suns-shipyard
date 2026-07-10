@@ -9,6 +9,12 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.3",
+    date: "2026-07-10",
+    title: "Small wording fix",
+    items: ["The builder's unit list is now headed \"Roster\" instead of \"Fleet manifest\"."],
+  },
+  {
     version: "0.8.2",
     date: "2026-07-10",
     title: "The builder works on a phone now",

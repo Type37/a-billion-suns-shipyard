@@ -928,7 +928,7 @@ function builderView(state: AppState): string {
 
     <div class="mf-body">
       <section class="mf-manifest">
-        <h3 class="mf-h">Fleet manifest <span class="mf-h-count">${list.fleet.units.length} ${unitWord}</span></h3>
+        <h3 class="mf-h">Roster <span class="mf-h-count">${list.fleet.units.length} ${unitWord}</span></h3>
         <div class="mf-list">
           ${unitRows || '<p class="mf-empty">Nothing requisitioned yet. Add classes from the yard on the right.</p>'}
         </div>

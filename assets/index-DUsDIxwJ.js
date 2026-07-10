@@ -493,17 +493,24 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
       </div>`;if(i){let n=t.fleet.hvp[r];return`
       <article class="personnel-row chosen">
         ${a}
-        <div class="personnel-assign">
-          <input class="personnel-rename" type="text" value="${N(n.customName??``)}"
-            placeholder="Name this person" data-action="hvp-name" data-index="${r}" />
-          <label class="inline-field personnel-carrier">Carried by
-            <select data-action="hvp-assign" data-index="${r}">
-              <option value="">Not assigned yet</option>
-              ${y(n.assignedUnitId)}
-            </select>
-          </label>
-        </div>
-        <button class="ghost-btn danger personnel-remove" data-action="remove-hvp" data-index="${r}" title="Remove ${N(e.name)}">${F(`close`,16)}</button>
+        <span class="personnel-actions">
+          <details class="personnel-config">
+            <summary class="ghost-btn ${n.assignedUnitId||n.customName?`is-set`:``}" title="Rename or assign a carrier">${F(`pencil`,15)}</summary>
+            <div class="personnel-config-panel">
+              <label class="inline-field">Name
+                <input class="personnel-rename" type="text" value="${N(n.customName??``)}"
+                  placeholder="Name this person" data-action="hvp-name" data-index="${r}" />
+              </label>
+              <label class="inline-field">Carried by
+                <select data-action="hvp-assign" data-index="${r}">
+                  <option value="">Not assigned yet</option>
+                  ${y(n.assignedUnitId)}
+                </select>
+              </label>
+            </div>
+          </details>
+          <button class="ghost-btn danger" data-action="remove-hvp" data-index="${r}" title="Remove ${N(e.name)}">${F(`close`,16)}</button>
+        </span>
       </article>`}return v?`<article class="personnel-row is-full">${a}<span class="add-cue is-off">Full</span></article>`:`
     <article class="personnel-row is-option" data-action="add-hvp" data-hvp="${e.id}" role="button" title="Add ${N(e.name)}">
       ${a}

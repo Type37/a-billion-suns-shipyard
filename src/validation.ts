@@ -200,11 +200,20 @@ export function validateFleet(fleet: Fleet, catalog: Catalog = defaultCatalog): 
   for (const h of faction.hvp) allowedHvp.set(h.id, h);
   for (const h of catalog.genericHvp) allowedHvp.set(h.id, h);
 
-  if (fleet.hvp.length !== HVP_REQUIRED) {
+  // Three is the standard, but a faction may print its own range - The Discord's
+  // "Aces and Heroes" takes 3 to 5 (p.170). The builder already offers the wider
+  // range, so the validator has to honour the same numbers or it rejects a
+  // legal fleet the UI invited the player to build.
+  const hvpMin = faction.hvpMin ?? HVP_REQUIRED;
+  const hvpMax = faction.hvpMax ?? HVP_REQUIRED;
+  if (fleet.hvp.length < hvpMin || fleet.hvp.length > hvpMax) {
     add({
       code: "HVP_COUNT",
       severity: "error",
-      message: `A fleet must select exactly ${HVP_REQUIRED} HVP (got ${fleet.hvp.length}).`,
+      message:
+        hvpMin === hvpMax
+          ? `A fleet must select exactly ${hvpMin} HVP (got ${fleet.hvp.length}).`
+          : `${faction.name} must select between ${hvpMin} and ${hvpMax} HVP (got ${fleet.hvp.length}).`,
     });
   }
 

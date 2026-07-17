@@ -174,31 +174,6 @@ export interface Fleet {
 // Shipyard (Hypergrowth / Management Training)
 // ---------------------------------------------------------------------------
 
-/** A pool entry: N identical ships bought into the Shipyard, not yet in units. */
-export interface ShipyardEntry {
-  shipClassId: string;
-  count: number;
-  /** Player-given names for the individual ships, index-aligned with count. Cosmetic. */
-  shipNames?: string[];
-}
-
-/**
- * Shipyard - Hypergrowth's builder shape (p.122): "fill it up with ships
- * totalling no more than ¢300bn. You are buying ships; you don't have to
- * organise them into units until you requisition them during the game."
- */
-export interface Shipyard {
-  name?: string;
-  factionId: string;
-  /** Fixed at 300 in the rules; kept adjustable for the Unlimited Shipyards option and campaigns. */
-  creditsLimit: number;
-  /** Advanced Option - Unlimited Shipyards (p.124): no pre-built pool at all. */
-  unlimited?: boolean;
-  ships: ShipyardEntry[];
-  /** Chosen after missions are rolled (p.125), but stored with the shipyard. */
-  hvp: FleetHvp[];
-}
-
 // ---------------------------------------------------------------------------
 // Outfit (Junkspace solo play)
 // ---------------------------------------------------------------------------
@@ -230,42 +205,3 @@ export interface Outfit {
   ships: OutfitShip[];
 }
 
-// ---------------------------------------------------------------------------
-// Saved-roster envelope (what persistence and share links carry)
-// ---------------------------------------------------------------------------
-
-export type Roster =
-  | { mode: "combat-simulator" | "armageddon" | "age-of-unity"; fleet: Fleet }
-  | { mode: "management-training" | "hypergrowth"; shipyard: Shipyard }
-  | { mode: "junkspace"; outfit: Outfit };
-
-// ---------------------------------------------------------------------------
-// Missions (and Junkspace Jobs, which share the shape)
-// ---------------------------------------------------------------------------
-
-export interface MissionSection {
-  title: string;
-  text: string;
-}
-
-export interface Mission {
-  /** Unique across the whole catalog, kebab-case. */
-  id: string;
-  /** Which mode's mission table this belongs to. */
-  mode: GameMode;
-  name: string;
-  /** Roll/table key used to generate it (e.g. "1", "5-6", "J", "Q"). */
-  tableKey?: string;
-  /** Player count text as printed (e.g. "2", "3-4", "2-4"). */
-  players?: string;
-  /** One-line italic flavor/objective line from the mission header. */
-  blurb?: string;
-  /** Verbatim setup instructions. */
-  setup: string;
-  /** Scoring lines resolved in each End Phase - feeds the 4-round scorepad. */
-  scoringPerRound?: string[];
-  /** Scoring lines resolved at the end of the game. */
-  scoringEndGame?: string[];
-  /** Special rules, attacker/defender briefings, revenue notes, etc. */
-  sections?: MissionSection[];
-}

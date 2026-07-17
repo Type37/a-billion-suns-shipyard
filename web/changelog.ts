@@ -9,6 +9,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.13",
+    date: "2026-07-17",
+    title: "The tutorial no longer opens broken",
+    items: [
+      "Combat Simulator arrives with the three Seasoned Captains the rulebook issues it (p.63), and the builder now says so: all three are listed, each with its own carrier, under a heading that reads \"Issued by the scenario\". Previously the fleet opened with two red errors complaining that Seasoned Captain was picked more than once, while the personnel list could only show one of them and offered no way to fix anything. Picking one of each remains the rule for fleets you build yourself.",
+      "The Discord may take between three and five High-Value Personnel, as their Aces and Heroes rule allows. The builder always offered the choice; taking a fourth now stops reporting the fleet as illegal.",
+      "The builder calls them High-Value Personnel, the rulebook's own term, rather than the \"Personnel pool\".",
+    ],
+  },
+  {
     version: "0.8.12",
     date: "2026-07-17",
     title: "Panels you open stay open",

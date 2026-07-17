@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 
 import type { Fleet, FleetUnit, FleetHvp, AllianceSpecies } from "../src/types.ts";
 import { validateFleet, fleetCost, maxUnitSize, type IssueCode } from "../src/validation.ts";
+import { GENERIC_HVP, type Catalog } from "../src/data/index.ts";
+import { THE_DISCORD } from "../src/data/factions/the-discord.ts";
 
 // --- test helpers ----------------------------------------------------------
 
@@ -243,6 +245,44 @@ test("must select exactly 3 HVP", () => {
     hvp: [h("brood-mother", "a"), h("war-singer", "a"), h("seer-empath", "a"), h("executive-officer", "a")],
   });
   assert.ok(hasCode(validateFleet(four), "HVP_COUNT"));
+});
+
+test("a faction may print its own HVP range, and the validator honours it", () => {
+  // The Discord's "Aces and Heroes" takes 3 to 5 HVP, not the standard 3, and
+  // the builder already offers up to 5 - so anything in that range must
+  // validate. The Discord is Age of Unity, and defaultCatalog carries only the
+  // Armageddon four, so the catalog is injected here (the app builds its own
+  // from every faction file). Without this the fleet would fail as
+  // FACTION_UNKNOWN and never reach the HVP checks at all.
+  const catalog: Catalog = {
+    getFaction: (id) => (id === THE_DISCORD.id ? THE_DISCORD : undefined),
+    genericHvp: GENERIC_HVP,
+  };
+  const crew = [
+    "battle-hardened-admiral",
+    "fallen-princess",
+    "hot-shot-pilot",
+    "idealistic-diplomat",
+    "rebellious-tactician",
+    "gorgronti-veteran",
+  ];
+  const withHvp = (n: number) =>
+    fleet({
+      factionId: THE_DISCORD.id,
+      units: [u("a", "command-ship", 1)],
+      hvp: crew.slice(0, n).map((id) => h(id, "a")),
+    });
+
+  assert.equal(THE_DISCORD.hvpMin, 3);
+  assert.equal(THE_DISCORD.hvpMax, 5);
+
+  // Inside the faction's printed range: legal.
+  for (const n of [3, 4, 5]) {
+    assert.equal(hasCode(validateFleet(withHvp(n), catalog), "HVP_COUNT"), false, `${n} HVP should be legal`);
+  }
+  // Outside it: under the minimum, and over the maximum.
+  assert.ok(hasCode(validateFleet(withHvp(2), catalog), "HVP_COUNT"), "2 HVP is under the minimum");
+  assert.ok(hasCode(validateFleet(withHvp(6), catalog), "HVP_COUNT"), "6 HVP is over the maximum");
 });
 
 test("duplicate HVP selection is rejected", () => {

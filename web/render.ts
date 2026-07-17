@@ -742,6 +742,11 @@ function builderView(state: AppState): string {
       drop.add("UNIT_SIZE_EXCEEDED");
     }
     if (list.mode === "management-training") drop.add("HVP_COUNT");
+    // Combat Simulator does not let you pick personnel: the scenario issues
+    // three Seasoned Captains (p.63, transcribed in the guide above). One of
+    // each is a fleet-BUILDING rule, and this fleet was not built - so the
+    // duplicate check does not apply to it.
+    if (list.mode === "combat-simulator") drop.add("HVP_DUPLICATE");
     issues = result.issues.filter((i) => !drop.has(i.code));
     valid = !issues.some((i) => i.severity === "error");
   }
@@ -855,10 +860,39 @@ function builderView(state: AppState): string {
       <span class="add-cue">${icon("plus", 15)}<span>Add</span></span>
     </article>`;
   };
-  const personnelCatalog = faction
-    ? faction.hvp.map((h) => personnelCard(h, escapeHtml(faction.name))).join("") +
-      GENERIC_HVP.map((h) => personnelCard(h, "Generic")).join("")
-    : GENERIC_HVP.map((h) => personnelCard(h, "Generic")).join("");
+  // Combat Simulator issues a fixed crew rather than offering a choice: "All
+  // three of your HVP are Seasoned Captains" (p.63). The picker below is one
+  // card per HVP *type*, so it physically cannot show three of one person - it
+  // would collapse them to a single card and strand the other two, unremovable,
+  // while the counter still read 3/3. The scenario gets its own roster instead:
+  // one row per captain issued, each assignable, none removable.
+  const isFixedCrew = list.mode === "combat-simulator";
+  const fixedCrewRoster = list.fleet.hvp
+    .map((sel, i) => {
+      const def = hvpById(sel.hvpId, faction);
+      if (!def) return "";
+      return `
+      <article class="personnel-row chosen">
+        <div class="personnel-body">
+          <span class="personnel-name">${escapeHtml(def.name)}</span>
+          <span class="personnel-rule">${ruleText(def.rule)}</span>
+        </div>
+        <span class="personnel-actions">
+          <select class="personnel-assign" data-action="hvp-assign" data-index="${i}" title="Assign a carrier for ${escapeHtml(def.name)}">
+            <option value="">Not assigned</option>
+            ${carrierOptions(sel.assignedUnitId)}
+          </select>
+        </span>
+      </article>`;
+    })
+    .join("");
+
+  const personnelCatalog = isFixedCrew
+    ? fixedCrewRoster
+    : faction
+      ? faction.hvp.map((h) => personnelCard(h, escapeHtml(faction.name))).join("") +
+        GENERIC_HVP.map((h) => personnelCard(h, "Generic")).join("")
+      : GENERIC_HVP.map((h) => personnelCard(h, "Generic")).join("");
 
   // Roster units.
   // Compact rows with inline controls (ship count stepper, HVP carrier assignment).
@@ -989,11 +1023,14 @@ function builderView(state: AppState): string {
     </details>`;
 
   const unitWord = list.fleet.units.length === 1 ? "unit" : "units";
-  const hvpCount = list.freePlay
-    ? `${list.fleet.hvp.length}`
-    : hvpMin === hvpMax
-      ? `${list.fleet.hvp.length}/${hvpMax}`
-      : `${list.fleet.hvp.length}/${hvpMin}–${hvpMax}`;
+  // A fixed crew is not a tally against a cap - there is nothing to fill.
+  const hvpCount = isFixedCrew
+    ? "Issued by the scenario"
+    : list.freePlay
+      ? `${list.fleet.hvp.length}`
+      : hvpMin === hvpMax
+        ? `${list.fleet.hvp.length}/${hvpMax}`
+        : `${list.fleet.hvp.length}/${hvpMin}–${hvpMax}`;
 
   return `
   ${topbar()}
@@ -1081,7 +1118,7 @@ function builderView(state: AppState): string {
                 }
               </div>`
         }
-        <h3 class="mf-h">Personnel pool <span class="mf-h-count">${hvpCount}</span></h3>
+        <h3 class="mf-h">High-Value Personnel <span class="mf-h-count">${hvpCount}</span></h3>
         <div class="mf-list personnel-grid">${personnelCatalog}</div>
 
         <details class="mf-notes" data-persist="notes" ${list.fleet.notes ? "open" : ""}>

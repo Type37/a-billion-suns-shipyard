@@ -506,7 +506,7 @@ function factionDetailPane(f: Faction): string {
   const name = escapeHtml(f.name);
   return `
     <div class="nf-detail">
-      <h3 class="nfd-title nfd-title--${eraKey}" data-anim-title data-era="${eraKey}" data-title="${name}" aria-label="${name}">${name}<span class="nfd-rule" aria-hidden="true"></span></h3>
+      <h3 class="nfd-title nfd-title--${eraKey}" data-anim-title data-era="${eraKey}" data-title="${name}" aria-label="${name}">${name}<span class="nfd-underline" aria-hidden="true"></span></h3>
       <p class="nfd-era-tag">${escapeHtml(f.era)}</p>
       <div class="nfd-intro">
         ${slogan ? `<p class="nfd-tagline">${escapeHtml(slogan)}</p>` : ""}
@@ -1535,22 +1535,34 @@ function foundryListView(state: AppState): string {
 }
 
 function weaponEditor(shipIndex: number, slot: "primary" | "auxiliary", weapons: ShipClass["primary"]): string {
+  const cell = (wi: number, field: string, extra: string): string =>
+    `data-action="cf-weapon" data-ship="${shipIndex}" data-slot="${slot}" data-index="${wi}" data-field="${field}" ${extra}`;
   const rows = weapons
     .map(
       (w, wi) => `
       <div class="weapon-edit-row">
-        <input type="text" value="${escapeHtml(w.name)}" placeholder="Weapon name" data-action="cf-weapon" data-ship="${shipIndex}" data-slot="${slot}" data-index="${wi}" data-field="name" />
-        <input type="number" min="1" value="${w.count}" title="Number of dice" data-action="cf-weapon" data-ship="${shipIndex}" data-slot="${slot}" data-index="${wi}" data-field="count" />
-        <select title="Die type" data-action="cf-weapon" data-ship="${shipIndex}" data-slot="${slot}" data-index="${wi}" data-field="die">
-          ${["D6", "D8", "D10", "D12"].map((d) => `<option ${w.die === d ? "selected" : ""}>${d}</option>`).join("")}
-        </select>
-        <input type="number" min="0" value="${w.rangeMin}" title="Minimum range in inches" data-action="cf-weapon" data-ship="${shipIndex}" data-slot="${slot}" data-index="${wi}" data-field="rangeMin" />
-        <input type="number" min="0" value="${w.rangeMax}" title="Maximum range in inches" data-action="cf-weapon" data-ship="${shipIndex}" data-slot="${slot}" data-index="${wi}" data-field="rangeMax" />
-        <button class="ghost-btn danger" data-action="cf-weapon-remove" data-ship="${shipIndex}" data-slot="${slot}" data-index="${wi}">${icon("close", 14)}</button>
+        <input class="we-name" type="text" value="${escapeHtml(w.name)}" placeholder="Weapon name" ${cell(wi, "name", "")} />
+        <span class="we-group" title="Attack: number of dice and die type">
+          <input class="we-num" type="number" min="1" value="${w.count}" aria-label="Number of dice" ${cell(wi, "count", "")} />
+          <span class="we-x">&times;</span>
+          <select class="we-die" aria-label="Die type" ${cell(wi, "die", "")}>
+            ${["D6", "D8", "D10", "D12"].map((d) => `<option ${w.die === d ? "selected" : ""}>${d}</option>`).join("")}
+          </select>
+        </span>
+        <span class="we-group we-range" title="Range in inches, minimum to maximum">
+          <input class="we-num" type="number" min="0" value="${w.rangeMin}" aria-label="Minimum range in inches" ${cell(wi, "rangeMin", "")} />
+          <span class="we-dash">&ndash;</span>
+          <input class="we-num" type="number" min="0" value="${w.rangeMax}" aria-label="Maximum range in inches" ${cell(wi, "rangeMax", "")} />
+          <span class="we-unit">in</span>
+        </span>
+        <button class="ghost-btn danger" data-action="cf-weapon-remove" data-ship="${shipIndex}" data-slot="${slot}" data-index="${wi}" title="Remove weapon">${icon("close", 14)}</button>
       </div>`,
     )
     .join("");
-  return `${rows}
+  const head = weapons.length
+    ? `<div class="weapon-edit-head"><span>Weapon</span><span>Attack</span><span>Range (inches)</span><span></span></div>`
+    : "";
+  return `${head}${rows}
     <button class="ghost-btn" data-action="cf-weapon-add" data-ship="${shipIndex}" data-slot="${slot}">${icon("plus", 14)} Add a ${slot} weapon</button>`;
 }
 
@@ -1606,6 +1618,7 @@ function foundryEditView(state: AppState, factionId: string): string {
     .map(
       (h, hi) => `
     <article class="cf-hvp">
+      <span class="cf-hvp-num" aria-hidden="true">${hi + 1}</span>
       <input type="text" value="${escapeHtml(h.name)}" placeholder="Name or title" data-action="cf-hvp" data-index="${hi}" data-field="name" />
       <textarea rows="2" placeholder="Their special rule, written in full" data-action="cf-hvp" data-index="${hi}" data-field="rule">${escapeHtml(h.rule)}</textarea>
       <button class="ghost-btn danger" data-action="cf-hvp-remove" data-index="${hi}">${icon("close", 14)}</button>

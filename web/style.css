@@ -106,6 +106,12 @@ body {
 h1, h2, h3, h4, h5 { margin: 0; font-family: var(--display); font-weight: 800; letter-spacing: -0.015em; }
 p { margin: 0; }
 
+/* A real footer: the app is a column at least as tall as the viewport and the
+   main content grows to fill it, so the footer rests at the bottom of the page
+   on short views instead of floating up under the content. */
+#app { display: flex; flex-direction: column; min-height: 100vh; }
+#app > main { flex: 1 0 auto; }
+
 a { color: var(--blue); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
@@ -181,9 +187,9 @@ summary { outline-offset: 2px; }
    body fonts and fell back to a stray "@"). Sized to the surrounding text. */
 .mass-inline {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 1.15em; height: 1.15em; margin: 0 0.05em; vertical-align: -0.18em;
-  border: 1.3px solid currentColor; border-radius: 50%;
-  font-family: var(--sans); font-weight: 700; font-size: 0.74em; line-height: 1;
+  width: 1.05em; height: 1.05em; margin: 0 0.14em; vertical-align: -0.14em;
+  border: 1.5px solid currentColor; border-radius: 50%;
+  font-family: var(--sans); font-weight: 800; font-size: 0.92em; line-height: 1;
 }
 .emblem { display: inline-block; vertical-align: middle; }
 
@@ -1121,9 +1127,20 @@ button { font-family: inherit; }
 @media (max-width: 720px) { .cf-slots { grid-template-columns: 1fr; } }
 .cf-slot h5 { font-family: var(--sans); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .check-inline { font-size: 10px; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--ink-2); display: inline-flex; gap: 5px; align-items: center; }
-.weapon-edit-row { display: grid; grid-template-columns: 2fr 60px 80px 60px 60px auto; gap: 6px; margin-bottom: 6px; align-items: center; }
-.cf-hvp { display: grid; grid-template-columns: 220px 1fr auto; gap: 8px; align-items: start; margin-bottom: 10px; }
-@media (max-width: 720px) { .weapon-edit-row, .cf-hvp { grid-template-columns: 1fr; } }
+.weapon-edit-row, .weapon-edit-head { display: grid; grid-template-columns: minmax(0, 2fr) auto auto auto; gap: 10px; align-items: center; }
+.weapon-edit-row { margin-bottom: 6px; }
+/* Column labels so each field's meaning is obvious, not just a tooltip. */
+.weapon-edit-head { margin-bottom: 4px; }
+.weapon-edit-head span { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); }
+/* Attack and range read as single grouped controls: "2 x D6", "0 - 12 in". */
+.we-group { display: inline-flex; align-items: center; gap: 6px; }
+.weapon-edit-row .we-num { width: 52px; text-align: center; }
+.weapon-edit-row .we-die { width: 68px; }
+.we-x, .we-dash { font-weight: 700; color: var(--ink-3); }
+.we-unit { font-size: 12px; font-weight: 600; color: var(--ink-3); }
+.cf-hvp { display: grid; grid-template-columns: auto 220px 1fr auto; gap: 8px; align-items: start; margin-bottom: 10px; }
+.cf-hvp-num { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; margin-top: 8px; border: 1.5px solid var(--blue); color: var(--blue); font-family: var(--display); font-weight: 800; font-size: 13px; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+@media (max-width: 720px) { .weapon-edit-row, .weapon-edit-head, .cf-hvp { grid-template-columns: 1fr; } .weapon-edit-head { display: none; } }
 
 /* ------------------------------------------------------------ changelog */
 
@@ -1966,12 +1983,12 @@ button { font-family: inherit; }
 .nfd-title { position: relative; display: inline-block; font-family: var(--display); font-weight: 800; font-size: 22px; margin-bottom: 2px; text-transform: none; letter-spacing: -0.01em; color: var(--ink); }
 .nfd-title--unity { color: var(--blue); }
 .nfd-title .c { display: inline-block; white-space: pre; }
-.nfd-title .nfd-rule { position: absolute; left: 0; bottom: -5px; height: 3px; width: 100%; background: var(--red); transform: scaleX(0); transform-origin: left bottom; transition: transform 260ms ease-out; }
+.nfd-title .nfd-underline { position: absolute; left: 0; bottom: -5px; height: 3px; width: 100%; background: var(--red); transform: scaleX(0); transform-origin: left bottom; transition: transform 260ms ease-out; }
 /* Armageddon's underline is shown at rest (mobile / reduced-motion / repaint).
    During the slam the title carries .is-landing, which holds it collapsed with
    no transition; removing that class on landing lets the transition draw it in. */
-.nfd-title--arma .nfd-rule { transform: scaleX(1); }
-.nfd-title--arma.is-landing .nfd-rule { transform: scaleX(0); transition: none; }
+.nfd-title--arma .nfd-underline { transform: scaleX(1); }
+.nfd-title--arma.is-landing .nfd-underline { transform: scaleX(0); transition: none; }
 .nfd-era-tag { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-bottom: 12px; }
 /* The slogan sits in a fixed-height well so the "Signature ability" heading and
    the stat plates below hold the same position no matter which faction you

@@ -203,7 +203,7 @@ const DECODE_POOL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/<>*-_".split("");
 
 function titleRule(): HTMLSpanElement {
   const rule = document.createElement("span");
-  rule.className = "nfd-rule";
+  rule.className = "nfd-underline";
   rule.setAttribute("aria-hidden", "true");
   return rule;
 }

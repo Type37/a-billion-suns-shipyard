@@ -9,6 +9,17 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.20",
+    date: "2026-07-17",
+    title: "Clearer custom-rules editor and a footer that sits at the bottom",
+    items: [
+      "In Custom Rules, each weapon now reads as two clear groups, the attack (number of dice times the die) and the range (minimum to maximum, in inches), with column labels above them and the die selector lined up with the other fields.",
+      "The High-Value Personnel list in Custom Rules is now numbered.",
+      "The circled Mass symbol used in rules text is larger, bolder, and sits better on the line.",
+      "The footer now rests at the bottom of the page on short views instead of floating up beneath the content.",
+    ],
+  },
+  {
     version: "0.8.19",
     date: "2026-07-17",
     title: "The faction title arrives in its era's own style",

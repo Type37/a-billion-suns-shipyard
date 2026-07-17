@@ -163,7 +163,10 @@ export function initialState(): AppState {
   persistOnboarding(onboarding);
   return {
     route: parseRoute(location.hash),
-    lists: loadLists(),
+    // Training lists are ephemeral: any left over in storage from before they
+    // became "their own thing" are dropped on load, so they never reappear as
+    // loadable fleets.
+    lists: loadLists().filter((l) => l.mode !== "combat-simulator" && l.mode !== "management-training"),
     customFactions: loadCustomFactions(),
     outfits: loadOutfits(),
     onboarding,

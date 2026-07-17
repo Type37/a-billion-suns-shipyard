@@ -860,8 +860,11 @@ function handleClick(e: MouseEvent): void {
       const mode = target.dataset["mode"] as "combat-simulator" | "management-training";
       const list = createTrainingList(mode);
       store.setState((s) => {
+        // The training list lives in memory for this session so the builder and
+        // Play Mode can run, but it is never written to storage - it is not a
+        // saved fleet you can load again.
         const lists = [...s.lists, list];
-        persistLists(lists);
+        persistLists(lists.filter((l) => l.mode !== "combat-simulator" && l.mode !== "management-training"));
         // Taking a tutorial retires the suggestion.
         const onboarding = { ...s.onboarding, tutorialsDismissed: true };
         persistOnboarding(onboarding);

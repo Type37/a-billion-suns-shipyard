@@ -92,6 +92,34 @@ export function initiativeDice(initiative: string, size = 16): string {
   return `<span class="init-dice" aria-hidden="true">${icon("die", size, "init-die").repeat(n)}</span>`;
 }
 
+/** How many dice an Initiative pool rolls: "2D6" -> 2, bare "D12" -> 1. */
+function initiativeCount(initiative: string): number {
+  const m = /^\s*(\d*)\s*[dD]\s*\d+/.exec(initiative);
+  if (!m) return 0;
+  return Math.min(6, Math.max(1, m[1] ? parseInt(m[1], 10) : 1));
+}
+
+// Ri dice-line: a single filled isometric die outline. Filled path, so it is
+// rendered directly rather than through the stroke-based icon() helper.
+const DICE_LINE =
+  '<path fill="currentColor" d="M10.998 1.58a2 2 0 0 1 2.004 0l7.5 4.342a2 2 0 0 1 .998 1.731v8.694a2 2 0 0 1-.998 1.73l-7.5 4.343a2 2 0 0 1-2.004 0l-7.5-4.342a2 2 0 0 1-.998-1.731V7.653a2 2 0 0 1 .998-1.73zM4.5 7.653v.005l6.502 3.764A2 2 0 0 1 12 13.153v7.536l7.5-4.342V7.653L12 3.311zM6.132 12.3c0-.552-.388-1.224-.866-1.5s-.866-.052-.866.5s.388 1.224.866 1.5s.866.052.866-.5m2.597 6.498c.478.276.866.053.866-.5c0-.552-.388-1.224-.866-1.5s-.866-.052-.866.5s.388 1.224.866 1.5M5.266 16.8c.478.276.866.052.866-.5s-.388-1.224-.866-1.5s-.866-.052-.866.5s.388 1.224.866 1.5m3.463-2c.478.277.866.053.865-.5c0-.552-.387-1.223-.866-1.5c-.478-.276-.866-.052-.866.5c0 .553.388 1.224.867 1.5M14.898 8c.478-.276.478-.724 0-1s-1.254-.276-1.732 0c-.479.276-.479.724 0 1c.478.276 1.254.276 1.732 0m-4.8-1c.478.276.478.724 0 1s-1.254.276-1.732 0s-.478-.724 0-1s1.254-.276 1.732 0m5.897 8.35c.598-.346 1.083-1.185 1.083-1.875s-.485-.97-1.082-.625s-1.083 1.184-1.083 1.875c0 .69.485.97 1.082.625"/>';
+
+/** A row of ri:dice-line glyphs sized to the Initiative pool (one per die). */
+export function diceRow(initiative: string, size = 20): string {
+  const n = initiativeCount(initiative);
+  if (n === 0) return "";
+  const one = `<svg class="dice-ico" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true">${DICE_LINE}</svg>`;
+  return `<span class="dice-row" aria-hidden="true">${one.repeat(n)}</span>`;
+}
+
+/**
+ * The command-token glyph: a delta that draws itself in, then swells to a full
+ * triangle. One-shot SMIL, so it plays when the mark first renders.
+ */
+export function commandToken(size = 20, cls = ""): string {
+  return `<svg class="cmd-token ${cls}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="28" d="M12 10l4 7h-8Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.4s" values="28;0"/></path><path d="M12 4l9.25 16h-18.5Z" opacity="0"><set fill="freeze" attributeName="opacity" begin="0.4s" to="1"/><animate fill="freeze" attributeName="d" begin="0.4s" dur="0.2s" values="M12 10l4 7h-8Z;M12 4l9.25 16h-18.5Z"/></path></g></svg>`;
+}
+
 /**
  * Four labelled stat chips for a ship. Each shows an icon, a word, and the
  * value together, so the meaning is legible and memorable rather than a bare

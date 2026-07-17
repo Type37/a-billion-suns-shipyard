@@ -9,6 +9,20 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.15",
+    date: "2026-07-17",
+    title: "One builder list, fleets as cards, and a livelier New Fleet",
+    items: [
+      "The builder's Ship Classes and Roster are now a single list. The units you have added sit at the top with their steppers, the rest of the faction's classes follow under an Add ships heading, and the personnel pool moved to the bottom. No more jumping between a catalogue on the right and a roster on the left.",
+      "Saved fleets are shown as cards rather than table rows, each rising into place with a short stagger. When you have none, the page says so plainly and notes that all fleets are saved to your browser's cache.",
+      "Learn to Play no longer drops a Training Fleet into your saved list. The tutorial is its own thing now: you play it, but it is never saved and cannot be loaded again, and any training fleets left in storage from before are cleared out.",
+      "Choosing a faction in New Fleet shows its slogan, a single sentence on how it plays, its signature ability, and two figures: Initiative, with a die drawn for each you roll, and Command tokens per round marked with the command symbol. The old Ship classes and Personnel counts were dropped, and the long rulebook descriptions were replaced with that one plain sentence.",
+      "The faction panel keeps its shape as you click between factions. The Signature ability heading and the figures beneath it hold their position instead of jumping around, and the four era cards are all the same size whichever era you are browsing.",
+      "The home page rows regained their old hover, a blue panel that sweeps in from the left behind the text with a red leading edge, and footer links gained an underline that wipes in from the left and slides off to the right.",
+      "Two new emblems, Ishtar Commander and TrueCommand, joined the picker, and the button that reveals other eras and custom factions now reads More Fleets and Custom.",
+    ],
+  },
+  {
     version: "0.8.14",
     date: "2026-07-17",
     title: "Usable without a mouse, and readable on a phone",

@@ -109,6 +109,24 @@ p { margin: 0; }
 a { color: var(--blue); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
+/* Generic-link hover: a 1px rule that wipes IN from the left and, on leave,
+   collapses OUT to the right - one continuous left-to-right sweep, not a
+   symmetric grow or a fade. The trick is flipping transform-origin between the
+   rest state (right) and hover (left). GPU-friendly scaleX (never width);
+   hover-capable wide screens only; colour is a variable so a dark strip can
+   flip it. Opt in with .hover-link, or via a scoped selector (see footer). */
+.hover-link { position: relative; display: inline-block; cursor: pointer; --underline-color: currentColor; }
+@media (hover: hover) and (min-width: 992px) {
+  .hover-link::after {
+    content: ""; position: absolute; left: 0; bottom: -1px; width: 100%; height: 1px;
+    background-color: var(--underline-color);
+    transform: scaleX(0); transform-origin: right bottom;
+    transition: transform 0.25s ease-out;
+  }
+  .hover-link:hover { text-decoration: none; }
+  .hover-link:hover::after { transform: scaleX(1); transform-origin: left bottom; }
+}
+
 /* Unified keyboard-focus ring. Rocket red reads clearly on both the white
    content ground and the blue chrome, and :focus-visible keeps it keyboard-only
    so a mouse click never draws it. Inputs that set their own focus affordance
@@ -313,11 +331,22 @@ button { font-family: inherit; }
 .gif-inner > span, .gif-inner > a { padding: 0 2px; }
 .gif-title { font-weight: 800; color: var(--ink); }
 .gif-sep { width: 3px; height: 3px; border-radius: 50%; background: var(--ink-3); margin: 0 10px; display: inline-block; }
-.game-info-footer a { color: var(--color-action); font-weight: 600; }
+.game-info-footer a { color: var(--color-action); font-weight: 600; position: relative; display: inline-block; --underline-color: currentColor; }
 .game-info-footer a:hover { text-decoration: underline; }
 /* The WarLore signature: Terminal Grotesque Open, gold on a black highlight. */
-.game-info-footer a.wl-sig { font-family: "Terminal Grotesque Open", var(--sans); font-weight: 400; color: #d4ad4a; background: #111; padding: 1px 7px 2px; letter-spacing: 0.02em; }
+.game-info-footer a.wl-sig { font-family: "Terminal Grotesque Open", var(--sans); font-weight: 400; color: #d4ad4a; background: #111; padding: 1px 7px 2px; letter-spacing: 0.02em; --underline-color: #e7c56a; }
 .game-info-footer a.wl-sig:hover { color: #e7c56a; text-decoration: none; }
+/* The footer links carry the left-to-right wipe (see .hover-link above). */
+@media (hover: hover) and (min-width: 992px) {
+  .game-info-footer a::after {
+    content: ""; position: absolute; left: 0; bottom: -1px; width: 100%; height: 1px;
+    background-color: var(--underline-color);
+    transform: scaleX(0); transform-origin: right bottom;
+    transition: transform 0.25s ease-out;
+  }
+  .game-info-footer a:hover { text-decoration: none; }
+  .game-info-footer a:hover::after { transform: scaleX(1); transform-origin: left bottom; }
+}
 @media (max-width: 760px) { .gif-sep { margin: 0 7px; } .game-info-footer { margin-top: 40px; } }
 
 /* --------------------------------------------------------------------- toast */
@@ -399,21 +428,49 @@ button { font-family: inherit; }
 .index-book-cta { display: inline-flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 800; font-size: clamp(16px, 1.8vw, 20px); text-transform: uppercase; letter-spacing: 0.01em; text-align: center; }
 @media (max-width: 860px) { .index-book { position: static; margin-top: 20px; } }
 .index { border-top: 2px solid var(--ink); display: flex; flex-direction: column; gap: 6px; }
+/* The one bit of showmanship on the site: on hover the row slides right, a
+   blue panel sweeps in from the left behind the content (skewed, so it reads
+   as motion not a fill), a red spine grows at the leading edge, and the whole
+   plate throws an offset drop-shadow. The clipped corner keeps it from looking
+   like a plain button. */
 .index-row {
-  width: 100%; display: grid; grid-template-columns: 60px 1fr 36px; align-items: center; gap: 16px;
-  padding: 15px 18px; border: 1px solid var(--hair); border-left: 3px solid transparent;
-  color: var(--ink); background: var(--paper); font-family: inherit; text-align: left; cursor: pointer;
-  transition: background 0.12s ease, border-color 0.12s ease, transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative; isolation: isolate; overflow: hidden; width: 100%;
+  display: grid; grid-template-columns: 60px 1fr 36px; align-items: center; gap: 16px;
+  padding: 15px 18px; border: 1px solid var(--hair); color: var(--ink); background: var(--paper);
+  font-family: inherit; text-align: left; cursor: pointer;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%);
+  transition: transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.16s ease, border-color 0.16s;
 }
-.index-row:hover { text-decoration: none; background: var(--blue); border-color: var(--blue-deep); border-left-color: var(--red); color: #fff; transform: translateX(8px); }
+.index-row::before {
+  content: ""; position: absolute; inset: -2px -2px -2px -14px; z-index: -2;
+  background: var(--blue); transform-origin: left;
+  transform: translateX(-102%) skewX(-9deg);
+  transition: transform 0.3s cubic-bezier(0.16, 0.84, 0.44, 1);
+}
+.index-row::after {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 0; z-index: -1;
+  background: var(--red); transition: width 0.16s ease;
+}
+.index-row:hover {
+  text-decoration: none; color: #fff; border-color: var(--blue-deep);
+  transform: translateX(10px);
+  filter: drop-shadow(-9px 7px 0 rgba(11, 61, 145, 0.22));
+}
+.index-row:hover::before { transform: translateX(0) skewX(-9deg); }
+.index-row:hover::after { width: 7px; }
 .index-num {
   display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px;
-  border: 1px solid var(--line-2, #c8ccd3);
+  border: 2px solid var(--line-2, #c8ccd3);
   font-family: var(--display); font-weight: 900; font-size: 22px; color: var(--red);
   font-variant-numeric: tabular-nums;
   transition: color 0.16s, background 0.16s, border-color 0.16s;
 }
 .index-row:hover .index-num { color: var(--blue); background: #fff; border-color: #fff; }
+@media (prefers-reduced-motion: reduce) {
+  .index-row, .index-row::before, .index-row:hover { transition: none; transform: none; }
+  .index-row:hover { background: var(--blue); }
+  .index-row:hover::before { transform: translateX(0) skewX(0); }
+}
 .index-main { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
 .index-name { font-family: var(--display); font-weight: 800; font-size: clamp(20px, 3vw, 30px); letter-spacing: -0.01em; line-height: 1.02; text-transform: uppercase; }
 .index-desc { font-size: 13.5px; color: var(--ink-2); transition: color 0.16s; }
@@ -428,6 +485,49 @@ button { font-family: inherit; }
 .create-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 6px; }
 .create-extras { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 @media (max-width: 720px) { .create-extras { grid-template-columns: 1fr; } }
+
+/* Saved fleets as a card grid. Each lands with a short staggered rise so the
+   set arrives as a deliberate sweep rather than snapping in all at once - the
+   friction between "Fleets" and your list of fleets. */
+.fleet-cards {
+  margin-top: 22px; display: grid; gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+.fleet-card {
+  display: flex; flex-direction: column; background: var(--paper);
+  border: 1px solid var(--hair); border-top: 3px solid var(--blue);
+  transition: border-color 0.14s ease, box-shadow 0.14s ease, transform 0.14s ease;
+  animation: fleet-card-in 0.34s cubic-bezier(0.16, 0.84, 0.44, 1) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+.fleet-card:hover {
+  border-color: var(--hair); border-top-color: var(--red);
+  transform: translateY(-3px); box-shadow: -6px 8px 0 rgba(11, 61, 145, 0.12);
+}
+@keyframes fleet-card-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fleet-card { animation: none; }
+  .fleet-card:hover { transform: none; }
+}
+.fleet-card-open { display: flex; align-items: center; gap: 14px; padding: 16px; color: var(--ink); text-decoration: none; }
+.fleet-card-open:hover { text-decoration: none; }
+.fleet-card-emblem { flex-shrink: 0; display: inline-flex; }
+.fleet-card-body { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.fleet-card-name { font-family: var(--display); font-weight: 800; font-size: 19px; line-height: 1.1; letter-spacing: -0.01em; color: var(--ink); }
+.fleet-card-open:hover .fleet-card-name { color: var(--blue); }
+.fleet-card-faction { font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-2); }
+.fleet-card-meta { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 0 16px 12px; }
+.fleet-card-mode { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--blue); }
+.fleet-card-cost { font-family: var(--display); font-weight: 800; font-size: 17px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.fleet-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px 8px 16px; border-top: 1px solid var(--hair-soft); margin-top: auto; }
+.fleet-card-date { font-family: var(--sans); font-size: 11px; font-weight: 600; color: var(--ink-3); }
+.fleet-card-actions { display: inline-flex; gap: 2px; }
+
+.fleets-empty { margin-top: 26px; font-family: var(--display); font-weight: 800; font-size: clamp(20px, 3vw, 26px); color: var(--ink); line-height: 1.25; }
+.fleets-empty-sub { font-family: var(--sans); font-size: 13.5px; font-weight: 500; color: var(--ink-2); }
 
 /* ------------------------------------------------------------- home layout */
 
@@ -1805,6 +1905,14 @@ button { font-family: inherit; }
 .nf-custom input { width: 64px; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; padding: 3px 0; background: transparent; color: var(--ink); }
 .modal-body .faction-plaques { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 @media (max-width: 480px) { .modal-body .faction-plaques { grid-template-columns: 1fr; } }
+/* All four era cards are the same size no matter which era you click through:
+   a fixed height sized for a two-line name, content vertically centred. The
+   one name long enough to overflow that (the Alliance of Non-Human Worlds) is
+   set a touch smaller so it still fits two lines instead of shoving its card
+   taller than its neighbours. Nothing is clipped - the font gives, not the box. */
+.modal-body .faction-plaque { height: 66px; min-height: 0; justify-content: center; }
+.modal-body .faction-plaque-name { text-wrap: balance; }
+.modal-body .faction-plaque[data-faction="alliance"] .faction-plaque-name { font-size: 11.5px; }
 .nf-more {
   align-self: flex-start; margin-top: 4px; background: transparent; border: none; cursor: pointer;
   font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: 0.03em; color: var(--color-action);
@@ -1828,14 +1936,33 @@ button { font-family: inherit; }
 .nf-detail-empty { display: flex; align-items: center; justify-content: center; min-height: 220px; text-align: center; }
 .nfd-title { font-family: var(--display); font-weight: 800; font-size: 22px; margin-bottom: 2px; text-transform: none; letter-spacing: -0.01em; color: var(--ink); }
 .nfd-era-tag { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-bottom: 12px; }
+/* Slogan + summary sit in a fixed-height well so the "Signature ability"
+   heading and the stat plates below hold the same position no matter which
+   faction you click - the shorter blurbs pad out with air rather than letting
+   everything beneath them jump up the pane. Sized to the tallest blurb at a
+   normal detail-column width; nothing is clipped if one runs longer. */
+.nfd-intro { min-height: 110px; }
+/* Slogan: the faction's own epigraph, verbatim. Some are spoken lines, some
+   machine logs (starting with >), so no auto-quotes - italic serif sets it
+   apart as the one literary line in the pane. */
+.nfd-tagline { font-family: var(--serif); font-style: italic; font-size: 14px; font-weight: 600; line-height: 1.4; color: var(--ink); margin-bottom: 10px; }
 .nfd-summary { font-family: var(--sans); font-size: 13.5px; line-height: 1.5; color: var(--ink); margin-bottom: 4px; font-weight: 500; }
 .nfd-h { font-family: var(--sans); font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin: 18px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--hair-soft); }
 .nfd-rule { font-size: 13.5px; line-height: 1.5; color: var(--ink-2); font-weight: 400; letter-spacing: normal; text-transform: none; }
 .nfd-rule-name { font-weight: 700; color: var(--ink); }
-.nfd-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; margin-top: 18px; }
-.nfd-stats div { display: flex; flex-direction: column; gap: 2px; }
-.nfd-stats dt { font-family: var(--sans); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
-.nfd-stats dd { font-family: var(--display); font-weight: 800; font-size: 17px; color: var(--ink); font-variant-numeric: tabular-nums; }
+/* Two stat plates: Initiative (value + a row of dice) and CMD/round (value +
+   the command-token delta). Boxed so they read as the two numbers that matter
+   at pick-time, not a four-way data dump. */
+.nfd-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
+.nfd-stat { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border: 1px solid var(--hair); background: var(--blue-wash); }
+.nfd-stat-label { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); }
+.nfd-stat-val { display: flex; align-items: center; gap: 8px; font-family: var(--display); font-weight: 800; font-size: 22px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.dice-row { display: inline-flex; align-items: center; gap: 3px; color: var(--blue); }
+.dice-ico { display: block; }
+.nfd-cmd-token { color: var(--red); }
+@media (prefers-reduced-motion: reduce) {
+  .cmd-token path { animation: none; }
+}
 @media (max-width: 720px) {
   .nf-modal .nf-body { grid-template-columns: 1fr; }
   .nf-detail-col { border-left: none; padding-left: 0; border-top: 1px solid var(--hair-soft); padding-top: 16px; }

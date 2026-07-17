@@ -5,7 +5,16 @@ import { GENERIC_HVP } from "../src/data/index.ts";
 import { JUNKSPACE_SHIPS } from "../src/data/junkspace.ts";
 import { allFactions, factionsByEra, findFaction, makeCatalog, ERA_ORDER } from "./catalog.ts";
 import { auxSlotText, credits, escapeHtml, formatDate, primarySlotText, ruleText } from "./format.ts";
-import { emblemMark, icon, initiativeDice, massGlyph, statChips, tacticalDiagram } from "./icons.ts";
+import {
+  commandToken,
+  diceRow,
+  emblemMark,
+  icon,
+  initiativeDice,
+  massGlyph,
+  statChips,
+  tacticalDiagram,
+} from "./icons.ts";
 import { iconLibraryControls, iconLibraryGrid, libraryUrl } from "./emblems.ts";
 import { CHANGELOG } from "./changelog.ts";
 import { FACTION_LORE } from "./faction-lore.ts";
@@ -400,7 +409,7 @@ function homeView(state: AppState): string {
         ${row("01", "#/fleets", "Fleets", "Build, save, print, and share army lists for any faction and era.")}
         ${row("02", "#/solo", "Solo Play", "Junkspace: build an outfit, roll for the enemy, run the debt campaign.")}
         ${row("03", "#/ships", "Ship Compendium", "Every ship in the game in one filterable, sortable table.")}
-        ${row("04", "#/fleets", "Learn to Play", "A guided tutorial battle: the Training Fleet loaded, walked through setup, every phase, and scoring.", "new-training", 'data-mode="combat-simulator"')}
+        ${row("04", "#/fleets", "Learn to Play", "A guided tutorial battle with a ready-made Training Fleet: setup, every phase, and scoring, walked through step by step.", "new-training", 'data-mode="combat-simulator"')}
         ${row("05", "#/foundry", "Custom Rules", "Design your own factions, ship classes, and personnel.")}
       </nav>
     </div>
@@ -420,26 +429,39 @@ function homeView(state: AppState): string {
 // ---------------------------------------------------------------------------
 
 function fleetsView(state: AppState): string {
-  const lists = [...state.lists].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  // Training lists (Combat Simulator, Management Training) are their own thing:
+  // launched from Learn to Play, never saved into your fleets and never loaded
+  // from here. They stay out of this list entirely.
+  const lists = [...state.lists]
+    .filter((l) => l.mode !== "combat-simulator" && l.mode !== "management-training")
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 
-  const rows = lists
-    .map((l) => {
+  const cards = lists
+    .map((l, i) => {
       const faction = findFaction(l.fleet.factionId, state.customFactions);
       const { total } = listTotals(l, state.customFactions);
       return `
-      <tr>
-        <td class="cell-emblem"><span class="emblem-chip">${listEmblem(l, 28)}</span></td>
-        <td class="cell-name"><a href="#/list/${l.id}">${escapeHtml(l.fleet.name || "Unnamed fleet")}</a></td>
-        <td data-label="Faction">${escapeHtml(faction?.name ?? "Mixed forces")}</td>
-        <td data-label="Mode">${l.freePlay ? "Free Play" : MODE_LABEL[l.mode]}</td>
-        <td class="cell-num" data-label="Cost">${credits(total)}</td>
-        <td class="cell-date" data-label="Updated">${formatDate(l.updatedAt)}</td>
-        <td class="cell-actions">
-          <button class="ghost-btn" data-action="duplicate-list" data-id="${l.id}" title="Duplicate this fleet">${icon("duplicate", 16)}</button>
-          <button class="ghost-btn" data-action="share-list" data-id="${l.id}" title="Copy a share link">${icon("link", 16)}</button>
-          <button class="ghost-btn danger" data-action="delete-list" data-id="${l.id}" title="Delete this fleet">${icon("trash", 16)}</button>
-        </td>
-      </tr>`;
+      <article class="fleet-card" style="--i:${i}">
+        <a class="fleet-card-open" href="#/list/${l.id}" aria-label="Open ${escapeHtml(l.fleet.name || "Unnamed fleet")}">
+          <span class="fleet-card-emblem">${listEmblem(l, 40)}</span>
+          <span class="fleet-card-body">
+            <span class="fleet-card-name">${escapeHtml(l.fleet.name || "Unnamed fleet")}</span>
+            <span class="fleet-card-faction">${escapeHtml(faction?.name ?? "Mixed forces")}</span>
+          </span>
+        </a>
+        <div class="fleet-card-meta">
+          <span class="fleet-card-mode">${l.freePlay ? "Free Play" : MODE_LABEL[l.mode]}</span>
+          <span class="fleet-card-cost">${credits(total)}</span>
+        </div>
+        <div class="fleet-card-foot">
+          <span class="fleet-card-date">Updated ${formatDate(l.updatedAt)}</span>
+          <span class="fleet-card-actions">
+            <button class="ghost-btn" data-action="duplicate-list" data-id="${l.id}" title="Duplicate this fleet">${icon("duplicate", 16)}</button>
+            <button class="ghost-btn" data-action="share-list" data-id="${l.id}" title="Copy a share link">${icon("link", 16)}</button>
+            <button class="ghost-btn danger" data-action="delete-list" data-id="${l.id}" title="Delete this fleet">${icon("trash", 16)}</button>
+          </span>
+        </div>
+      </article>`;
     })
     .join("");
 
@@ -453,11 +475,8 @@ function fleetsView(state: AppState): string {
 
     ${
       lists.length === 0
-        ? '<p class="muted" style="margin-top:20px">No lists yet. Use Assemble new fleet to begin; lists are stored in this browser.</p>'
-        : `<div class="table-scroll" style="margin-top:22px"><table class="dock-table">
-            <thead><tr><th></th><th>Fleet</th><th>Faction</th><th>Mode</th><th>Cost</th><th>Updated</th><th></th></tr></thead>
-            <tbody>${rows}</tbody>
-          </table></div>`
+        ? `<p class="fleets-empty">No fleets built yet.<br /><span class="fleets-empty-sub">All fleets are saved to your browser's cache.</span></p>`
+        : `<div class="fleet-cards">${cards}</div>`
     }
   </main>
   ${newFleetModal(state, state.customFactions)}
@@ -480,17 +499,25 @@ function factionDetailPane(f: Faction): string {
     <div class="nf-detail">
       <h3 class="nfd-title">${escapeHtml(f.name)}</h3>
       <p class="nfd-era-tag">${escapeHtml(f.era)}</p>
-      ${summary ? `<p class="nfd-summary">${escapeHtml(summary)}</p>` : ""}
+      <div class="nfd-intro">
+        ${lore?.tagline ? `<p class="nfd-tagline">${escapeHtml(lore.tagline)}</p>` : ""}
+        ${summary ? `<p class="nfd-summary">${escapeHtml(summary)}</p>` : ""}
+      </div>
       <div class="nfd-ability">
         <h4 class="nfd-h">Signature ability</h4>
         <p class="nfd-rule"><span class="nfd-rule-name">${escapeHtml(f.rule.name)}.</span> ${ruleText(f.rule.text)}</p>
       </div>
-      <dl class="nfd-stats">
-        <div><dt>Initiative</dt><dd>${escapeHtml(f.initiative)}</dd></div>
-        <div><dt>CMD / round</dt><dd>${escapeHtml(f.cmdTokens)}</dd></div>
-        <div><dt>Ship classes</dt><dd>${f.ships.length}</dd></div>
-        <div><dt>Personnel</dt><dd>${f.hvp.length}</dd></div>
-      </dl>
+      <div class="nfd-stats">
+        <div class="nfd-stat">
+          <span class="nfd-stat-label">Initiative</span>
+          <span class="nfd-stat-val">${escapeHtml(f.initiative)}</span>
+          ${diceRow(f.initiative, 22)}
+        </div>
+        <div class="nfd-stat">
+          <span class="nfd-stat-label">CMD / round</span>
+          <span class="nfd-stat-val">${escapeHtml(f.cmdTokens)} ${commandToken(24, "nfd-cmd-token")}</span>
+        </div>
+      </div>
     </div>`;
 }
 
@@ -556,11 +583,10 @@ function newFleetModal(state: AppState, customs: Faction[]): string {
                  scrolls inside this box instead of shoving everything below it. -->
             <div class="nf-faction-scroll">
               <div class="faction-plaques">${eraFactions.map(plaque).join("")}</div>
-              <button class="nf-more" data-action="nf-toggle-all">${m.showAll ? "Show fewer" : `${icon("plus", 13)} More — other eras &amp; custom`}</button>
+              <button class="nf-more" data-action="nf-toggle-all">${m.showAll ? "Show fewer" : `${icon("plus", 13)} More Fleets &amp; Custom`}</button>
               ${
                 m.showAll
-                  ? `<p class="muted picker-note">Any faction may be fielded in any era. Other eras first, then your custom factions.</p>
-                     <div class="faction-plaques nf-all">${others.map(plaque).join("")}</div>`
+                  ? `<div class="faction-plaques nf-all">${others.map(plaque).join("")}</div>`
                   : ""
               }
             </div>

@@ -27,12 +27,35 @@ function paint(): void {
   // carried across the re-render like focus and caret are.
   const manifestScroll = document.querySelector(".mf-manifest")?.scrollTop ?? 0;
 
+  // A <details> the player opened is a decision, and re-rendering must not undo
+  // it. Without this, adding a ship from the "Add ships" catalog collapses the
+  // catalog you are adding from, so a second ship means opening it again. Only
+  // panels marked data-persist are carried; transient popovers (the overflow
+  // menu, the faction switcher) are deliberately left to close on re-render.
+  // Closed is tracked as well as open, so a panel the player shut does not
+  // spring back open just because it renders open by default.
+  const openPanels = new Set<string>();
+  const closedPanels = new Set<string>();
+  for (const d of document.querySelectorAll<HTMLDetailsElement>("details[data-persist]")) {
+    const key = d.dataset["persist"];
+    if (!key) continue;
+    (d.open ? openPanels : closedPanels).add(key);
+  }
+
   root.innerHTML = render(store.getState());
   enhanceNav();
   positionTour();
 
   const manifest = document.querySelector(".mf-manifest");
   if (manifest) manifest.scrollTop = manifestScroll;
+
+  for (const d of document.querySelectorAll<HTMLDetailsElement>("details[data-persist]")) {
+    const key = d.dataset["persist"];
+    if (!key) continue;
+    // A key seen in neither set is new this render: leave its authored default.
+    if (openPanels.has(key)) d.open = true;
+    else if (closedPanels.has(key)) d.open = false;
+  }
 
   if (activeId) {
     const restored = document.getElementById(activeId);

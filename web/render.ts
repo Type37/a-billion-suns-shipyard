@@ -175,7 +175,7 @@ function trainingGuide(mode: GameMode, firstSession: boolean): string {
   const notes = g.notes.map((s) => stepHtml(s)).join("");
   return `
   <section class="guide-band">
-    <details class="guide-shell" ${firstSession ? "open" : ""}>
+    <details class="guide-shell" data-persist="guide" ${firstSession ? "open" : ""}>
       <summary class="guide-title">${icon("book", 16)} Guided tutorial</summary>
       <div class="guide-inner">
         <p class="guide-intro">${escapeHtml(g.intro)}</p>
@@ -783,7 +783,7 @@ function builderView(state: AppState): string {
     catalogHtml = allFactions(customs)
       .map(
         (f, i) => `
-        <details class="catalog-group" ${i === 0 ? "open" : ""}>
+        <details class="catalog-group" data-persist="catalog-${f.id}" ${i === 0 ? "open" : ""}>
           <summary>${escapeHtml(f.name)} <span class="muted">${f.era}</span></summary>
           ${f.ships.map((s) => catalogShipRow(s, f, true, ownedCount(`${f.id}/${s.id}`))).join("")}
         </details>`,
@@ -1074,7 +1074,7 @@ function builderView(state: AppState): string {
                       : ""
                     : list.fleet.units.length === 0
                       ? unownedCatalogHtml
-                      : `<details class="mf-addships">
+                      : `<details class="mf-addships" data-persist="addships">
                           <summary class="mf-sub-h">${icon("plus", 14)} Add ships <span class="mf-h-count">${unownedCount} ${unownedCount === 1 ? "class" : "classes"}</span></summary>
                           ${unownedCatalogHtml}
                         </details>`
@@ -1084,7 +1084,7 @@ function builderView(state: AppState): string {
         <h3 class="mf-h">Personnel pool <span class="mf-h-count">${hvpCount}</span></h3>
         <div class="mf-list personnel-grid">${personnelCatalog}</div>
 
-        <details class="mf-notes" ${list.fleet.notes ? "open" : ""}>
+        <details class="mf-notes" data-persist="notes" ${list.fleet.notes ? "open" : ""}>
           <summary>Notes${list.fleet.notes ? ` <span class="mf-h-count">${list.fleet.notes.trim().length} chars</span>` : ""}</summary>
           <textarea class="notes-input" rows="3" placeholder="Tactics, list rationale, reminders..." data-action="fleet-notes">${escapeHtml(list.fleet.notes ?? "")}</textarea>
         </details>

@@ -9,6 +9,14 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.12",
+    date: "2026-07-17",
+    title: "Panels you open stay open",
+    items: [
+      "Adding a ship no longer closes the Add ships catalog you added it from, so you can add several without reopening it each time. The same fix keeps the tutorial band, your fleet notes, and the Free Play faction sections in whatever state you left them, while menus and popovers still close behind you as before.",
+    ],
+  },
+  {
     version: "0.8.11",
     date: "2026-07-17",
     title: "Denser on every screen, and a print sheet that stops repeating itself",

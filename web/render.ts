@@ -498,9 +498,15 @@ function factionDetailPane(f: Faction): string {
   // Custom factions have no slogan on file; fall back to their own playstyle
   // blurb so their panel is not left blank.
   const fallback = slogan ? undefined : f.playstyle;
+  // Era keys the title's desktop entrance animation (see animateFactionTitle in
+  // main.ts): hyper = decode, arma = slam, everything else = wipe. The era class
+  // also carries the resting colour and, for Armageddon, the red underline, so
+  // the title looks right without JS (mobile, reduced-motion, unrelated repaint).
+  const eraKey = f.era === "Hypergrowth" ? "hyper" : f.era === "Armageddon" ? "arma" : "unity";
+  const name = escapeHtml(f.name);
   return `
     <div class="nf-detail">
-      <h3 class="nfd-title">${escapeHtml(f.name)}</h3>
+      <h3 class="nfd-title nfd-title--${eraKey}" data-anim-title data-era="${eraKey}" data-title="${name}" aria-label="${name}">${name}<span class="nfd-rule" aria-hidden="true"></span></h3>
       <p class="nfd-era-tag">${escapeHtml(f.era)}</p>
       <div class="nfd-intro">
         ${slogan ? `<p class="nfd-tagline">${escapeHtml(slogan)}</p>` : ""}

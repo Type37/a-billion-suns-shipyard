@@ -9,6 +9,15 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.19",
+    date: "2026-07-17",
+    title: "The faction title arrives in its era's own style",
+    items: [
+      "When you pick a faction in New Fleet, its name now plays a short entrance that matches the era. Hypergrowth names flicker through random glyphs and settle left to right; Age of Unity names wipe in from the left in blue; Armageddon names slam in oversized, shudder, and land, then a red underline draws in beneath them.",
+      "This is a desktop flourish only, and it steps aside entirely if your system asks for reduced motion. The era tabs themselves stay instant, and the animation fires only when the title actually changes, not on every click.",
+    ],
+  },
+  {
     version: "0.8.18",
     date: "2026-07-17",
     title: "Steadier faction panel, an obvious compendium toggle, and a calmer nav",

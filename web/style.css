@@ -1960,7 +1960,18 @@ button { font-family: inherit; }
 .nf-faction-scroll { height: 320px; overflow-y: auto; padding-right: 4px; }
 .nf-detail-col { min-width: 0; border-left: 1px solid var(--hair-soft); padding-left: 22px; }
 .nf-detail-empty { display: flex; align-items: center; justify-content: center; min-height: 220px; text-align: center; }
-.nfd-title { font-family: var(--display); font-weight: 800; font-size: 22px; margin-bottom: 2px; text-transform: none; letter-spacing: -0.01em; color: var(--ink); }
+/* The title carries an era-keyed desktop entrance (main.ts). inline-block so the
+   underline and the wipe clip hug the text; the era class sets the resting
+   colour and, for Armageddon, shows the underline. */
+.nfd-title { position: relative; display: inline-block; font-family: var(--display); font-weight: 800; font-size: 22px; margin-bottom: 2px; text-transform: none; letter-spacing: -0.01em; color: var(--ink); }
+.nfd-title--unity { color: var(--blue); }
+.nfd-title .c { display: inline-block; white-space: pre; }
+.nfd-title .nfd-rule { position: absolute; left: 0; bottom: -5px; height: 3px; width: 100%; background: var(--red); transform: scaleX(0); transform-origin: left bottom; transition: transform 260ms ease-out; }
+/* Armageddon's underline is shown at rest (mobile / reduced-motion / repaint).
+   During the slam the title carries .is-landing, which holds it collapsed with
+   no transition; removing that class on landing lets the transition draw it in. */
+.nfd-title--arma .nfd-rule { transform: scaleX(1); }
+.nfd-title--arma.is-landing .nfd-rule { transform: scaleX(0); transition: none; }
 .nfd-era-tag { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-bottom: 12px; }
 /* The slogan sits in a fixed-height well so the "Signature ability" heading and
    the stat plates below hold the same position no matter which faction you

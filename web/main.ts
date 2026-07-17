@@ -95,6 +95,8 @@ function paint(): void {
   const manifest = document.querySelector(".mf-manifest");
   if (manifest) manifest.scrollTop = manifestScroll;
 
+  animateFactionTitle();
+
   for (const d of document.querySelectorAll<HTMLDetailsElement>("details[data-persist]")) {
     const key = d.dataset["persist"];
     if (!key) continue;
@@ -188,6 +190,121 @@ function enhanceNav(): void {
   pill.style.transition = "";
   links.forEach((a) => a.addEventListener("mouseenter", () => place(a)));
   nav.addEventListener("mouseleave", () => place(active));
+}
+
+// The faction info panel plays a short, era-keyed entrance on its title whenever
+// the panel content changes (a new faction picked, the panel first opening).
+// Desktop only, and skipped for reduced-motion: on those the server-rendered
+// resting state stands. Keyed by era+title so it fires only when the title
+// actually changes - never on unrelated re-renders, which would otherwise
+// re-scramble the title on every single click.
+let lastTitleKey: string | null = null;
+const DECODE_POOL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/<>*-_".split("");
+
+function titleRule(): HTMLSpanElement {
+  const rule = document.createElement("span");
+  rule.className = "nfd-rule";
+  rule.setAttribute("aria-hidden", "true");
+  return rule;
+}
+
+// Hypergrowth: each glyph flickers through random characters and settles
+// left-to-right - mechanical, fast, transactional.
+function decodeTitle(el: HTMLElement, text: string): void {
+  el.textContent = "";
+  const spans = [...text].map((c) => {
+    const s = document.createElement("span");
+    s.className = "c";
+    s.setAttribute("aria-hidden", "true");
+    s.dataset["o"] = c;
+    // Seed with the real character (not blank): the first frame overwrites it
+    // with a random glyph, so the scramble still reads, but if rAF never runs
+    // the title shows correctly instead of empty.
+    s.textContent = c;
+    el.appendChild(s);
+    return s;
+  });
+  el.appendChild(titleRule());
+  const start = performance.now();
+  const frame = (now: number): void => {
+    if (!el.isConnected) return; // element replaced by a re-render; abandon
+    const t = now - start;
+    let done = true;
+    spans.forEach((s, i) => {
+      const o = s.dataset["o"] ?? "";
+      if (o === " ") return;
+      if (t < 70 + i * 26) {
+        s.textContent = DECODE_POOL[Math.floor(Math.random() * DECODE_POOL.length)] ?? o;
+        done = false;
+      } else {
+        s.textContent = o;
+      }
+    });
+    if (!done) requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+}
+
+// Age of Unity: the title reveals left-to-right under a clip-path with a slight
+// opacity lift - composed, ordered, inevitable.
+function wipeTitle(el: HTMLElement, text: string): void {
+  el.textContent = text;
+  el.appendChild(titleRule());
+  el.animate(
+    [
+      { clipPath: "inset(0 100% 0 0)", opacity: 0.4 },
+      { clipPath: "inset(0 0 0 0)", opacity: 1 },
+    ],
+    { duration: 340, fill: "forwards", easing: "cubic-bezier(.3,.7,.2,1)" },
+  );
+}
+
+// Armageddon: the title crashes in oversized, overshoots and shudders, then a
+// red underline draws in only once it has landed - violent, abrupt.
+function slamTitle(el: HTMLElement, text: string): void {
+  el.textContent = text;
+  el.appendChild(titleRule());
+  el.classList.add("is-landing"); // hold the underline collapsed through the slam
+  el.style.transformOrigin = "0% 50%";
+  el.animate(
+    [
+      { opacity: 0, transform: "scale(1.9)" },
+      { opacity: 1, transform: "scale(.96)", offset: 0.6 },
+      { transform: "translate(3px,-2px)", offset: 0.78 },
+      { transform: "translate(-3px,2px)", offset: 0.9 },
+      { transform: "translate(0,0) scale(1)" },
+    ],
+    { duration: 340, easing: "cubic-bezier(.2,.9,.2,1)", fill: "forwards" },
+  );
+  // Only once the title has landed (slam is 340ms): drop the hold, and the CSS
+  // transition on .nfd-rule draws the red underline in. A timer rather than the
+  // animation's finish event, so the underline never gets stranded if the finish
+  // event is missed.
+  window.setTimeout(() => el.classList.remove("is-landing"), 360);
+}
+
+function animateFactionTitle(): void {
+  const el = document.querySelector<HTMLElement>(".nfd-title[data-anim-title]");
+  if (!el) {
+    lastTitleKey = null; // panel gone - reopening it should animate afresh
+    return;
+  }
+  const era = el.dataset["era"] ?? "unity";
+  const title = el.dataset["title"] ?? el.textContent ?? "";
+  const key = `${era}|${title}`;
+  if (key === lastTitleKey) return; // unchanged - leave the resting state be
+  lastTitleKey = key;
+
+  // Desktop only ("this order is just for desktop"), and never against the OS
+  // reduced-motion preference. In both cases the resting markup is already right.
+  const canMotion =
+    window.matchMedia("(hover: hover) and (min-width: 992px)").matches &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!canMotion) return;
+
+  if (era === "hyper") decodeTitle(el, title);
+  else if (era === "arma") slamTitle(el, title);
+  else wipeTitle(el, title);
 }
 
 // The tour popover is a real DOM node in the rendered string, but it targets

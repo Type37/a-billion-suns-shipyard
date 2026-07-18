@@ -6,7 +6,7 @@ import { JUNKSPACE_SHIPS } from "../src/data/junkspace.ts";
 import { allFactions, factionsByEra, findFaction, makeCatalog, ERA_ORDER } from "./catalog.ts";
 import { auxSlotText, credits, escapeHtml, formatDate, primarySlotText, ruleText } from "./format.ts";
 import {
-  commandToken,
+  commandRow,
   diceRow,
   emblemMark,
   icon,
@@ -326,8 +326,8 @@ function topbar(): string {
 
 function footer(): string {
   // The uniform WarLore builder footer: one centered line, dot-separated. The
-  // separators are styled spans, not literal interpunct characters.
-  const v = CHANGELOG[0]?.version ?? "";
+  // separators are styled spans, not literal interpunct characters. The version
+  // / changelog link lives in the Options dialog now, not here.
   const sep = '<span class="gif-sep" aria-hidden="true"></span>';
   return `
   <footer class="game-info-footer">
@@ -337,8 +337,7 @@ function footer(): string {
       <a href="./ABS-2E-Quick-Reference.pdf" target="_blank" rel="noopener">${icon("scroll", 13)} Quick Reference</a>${sep}
       <span class="gif-builder">Fleet builder by <a class="wl-sig" href="https://linktr.ee/warlore" target="_blank" rel="noopener">WarLore</a></span>${sep}
       <a href="mailto:warlore1@outlook.com">Send Feedback</a>${sep}
-      <a href="https://github.com/Type37/a-billion-suns-shipyard" target="_blank" rel="noopener">Source on GitHub</a>${sep}
-      <a href="#/changelog">v${escapeHtml(v)}</a>
+      <a href="https://github.com/Type37/a-billion-suns-shipyard" target="_blank" rel="noopener">Source on GitHub</a>
     </div>
   </footer>`;
 }
@@ -510,7 +509,7 @@ function factionDetailPane(f: Faction): string {
       <h3 class="nfd-title nfd-title--${eraKey}" data-anim-title data-era="${eraKey}" data-title="${name}" aria-label="${name}">${name}<span class="nfd-underline" aria-hidden="true"></span></h3>
       <p class="nfd-era-tag">${escapeHtml(f.era)}</p>
       <div class="nfd-intro">
-        ${slogan ? `<p class="nfd-tagline">${escapeHtml(slogan)}</p>` : ""}
+        ${slogan ? `<p class="nfd-tagline ${slogan.startsWith(">") ? "nfd-tagline--term" : ""}">${escapeHtml(slogan)}</p>` : ""}
         ${fallback ? `<p class="nfd-summary">${escapeHtml(fallback)}</p>` : ""}
       </div>
       <div class="nfd-stats">
@@ -525,7 +524,7 @@ function factionDetailPane(f: Faction): string {
           <span class="nfd-stat-label">CMD / round</span>
           <span class="nfd-stat-figure">
             <span class="nfd-stat-val">${escapeHtml(f.cmdTokens)}</span>
-            <span class="dice-row">${commandToken(20)}</span>
+            ${commandRow(f.cmdTokens, 20)}
           </span>
         </div>
       </div>
@@ -2101,28 +2100,24 @@ function shipsView(state: AppState): string {
         <select data-action="ship-filter" data-field="faction"><option value="">All factions</option>${facOptions}</select></label>
       <label class="control-group"><span class="control-label">Mass</span>
         <select data-action="ship-filter" data-field="mass"><option value="">All masses</option>${massOptions}</select></label>
-      ${f.era || f.faction || f.mass || f.q ? '<button class="ghost-btn" data-action="ship-filter-clear">Clear filters</button>' : ""}
+      <label class="comp-groupcheck ${grouped ? "on" : ""}">
+        <input type="checkbox" data-action="ship-group-faction" ${grouped ? "checked" : ""} />
+        <span class="comp-groupcheck-box">${icon("check", 14)}</span>
+        <span class="comp-groupcheck-label">Sort by faction</span>
+      </label>
+      ${
+        customCount > 0
+          ? `<label class="comp-groupcheck ${f.showCustom ? "on" : ""}">
+              <input type="checkbox" data-action="ship-show-custom" ${f.showCustom ? "checked" : ""} />
+              <span class="comp-groupcheck-box">${icon("check", 14)}</span>
+              <span class="comp-groupcheck-label">Show custom ships</span>
+            </label>`
+          : ""
+      }
+      ${f.era || f.faction || f.mass || f.q ? '<button class="ghost-btn comp-clear" data-action="ship-filter-clear">Clear filters</button>' : ""}
     </div>
 
-    <div class="comp-sortbar">
-      <div class="comp-toggles">
-        <label class="comp-groupcheck ${grouped ? "on" : ""}">
-          <input type="checkbox" data-action="ship-group-faction" ${grouped ? "checked" : ""} />
-          <span class="comp-groupcheck-box">${icon("check", 14)}</span>
-          <span class="comp-groupcheck-label">Sort by faction</span>
-        </label>
-        ${
-          customCount > 0
-            ? `<label class="comp-groupcheck ${f.showCustom ? "on" : ""}">
-                <input type="checkbox" data-action="ship-show-custom" ${f.showCustom ? "checked" : ""} />
-                <span class="comp-groupcheck-box">${icon("check", 14)}</span>
-                <span class="comp-groupcheck-label">Show custom ships</span>
-              </label>`
-            : ""
-        }
-      </div>
-      <p class="comp-count">${shown.length} of ${f.showCustom ? rows.length : rows.length - customCount} ships</p>
-    </div>
+    <p class="comp-count">${shown.length} of ${f.showCustom ? rows.length : rows.length - customCount} ships</p>
     <div class="table-scroll comp-scroll">
       <table class="comp-table ${grouped ? "grouped" : ""}">
         <thead>${headRow}</thead>

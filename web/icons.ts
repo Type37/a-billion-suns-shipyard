@@ -113,6 +113,21 @@ export function diceRow(initiative: string, size = 20): string {
   return `<span class="dice-row" aria-hidden="true">${one.repeat(n)}</span>`;
 }
 
+// A static command-token delta (no draw animation), for repeating in a row.
+const CMD_DELTA = '<path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" d="M12 4l9.25 16h-18.5Z"/>';
+
+/**
+ * A row of command-token deltas sized to the faction's CMD-per-round value: a
+ * numeric value shows that many triangles (capped), a die value (e.g. D12)
+ * shows a single token. Mirrors diceRow for Initiative.
+ */
+export function commandRow(cmdTokens: string, size = 20): string {
+  const one = `<svg class="cmd-token" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" aria-hidden="true">${CMD_DELTA}</svg>`;
+  const m = /^\s*(\d+)/.exec(cmdTokens);
+  const n = m ? Math.min(9, Math.max(1, parseInt(m[1] ?? "1", 10))) : 1;
+  return `<span class="dice-row cmd-row" aria-hidden="true">${one.repeat(n)}</span>`;
+}
+
 /**
  * The command-token glyph: a delta that draws itself in, then swells to a full
  * triangle. One-shot SMIL, so it plays when the mark first renders.

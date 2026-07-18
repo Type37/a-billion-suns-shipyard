@@ -9,6 +9,18 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.24",
+    date: "2026-07-17",
+    title: "Layout fix, tidier compendium controls, and small faction-panel touches",
+    items: [
+      "Fixed a layout regression from the footer change: the main content had gone narrow and centred and the fleet cards stacked into a single column. The page is full width again and the cards tile properly.",
+      "In the Ship Compendium, the Sort by faction and Show custom ships toggles now sit in the same bar as the search and dropdowns, in a conventional order, with the result count on its own line beneath.",
+      "Choosing a credits limit now shows a brief Smaller game or Larger game note.",
+      "Machine-log faction slogans (AEGIS, Golem) now read as a terminal line: monospace, upright, with a blinking cursor.",
+      "The command-tokens-per-round figure now shows that many triangle marks, mirroring the initiative dice, and the version and changelog link moved out of the footer into the Options dialog.",
+    ],
+  },
+  {
     version: "0.8.23",
     date: "2026-07-17",
     title: "A real pilot-class picker, and ships that arrive with a flourish",

@@ -423,6 +423,7 @@ function handleClick(e: MouseEvent): void {
       const limit = Number(target.dataset["limit"]);
       if (!id || !Number.isFinite(limit)) return;
       store.setState((s) => updateFleet(s, id, (f) => ({ ...f, creditsLimit: limit })));
+      showToast(limit <= 300 ? "Smaller game" : "Larger game");
       break;
     }
     case "set-faction": {
@@ -841,6 +842,7 @@ function handleClick(e: MouseEvent): void {
       store.setState((s) =>
         s.ui.modal?.kind === "new-fleet" ? { ...s, ui: { ...s.ui, modal: { ...s.ui.modal, limit } } } : s,
       );
+      showToast(limit <= 300 ? "Smaller game" : "Larger game");
       break;
     }
     case "nf-faction": {

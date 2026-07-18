@@ -97,6 +97,7 @@ function paint(): void {
 
   animateFactionTitle();
   animateNewRosterRows();
+  animateCountChanges();
   // After layout settles: measuring mid-paint reads pre-layout boxes, and web
   // fonts landing later reflow the sheet and move every page boundary.
   requestAnimationFrame(() => paginatePrintPreview());
@@ -413,9 +414,17 @@ function animateStatGlyphs(): void {
 // (the first sighting just seeds the set).
 let prevRosterKeys: Set<string> | null = null;
 function animateNewRosterRows(): void {
+  // Distinguish "the roster isn't on screen" from "the roster is empty". If we
+  // reset on an empty roster, the FIRST ship you add is the first sighting and
+  // never animates - which is exactly the add most worth acknowledging.
+  const rosterOnScreen = document.querySelector(".mf-manifest, .roster-sheet") !== null;
   const rows = Array.from(document.querySelectorAll<HTMLElement>("[data-roster-key]"));
-  if (rows.length === 0) {
+  if (!rosterOnScreen) {
     prevRosterKeys = null; // roster left the page; a fresh one should not animate on open
+    return;
+  }
+  if (rows.length === 0) {
+    prevRosterKeys = new Set(); // on screen but empty: the next add IS new
     return;
   }
   const current = new Set<string>();
@@ -436,6 +445,53 @@ function animateNewRosterRows(): void {
         { opacity: 1, transform: "translateY(0)", boxShadow: "inset 0 0 0 rgba(11,61,145,0)" },
       ],
       { duration: 320, easing: "cubic-bezier(.2,.8,.2,1)" },
+    );
+  }
+}
+
+/**
+ * A Shipyard stacks: adding a ship you already hold only raises its number, so
+ * no new row appears and animateNewRosterRows has nothing to play. Pop the
+ * figure instead, so every add is acknowledged on the roster and not only in
+ * the toast. Same prev-set diffing pattern as the row entrance above.
+ */
+let prevUnitCounts: Map<string, string> | null = null;
+function animateCountChanges(): void {
+  const rosterOnScreen = document.querySelector(".mf-manifest, .roster-sheet") !== null;
+  const rows = Array.from(document.querySelectorAll<HTMLElement>("[data-roster-key]"));
+  if (!rosterOnScreen) {
+    prevUnitCounts = null;
+    return;
+  }
+  if (rows.length === 0) {
+    prevUnitCounts = new Map();
+    return;
+  }
+  const current = new Map<string, string>();
+  for (const r of rows) {
+    const key = r.dataset["rosterKey"];
+    const countEl = r.querySelector<HTMLElement>(".stepper-count");
+    if (key && countEl) current.set(key, countEl.textContent ?? "");
+  }
+  const seen = prevUnitCounts;
+  prevUnitCounts = current;
+  if (seen === null) return; // first sight - seed only
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  for (const r of rows) {
+    const key = r.dataset["rosterKey"];
+    const countEl = r.querySelector<HTMLElement>(".stepper-count");
+    if (!key || !countEl) continue;
+    const before = seen.get(key);
+    const after = current.get(key);
+    if (before === undefined || after === undefined || before === after) continue;
+    if (Number(after) <= Number(before)) continue; // only celebrate going up
+    countEl.animate(
+      [
+        { transform: "scale(1)", color: "var(--ink)" },
+        { transform: "scale(1.5)", color: "var(--blue)", offset: 0.4 },
+        { transform: "scale(1)", color: "var(--ink)" },
+      ],
+      { duration: 340, easing: "cubic-bezier(.2,.9,.3,1.2)" },
     );
   }
 }

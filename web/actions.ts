@@ -21,6 +21,7 @@ import type { SavedOutfit } from "./storage.ts";
 import {
   createList,
   createOutfit,
+  activeOutfit,
   createTrainingList,
   DEFAULT_PRINT,
   EMPTY_SHIP_FILTER,
@@ -518,28 +519,30 @@ function handleClick(e: MouseEvent): void {
       const shipId = target.dataset["ship"];
       if (!id || !shipId) return;
       const list = state.lists.find((l) => l.id === id);
+      if (!list) return;
       // A Shipyard mode (Hypergrowth) stocks ship CLASSES, not units: the first
       // add creates the entry, every add after that raises how many you hold.
       // Nothing here ever forms a unit - that happens at requisition, in play.
-      const stocking = list ? MODE_BUILDER_SHAPE[list.mode] === "shipyard" : false;
-      let addedName = "Unit";
-      let held = 1;
+      const stocking = MODE_BUILDER_SHAPE[list.mode] === "shipyard";
+      const faction = findFaction(list.fleet.factionId, state.customFactions);
+      const addedName = resolveShip(shipId, faction, state.customFactions)?.ship.name ?? "Unit";
+      const held = stocking ? (list.fleet.units.find((u) => u.shipClassId === shipId)?.count ?? 0) + 1 : 1;
+      // Toast BEFORE the mutation. showToast is its own setState, and every
+      // setState repaints by replacing innerHTML - which destroys any animation
+      // the mutation's paint just started. Toasting first leaves the mutation's
+      // paint last, so the roster's add animation survives long enough to play.
+      showToast(stocking ? `${addedName} ×${held} in the Shipyard` : `Added ${addedName}`);
       store.setState((s) =>
         updateFleet(s, id, (f) => {
-          const faction = findFaction(f.factionId, s.customFactions);
-          addedName = resolveShip(shipId, faction, s.customFactions)?.ship.name ?? "Unit";
           if (stocking) {
             const idx = f.units.findIndex((u) => u.shipClassId === shipId);
             if (idx >= 0) {
-              const units = f.units.map((u, i) => (i === idx ? { ...u, count: u.count + 1 } : u));
-              held = units[idx]!.count;
-              return { ...f, units };
+              return { ...f, units: f.units.map((u, i) => (i === idx ? { ...u, count: u.count + 1 } : u)) };
             }
           }
           return { ...f, units: [...f.units, { id: nextUnitIdFor(f), shipClassId: shipId, count: 1 }] };
         }),
       );
-      showToast(stocking ? `${addedName} ×${held} in the Shipyard` : `Added ${addedName}`);
       break;
     }
     case "close-modal": {
@@ -801,19 +804,16 @@ function handleClick(e: MouseEvent): void {
     case "outfit-add-ship": {
       const shipId = target.dataset["ship"];
       if (!shipId) return;
-      let full = false;
-      editOutfit((o) => {
-        if (o.ships.length >= OUTFIT_MAX_SHIPS) {
-          full = true;
-          return o;
-        }
-        return {
-          ...o,
-          ships: [...o.ships, { id: nextOutfitShipId(o), shipClassId: shipId, pilotClass: "Gunner" as PilotClass }],
-        };
-      });
-      const shipName = JUNKSPACE_SHIPS.find((s) => s.id === shipId)?.name ?? "Ship";
+      const outfit = activeOutfit(state);
+      const full = (outfit?.ships.length ?? 0) >= OUTFIT_MAX_SHIPS;
+      const shipName = JUNKSPACE_SHIPS.find((s2) => s2.id === shipId)?.name ?? "Ship";
+      // Toast first - see add-unit: a later repaint would kill the add animation.
       showToast(full ? `Outfit is full at ${OUTFIT_MAX_SHIPS} ships` : `Added ${shipName}`);
+      if (full) return;
+      editOutfit((o) => ({
+        ...o,
+        ships: [...o.ships, { id: nextOutfitShipId(o), shipClassId: shipId, pilotClass: "Gunner" as PilotClass }],
+      }));
       break;
     }
     case "outfit-remove-ship": {

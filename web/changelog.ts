@@ -9,6 +9,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.51",
+    date: "2026-07-18",
+    title: "Adding a ship actually looks like something happened",
+    items: [
+      "Fixed the add animation never playing. The confirmation message was triggering a second redraw a few milliseconds later that wiped out the animation before you could see it. Adding a ship now visibly lands in your roster.",
+      "The first ship added to an empty roster animates too — previously that one add, the one most worth confirming, was silently skipped. Reopening a fleet still doesn't replay animations for ships already there.",
+      "In a shipyard, adding a ship you already hold pops its number, since no new row appears to animate.",
+    ],
+  },
+  {
     version: "0.8.50",
     date: "2026-07-18",
     title: "Solo reads like the rest of the app",

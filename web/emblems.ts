@@ -23,6 +23,15 @@ const thumbUrls = import.meta.glob("./emblem-thumbs/**/*.webp", {
   import: "default",
 }) as Record<string, string>;
 
+// Which raster marks have a real alpha channel, written by the thumbnail script.
+// Tinting paints a colour through the mark's own transparency (a CSS mask), so
+// it works on any cut-out image - it was gated to SVG only, which meant a
+// labelled Tint row that did nothing for 247 of 253 marks. An opaque image would
+// mask into a solid coloured rectangle, hence the check.
+import tintableList from "./emblem-thumbs/tintable.json";
+
+const TINTABLE = new Set<string>(tintableList as string[]);
+
 const THUMB_BY_REL = new Map<string, string>(
   Object.entries(thumbUrls).map(([path, url]) => [path.replace(/^\.\/emblem-thumbs\//, "").replace(/\.webp$/i, ""), url]),
 );
@@ -38,6 +47,8 @@ export interface LibraryIcon {
   label: string;
   /** Extra search terms describing what the mark depicts. */
   keywords: string[];
+  /** True if a colour can be painted through this mark (it has transparency). */
+  tintable: boolean;
 }
 
 function titleCase(s: string): string {
@@ -125,6 +136,13 @@ const KEYWORD_RULES: Array<[RegExp, string[]]> = [
   [/chess|chesspiece|game|play|trailer/i, ["chess", "game", "strategy", "piece"]],
   [/recycle|arrows|renew|earth.?day|green/i, ["recycle", "renewal", "environment", "green", "cycle"]],
   [/net(run|work)|decipher|signal|query|data|algorithm|match/i, ["network", "data", "signal", "code", "computing"]],
+  // Terms an audit found returning nothing at all.
+  [/warship|frigate|cruiser|destroyer|dreadnought|battle|combat|assault/i, ["warship", "battle", "combat", "military", "fleet"]],
+  [/rocket|missile|torpedo|launch|thrust|engine|propuls/i, ["rocket", "missile", "engine", "launch", "thrust"]],
+  [/imperial|empire|imperium|throne|regal|sovereign|dominion/i, ["imperial", "empire", "throne", "authority", "rule"]],
+  [/wolf|hound|fang|claw|predator|hunt/i, ["wolf", "predator", "hunter", "animal", "beast"]],
+  [/mining|miner|drill|excav|quarry|extract|foundry|smelt/i, ["mining", "drill", "industry", "extraction", "labour"]],
+  [/trade|merchant|cargo|freight|haul|market|commerce|logistic/i, ["trade", "cargo", "merchant", "shipping", "commerce"]],
 ];
 
 /** Every keyword that should find this icon. */
@@ -145,7 +163,9 @@ export const ICON_LIBRARY: LibraryIcon[] = Object.entries(urls)
     const label = cleanLabel(file.replace(/\.[^.]+$/, ""));
     // SVGs have no thumbnail (and need none) - they fall back to the original.
     const thumb = THUMB_BY_REL.get(rel.replace(/\.[^.]+$/, "")) ?? url;
-    return { id: rel, url, thumb, category, label, keywords: keywordsFor(file, category, label) };
+    // Vectors are always tintable; rasters only if they carry transparency.
+    const tintable = /\.svg$/i.test(rel) || TINTABLE.has(rel.replace(/\.[^.]+$/, ""));
+    return { id: rel, url, thumb, category, label, keywords: keywordsFor(file, category, label), tintable };
   })
   .sort((a, b) => a.category.localeCompare(b.category) || a.label.localeCompare(b.label));
 
@@ -213,6 +233,29 @@ export function randomIconId(): string | undefined {
 /** Tiles rendered per page. Roughly three screens' worth at the modal's width. */
 export const LIB_PAGE = 72;
 
+/**
+ * Does this mark match the query? Every word must match somewhere, so "red
+ * skull" narrows rather than widens. A trailing "s" is also tried bare, because
+ * "skulls" returning nothing while "skull" returns eleven reads as broken.
+ */
+function matchesQuery(i: LibraryIcon, terms: string[]): boolean {
+  if (terms.length === 0) return true;
+  const hay = HAYSTACK.get(i.id) ?? "";
+  return terms.every((t) => hay.includes(t) || (t.length > 3 && t.endsWith("s") && hay.includes(t.slice(0, -1))));
+}
+
+/** Split a raw query into search terms. */
+export function queryTerms(query?: string): string[] {
+  const q = (query ?? "").trim().toLowerCase();
+  return q ? q.split(/\s+/) : [];
+}
+
+/** Marks matching a query, ignoring the folder filter. Used for folder counts. */
+export function matchCount(query: string | undefined, category?: string): number {
+  const terms = queryTerms(query);
+  return ICON_LIBRARY.filter((i) => (!category || i.category === category) && matchesQuery(i, terms)).length;
+}
+
 export function iconLibraryGrid(
   actLib: string,
   currentLib?: string,
@@ -221,14 +264,9 @@ export function iconLibraryGrid(
   shown: number = LIB_PAGE,
 ): string {
   const q = (query ?? "").trim().toLowerCase();
-  // Every word has to match somewhere, so "red skull" narrows rather than widens.
-  const terms = q ? q.split(/\s+/) : [];
-  const matches = ICON_LIBRARY.filter((i) => !activeCat || activeCat === "all" || i.category === activeCat).filter(
-    (i) => {
-      if (terms.length === 0) return true;
-      const hay = HAYSTACK.get(i.id) ?? "";
-      return terms.every((t) => hay.includes(t));
-    },
+  const terms = queryTerms(query);
+  const matches = ICON_LIBRARY.filter(
+    (i) => (!activeCat || activeCat === "all" || i.category === activeCat) && matchesQuery(i, terms),
   );
   // Only the first `shown` are built. The rest arrive as the sentinel below
   // scrolls into view (see main.ts), which keeps the modal instant to open and
@@ -244,15 +282,28 @@ export function iconLibraryGrid(
   const items = matches
     .slice(0, shown)
     .map(
-      // No title tooltip - the mouseover label was noise. alt stays for a11y.
-      // Intrinsic width/height plus lazy/async decoding keep a 150-tile grid from
-      // reflowing as images arrive; the CSS pairs this with content-visibility so
-      // offscreen tiles cost nothing to lay out on each repaint.
+      // The name is back as a title. It was dropped as "mouseover noise", but the
+      // alternative turned out to be 253 anonymous pictures whose only name was a
+      // raw asset filename in alt text, so a search hit set looked arbitrary.
+      // Intrinsic width/height plus lazy/async decoding keep the grid from
+      // reflowing as images arrive.
       (i, n) =>
-        `<button class="lib-icon ${currentLib === i.id ? "selected" : ""}" data-cat="${escapeHtml(i.category)}" data-action="${actLib}" data-lib="${escapeHtml(i.id)}"><img loading="${n < EAGER ? "eager" : "lazy"}" decoding="async" width="64" height="64" src="${i.thumb}" alt="${escapeHtml(i.label)}" /></button>`,
+        `<button class="lib-icon ${currentLib === i.id ? "selected" : ""}" data-cat="${escapeHtml(i.category)}" data-action="${actLib}" data-lib="${escapeHtml(i.id)}" title="${escapeHtml(i.label)}" aria-pressed="${currentLib === i.id}" aria-label="${escapeHtml(i.label)}"><img loading="${n < EAGER ? "eager" : "lazy"}" decoding="async" width="64" height="64" src="${i.thumb}" alt="" /><span class="lib-icon-name">${escapeHtml(i.label)}</span></button>`,
     )
     .join("");
-  if (!items) return `<p class="muted">${q ? "No sigils match that search." : "No icons in this folder."}</p>`;
+  if (!items) {
+    // Never just "no match": the search is scoped to the open folder, and an
+    // unqualified denial made a folder-scoped miss look like the library had
+    // nothing. Say where it looked and how many there are elsewhere.
+    if (!q) return `<p class="muted">No sigils in this folder.</p>`;
+    const everywhere = matchCount(query);
+    const folder = activeCat && activeCat !== "all" ? categoryLabel(activeCat) : "";
+    return folder
+      ? `<p class="muted">Nothing matching that in ${escapeHtml(folder)}.${
+          everywhere ? ` <button class="linklike" data-action="emblem-lib-cat" data-cat="all">Search all ${everywhere} instead</button>` : ""
+        }</p>`
+      : `<p class="muted">No sigils match that search.</p>`;
+  }
   // A real button, not a bare sentinel. The scroll observer in main.ts loads the
   // next page automatically when this comes into view, but an observer inside a
   // short modal scroller is not something to bet the feature on - and a button
@@ -264,3 +315,8 @@ export function iconLibraryGrid(
 }
 
 
+
+/** Look up a library icon by its stored id. */
+export function libraryIcon(id: string | undefined): LibraryIcon | undefined {
+  return id ? BY_ID.get(id) : undefined;
+}

@@ -20,7 +20,15 @@ import {
   statChips,
   tacticalDiagram,
 } from "./icons.ts";
-import { ICON_CATEGORIES, ICON_COUNT_BY_CATEGORY, LIB_PAGE, categoryLabel, iconLibraryGrid, libraryUrl } from "./emblems.ts";
+import {
+  ICON_CATEGORIES,
+  LIB_PAGE,
+  categoryLabel,
+  iconLibraryGrid,
+  libraryIcon,
+  libraryUrl,
+  matchCount,
+} from "./emblems.ts";
 import { CHANGELOG } from "./changelog.ts";
 import { FACTION_LORE } from "./faction-lore.ts";
 import type { AppState } from "./state.ts";
@@ -341,7 +349,10 @@ interface EmblemFields {
 // The bare sigil: a tinted vector (SVG + chosen colour, painted via CSS mask),
 // or the shared emblemMark for uploads / raster marks / built-in glyphs.
 function renderSigil(e: EmblemFields, size: number, cls = ""): string {
-  if (!e.emblemImage && e.emblemLib && /\.svg$/i.test(e.emblemLib) && e.emblemColor) {
+  // Tinting paints the colour through the mark's own alpha channel, so it works
+  // on any cut-out image, not only vectors. libraryIcon().tintable is computed
+  // from the actual transparency of each file (see scripts/make-emblem-thumbs.py).
+  if (!e.emblemImage && e.emblemLib && e.emblemColor && libraryIcon(e.emblemLib)?.tintable) {
     const url = libraryUrl(e.emblemLib);
     if (url) {
       const color = EMBLEM_TINT[e.emblemColor] ?? "var(--ink)";
@@ -2790,48 +2801,67 @@ function emblemModal(state: AppState): string {
   const tabDefs: Array<[string, string]> = [["library", "Library"], ["upload", "Upload"]];
   const tab = tabDefs.some(([id]) => id === m.tab) ? m.tab : "library";
   const tabBtns = tabDefs
-    .map(([id, label]) => `<button class="em-tab ${tab === id ? "on" : ""}" data-action="emblem-modal-tab" data-tab="${id}">${escapeHtml(label)}</button>`)
+    .map(
+      ([id, label]) =>
+        `<button class="em-tab ${tab === id ? "on" : ""}" role="tab" aria-selected="${tab === id}" data-action="emblem-modal-tab" data-tab="${id}">${escapeHtml(label)}</button>`,
+    )
     .join("");
 
-  const isSvg = cfg.currentLib ? /\.svg$/i.test(cfg.currentLib) : false;
-  const tintSwatch = (val: string, cls: string, label: string) =>
-    `<button class="tint-swatch ${cls} ${(cfg!.currentColor ?? "") === val ? "selected" : ""}" data-action="emblem-set-color" data-color="${val}" aria-label="${label}">${val === "" ? icon("close", 12) : ""}</button>`;
-  const bgSwatch = (val: string, style: string, label: string) =>
-    `<button class="bg-swatch ${(cfg!.currentBg ?? "") === val ? "selected" : ""}" data-action="emblem-set-bg" data-bg="${val}" aria-label="${label}" style="${style}">${val === "" ? icon("close", 12) : ""}</button>`;
+  // Can a colour be painted through the chosen mark? Tinting is a CSS mask, so
+  // it needs the mark's own transparency; it was gated to SVG, which left a
+  // labelled control dead for 247 of 253 marks. 162 of them can actually take it.
+  const current = cfg.currentLib ? libraryIcon(cfg.currentLib) : undefined;
+  const canTint = cfg.currentLib ? (current?.tintable ?? /\.svg$/i.test(cfg.currentLib)) : false;
+  const tintWhy = !cfg.currentLib ? "pick a sigil first" : canTint ? "" : "this mark has no transparency";
 
-  // Folder chips (the emblem sub-folders), plus the filtered grid.
+  const tintSwatch = (val: string, cls: string, label: string) =>
+    `<button class="tint-swatch ${cls} ${(cfg!.currentColor ?? "") === val ? "selected" : ""}" data-action="emblem-set-color" data-color="${val}" aria-label="${label}" title="${label}">${val === "" ? icon("close", 12) : ""}</button>`;
+  const bgSwatch = (val: string, style: string, label: string) =>
+    `<button class="bg-swatch ${(cfg!.currentBg ?? "") === val ? "selected" : ""}" data-action="emblem-set-bg" data-bg="${val}" aria-label="${label}" title="${label}" style="${style}">${val === "" ? icon("close", 12) : ""}</button>`;
+
+  // Folder chips. Counts follow the active search, so a chip cannot promise
+  // "All 253" while the grid shows eleven; a folder with no match is dimmed
+  // rather than removed, so the row does not reflow as you type.
   const activeCat = m.libCat ?? "all";
-  const totalIcons = Object.values(ICON_COUNT_BY_CATEGORY).reduce((a, b) => a + b, 0);
+  const q = m.libQuery ?? "";
   const folderChips = `<div class="em-folders">
-      <button class="em-folder ${activeCat === "all" ? "on" : ""}" data-action="emblem-lib-cat" data-cat="all">All <span class="em-folder-n">${totalIcons}</span></button>
-      ${ICON_CATEGORIES.map(
-        (c) =>
-          `<button class="em-folder ${activeCat === c ? "on" : ""}" data-action="emblem-lib-cat" data-cat="${escapeHtml(c)}">${escapeHtml(categoryLabel(c))} <span class="em-folder-n">${ICON_COUNT_BY_CATEGORY[c] ?? 0}</span></button>`,
-      ).join("")}
+      <button class="em-folder ${activeCat === "all" ? "on" : ""}" data-action="emblem-lib-cat" data-cat="all">All <span class="em-folder-n">${matchCount(q)}</span></button>
+      ${ICON_CATEGORIES.map((c) => {
+        const n = matchCount(q, c);
+        return `<button class="em-folder ${activeCat === c ? "on" : ""} ${n === 0 ? "is-empty" : ""}" data-action="emblem-lib-cat" data-cat="${escapeHtml(c)}">${escapeHtml(categoryLabel(c))} <span class="em-folder-n">${n}</span></button>`;
+      }).join("")}
     </div>`;
 
-  // Colour controls sit under the grid so the sigil and its colours are on screen
-  // together. Two labelled rows, no explanatory prose: a paragraph apologising
-  // that tinting needs a vector mark is noise every time you open the picker,
-  // and it is obvious enough from the row being greyed out.
+  // Colour controls. These sit directly above the footer rather than under the
+  // grid: below the grid they were 1156px off-screen at the default page size
+  // and 4886px after "Show all", so "make it red" was undiscoverable in the very
+  // tab it had just been moved into. Shown on both tabs, since a background
+  // applies to an uploaded image too.
   const colourBlock = `<div class="em-colour">
       <div class="em-colour-row">
         <span class="em-colour-label">Background</span>
         <div class="em-swatches">${bgSwatch("", "", "None")}${bgSwatch("ink", "background:var(--ink)", "Ink")}${bgSwatch("blue", "background:var(--blue)", "Blue")}${bgSwatch("red", "background:var(--red)", "Red")}${bgSwatch("steel", "background:#5b6472", "Steel")}${bgSwatch("sand", "background:#caa96a", "Sand")}</div>
       </div>
-      <div class="em-colour-row ${isSvg ? "" : "is-off"}">
-        <span class="em-colour-label">Tint${isSvg ? "" : ` <span class="em-colour-why">vector only</span>`}</span>
+      <div class="em-colour-row ${canTint ? "" : "is-off"}">
+        <span class="em-colour-label">Tint${tintWhy ? ` <span class="em-colour-why">${escapeHtml(tintWhy)}</span>` : ""}</span>
         <div class="em-swatches">${tintSwatch("", "tint-none", "Original")}${tintSwatch("ink", "tint-ink", "Ink")}${tintSwatch("blue", "tint-blue", "Blue")}${tintSwatch("red", "tint-red", "Red")}</div>
       </div>
     </div>`;
 
   const body =
     tab === "upload"
-      ? `<label class="em-drop"><span class="em-drop-cue">${icon("upload", 22)}<span>Click to upload your own image</span></span><input type="file" accept="image/*" data-action="${cfg.upA}" hidden /></label>`
-      : `<input id="emblem-lib-search" class="em-search" type="search" placeholder="Search sigils — try skull, wings, money…" value="${escapeHtml(m.libQuery ?? "")}" data-action="emblem-lib-search" aria-label="Search sigils" />
+      ? // A real button, not a bare <label> wrapping a hidden input: the input is
+        // out of the tab order, so there was no way to open the file dialog
+        // without a mouse. The button forwards the click to the input.
+        `<div class="em-upload">
+           <button class="em-drop" data-action="emblem-upload-pick">
+             <span class="em-drop-cue">${icon("upload", 22)}<span>Choose an image to upload</span></span>
+           </button>
+           <input id="emblem-upload-input" type="file" accept="image/*" data-action="${cfg.upA}" hidden />
+         </div>`
+      : `<input id="emblem-lib-search" class="em-search" type="search" placeholder="Search sigils: try skull, wings, money" value="${escapeHtml(m.libQuery ?? "")}" data-action="emblem-lib-search" aria-label="Search sigils" />
          ${folderChips}
-         <div class="em-scroll">${iconLibraryGrid(cfg.libA, cfg.currentLib, activeCat, m.libQuery, m.libShown ?? LIB_PAGE)}</div>
-         ${colourBlock}`;
+         <div class="em-scroll">${iconLibraryGrid(cfg.libA, cfg.currentLib, activeCat, m.libQuery, m.libShown ?? LIB_PAGE)}</div>`;
 
   return `
   <div class="modal-root">
@@ -2843,8 +2873,10 @@ function emblemModal(state: AppState): string {
       </header>
       <div class="em-tabs" role="tablist">${tabBtns}</div>
       <div class="em-body">${body}</div>
+      ${colourBlock}
       <div class="em-foot">
         <button class="bar-btn" data-action="${cfg.rndA}">${icon("shuffle", 15)} Random</button>
+        <button class="bar-btn" data-action="emblem-revert" title="Put back the emblem you had when you opened this">${icon("undo", 15)} Revert</button>
         ${cfg.hasImage ? `<button class="bar-btn danger" data-action="${cfg.clrA}">${icon("close", 15)} Remove</button>` : ""}
         <button class="cta-btn em-done" data-action="close-modal">${icon("check", 16)} Done</button>
       </div>

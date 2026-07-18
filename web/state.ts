@@ -197,6 +197,13 @@ export interface AppState {
            * reaches all of it.
            */
           libShown?: number;
+          /**
+           * The emblem as it was when the picker opened, so it can be put back.
+           * Every change writes straight to storage the moment it is clicked, so
+           * eight presses of Random used to leave the mark you arrived with
+           * unrecoverable - and it is not findable in a 253-tile grid by memory.
+           */
+          initial?: { emblemImage?: string; emblemLib?: string; emblemColor?: string; emblemBg?: string };
         }
       | { kind: "options" };
     /** In-progress first-visit coachmark tour, once the user has advanced past step 0. */

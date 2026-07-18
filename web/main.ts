@@ -136,6 +136,12 @@ function paint(): void {
       }
     }
   }
+
+  // After the focus restore above, not before: opening the picker restored focus
+  // to the button that opened it, which immediately undid the dialog's own
+  // focus. A newly opened modal owns the focus.
+  syncModalFocus();
+  revealSelectedSigil();
 }
 
 // A share link carries the whole list (and any custom faction) in the hash. Import
@@ -544,6 +550,90 @@ function observeEmblemLibrary(): void {
   libMoreObserver.observe(sentinel);
 }
 
+/**
+ * Make an open modal behave like a dialog.
+ *
+ * It carried role="dialog" aria-modal="true" and none of the behaviour: focus
+ * stayed on <body> when it opened, all 63 controls behind the backdrop stayed
+ * tabbable (the search box was roughly the 65th stop), the page behind still
+ * scrolled, and closing dropped focus to <body> rather than back to the button
+ * that opened it.
+ */
+let modalReturnFocus: HTMLElement | null = null;
+let trapHandler: ((e: KeyboardEvent) => void) | null = null;
+
+function focusables(root: Element): HTMLElement[] {
+  return [
+    ...root.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    ),
+  ].filter((el) => el.offsetParent !== null || el === document.activeElement);
+}
+
+function syncModalFocus(): void {
+  const panel = document.querySelector<HTMLElement>(".modal-root .modal-panel");
+
+  if (!panel) {
+    if (trapHandler) {
+      document.removeEventListener("keydown", trapHandler, true);
+      trapHandler = null;
+    }
+    document.body.style.removeProperty("overflow");
+    // Hand focus back to whatever opened the dialog, not to <body>.
+    if (modalReturnFocus?.isConnected) modalReturnFocus.focus();
+    modalReturnFocus = null;
+    return;
+  }
+
+  if (!trapHandler) {
+    // Opening: remember the trigger, stop the page behind from scrolling, and
+    // put the caret somewhere useful rather than nowhere.
+    const active = document.activeElement;
+    modalReturnFocus = active instanceof HTMLElement && active !== document.body ? active : null;
+    document.body.style.overflow = "hidden";
+    const first = panel.querySelector<HTMLElement>("#emblem-lib-search") ?? focusables(panel)[0];
+    first?.focus();
+
+    trapHandler = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+      const live = document.querySelector<HTMLElement>(".modal-root .modal-panel");
+      if (!live) return;
+      const items = focusables(live);
+      if (items.length === 0) return;
+      const firstItem = items[0]!;
+      const lastItem = items[items.length - 1]!;
+      // Wrap at both ends, and pull focus back in if it has escaped entirely.
+      if (!live.contains(document.activeElement)) {
+        e.preventDefault();
+        (e.shiftKey ? lastItem : firstItem).focus();
+      } else if (e.shiftKey && document.activeElement === firstItem) {
+        e.preventDefault();
+        lastItem.focus();
+      } else if (!e.shiftKey && document.activeElement === lastItem) {
+        e.preventDefault();
+        firstItem.focus();
+      }
+    };
+    document.addEventListener("keydown", trapHandler, true);
+  }
+}
+
+/**
+ * Bring the chosen sigil into view. Reopening the picker showed no sign of what
+ * you were already using (it is usually past the first page of tiles), and
+ * Random put its pick off-screen four times in six.
+ */
+function revealSelectedSigil(): void {
+  const sel = document.querySelector<HTMLElement>(".em-modal .lib-icon.selected");
+  if (!sel) return;
+  const scroller = sel.closest<HTMLElement>(".em-body");
+  if (!scroller) return;
+  const s = scroller.getBoundingClientRect();
+  const b = sel.getBoundingClientRect();
+  if (b.top >= s.top && b.bottom <= s.bottom) return;
+  scroller.scrollTop += b.top - s.top - scroller.clientHeight / 2 + b.height / 2;
+}
+
 function measureStickyHeader(): void {
   const head = document.querySelector<HTMLElement>(".mf-head");
   if (!head) return;
@@ -616,7 +706,11 @@ window.addEventListener("resize", () => {
 });
 
 window.addEventListener("hashchange", () => {
-  store.setState((s) => ({ ...s, route: parseRoute(location.hash) }));
+  // Dismiss any open dialog on navigation. render() appends the modals after the
+  // view regardless of route, so an emblem picker left open followed the player
+  // from the builder into Play Mode and sat on top of it - and, once the dialog
+  // started locking body scroll, took the page's scrollbar with it.
+  store.setState((s) => ({ ...s, route: parseRoute(location.hash), ui: { ...s.ui, modal: undefined } }));
 });
 
 wireActions(root);

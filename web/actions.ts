@@ -36,11 +36,22 @@ import {
 } from "./state.ts";
 import type { AppState, LastRoll, PrintOpts, ShipFilter } from "./state.ts";
 import { RANDOM_BEHAVIOUR, GLITCH_BLIP, type RollRow } from "../src/data/junkspace-solo.ts";
-import { LIB_PAGE, randomIconId } from "./emblems.ts";
+import { LIB_PAGE, libraryIcon, randomIconId } from "./emblems.ts";
 import { shareUrl } from "./share.ts";
 import { fleetToMarkdown } from "./export-text.ts";
 
 // --- Solo dice roller -------------------------------------------------------
+
+/**
+ * The fields to write when a library mark is chosen. A tint only survives if the
+ * new mark can actually take one - otherwise the colour sat invisibly in storage
+ * and sprang back the next time a tintable mark was picked.
+ */
+function libFields(lib: string): { emblemLib: string; emblemImage: undefined; emblemColor?: undefined } {
+  return libraryIcon(lib)?.tintable
+    ? { emblemLib: lib, emblemImage: undefined }
+    : { emblemLib: lib, emblemImage: undefined, emblemColor: undefined };
+}
 
 function d(sides: number): number {
   return Math.floor(Math.random() * sides) + 1;
@@ -404,7 +415,25 @@ function handleClick(e: MouseEvent): void {
     case "open-emblem-modal": {
       const tgt = target.dataset["target"];
       const emblemTarget = tgt === "faction" || tgt === "outfit" ? tgt : "list";
-      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "emblem", target: emblemTarget, tab: "library" } } }));
+      store.setState((s) => {
+        // Snapshot what the emblem is right now, so Revert has something to
+        // restore after Random or a misclick.
+        const src =
+          emblemTarget === "faction"
+            ? s.customFactions.find((f) => f.id === currentFoundryId())
+            : emblemTarget === "outfit"
+              ? s.outfits.find((o) => o.id === currentOutfitId())
+              : s.lists.find((l) => l.id === currentListId());
+        const initial = src
+          ? {
+              ...(src.emblemImage ? { emblemImage: src.emblemImage } : {}),
+              ...(src.emblemLib ? { emblemLib: src.emblemLib } : {}),
+              ...(src.emblemColor ? { emblemColor: src.emblemColor } : {}),
+              ...(src.emblemBg ? { emblemBg: src.emblemBg } : {}),
+            }
+          : {};
+        return { ...s, ui: { ...s.ui, modal: { kind: "emblem", target: emblemTarget, tab: "library", initial } } };
+      });
       break;
     }
     case "emblem-modal-tab": {
@@ -413,6 +442,37 @@ function handleClick(e: MouseEvent): void {
       store.setState((s) =>
         s.ui.modal?.kind === "emblem" ? { ...s, ui: { ...s.ui, modal: { ...s.ui.modal, tab } } } : s,
       );
+      break;
+    }
+    case "emblem-revert": {
+      // Put back exactly what was there when the picker opened.
+      store.setState((s) => {
+        if (s.ui.modal?.kind !== "emblem") return s;
+        const init = s.ui.modal.initial ?? {};
+        const fields = {
+          emblemImage: init.emblemImage,
+          emblemLib: init.emblemLib,
+          emblemColor: init.emblemColor as "ink" | "blue" | "red" | undefined,
+          emblemBg: init.emblemBg as "ink" | "blue" | "red" | "steel" | "sand" | undefined,
+        };
+        if (s.ui.modal.target === "faction") {
+          const fid = currentFoundryId();
+          if (fid) editFaction(fid, (f) => ({ ...f, ...fields }));
+          return s;
+        }
+        if (s.ui.modal.target === "outfit") {
+          editOutfit((o) => ({ ...o, ...fields }));
+          return s;
+        }
+        const id = currentListId();
+        return id ? updateList(s, id, (l) => ({ ...l, ...fields })) : s;
+      });
+      break;
+    }
+    case "emblem-upload-pick": {
+      // The file input is hidden (a styled drop zone stands in for it), which
+      // also takes it out of the tab order. This button is the keyboard route in.
+      document.getElementById("emblem-upload-input")?.click();
       break;
     }
     case "emblem-lib-more": {
@@ -449,13 +509,27 @@ function handleClick(e: MouseEvent): void {
     case "clear-emblem-image": {
       const id = currentListId();
       if (!id) return;
-      store.setState((s) => updateList(s, id, (l) => ({ ...l, emblemImage: undefined, emblemLib: undefined })));
+      store.setState((s) =>
+        updateList(s, id, (l) => ({
+          ...l,
+          emblemImage: undefined,
+          emblemLib: undefined,
+          emblemColor: undefined,
+          emblemBg: undefined,
+        })),
+      );
       break;
     }
     case "cf-clear-emblem": {
       const fid = currentFoundryId();
       if (!fid) return;
-      editFaction(fid, (f) => ({ ...f, emblemImage: undefined, emblemLib: undefined }));
+      editFaction(fid, (f) => ({
+        ...f,
+        emblemImage: undefined,
+        emblemLib: undefined,
+        emblemColor: undefined,
+        emblemBg: undefined,
+      }));
       break;
     }
     // --- icon library + random, across the three contexts ---
@@ -463,36 +537,36 @@ function handleClick(e: MouseEvent): void {
       const id = currentListId();
       const lib = target.dataset["lib"];
       if (!id || !lib) return;
-      store.setState((s) => updateList(s, id, (l) => ({ ...l, emblemLib: lib, emblemImage: undefined })));
+      store.setState((s) => updateList(s, id, (l) => ({ ...l, ...libFields(lib) })));
       break;
     }
     case "random-emblem": {
       const id = currentListId();
       const lib = randomIconId();
       if (!id || !lib) return;
-      store.setState((s) => updateList(s, id, (l) => ({ ...l, emblemLib: lib, emblemImage: undefined })));
+      store.setState((s) => updateList(s, id, (l) => ({ ...l, ...libFields(lib) })));
       break;
     }
     case "outfit-set-lib": {
       const lib = target.dataset["lib"];
-      if (lib) editOutfit((o) => ({ ...o, emblemLib: lib, emblemImage: undefined }));
+      if (lib) editOutfit((o) => ({ ...o, ...libFields(lib) }));
       break;
     }
     case "outfit-random-emblem": {
       const lib = randomIconId();
-      if (lib) editOutfit((o) => ({ ...o, emblemLib: lib, emblemImage: undefined }));
+      if (lib) editOutfit((o) => ({ ...o, ...libFields(lib) }));
       break;
     }
     case "cf-set-lib": {
       const fid = currentFoundryId();
       const lib = target.dataset["lib"];
-      if (fid && lib) editFaction(fid, (f) => ({ ...f, emblemLib: lib, emblemImage: undefined }));
+      if (fid && lib) editFaction(fid, (f) => ({ ...f, ...libFields(lib) }));
       break;
     }
     case "cf-random-emblem": {
       const fid = currentFoundryId();
       const lib = randomIconId();
-      if (fid && lib) editFaction(fid, (f) => ({ ...f, emblemLib: lib, emblemImage: undefined }));
+      if (fid && lib) editFaction(fid, (f) => ({ ...f, ...libFields(lib) }));
       break;
     }
     case "set-limit": {
@@ -848,7 +922,13 @@ function handleClick(e: MouseEvent): void {
       break;
     }
     case "outfit-clear-emblem": {
-      editOutfit((o) => ({ ...o, emblemImage: undefined }));
+      editOutfit((o) => ({
+        ...o,
+        emblemImage: undefined,
+        emblemLib: undefined,
+        emblemColor: undefined,
+        emblemBg: undefined,
+      }));
       break;
     }
     case "alert-adjust": {
@@ -1492,7 +1572,21 @@ function handleChange(e: Event): void {
       const q = inputValue;
       store.setState((s) =>
         s.ui.modal?.kind === "emblem"
-          ? { ...s, ui: { ...s.ui, modal: { ...s.ui.modal, libQuery: q, libShown: LIB_PAGE } } }
+          ? {
+              ...s,
+              ui: {
+                ...s.ui,
+                modal: {
+                  ...s.ui.modal,
+                  libQuery: q,
+                  libShown: LIB_PAGE,
+                  // Searching leaves the open folder. Otherwise the query is
+                  // silently scoped to it, and a search for "skull" from inside
+                  // Faith reports that nothing matches - in a library with 11.
+                  libCat: q ? "all" : s.ui.modal.libCat,
+                },
+              },
+            }
           : s,
       );
       break;

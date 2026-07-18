@@ -9,6 +9,25 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.57",
+    date: "2026-07-18",
+    title: "The emblem picker, properly audited",
+    items: [
+      "Search no longer answers for one folder while pretending to answer for the library. With Faith open, searching skull reported that nothing matched — in a library with eleven. Searching now leaves the folder, and the folder counts follow what you typed instead of promising All 253 beside a grid of eleven.",
+      "Tint works on 162 sigils instead of 6. It was restricted to vector marks, but tinting paints a colour through the mark's own transparency, which most of these have — the restriction was arbitrary. Marks that genuinely cannot take a colour now say why rather than greying out silently.",
+      "The colour controls are reachable. They were technically in the Library tab and actually 1156 pixels below the visible area — 4886 after Show all — so nobody would ever have found them. They sit above the buttons now, always on screen.",
+      "On a phone the Done button was cut off to Do, but only once you had an emblem, which is to say almost always. The buttons wrap now.",
+      "Reopening the picker shows you what you are already using, scrolled into view. Random does the same, so you can see what it gave you.",
+      "Added Revert. Every click wrote straight to storage, so a few presses of Random lost the mark you arrived with for good. Revert puts back whatever you had when you opened the picker.",
+      "Remove now removes the tint and background too, instead of leaving them behind to reappear on your next choice.",
+      "Every sigil shows its name. 253 anonymous pictures made search results look arbitrary.",
+      "The Upload tab can be used without a mouse, and switching tabs no longer jerks the dialog 146 pixels out from under your cursor.",
+      "The picker behaves like a real dialog: it takes focus, keeps Tab inside itself, stops the page behind from scrolling, and hands focus back when it closes.",
+      "Navigating away now closes it. An open picker used to follow you from the builder into Play Mode and sit on top of it.",
+      "Searching a plural works (skulls finds the same eleven as skull), and warship, wolf and imperial return results instead of nothing.",
+    ],
+  },
+  {
     version: "0.8.56",
     date: "2026-07-18",
     title: "Buttons that say what they do",

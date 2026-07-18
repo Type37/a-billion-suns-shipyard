@@ -552,7 +552,7 @@ button { font-family: inherit; }
   font-family: var(--serif); font-size: 16.5px; line-height: 1.6; color: var(--ink);
   max-width: 64ch; margin: 4px 0 26px; padding-left: 16px; border-left: 3px solid var(--red);
 }
-@media (max-width: 620px) { .flavor-lede { font-size: 15px; } }
+@media (max-width: 620px) { }
 
 .era-block { margin-bottom: 34px; }
 .era-title {
@@ -603,7 +603,6 @@ button { font-family: inherit; }
 .dock-table tbody td { padding: 11px 12px; border-top: 1px solid var(--hair-soft); vertical-align: middle; }
 .dock-table tbody tr:hover { background: var(--blue-wash); }
 .cell-emblem { width: 40px; }
-.emblem-chip { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: var(--blue-wash); color: var(--blue); border: 1px solid var(--hair-soft); }
 .cell-name a { font-family: var(--display); font-weight: 700; font-size: 15px; }
 .cell-num { font-variant-numeric: tabular-nums; font-weight: 700; }
 .cell-date { color: var(--ink-3); white-space: nowrap; font-size: 12px; }
@@ -645,12 +644,7 @@ button { font-family: inherit; }
 /* Collapsed emblem control: one button showing the current mark; the whole
    picker opens in a popover so it no longer clutters the setup band. */
 .emblem-menu { position: relative; }
-.emblem-menu > summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 5px 8px 5px 6px; border: 1px solid var(--hair); background: var(--paper); }
-.emblem-menu > summary::-webkit-details-marker { display: none; }
-.emblem-menu > summary:hover { border-color: var(--ink); }
 .emblem-current-btn .emblem, .emblem-current-btn .emblem-img, .emblem-current-btn .emblem-bgbox { width: 46px; height: 46px; color: var(--blue); }
-.emblem-caret { color: var(--ink-3); }
-.emblem-menu[open] > summary { border-color: var(--blue); }
 .emblem-menu-panel {
   position: absolute; top: calc(100% + 4px); left: 0; z-index: 40;
   width: 320px; max-height: 360px; overflow-y: auto;
@@ -659,18 +653,10 @@ button { font-family: inherit; }
 }
 .emblem-menu-tools { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 .emblem-menu-panel .lib-cat:first-of-type { margin-top: 0; }
-.emblem-choice { width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center; background: var(--paper); border: 1px solid var(--hair-soft); color: var(--ink-2); cursor: pointer; }
-.emblem-choice:hover { border-color: var(--ink); color: var(--ink); }
-.emblem-choice.selected { background: var(--blue); border-color: var(--blue); color: #fff; }
-.emblem-upload { cursor: pointer; }
 .emblem-img { object-fit: cover; display: block; }
 /* Emblem art renders in full colour, in the picker and everywhere it lands. */
 .emblem-img, .lib-icon img { filter: none; }
-.emblem-chip .emblem-img { width: 34px; height: 34px; }
 .roster-emblem .emblem-img, .sheet-emblem .emblem-img { border: 1px solid rgba(255, 255, 255, 0.5); }
-.cf-emblem-row { display: flex; align-items: center; gap: 10px; margin-top: 5px; flex-wrap: wrap; }
-.cf-emblem-preview { display: inline-flex; width: 40px; height: 40px; border: 1px solid var(--hair-soft); align-items: center; justify-content: center; color: var(--ink-3); }
-.cf-emblem-preview .emblem-img { width: 40px; height: 40px; }
 /* Per-ship-class art upload in the Foundry ship editor. */
 .cf-shipimg-row { display: flex; align-items: center; gap: 10px; margin-top: 5px; flex-wrap: wrap; }
 /* A proper click-to-upload tile: the whole dashed box is the button. */
@@ -683,33 +669,11 @@ button { font-family: inherit; }
 .cf-shipimg-drop.has-img { border-style: solid; border-color: var(--blue); padding: 0; min-height: 0; }
 .cf-shipimg-drop img { width: 100%; max-width: 240px; height: auto; object-fit: cover; display: block; }
 .cf-shipimg-cue { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sans); font-size: 12.5px; font-weight: 700; }
-.emblem-current .emblem-img { width: 24px; height: 24px; }
 
 /* Icon library picker */
 /* Reworked emblem picker: a large preview beside labelled actions, so "upload
    your own" versus "choose from library" reads at a glance. */
 .emblem-pick { display: flex; align-items: flex-start; gap: 14px; margin-top: 6px; flex-wrap: wrap; }
-.emblem-pick-preview {
-  flex: 0 0 auto; width: 60px; height: 60px; display: inline-flex; align-items: center; justify-content: center;
-  border: 1px solid var(--hair); background: var(--paper); color: var(--ink-3);
-}
-.emblem-pick-preview .emblem, .emblem-pick-preview .emblem-img, .emblem-pick-preview img { width: 44px; height: 44px; object-fit: contain; }
-.emblem-pick-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; }
-.ep-btn {
-  display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
-  border: 1px solid var(--hair); background: var(--paper); color: var(--ink);
-  padding: 9px 13px; font-family: var(--sans); font-size: 13px; font-weight: 700; list-style: none; white-space: nowrap;
-}
-.ep-btn > span { line-height: 1; }
-.ep-btn:hover { border-color: var(--ink); }
-.ep-btn .icon { color: var(--blue); }
-.ep-btn.danger { color: var(--red-deep); }
-.ep-btn.danger:hover { border-color: var(--red-deep); }
-.ep-lib { position: relative; }
-.ep-lib > summary { list-style: none; }
-.ep-lib > summary::-webkit-details-marker { display: none; }
-.ep-lib[open] > summary { background: var(--ink); border-color: var(--ink); color: #fff; }
-.ep-lib[open] > summary .icon { color: #fff; }
 .ep-lib-panel {
   position: absolute; z-index: 30; top: calc(100% + 6px); left: 0;
   width: min(460px, 88vw); background: var(--paper); border: 2px solid var(--ink);
@@ -720,17 +684,6 @@ button { font-family: inherit; }
 .ep-lib-close { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border: 1px solid var(--hair); background: var(--paper); color: var(--ink); cursor: pointer; }
 .ep-lib-close:hover { border-color: var(--ink); }
 .ep-lib-scroll { overflow-y: auto; padding: 14px; }
-
-.icon-library { position: relative; display: inline-block; }
-.icon-library > summary { list-style: none; }
-.icon-library > summary::-webkit-details-marker { display: none; }
-.icon-library[open] > summary { background: var(--ink); color: #fff; }
-.lib-body {
-  position: absolute; z-index: 30; top: calc(100% + 6px); left: 0;
-  width: min(460px, 88vw); max-height: 60vh; overflow-y: auto;
-  background: var(--paper); border: 2px solid var(--ink); padding: 14px;
-}
-.lib-cat { margin-bottom: 14px; }
 .lib-cat-title { font-family: var(--sans); font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--hair-soft); }
 .lib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); gap: 6px; }
 /* A faint checkerboard behind each tile so all-white / transparent sigils are
@@ -743,7 +696,6 @@ button { font-family: inherit; }
 .lib-icon img { width: 100%; height: 100%; object-fit: contain; }
 /* Tinted vector mark: the SVG painted as a solid colour via CSS mask. */
 .emblem-tint { display: inline-block; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; vertical-align: middle; }
-.emblem-tint-row { display: flex; align-items: center; gap: 8px; padding: 4px 0 10px; flex-wrap: wrap; }
 .tint-swatch { width: 24px; height: 24px; border: 1px solid var(--hair); cursor: pointer; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
 .tint-swatch.selected { box-shadow: inset 0 0 0 2px var(--paper), 0 0 0 2px var(--ink); }
 .tint-none { background: var(--paper); color: var(--ink-3); }
@@ -787,8 +739,6 @@ button { font-family: inherit; }
 .segment { display: inline-flex; border: 1px solid var(--hair); }
 /* Custom credits input living inside the preset segment. */
 .segment-limit .limit-input { width: 96px; border: none; border-left: 1px solid var(--hair); margin: 0; }
-.segment-limit .limit-input.selected { background: var(--blue); color: #fff; }
-.segment-limit .limit-input.selected::placeholder { color: #cdddf6; }
 .segment button {
   background: var(--paper); border: none; border-left: 1px solid var(--hair);
   font-family: var(--sans); font-weight: 700; font-size: 13px; font-variant-numeric: tabular-nums;
@@ -1985,25 +1935,6 @@ button { font-family: inherit; }
    Merged single-column builder preview
    ============================================================ */
 .mf-preview-merged .mf-body { display: block; }
-.mf-preview-merged .mf-manifest {
-  position: static; max-height: none; overflow-y: visible;
-  padding-right: 0; border-right: none; max-width: 700px;
-}
-.mf-preview-merged .mf-manifest .mf-list .roster-unit {
-  background: var(--blue-wash); border-left-color: var(--blue);
-}
-.mf-preview-merged .mf-manifest .ship-row {
-  background: none; border-left: 3px solid transparent;
-  border-bottom: 1px solid var(--hair-soft); padding: 8px 2px;
-}
-.mf-preview-merged .mf-manifest .ship-row:hover,
-.mf-preview-merged .mf-manifest .is-option:hover { background: var(--blue-wash); border-left-color: var(--blue); }
-.mf-preview-merged .mf-manifest .personnel-grid { gap: 0; }
-.mf-preview-merged .mf-manifest .personnel-row {
-  border: none; border-bottom: 1px solid var(--hair-soft);
-  border-left: 3px solid transparent; background: none; padding: 8px 2px;
-}
-.mf-preview-merged .mf-manifest .personnel-row.chosen { background: var(--blue-wash); border-left-color: var(--blue); }
 .mf-sub-h {
   font-family: var(--display); font-size: 11px; font-weight: 700;
   letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3);

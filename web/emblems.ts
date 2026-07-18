@@ -3,7 +3,6 @@
 // categories; loose files sit under "General".
 
 import { escapeHtml } from "./format.ts";
-import { icon } from "./icons.ts";
 
 const urls = import.meta.glob("./emblems/**/*.{png,jpg,jpeg,svg,webp,PNG,JPG,JPEG,SVG}", {
   eager: true,
@@ -93,11 +92,6 @@ export function randomIconId(): string | undefined {
   return ICON_LIBRARY[Math.floor(Math.random() * ICON_LIBRARY.length)]!.id;
 }
 
-/**
- * Shared markup for the icon-library controls: a Random button and a
- * categorised picker. Action names are passed so fleets, outfits, and custom
- * factions can reuse it.
- */
 /** One flat, sorted grid of every icon (no category headers), for embedding.
  * Each tile carries its origin folder as data-cat so styling can treat sets
  * differently (e.g. keep the colour on the "vg" insignia). */
@@ -119,51 +113,3 @@ export function iconLibraryGrid(actLib: string, currentLib?: string, activeCat?:
 }
 
 
-export function iconLibraryControls(actLib: string, actRandom: string, currentLib?: string): string {
-  const cats = iconLibraryGrid(actLib, currentLib);
-  return `
-    <button class="emblem-choice" data-action="${actRandom}" title="Random icon from the library">${icon("shuffle", 18)}</button>
-    <details class="icon-library">
-      <summary class="emblem-choice lib-open" title="Choose from the icon library">${icon("grid", 18)}</summary>
-      <div class="lib-body">${cats || '<p class="muted">No icons in the library yet.</p>'}</div>
-    </details>`;
-}
-
-/**
- * The full emblem picker: a large current-emblem preview beside clearly-labelled
- * actions - Upload, Library (opens the grid), Random, and Remove. Every action
- * pairs an icon with a word, so "upload your own" versus "choose from the
- * library" reads at a glance instead of a cramped row of identical squares.
- * `previewHtml` is the caller's rendered current emblem (or a placeholder).
- */
-export function emblemPickerUI(opts: {
-  previewHtml: string;
-  uploadAction: string;
-  libAction: string;
-  randomAction: string;
-  clearAction: string;
-  hasImage: boolean;
-  currentLib?: string;
-}): string {
-  const grid = iconLibraryGrid(opts.libAction, opts.currentLib);
-  return `
-    <div class="emblem-pick">
-      <span class="emblem-pick-preview ${opts.hasImage ? "has-img" : ""}">${opts.previewHtml}</span>
-      <div class="emblem-pick-actions">
-        <label class="ep-btn" title="Upload your own image">${icon("upload", 16)}<span>Upload</span>
-          <input type="file" accept="image/*" data-action="${opts.uploadAction}" hidden /></label>
-        <details class="ep-lib">
-          <summary class="ep-btn" title="Choose from the icon library">${icon("grid", 16)}<span>Library</span></summary>
-          <div class="ep-lib-panel">
-            <div class="ep-lib-head">
-              <span class="ep-lib-title">Emblem library</span>
-              <button type="button" class="ep-lib-close" data-action="close-popover" aria-label="Close">${icon("close", 16)}</button>
-            </div>
-            <div class="ep-lib-scroll">${grid || '<p class="muted">No icons in the library yet.</p>'}</div>
-          </div>
-        </details>
-        <button type="button" class="ep-btn" data-action="${opts.randomAction}" title="Pick a random icon">${icon("shuffle", 16)}<span>Random</span></button>
-        ${opts.hasImage ? `<button type="button" class="ep-btn danger" data-action="${opts.clearAction}" title="Remove the emblem">${icon("close", 16)}<span>Remove</span></button>` : ""}
-      </div>
-    </div>`;
-}

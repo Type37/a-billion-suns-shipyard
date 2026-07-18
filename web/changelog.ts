@@ -9,6 +9,15 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.39",
+    date: "2026-07-18",
+    title: "Bigger emblems everywhere, and a tidy-up under the hood",
+    items: [
+      "Emblems are bigger across the app now, not just in the builder header: fleet cards, the print sheet, solo outfit cards, and the outfit roster all show a larger mark.",
+      "Cleared out the code left behind by the picker rework: the old inline emblem pickers and their styles are gone, which trims the stylesheet and keeps the app quick to load.",
+    ],
+  },
+  {
     version: "0.8.38",
     date: "2026-07-18",
     title: "The sigil picker sorts and searches properly",

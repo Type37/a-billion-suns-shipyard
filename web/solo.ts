@@ -31,7 +31,7 @@ import {
   PERKS_BY_CLASS,
 } from "../src/data/junkspace-solo.ts";
 import { auxSlotText, escapeHtml, formatDate, primarySlotText } from "./format.ts";
-import { emblem, emblemMark, icon, massGlyph, statChips } from "./icons.ts";
+import { icon, massGlyph, statChips } from "./icons.ts";
 import { emblemView, weaponsTable } from "./render.ts";
 import { libraryUrl } from "./emblems.ts";
 import gunnerIcon from "./pilots/gunner.png";
@@ -66,7 +66,7 @@ export function soloListView(state: AppState): string {
       return `
       <article class="outfit-card">
         <a class="outfit-card-main" href="#/solo/${o.id}">
-          <span class="outfit-card-emblem">${emblemView(o, 34)}</span>
+          <span class="outfit-card-emblem">${emblemView(o, 44)}</span>
           <span class="outfit-card-id">
             <span class="outfit-card-name">${escapeHtml(o.name || "Unnamed outfit")}</span>
             <span class="outfit-card-meta">${o.ships.length} ${o.ships.length === 1 ? "ship" : "ships"} · updated ${formatDate(o.updatedAt)}</span>
@@ -200,7 +200,7 @@ function outfitTab(o: SavedOutfit): string {
     <aside class="roster">
       <div class="roster-sheet">
         <header class="roster-head">
-          <span class="roster-emblem">${emblemView(o, 34)}</span>
+          <span class="roster-emblem">${emblemView(o, 44)}</span>
           <div>
             <h2 class="roster-title">${escapeHtml(o.name || "Unnamed outfit")}</h2>
             <p class="roster-subtitle">Junkspace outfit</p>

@@ -441,14 +441,6 @@ function handleClick(e: MouseEvent): void {
       store.setState((s) => updateList(s, id, (l) => ({ ...l, emblemLib: lib, emblemImage: undefined })));
       break;
     }
-    case "set-emblem-color": {
-      const id = currentListId();
-      if (!id) return;
-      const raw = target.dataset["color"];
-      const color = raw === "ink" || raw === "blue" || raw === "red" ? raw : undefined;
-      store.setState((s) => updateList(s, id, (l) => ({ ...l, emblemColor: color })));
-      break;
-    }
     case "random-emblem": {
       const id = currentListId();
       const lib = randomIconId();

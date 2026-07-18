@@ -473,7 +473,7 @@ function fleetsView(state: AppState): string {
       return `
       <article class="fleet-card" style="--i:${i}">
         <a class="fleet-card-open" href="#/list/${l.id}" aria-label="Open ${escapeHtml(l.fleet.name || "Unnamed fleet")}">
-          <span class="fleet-card-emblem">${listEmblem(l, 40)}</span>
+          <span class="fleet-card-emblem">${listEmblem(l, 52)}</span>
           <span class="fleet-card-body">
             <span class="fleet-card-name">${escapeHtml(l.fleet.name || "Unnamed fleet")}</span>
             <span class="fleet-card-faction">${escapeHtml(faction?.name ?? "Mixed forces")}</span>
@@ -1484,7 +1484,7 @@ function printView(state: AppState): string {
 
     <article class="sheet">
       <header class="sheet-head">
-        <div class="sheet-emblem">${listEmblem(list, 44)}</div>
+        <div class="sheet-emblem">${listEmblem(list, 52)}</div>
         <div class="sheet-title-block">
           <h1 class="sheet-title">${escapeHtml(list.fleet.name || "Unnamed fleet")}</h1>
           <p class="sheet-subtitle">${subtitle}</p>

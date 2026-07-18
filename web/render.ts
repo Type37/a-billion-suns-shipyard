@@ -316,27 +316,27 @@ function topbar(): string {
     <nav class="topnav" aria-label="Main">
       <span class="nav-pill" aria-hidden="true"></span>
       <a href="#/fleets">${icon("flag", 16)} Fleets</a>
-      <a href="#/ships">${icon("compare", 16)} Compendium</a>
       <a href="#/solo">${icon("book", 16)} Solo</a>
+      <a href="#/ships">${icon("compare", 16)} Compendium</a>
+      <button class="topnav-btn" data-action="new-training" data-mode="combat-simulator" title="Learn to Play">${icon("die", 16)} Learn to Play</button>
       <a href="#/foundry">${icon("wrench", 16)} Custom Rules</a>
-      <button class="topnav-btn" data-action="open-options" title="Options">${icon("settings", 16)} Options</button>
+      <button class="topnav-btn" data-action="open-options" title="Options">${icon("sliders", 16)} Options</button>
     </nav>
   </header>`;
 }
 
 function footer(): string {
-  // The uniform WarLore builder footer: one centered line, dot-separated. The
-  // separators are styled spans, not literal interpunct characters. The version
+  // The uniform WarLore builder footer: one centered line. No interpunct
+  // separators - the items are spaced apart by the flex gap instead. The version
   // / changelog link lives in the Options dialog now, not here.
-  const sep = '<span class="gif-sep" aria-hidden="true"></span>';
   return `
   <footer class="game-info-footer">
     <div class="gif-inner">
-      <span class="gif-title">A Billion Suns</span>${sep}
-      <span>by <a href="https://planetsmashergames.com/a-billion-suns/" target="_blank" rel="noopener">Mike Hutchinson</a>, Osprey Games</span>${sep}
-      <a href="./ABS-2E-Quick-Reference.pdf" target="_blank" rel="noopener">${icon("scroll", 13)} Quick Reference</a>${sep}
-      <span class="gif-builder">Fleet builder by <a class="wl-sig" href="https://linktr.ee/warlore" target="_blank" rel="noopener">WarLore</a></span>${sep}
-      <a href="mailto:warlore1@outlook.com">Send Feedback</a>${sep}
+      <span class="gif-title">A Billion Suns</span>
+      <span>by <a href="https://planetsmashergames.com/a-billion-suns/" target="_blank" rel="noopener">Mike Hutchinson</a>, Osprey Games</span>
+      <a href="./ABS-2E-Quick-Reference.pdf" target="_blank" rel="noopener">${icon("scroll", 13)} Quick Reference</a>
+      <span class="gif-builder">Fleet builder by <a class="wl-sig" href="https://linktr.ee/warlore" target="_blank" rel="noopener">WarLore</a></span>
+      <a href="mailto:warlore1@outlook.com">Send Feedback</a>
       <a href="https://github.com/Type37/a-billion-suns-shipyard" target="_blank" rel="noopener">Source on GitHub</a>
     </div>
   </footer>`;
@@ -702,8 +702,9 @@ function weaponsTable(ship: ShipClass): string {
   // either size; only which of the two labels is visible changes.
   const row = (w: Weapon, arc: "primary" | "aux") => {
     const arcLabel = arc === "primary" ? "Primary, 45 degree arc" : "Auxiliary, 180 degree arc";
+    const arcAbbr = arc === "primary" ? "PRI" : "AUX";
     return `<div class="wt-row" role="row">
-      <span class="wt-arc" role="cell"><span class="visually-hidden">${arcLabel}</span>${icon(arc === "primary" ? "arc-primary" : "arc-aux", 11, "slot-arc")}</span>
+      <span class="wt-arc" role="cell"><span class="visually-hidden">${arcLabel}</span>${icon(arc === "primary" ? "arc-primary" : "arc-aux", 12, "slot-arc")}<span class="wt-arc-abbr">${arcAbbr}</span></span>
       <span class="wt-name" role="cell">${escapeHtml(w.name)}</span>
       <span class="wt-num wt-atk" role="cell"><span class="wt-inline-lbl">Attack </span>${w.count}${w.die}</span>
       <span class="wt-num wt-rng" role="cell"><span class="wt-inline-lbl">Range </span>${w.rangeMin}-${w.rangeMax}"</span>
@@ -725,7 +726,7 @@ function weaponsTable(ship: ShipClass): string {
     : "";
   return `<div class="weap-table" role="table" aria-label="Weapons">
     <div class="wt-row wt-headrow" role="row">
-      <span class="wt-arc wt-h" role="columnheader"><span class="visually-hidden">Firing arc</span></span><span class="wt-h" role="columnheader">Weapon</span><span class="wt-h wt-num" role="columnheader">Attack</span><span class="wt-h wt-num" role="columnheader">Range</span><span class="wt-h wt-num" role="columnheader">Dmg</span>
+      <span class="wt-arc wt-h" role="columnheader">Arc</span><span class="wt-h" role="columnheader">Weapon</span><span class="wt-h wt-num" role="columnheader">Attack</span><span class="wt-h wt-num" role="columnheader">Range</span><span class="wt-h wt-num" role="columnheader">Dmg</span>
     </div>
     ${rows.join("")}${noteRow}
   </div>`;
@@ -1093,7 +1094,7 @@ function builderView(state: AppState): string {
   // output actions and get their own buttons at the foot of the manifest.
   const moreMenu = `
     <details class="mf-menu">
-      <summary class="mf-menu-btn" title="More actions" aria-label="More actions">${icon("more", 20)}</summary>
+      <summary class="mf-menu-btn" title="Fleet actions">${icon("more", 18)}<span class="mf-menu-label">Actions</span></summary>
       <div class="mf-menu-panel">
         <button data-action="share-list" data-id="${list.id}">${icon("link", 16)} Share link</button>
         <button data-action="copy-list-text" data-id="${list.id}">${icon("scroll", 16)} Copy as text</button>
@@ -1118,22 +1119,22 @@ function builderView(state: AppState): string {
 
   <main class="builder ${remaining < 0 ? "is-over" : ""}">
     <header class="mf-head">
-      <div class="mf-headline">
+      <div class="mf-idrow">
         <span class="mf-emblem">${emblemPicker}</span>
         <input class="mf-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled fleet" data-action="fleet-name" />
+        ${era ? `<span class="mf-era-badge" title="Era you are building for">${escapeHtml(era)}</span>` : ""}
         ${moreMenu}
       </div>
-      <div class="mf-budget">
-        <span class="mf-tally">
-          <span class="mf-tally-now">${credits(total)}</span>${limitControl}
-          <span class="mf-tally-free">${remaining < 0 ? `${credits(-remaining)} over` : `${credits(remaining)} free`}</span>
-        </span>
-        <div class="mf-meter"><span class="mf-meter-fill" style="width:${list.fleet.creditsLimit > 0 ? Math.min(100, (total / list.fleet.creditsLimit) * 100) : 0}%"></span></div>
-      </div>
-      <div class="mf-subline">
+      <div class="mf-metarow">
         <span class="mf-fac">${factionControl}</span>
-        ${era ? `<span class="mf-sep">/</span><span class="mf-era">${escapeHtml(era)}</span>` : ""}
+        <span class="mf-budget">
+          <span class="mf-tally">
+            <span class="mf-tally-now">${credits(total)}</span>${limitControl}
+            <span class="mf-tally-free">${remaining < 0 ? `${credits(-remaining)} over` : `${credits(remaining)} free`}</span>
+          </span>
+        </span>
       </div>
+      <div class="mf-meter"><span class="mf-meter-fill" style="width:${list.fleet.creditsLimit > 0 ? Math.min(100, (total / list.fleet.creditsLimit) * 100) : 0}%"></span></div>
     </header>
 
     <div class="mf-body">

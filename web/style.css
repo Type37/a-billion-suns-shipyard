@@ -334,10 +334,9 @@ button { font-family: inherit; }
 
 /* Uniform WarLore builder footer: one centered, dot-separated line. */
 .game-info-footer { margin-top: 64px; border-top: 1px solid var(--hair-soft); padding: 18px 16px 30px; }
-.gif-inner { max-width: var(--shell); margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 0; font-size: 12.5px; color: var(--ink-2); }
+.gif-inner { max-width: var(--shell); margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 24px; font-size: 12.5px; color: var(--ink-2); }
 .gif-inner > span, .gif-inner > a { padding: 0 2px; }
 .gif-title { font-weight: 800; color: var(--ink); }
-.gif-sep { width: 3px; height: 3px; border-radius: 50%; background: var(--ink-3); margin: 0 10px; display: inline-block; }
 .game-info-footer a { color: var(--color-action); font-weight: 600; position: relative; display: inline-block; --underline-color: currentColor; }
 .game-info-footer a:hover { text-decoration: underline; }
 /* The WarLore signature: Terminal Grotesque Open, gold on a black highlight. */
@@ -354,7 +353,7 @@ button { font-family: inherit; }
   .game-info-footer a:hover { text-decoration: none; }
   .game-info-footer a:hover::after { transform: scaleX(1); transform-origin: left bottom; }
 }
-@media (max-width: 760px) { .gif-sep { margin: 0 7px; } .game-info-footer { margin-top: 40px; } }
+@media (max-width: 760px) { .gif-inner { gap: 6px 16px; } .game-info-footer { margin-top: 40px; } }
 
 /* --------------------------------------------------------------------- toast */
 
@@ -547,6 +546,13 @@ button { font-family: inherit; }
 
 .panel-title { font-size: 12px; font-weight: 600; color: var(--blue); margin-bottom: 6px; }
 .panel-note { color: var(--ink-2); font-size: 14px; margin-bottom: 24px; max-width: 62ch; }
+/* Flavor lede: the narrative scene-setter at the top of a mode. Serif, larger,
+   a touch loose, with a red rule down the left - it reads as story, not UI. */
+.flavor-lede {
+  font-family: var(--serif); font-size: 16.5px; line-height: 1.6; color: var(--ink);
+  max-width: 64ch; margin: 4px 0 26px; padding-left: 16px; border-left: 3px solid var(--red);
+}
+@media (max-width: 620px) { .flavor-lede { font-size: 15px; } }
 
 .era-block { margin-bottom: 34px; }
 .era-title {
@@ -857,13 +863,16 @@ button { font-family: inherit; }
    column a real fixed track, so "Attack"/"Range"/"Dmg" sit tight and aligned
    under their own header no matter how wide the row is. Max-width caps it at
    a legible line length instead of stretching across a wide desktop column. */
-.weap-table { max-width: 420px; margin-top: 6px; font-variant-numeric: tabular-nums; }
+/* fit-content so the table is only as wide as its content, not stretched to a
+   fixed 420px that leaves a big empty gap between a short weapon name and the
+   figures. The name column is auto (sized to the longest name) rather than 1fr. */
+.weap-table { width: fit-content; max-width: 100%; margin-top: 6px; font-variant-numeric: tabular-nums; }
 /* Every row - header, weapon, note - shares one template, so the columns line
    up down the whole table without the table being one big grid (which left the
    cells with no owning row for assistive tech). */
 .wt-row {
-  display: grid; grid-template-columns: 14px minmax(0, 1fr) 46px 56px 28px;
-  column-gap: 10px; align-items: baseline; margin-bottom: 3px;
+  display: grid; grid-template-columns: 46px minmax(80px, auto) 46px 56px 30px;
+  column-gap: 14px; align-items: baseline; margin-bottom: 3px;
 }
 /* On desktop the column header names each figure, so the inline label would be
    saying it twice. */
@@ -872,7 +881,10 @@ button { font-family: inherit; }
   font-family: var(--sans); font-size: 9px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
   color: var(--ink-3); padding-bottom: 3px; border-bottom: 1px solid var(--hair-soft); align-self: end;
 }
-.wt-arc { color: var(--blue); display: flex; align-items: center; }
+/* Arc cell: the wedge icon plus a PRI / AUX abbreviation, so the firing arc
+   reads as a word, not only a glyph you have to decode. */
+.wt-arc { color: var(--blue); display: flex; align-items: center; gap: 4px; }
+.wt-arc-abbr { font-size: 10px; font-weight: 800; letter-spacing: 0.03em; color: var(--ink-2); }
 .wt-name { font-size: 12.5px; font-weight: 600; color: var(--ink); }
 .wt-num { font-size: 12px; font-weight: 700; color: var(--ink); text-align: right; white-space: nowrap; }
 .wt-h.wt-num { font-weight: 700; }
@@ -1475,8 +1487,11 @@ button { font-family: inherit; }
   .wm-edition, .wm-tag { display: none; }
   .wm-lockup { font-size: 28px; }
 
-  /* Long faction names must not shove the era label off the edge. */
-  .mf-subline { flex-wrap: wrap; gap: 4px 12px; }
+  /* On a phone the era badge sits under the name rather than fighting it for a
+     line; the budget drops below the faction. */
+  .mf-idrow { flex-wrap: wrap; }
+  .mf-era-badge { margin-left: 0; }
+  .mf-metarow { gap: 8px 16px; }
   .mf-fac { min-width: 0; }
 
   /* Print setup: stack, and lift the actual Print button above the options so
@@ -1613,7 +1628,15 @@ button { font-family: inherit; }
 /* The one deliberate heavy rule on this page: it separates "what you're
    building" (masthead) from "how you build it" (the two columns below). */
 .mf-head { padding: 20px 0 12px; border-bottom: 1px solid var(--ink); }
-.mf-headline { display: flex; align-items: center; gap: 14px; }
+/* Identity row: emblem + name grow to the left; the era badge and the actions
+   button are pushed to the right, so the row fills the width instead of leaving
+   a big empty gap past a short fleet name. */
+.mf-idrow { display: flex; align-items: center; gap: 14px; }
+.mf-era-badge {
+  flex-shrink: 0; margin-left: auto; align-self: center;
+  background: var(--blue); color: #fff; font-family: var(--display); font-weight: 800;
+  font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; padding: 6px 13px; white-space: nowrap;
+}
 .mf-emblem { flex-shrink: 0; }
 .mf-emblem .emblem-current-btn { border: none; padding: 0; background: none; }
 .mf-emblem .emblem-caret { display: none; }
@@ -1630,7 +1653,10 @@ button { font-family: inherit; }
 .mf-name:hover { border-bottom-color: var(--ink-3); }
 .mf-name:focus { outline: none; border-bottom-style: solid; border-bottom-color: var(--blue); }
 
-.mf-budget { margin-top: 12px; }
+/* Meta row: faction switch on the left, the big budget figure on the right, so
+   the two things you tune most sit on one line and the header stays compact. */
+.mf-metarow { display: flex; align-items: baseline; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; margin-top: 14px; }
+.mf-budget { flex-shrink: 0; }
 .mf-tally { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 7px; font-family: var(--display); font-variant-numeric: tabular-nums; }
 .mf-tally-now { font-size: clamp(26px, 3.4vw, 42px); font-weight: 900; color: var(--ink); }
 .mf-tally-free { margin-left: 6px; font-family: var(--display); font-size: 17px; font-weight: 900; color: var(--go); }
@@ -1645,7 +1671,8 @@ button { font-family: inherit; }
 /* Overflow menu: a dots button that opens a small action list. position:absolute
    panel means opening it never moves the header. */
 .mf-menu { position: relative; flex-shrink: 0; }
-.mf-menu > summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--hair); background: var(--paper); color: var(--ink); }
+.mf-menu > summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 40px; padding: 0 14px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: 0.02em; }
+.mf-menu-label { text-transform: uppercase; letter-spacing: 0.05em; font-size: 11px; }
 .mf-menu > summary::-webkit-details-marker { display: none; }
 .mf-menu > summary:hover { border-color: var(--ink); }
 .mf-menu[open] > summary { border-color: var(--blue); color: var(--blue); }
@@ -1680,9 +1707,6 @@ button { font-family: inherit; }
 .mf-print-cta:hover { background: var(--blue); color: #fff; }
 .mf-print-cta .icon { width: 20px; height: 20px; }
 
-.mf-subline { display: flex; align-items: center; gap: 12px; margin-top: 12px; min-height: 28px; }
-.mf-sep { color: var(--ink); font-weight: 900; }
-.mf-era { font-family: var(--display); font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 0; color: var(--ink); }
 /* faction reads as an inline editable field, the same dotted-underline
    convention as the fleet name and credits cap - not a filled button. */
 .mf-fac .faction-switch > summary,

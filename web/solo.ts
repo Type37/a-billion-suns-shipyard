@@ -72,7 +72,7 @@ export function soloListView(state: AppState): string {
   <main class="home-main solo-main">
     <header class="solo-head">
       <h1 class="page-title">Junkspace</h1>
-      <p class="panel-note">The Unhuman War has shattered the galaxy. In the ruins of the Jura system you lead a rag-tag outfit of scavengers, in debt to a dangerous local gangster, flying Jobs against an automated enemy to clear what you owe. A full solo game: build your outfit, run the roller for the Hostiles, and track the campaign.</p>
+      <p class="flavor-lede">The Unhuman War has shattered the galaxy. In the ruins of the Jura system you lead a rag-tag outfit of scavengers, in debt to a dangerous local gangster, flying Jobs against an automated enemy to clear what you owe. A full solo game: build your outfit, run the roller for the Hostiles, and track the campaign.</p>
     </header>
     <section class="commission-panel">
       <h2 class="panel-title">Your outfits</h2>

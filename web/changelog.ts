@@ -9,6 +9,18 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.28",
+    date: "2026-07-17",
+    title: "A clearer builder header, labelled weapon arcs, and a tidier footer",
+    items: [
+      "The builder header is tighter and reads on fewer lines: the era you're building for is now a bold badge up top so it's unmistakable, and the big credits figure sits out to the right instead of leaving a wide empty gap.",
+      "Weapon tables now label each arc PRI or AUX in words alongside the arc icon, and the table only takes the width it needs rather than stretching the figures far from the weapon name.",
+      "The fleet Actions menu on the builder is now a proper labelled button, not a bare set of dots.",
+      "The top navigation now matches the home menu in order, and adds a Learn to Play entry. Cleaner Options icon.",
+      "The Junkspace intro reads as flavor text now: serif, with a red rule down the side. The footer drops its dot separators for plain spacing.",
+    ],
+  },
+  {
     version: "0.8.27",
     date: "2026-07-17",
     title: "The command tokens draw themselves in again, and the Armageddon slam is back",

@@ -9,6 +9,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.47",
+    date: "2026-07-18",
+    title: "Solo mode stops looking squashed",
+    items: [
+      "The solo workspace had its columns the wrong way round: the outfit list, which holds at most five ships, was taking the wide side while the ship picker was crushed into a narrow one. The picker was so tight that the ADD button ran into the damage column and the header note got cut off. Both columns are now split the same way as the fleet builder, and the picker has room to breathe.",
+      "Ships in your outfit now show their weapons in exactly the same table as the picker beside them, instead of a different text layout, so a ship reads the same whether you're choosing it or you already own it.",
+      "Weapon tables now fold themselves neatly whenever their column is narrow, whatever the window size, so nothing can overlap or spill again.",
+    ],
+  },
+  {
     version: "0.8.46",
     date: "2026-07-18",
     title: "Preview shows collapsed sections expanded, like the printer will",

@@ -30,7 +30,7 @@ import {
   SOLO_BLIP_RULES,
   PERKS_BY_CLASS,
 } from "../src/data/junkspace-solo.ts";
-import { auxSlotText, escapeHtml, formatDate, primarySlotText } from "./format.ts";
+import { escapeHtml, formatDate } from "./format.ts";
 import { icon, massGlyph, statChips } from "./icons.ts";
 import { emblemView, weaponsTable } from "./render.ts";
 import { libraryUrl } from "./emblems.ts";
@@ -170,11 +170,9 @@ function outfitTab(o: SavedOutfit): string {
           <span class="roster-unit-cost">${ck(def?.cost ?? 0)}</span>
         </div>
         ${
-          def
-            ? `<div class="roster-unit-stats">${statChips(def, true)}</div>
-        <p class="roster-unit-weap"><span class="ru-arc ru-arc-pri">PRI</span> ${primarySlotText(def)}</p>
-        <p class="roster-unit-weap"><span class="ru-arc ru-arc-aux">AUX</span> ${def.auxiliaryFitting ? escapeHtml(def.auxiliaryFitting) : auxSlotText(def)}</p>`
-            : ""
+          // Same stat chips and weapons table the catalogue uses, so a ship
+          // reads identically whether you're picking it or already own it.
+          def ? `<div class="roster-unit-stats">${statChips(def, true)}</div>${weaponsTable(def)}` : ""
         }
         <div class="roster-unit-tools">
           <div class="pilot-field">

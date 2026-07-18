@@ -775,11 +775,13 @@ button { font-family: inherit; }
 .workspace {
   max-width: var(--shell-wide); margin: 0 auto;
   padding: clamp(12px, 1.6vw, 20px) clamp(14px, 2vw, 24px) 0;
-  /* Roster (order:-1, left) is the primary pane and gets substantially more
-     room; the ship picker is a narrower support column on the right. */
-  display: grid; grid-template-columns: minmax(640px, 1.6fr) minmax(320px, 460px); gap: clamp(14px, 1.6vw, 24px); align-items: start;
+  /* Same split as the fleet builder's .mf-body: the roster (order:-1, left)
+     leads, but the catalogue keeps enough room for its weapons table. Capping
+     the roster at 460px was starving the picker - its ADD cue collided with the
+     damage column and the header hint clipped. */
+  display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: clamp(14px, 1.6vw, 24px); align-items: start;
 }
-@media (max-width: 1200px) { .workspace { grid-template-columns: minmax(0, 1fr) minmax(300px, 400px); } }
+@media (max-width: 1200px) { .workspace { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 @media (max-width: 900px) { .workspace { grid-template-columns: 1fr; } }
 
 /* catalog (left) */
@@ -2525,4 +2527,30 @@ button { font-family: inherit; }
   .sheet { width: auto; box-shadow: none; }
   .sheet-viewport { overflow: visible; display: block; max-width: none; }
   .pr-drop, .print-excluded-note { display: none !important; }
+}
+
+/* ---------------------------------------------------------------------------
+   Weapons table: reflow on its OWN width, not the viewport's.
+   The five-column grid can't shrink below ~314px of min-content, so in a narrow
+   column on a wide screen it used to overflow its row and run under the ADD
+   control. A container query makes it fold the same way it does on a phone,
+   whatever the window size — so the catalogue and the solo roster stay legible
+   at any column width.
+   --------------------------------------------------------------------------- */
+.ship-row-body, .roster-unit { container-type: inline-size; }
+@container (max-width: 360px) {
+  .wt-row {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px;
+    margin-bottom: 7px; padding-bottom: 6px; border-bottom: 1px solid var(--hair-soft);
+  }
+  .wt-row:last-child { border-bottom: none; }
+  .wt-headrow { display: none; }
+  .wt-name { flex: 1 1 100%; font-size: 13px; }
+  .wt-arc { flex: 0 0 auto; }
+  .wt-num { font-size: 12px; text-align: left; }
+  .wt-inline-lbl {
+    display: inline; font-family: var(--sans); font-size: 11px; font-weight: 700;
+    letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3);
+  }
+  .wt-noterow .wt-note { flex: 1 1 100%; }
 }

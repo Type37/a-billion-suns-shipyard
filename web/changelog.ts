@@ -9,6 +9,15 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.54",
+    date: "2026-07-18",
+    title: "The budget stays on screen",
+    items: [
+      "The roster header now stays pinned at the top while you scroll. It carries your fleet name and, more to the point, what you have spent against your limit — the number you are checking constantly while browsing the catalogue, which used to scroll away the moment you went looking for a ship.",
+      "On a short screen it still scrolls, since pinning a two-line header there would cost more view than it is worth.",
+    ],
+  },
+  {
     version: "0.8.53",
     date: "2026-07-18",
     title: "Nothing jumps, nothing flickers",

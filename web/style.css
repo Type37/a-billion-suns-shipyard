@@ -1714,7 +1714,22 @@ button { font-family: inherit; }
    overflowing on a phone. */
 /* The one deliberate heavy rule on this page: it separates "what you're
    building" (masthead) from "how you build it" (the two columns below). */
-.mf-head { padding: 20px 0 12px; border-bottom: 1px solid var(--ink); }
+/* The roster header carries the fleet name and, more importantly, the budget
+   (spent / limit / free). That is the number you are checking constantly while
+   you browse the catalogue below, so it pins to the top of the viewport instead
+   of scrolling away with the rest of the page. Opaque ground and a z-index above
+   the sticky roster panel, or catalogue rows would pass through it. */
+.mf-head {
+  padding: 14px 0 10px; border-bottom: 1px solid var(--ink);
+  position: sticky; top: 0; z-index: 30; background: var(--paper);
+}
+/* On a short viewport the header wraps to two lines and pinning it would eat a
+   third of the screen to keep one number in view, which is a bad trade. Below
+   this height it scrolls with the page as before. */
+@media (max-height: 620px) {
+  .mf-head { position: static; }
+  .mf-manifest { top: 16px; max-height: calc(100vh - 32px); }
+}
 /* One line: emblem, name, faction, era badge, then the budget + actions pushed
    to the right edge. Wraps only when the viewport is genuinely too narrow. */
 .mf-topline { display: flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; }
@@ -1838,7 +1853,7 @@ button { font-family: inherit; }
    the yard (ships, personnel) scrolls past on the right. */
 .mf-manifest {
   min-width: 0; padding-right: 28px; border-right: 1px solid var(--hair-soft);
-  position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto;
+  position: sticky; top: var(--mf-head-h, 104px); max-height: calc(100vh - var(--mf-head-h, 104px) - 16px); overflow-y: auto;
 }
 /* Scrolling a long roster must not cost you the two things you scroll it to
    check: what you have, and what to do next. The count pins to the top of the

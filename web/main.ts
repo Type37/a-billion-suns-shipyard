@@ -100,6 +100,7 @@ function paint(): void {
   const manifest = document.querySelector(".mf-manifest");
   if (manifest) manifest.scrollTop = manifestScroll;
 
+  measureStickyHeader();
   animateFactionTitle();
   animateNewRosterRows();
   animateCountChanges();
@@ -501,6 +502,19 @@ function animateCountChanges(): void {
   }
 }
 
+/**
+ * Publish the pinned roster header's real height as --mf-head-h, so the roster
+ * panel can stick directly beneath it. The header wraps to two lines on a narrow
+ * viewport and changes height when the credits limit control opens, so a
+ * hard-coded offset would either overlap the header or leave a gap under it.
+ */
+function measureStickyHeader(): void {
+  const head = document.querySelector<HTMLElement>(".mf-head");
+  if (!head) return;
+  const h = Math.round(head.getBoundingClientRect().height);
+  if (h > 0) document.documentElement.style.setProperty("--mf-head-h", `${h + 12}px`);
+}
+
 function animateFactionTitle(): void {
   const el = document.querySelector<HTMLElement>(".nfd-title[data-anim-title]");
   if (!el) {
@@ -560,6 +574,9 @@ function positionTour(): void {
 window.addEventListener("resize", () => {
   enhanceNav();
   positionTour();
+  // The pinned header wraps to a second line as the viewport narrows, and the
+  // roster panel sticks below it, so its height has to be re-read on resize.
+  measureStickyHeader();
 });
 
 window.addEventListener("hashchange", () => {

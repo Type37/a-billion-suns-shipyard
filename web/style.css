@@ -673,9 +673,16 @@ button { font-family: inherit; }
 .cf-emblem-preview .emblem-img { width: 40px; height: 40px; }
 /* Per-ship-class art upload in the Foundry ship editor. */
 .cf-shipimg-row { display: flex; align-items: center; gap: 10px; margin-top: 5px; flex-wrap: wrap; }
-.cf-shipimg-preview { display: inline-flex; width: 66px; height: 40px; border: 1px solid var(--hair-soft); align-items: center; justify-content: center; color: var(--ink-3); overflow: hidden; flex-shrink: 0; }
-.cf-shipimg-preview.has-img { border-color: var(--blue); }
-.cf-shipimg-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* A proper click-to-upload tile: the whole dashed box is the button. */
+.cf-shipimg-drop {
+  display: flex; align-items: center; justify-content: center; min-width: 220px; min-height: 70px;
+  border: 1.5px dashed var(--hair); background: var(--paper); color: var(--ink-3); cursor: pointer; overflow: hidden;
+  transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
+}
+.cf-shipimg-drop:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-wash); }
+.cf-shipimg-drop.has-img { border-style: solid; border-color: var(--blue); padding: 0; min-height: 0; }
+.cf-shipimg-drop img { width: 100%; max-width: 240px; height: auto; object-fit: cover; display: block; }
+.cf-shipimg-cue { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sans); font-size: 12.5px; font-weight: 700; }
 .emblem-current .emblem-img { width: 24px; height: 24px; }
 
 /* Icon library picker */
@@ -1060,20 +1067,34 @@ button { font-family: inherit; }
 .print-page { max-width: 940px; margin: 0 auto; padding: 20px; }
 .print-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; }
 
-.sheet { background: #fff; border: 2px solid var(--ink); padding: clamp(24px, 4vw, 44px); }
-.sheet-head { display: flex; align-items: center; gap: 18px; padding-bottom: 16px; border-bottom: 3px solid var(--ink); }
+.sheet { background: #fff; border: 1px solid var(--ink); padding: clamp(16px, 2.4vw, 26px); }
+.sheet-head { display: flex; align-items: center; gap: 14px; padding-bottom: 10px; border-bottom: 2px solid var(--ink); }
 .sheet-emblem { color: var(--blue); flex-shrink: 0; }
 .sheet-title-block { flex: 1; }
-.sheet-title { font-family: var(--display); font-weight: 900; font-size: clamp(28px, 5vw, 44px); letter-spacing: -0.02em; text-transform: uppercase; line-height: 0.95; }
-.sheet-subtitle { font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin-top: 6px; }
+.sheet-title { font-family: var(--display); font-weight: 900; font-size: clamp(22px, 3.4vw, 32px); letter-spacing: -0.02em; text-transform: uppercase; line-height: 0.95; }
+.sheet-subtitle { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-top: 4px; }
 .sheet-totals { text-align: right; }
 .sheet-total-line { font-family: var(--display); font-weight: 800; font-size: 20px; font-variant-numeric: tabular-nums; }
 .sheet-date { font-size: 11px; color: var(--ink-3); margin-top: 4px; }
 
-.sheet-section { font-family: var(--sans); font-size: 12px; font-weight: 600; color: #fff; background: var(--ink); padding: 6px 12px; margin: 26px 0 14px; }
-.print-rule { margin-top: 20px; border-left: 4px solid var(--blue); padding: 4px 0 4px 16px; }
-.print-rule h3 { font-family: var(--display); font-size: 16px; margin-bottom: 5px; }
-.print-rule p { font-family: var(--serif); font-size: 14px; line-height: 1.55; }
+/* Section headings are ink-friendly: a bold underlined label, not a filled dark
+   banner that eats toner on a home printer. */
+.sheet-section { font-family: var(--display); font-size: 13px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink); background: none; padding: 0 0 3px; margin: 16px 0 8px; border-bottom: 2px solid var(--ink); }
+.print-rule { margin-top: 12px; border-left: 3px solid var(--blue); padding: 2px 0 2px 12px; }
+.print-rule h3 { font-family: var(--display); font-size: 14px; margin-bottom: 3px; }
+.print-rule p { font-family: var(--serif); font-size: 13px; line-height: 1.4; }
+
+/* Actions & commands reference: two dense columns, name + full effect text. */
+.print-ref-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
+@media (max-width: 640px) { .print-ref-cols { grid-template-columns: 1fr; } }
+.print-ref-h { font-family: var(--display); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; margin: 0 0 6px; color: var(--ink); }
+.print-ref-sub { font-family: var(--sans); font-weight: 600; font-size: 9px; letter-spacing: 0.04em; color: var(--ink-3); }
+.print-ref-list { margin: 0; }
+.print-ref-list dt { font-family: var(--sans); font-weight: 800; font-size: 11.5px; color: var(--ink); margin-top: 5px; }
+.print-ref-list dt:first-child { margin-top: 0; }
+.print-ref-list dd { margin: 0 0 1px; font-family: var(--serif); font-size: 11.5px; line-height: 1.35; color: var(--ink-2); }
+.print-ref-cost { font-family: var(--sans); font-weight: 700; font-size: 9.5px; color: var(--blue); letter-spacing: 0.02em; }
+.print-ref-note { font-size: 10.5px; font-style: italic; color: var(--ink-2); margin: 8px 0 0; }
 
 /* Roster as one continuous unit-row table (Army Forge / Infinity Army style). */
 .print-roster { width: 100%; border-collapse: collapse; }
@@ -1082,7 +1103,7 @@ button { font-family: inherit; }
   font-size: 9px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
   color: var(--ink-2); padding: 6px 8px; white-space: nowrap;
 }
-.print-roster tbody td { border-bottom: 1px solid var(--hair-soft); padding: 8px; vertical-align: top; font-size: 13px; }
+.print-roster tbody td { border-bottom: 1px solid var(--hair-soft); padding: 4px 7px; vertical-align: top; font-size: 12px; }
 .print-roster tbody tr { break-inside: avoid; }
 .pr-unit-name { display: block; font-family: var(--display); font-weight: 800; font-size: 14px; }
 .pr-unit-class { display: block; font-size: 11px; font-weight: 600; color: var(--ink-2); }
@@ -1130,11 +1151,11 @@ button { font-family: inherit; }
 .ref-subpoints li::before { content: "\2022"; position: absolute; left: 2px; color: var(--blue); }
 .print-guide-intro { font-family: var(--serif); font-size: 14px; line-height: 1.55; margin-bottom: 16px; }
 
-.print-score th, .print-score td { border: 1px solid var(--ink); padding: 9px 10px; font-size: 12px; }
-.print-score thead th { background: var(--ink); color: #fff; font-size: 10px; font-weight: 700; text-align: center; }
-.print-score tbody th { text-align: left; font-weight: 700; background: #fbfcfe; }
-.print-score tbody td { height: 30px; }
-.sheet-foot { margin-top: 28px; padding-top: 12px; border-top: 1px solid var(--hair-soft); font-size: 10.5px; color: var(--ink-3); }
+.print-score th, .print-score td { border: 1px solid var(--ink-3); padding: 5px 8px; font-size: 12px; }
+.print-score thead th { background: none; color: var(--ink); border-bottom: 2px solid var(--ink); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; text-align: center; }
+.print-score tbody th { text-align: left; font-weight: 700; background: none; }
+.print-score tbody td { height: 26px; }
+.sheet-foot { margin-top: 16px; padding-top: 8px; border-top: 1px solid var(--hair-soft); font-size: 10px; color: var(--ink-3); }
 
 /* ------------------------------------------------------------ foundry */
 
@@ -1366,19 +1387,22 @@ button { font-family: inherit; }
    stays dark even when its option is selected, keeping the art legible. */
 .pilot-field { display: flex; flex-direction: column; gap: 6px; }
 .pilot-field-label { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
-.pilot-picker { display: flex; gap: 8px; }
+.pilot-picker { display: flex; gap: 6px; flex-wrap: wrap; }
+/* Compact segmented chips: a small icon + the class name, side by side. Much
+   tighter than the old 80px cards; the selected class's ability shows below. */
 .pilot-opt {
-  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 7px;
-  padding: 10px 6px; border: 1.5px solid var(--hair); background: var(--paper); cursor: pointer;
-  transition: border-color 0.12s ease, background 0.12s ease, transform 0.06s ease;
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 11px 6px 8px; border: 1.5px solid var(--hair); background: var(--paper); cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease;
 }
 .pilot-opt:hover { border-color: var(--blue); background: var(--blue-wash); }
-.pilot-opt:active { transform: translateY(1px); }
 .pilot-opt.on { border-color: var(--blue); background: var(--blue); }
-.pilot-ico { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: var(--ink); border-radius: 50%; }
-.pilot-ico img { width: 32px; height: 32px; object-fit: contain; display: block; }
+.pilot-ico-img { width: 20px; height: 20px; object-fit: contain; display: block; }
+.pilot-opt.on .pilot-ico-img { filter: brightness(0) invert(1); }
 .pilot-name { font-family: var(--display); font-weight: 800; font-size: 12px; letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink); }
 .pilot-opt.on .pilot-name { color: #fff; }
+.pilot-ability { margin: 8px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+.pilot-ability b { color: var(--ink); }
 .solo-primer { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; font-size: 14px; color: var(--ink-2); }
 .solo-primer strong { color: var(--ink); }
 

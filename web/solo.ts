@@ -9,7 +9,14 @@ import {
   OUTFIT_MAX_SHIPS,
   STARTING_DEBT_K,
   DEBT_CLEAR_GAMES,
+  PILOT_PERKS,
 } from "../src/data/junkspace.ts";
+
+// Each pilot class's starting ability (Gunner "Hot Shot", etc.) - the base
+// perk, not the campaign unlocks in PERKS_BY_CLASS.
+const BASE_PERK: Record<string, { perkName: string; text: string }> = Object.fromEntries(
+  PILOT_PERKS.map((p) => [p.class, { perkName: p.perkName, text: p.text }]),
+);
 import {
   JUNKSPACE_JOBS,
   JUNKSPACE_PIRATES,
@@ -134,13 +141,15 @@ function outfitTab(o: SavedOutfit): string {
   const shipRows = o.ships
     .map((s) => {
       const def = shipById.get(s.shipClassId);
-      const pilotPicker = PILOT_CLASSES.map(
-        (p) => `
-        <button class="pilot-opt ${s.pilotClass === p ? "on" : ""}" data-action="outfit-pilot-class" data-ship="${s.id}" data-class="${p}" aria-pressed="${s.pilotClass === p}" title="${p}">
-          <span class="pilot-ico"><img src="${PILOT_ICON[p]}" alt="" /></span>
+      const pilotPicker = PILOT_CLASSES.map((p) => {
+        const perk = BASE_PERK[p];
+        return `
+        <button class="pilot-opt ${s.pilotClass === p ? "on" : ""}" data-action="outfit-pilot-class" data-ship="${s.id}" data-class="${p}" aria-pressed="${s.pilotClass === p}" title="${perk ? escapeHtml(perk.perkName + ": " + perk.text) : p}">
+          <img class="pilot-ico-img" src="${PILOT_ICON[p]}" alt="" />
           <span class="pilot-name">${p}</span>
-        </button>`,
-      ).join("");
+        </button>`;
+      }).join("");
+      const activePerk = BASE_PERK[s.pilotClass];
       return `
       <article class="roster-unit" data-roster-key="${s.id}">
         <div class="roster-unit-head">
@@ -152,6 +161,7 @@ function outfitTab(o: SavedOutfit): string {
           <div class="pilot-field">
             <span class="pilot-field-label">Pilot class</span>
             <div class="pilot-picker" role="group" aria-label="Pilot class">${pilotPicker}</div>
+            ${activePerk ? `<p class="pilot-ability"><b>${escapeHtml(activePerk.perkName)}.</b> ${escapeHtml(activePerk.text)}</p>` : ""}
           </div>
           <label class="inline-field">Pilot name
             <input class="ship-name-input" type="text" value="${escapeHtml(s.pilotName ?? "")}" placeholder="Call sign" data-action="outfit-pilot-name" data-ship="${s.id}" />

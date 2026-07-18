@@ -4,6 +4,7 @@ import { validateFleet, type ValidationIssue } from "../src/validation.ts";
 import { GENERIC_HVP } from "../src/data/index.ts";
 import { JUNKSPACE_SHIPS } from "../src/data/junkspace.ts";
 import { TRAINING_FLEET } from "../src/data/training-fleet.ts";
+import { CORE_ACTIONS, CORE_COMMANDS } from "../src/data/commands.ts";
 import { allFactions, factionsByEra, findFaction, makeCatalog, ERA_ORDER } from "./catalog.ts";
 import { auxSlotText, credits, escapeHtml, formatDate, primarySlotText, ruleText } from "./format.ts";
 import {
@@ -1384,6 +1385,30 @@ function printView(state: AppState): string {
     })
     .join("");
 
+  // Actions and Commands reference: the full set every fleet can use, so the
+  // sheet replaces the rulebook at the table. Requisition is Hypergrowth-only,
+  // so it only appears for the Shipyard-shape modes. The faction rule and each
+  // carried HVP (printed in their own sections) can grant EXTRA commands or
+  // change their cost, so a standing note points the reader to them.
+  const usableCommands = CORE_COMMANDS.filter((c) => !c.shipyardOnly || isShipyard);
+  const commandsSection = `
+      <h2 class="sheet-section">Actions &amp; commands</h2>
+      <div class="print-ref-cols">
+        <div class="print-ref-col">
+          <h4 class="print-ref-h">Actions <span class="print-ref-sub">one per activation</span></h4>
+          <dl class="print-ref-list">
+            ${CORE_ACTIONS.map((a) => `<dt>${escapeHtml(a.name)}</dt><dd>${escapeHtml(a.text)}</dd>`).join("")}
+          </dl>
+        </div>
+        <div class="print-ref-col">
+          <h4 class="print-ref-h">Commands <span class="print-ref-sub">spend CMD tokens</span></h4>
+          <dl class="print-ref-list">
+            ${usableCommands.map((c) => `<dt>${escapeHtml(c.name)} <span class="print-ref-cost">${c.cost} CMD</span></dt><dd>${escapeHtml(c.text)}</dd>`).join("")}
+          </dl>
+          <p class="print-ref-note">Your faction rule${list.fleet.hvp.length ? " and carried personnel" : ""} can grant more commands or change their cost — see ${faction ? `the ${escapeHtml(faction.rule.name)} rule` : "the faction rule"}${list.fleet.hvp.length ? " and the HVP below" : ""}.</p>
+        </div>
+      </div>`;
+
   // The project's single interpunct lives in this subtitle, and its single
   // em-dash lives in the attribution line below. Nowhere else, ever.
   const subtitle = `${escapeHtml(faction?.name ?? "Mixed forces")}${era ? ` · ${era}` : ""}`;
@@ -1445,6 +1470,8 @@ function printView(state: AppState): string {
         opts.format === "guide"
           ? ""
           : `
+      ${opts.rules ? commandsSection : ""}
+
       ${hvpBlocks ? `<h2 class="sheet-section">High-Value Personnel</h2>${hvpBlocks}` : ""}
 
       <h2 class="sheet-section">Score record</h2>
@@ -1484,7 +1511,8 @@ function foundryListView(state: AppState): string {
         <td class="cell-num">${f.ships.length} ship classes</td>
         <td class="cell-num">${f.hvp.length} personnel</td>
         <td class="cell-actions">
-          <button class="ghost-btn" data-action="copy-faction" data-id="${f.id}" title="Copy as JSON to share">${icon("duplicate", 16)}</button>
+          <button class="ghost-btn" data-action="clone-faction" data-source="${f.id}" title="Duplicate this faction">${icon("duplicate", 16)} Duplicate</button>
+          <button class="ghost-btn" data-action="copy-faction" data-id="${f.id}" title="Copy as JSON to share">${icon("scroll", 16)} Copy</button>
           <button class="ghost-btn" data-action="export-faction" data-id="${f.id}" title="Download as a file">${icon("download", 16)}</button>
           <button class="ghost-btn danger" data-action="delete-faction" data-id="${f.id}" title="Delete">${icon("trash", 16)}</button>
         </td>
@@ -1609,10 +1637,11 @@ function foundryEditView(state: AppState, factionId: string): string {
           <input type="number" min="1" value="${s.cost}" data-action="cf-ship" data-ship="${si}" data-field="cost" /></label>
         <div class="field-block wide">Ship image
           <div class="cf-shipimg-row">
-            <span class="cf-shipimg-preview ${s.image ? "has-img" : ""}">${s.image ? `<img src="${s.image}" alt="" />` : icon("image", 22)}</span>
-            <label class="bar-btn file-btn">${icon("upload", 14)} Upload
-              <input type="file" accept="image/*" data-action="cf-ship-image-upload" data-ship="${si}" hidden /></label>
-            ${s.image ? `<button class="ghost-btn danger" data-action="cf-ship-image-clear" data-ship="${si}" title="Remove image">${icon("close", 14)}</button>` : ""}
+            <label class="cf-shipimg-drop ${s.image ? "has-img" : ""}" title="Click to choose an image">
+              ${s.image ? `<img src="${s.image}" alt="" />` : `<span class="cf-shipimg-cue">${icon("upload", 20)}<span>Click to upload an image</span></span>`}
+              <input type="file" accept="image/*" data-action="cf-ship-image-upload" data-ship="${si}" hidden />
+            </label>
+            ${s.image ? `<button class="ghost-btn danger" data-action="cf-ship-image-clear" data-ship="${si}" title="Remove image">${icon("close", 14)} Remove</button>` : ""}
           </div>
         </div>
       </div>

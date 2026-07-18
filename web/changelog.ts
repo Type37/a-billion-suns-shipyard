@@ -9,6 +9,17 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.32",
+    date: "2026-07-17",
+    title: "A print sheet that replaces the rulebook, and a clearer solo builder",
+    items: [
+      "Print mode is tighter and printer-friendly: the section headings are no longer solid dark bars that drink toner, spacing is much denser, and it now prints an Actions & Commands reference — every action and every command with its CMD cost and full effect text, taken verbatim from the Quick Reference. Requisition only shows in the Shipyard modes. Your faction rule and carried HVP still print in full, since that's where extra commands come from.",
+      "Solo pilot-class picker is now a compact chip for each class, and it shows the selected class's actual ability (Hot Shot, Tough, Smartass) right below, so you know what it does.",
+      "Custom Rules factions now have a proper Duplicate button (makes an editable copy in the app) alongside Copy and Download.",
+      "Uploading a ship image is now an obvious click-to-upload tile instead of a tiny button.",
+    ],
+  },
+  {
     version: "0.8.31",
     date: "2026-07-17",
     title: "Learn to Play is a real guided walkthrough now",

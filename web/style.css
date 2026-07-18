@@ -1641,9 +1641,14 @@ button { font-family: inherit; }
 
 /* Compact unit rows: a main open-button for details, inline +/- steppers to
    change ship count without drilling in, cost, and a remove button. */
+/* Solo roster row: the ship's spec (chips + weapons) on the left, the pilot
+   controls beside it, so the row uses its width instead of stacking a 320px
+   table above a 320px control block and leaving half the row empty. */
 .roster-sheet .roster-unit {
   background: var(--paper);
-  display: grid; grid-template-columns: 1fr auto auto auto; align-items: center; gap: 10px;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+  grid-template-areas: "head head" "spec tools";
+  align-items: start; gap: 10px 18px;
   padding: 9px 14px 9px 16px; border-bottom: 1px solid var(--hair-soft);
   border-left: 3px solid transparent; color: var(--color-ink);
   transition: background 0.12s ease, border-color 0.12s ease;
@@ -1884,10 +1889,14 @@ button { font-family: inherit; }
 }
 .mf-manifest .mf-list .roster-unit .ru-id { grid-area: id; }
 .mf-manifest .mf-list .roster-unit .ru-controls { grid-area: controls; }
+/* Chips beside the weapons table, not stacked above it: the table is ~320px in
+   a ~650px row, so stacking banked half the row as dead space. */
 .mf-manifest .mf-list .roster-unit .ru-details {
   grid-area: details; margin-top: 2px; padding-top: 0; border-top: none; align-self: start;
-  flex-direction: column; align-items: stretch;
+  flex-direction: row; flex-wrap: wrap; align-items: flex-start; gap: 8px 22px;
 }
+.mf-manifest .mf-list .roster-unit .ru-details .stat-chips { flex: 0 0 auto; align-content: flex-start; }
+.mf-manifest .mf-list .roster-unit .ru-details .weap-table { flex: 0 1 auto; margin-top: 0; }
 .ru-controls { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
 .mf-manifest .mf-list .roster-unit:hover { border-left-color: var(--blue); }
 .mf-manifest .mf-list .roster-unit.unresolved { background: var(--red-wash); }
@@ -2568,3 +2577,13 @@ button { font-family: inherit; }
 .mf-yard .mf-list { border: 1px solid var(--hair-soft); }
 .mf-yard .mf-h { margin-top: 22px; }
 .mf-yard .mf-h:first-child { margin-top: 0; }
+
+/* Solo roster row areas (see .roster-sheet .roster-unit above). */
+.roster-sheet .roster-unit > .roster-unit-head { grid-area: head; display: flex; align-items: center; gap: 10px; }
+.roster-sheet .roster-unit > .ru-spec { grid-area: spec; min-width: 0; }
+.roster-sheet .roster-unit > .roster-unit-tools { grid-area: tools; margin-top: 0; align-items: flex-start; flex-direction: column; gap: 8px; }
+.roster-sheet .roster-unit > .roster-unit-tools .pilot-field { width: 100%; }
+.roster-sheet .roster-unit .pilot-ability { max-width: 34ch; }
+@media (max-width: 900px) {
+  .roster-sheet .roster-unit { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "spec" "tools"; }
+}

@@ -172,7 +172,9 @@ function outfitTab(o: SavedOutfit): string {
         ${
           // Same stat chips and weapons table the catalogue uses, so a ship
           // reads identically whether you're picking it or already own it.
-          def ? `<div class="roster-unit-stats">${statChips(def, true)}</div>${weaponsTable(def)}` : ""
+          // Boxed as one "spec" column so the pilot controls can sit beside it
+          // instead of stacking under a half-empty row.
+          def ? `<div class="ru-spec"><div class="roster-unit-stats">${statChips(def, true)}</div>${weaponsTable(def)}</div>` : ""
         }
         <div class="roster-unit-tools">
           <div class="pilot-field">

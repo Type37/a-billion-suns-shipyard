@@ -1,6 +1,7 @@
 import type { Faction, GameMode, Mass, PilotClass, Weapon } from "../src/types.ts";
 import { maxUnitSize } from "../src/validation.ts";
 import { MODE_BUILDER_SHAPE } from "../src/types.ts";
+import { JUNKSPACE_SHIPS, OUTFIT_MAX_SHIPS } from "../src/data/junkspace.ts";
 import { w } from "../src/data/_helpers.ts";
 import { announce } from "./announce.ts";
 import { findFaction, isCustom } from "./catalog.ts";
@@ -800,13 +801,19 @@ function handleClick(e: MouseEvent): void {
     case "outfit-add-ship": {
       const shipId = target.dataset["ship"];
       if (!shipId) return;
+      let full = false;
       editOutfit((o) => {
-        if (o.ships.length >= 5) return o;
+        if (o.ships.length >= OUTFIT_MAX_SHIPS) {
+          full = true;
+          return o;
+        }
         return {
           ...o,
           ships: [...o.ships, { id: nextOutfitShipId(o), shipClassId: shipId, pilotClass: "Gunner" as PilotClass }],
         };
       });
+      const shipName = JUNKSPACE_SHIPS.find((s) => s.id === shipId)?.name ?? "Ship";
+      showToast(full ? `Outfit is full at ${OUTFIT_MAX_SHIPS} ships` : `Added ${shipName}`);
       break;
     }
     case "outfit-remove-ship": {

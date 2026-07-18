@@ -9,6 +9,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.49",
+    date: "2026-07-18",
+    title: "Rows use the space they're given",
+    items: [
+      "Fleet roster rows put the stats beside the weapons table instead of stacked above it, which closes the wide empty gap on the right and makes each row shorter.",
+      "Solo outfit rows do the same, with the pilot controls sitting alongside the ship's spec rather than underneath a half-empty row. Both stack back to one column on a narrow screen.",
+      "Adding a ship in solo now confirms it with a message, and tells you when the outfit is full at five.",
+    ],
+  },
+  {
     version: "0.8.48",
     date: "2026-07-18",
     title: "Hypergrowth is a shipyard, not a list of units",

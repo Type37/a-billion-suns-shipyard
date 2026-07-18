@@ -9,6 +9,14 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.34",
+    date: "2026-07-18",
+    title: "One emblem picker everywhere: a Choose-emblem dialog with tabs",
+    items: [
+      "The emblem picker is now the same everywhere — the fleet builder, Custom Rules, and solo outfits all use a single \"Choose emblem\" button that opens one dialog. It has Library, Upload, and (for fleets) Colour tabs, with the full icon library given real room to browse instead of a cramped popover. Pick an icon and the dialog stays open so you can keep trying; Done closes it.",
+    ],
+  },
+  {
     version: "0.8.33",
     date: "2026-07-17",
     title: "Shorter share links and a solo menu that shows your campaign",

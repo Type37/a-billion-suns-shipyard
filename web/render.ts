@@ -17,11 +17,11 @@ import {
   statChips,
   tacticalDiagram,
 } from "./icons.ts";
-import { emblemPickerUI, iconLibraryGrid, libraryUrl } from "./emblems.ts";
+import { iconLibraryGrid, libraryUrl } from "./emblems.ts";
 import { CHANGELOG } from "./changelog.ts";
 import { FACTION_LORE } from "./faction-lore.ts";
 import type { AppState } from "./state.ts";
-import { activeList } from "./state.ts";
+import { activeList, activeOutfit } from "./state.ts";
 import type { SavedList } from "./storage.ts";
 import { soloListView, soloOutfitView } from "./solo.ts";
 import { activeTour } from "./tours.ts";
@@ -1048,30 +1048,7 @@ function builderView(state: AppState): string {
 
   // One button showing the current mark; the whole picker lives in a popover so
   // it stops eating a row in the setup band.
-  const listImg = list.emblemImage ?? libraryUrl(list.emblemLib);
-  const emblemPicker = `
-    <details class="emblem-menu">
-      <summary class="emblem-current-btn" title="Choose an emblem">${listEmblem(list, 34)}${icon("chevronDown", 14, "emblem-caret")}</summary>
-      <div class="emblem-menu-panel">
-        <div class="emblem-menu-tools">
-          <label class="bar-btn file-btn">${icon("upload", 14)} Upload<input type="file" accept="image/*" data-action="emblem-upload" hidden /></label>
-          <button class="bar-btn" data-action="random-emblem">${icon("shuffle", 14)} Random</button>
-          ${listImg ? `<button class="bar-btn danger" data-action="clear-emblem-image">${icon("close", 14)} Clear image</button>` : ""}
-        </div>
-        ${
-          list.emblemLib && /\.svg$/i.test(list.emblemLib)
-            ? `<div class="emblem-tint-row">
-                <span class="control-label">Vector colour</span>
-                <button class="tint-swatch tint-none ${!list.emblemColor ? "selected" : ""}" data-action="set-emblem-color" data-color="" title="Original">${icon("close", 12)}</button>
-                <button class="tint-swatch tint-ink ${list.emblemColor === "ink" ? "selected" : ""}" data-action="set-emblem-color" data-color="ink" title="Ink" aria-label="Ink"></button>
-                <button class="tint-swatch tint-blue ${list.emblemColor === "blue" ? "selected" : ""}" data-action="set-emblem-color" data-color="blue" title="Blue" aria-label="Blue"></button>
-                <button class="tint-swatch tint-red ${list.emblemColor === "red" ? "selected" : ""}" data-action="set-emblem-color" data-color="red" title="Red" aria-label="Red"></button>
-              </div>`
-            : ""
-        }
-        ${iconLibraryGrid("set-emblem-lib", list.emblemLib)}
-      </div>
-    </details>`;
+  const emblemPicker = `<button class="emblem-current-btn" data-action="open-emblem-modal" data-target="list" title="Choose an emblem">${listEmblem(list, 34)}${icon("pencil", 12, "emblem-edit-cue")}</button>`;
 
   const limitIsPreset = [300, 400, 500].includes(list.fleet.creditsLimit);
   // The cap lives inline as "/500" in the tally itself, not a standing row of
@@ -1691,15 +1668,10 @@ function foundryEditView(state: AppState, factionId: string): string {
         <label class="field-block wide">Faction name
           <input type="text" value="${escapeHtml(f.name)}" data-action="cf-field" data-field="name" /></label>
         <div class="field-block wide">Emblem
-          ${emblemPickerUI({
-            previewHtml: emblemMark("delta", f.emblemImage ?? libraryUrl(f.emblemLib), 44),
-            uploadAction: "cf-emblem-upload",
-            libAction: "cf-set-lib",
-            randomAction: "cf-random-emblem",
-            clearAction: "cf-clear-emblem",
-            hasImage: Boolean(f.emblemImage || f.emblemLib),
-            currentLib: f.emblemLib,
-          })}
+          <button class="emblem-choose-btn" data-action="open-emblem-modal" data-target="faction">
+            <span class="emblem-choose-preview">${emblemMark("delta", f.emblemImage ?? libraryUrl(f.emblemLib), 40)}</span>
+            <span class="emblem-choose-label">${icon("image", 15)} Choose emblem</span>
+          </button>
         </div>
         <label class="field-block">Era
           <select data-action="cf-field" data-field="era">
@@ -2402,6 +2374,112 @@ function learnView(state: AppState): string {
   ${footer()}`;
 }
 
+// The unified emblem picker (Option B): a single "Choose emblem" button in the
+// builder, foundry, and solo opens this one modal. The Library / Upload / Colour
+// tabs and Random / Remove actions dispatch to the existing per-context emblem
+// actions, which resolve their own target (active list / faction / outfit), so
+// the modal only needs to know which target it's editing to pick action names.
+function emblemModal(state: AppState): string {
+  const m = state.ui.modal;
+  if (!m || m.kind !== "emblem") return "";
+
+  interface Cfg {
+    preview: string;
+    currentLib?: string;
+    hasImage: boolean;
+    libA: string;
+    upA: string;
+    rndA: string;
+    clrA: string;
+    colour: boolean;
+    currentColor?: string;
+  }
+  let cfg: Cfg | undefined;
+  if (m.target === "list") {
+    const l = activeList(state);
+    if (l)
+      cfg = {
+        preview: listEmblem(l, 64),
+        currentLib: l.emblemLib,
+        hasImage: Boolean(l.emblemImage || l.emblemLib),
+        libA: "set-emblem-lib",
+        upA: "emblem-upload",
+        rndA: "random-emblem",
+        clrA: "clear-emblem-image",
+        colour: true,
+        currentColor: l.emblemColor,
+      };
+  } else if (m.target === "faction") {
+    const fid = state.route.view === "foundry" ? state.route.factionId : undefined;
+    const f = fid ? state.customFactions.find((x) => x.id === fid) : undefined;
+    if (f)
+      cfg = {
+        preview: emblemMark("delta", f.emblemImage ?? libraryUrl(f.emblemLib), 64),
+        currentLib: f.emblemLib,
+        hasImage: Boolean(f.emblemImage || f.emblemLib),
+        libA: "cf-set-lib",
+        upA: "cf-emblem-upload",
+        rndA: "cf-random-emblem",
+        clrA: "cf-clear-emblem",
+        colour: false,
+      };
+  } else {
+    const o = activeOutfit(state);
+    if (o)
+      cfg = {
+        preview: emblemMark(o.emblem, o.emblemImage ?? libraryUrl(o.emblemLib), 64),
+        currentLib: o.emblemLib,
+        hasImage: Boolean(o.emblemImage || o.emblemLib),
+        libA: "outfit-set-lib",
+        upA: "outfit-emblem-upload",
+        rndA: "outfit-random-emblem",
+        clrA: "outfit-clear-emblem",
+        colour: false,
+      };
+  }
+  if (!cfg) return "";
+
+  const tabDefs: Array<[string, string]> = [["library", "Library"], ["upload", "Upload"]];
+  if (cfg.colour) tabDefs.push(["colour", "Colour"]);
+  const tab = tabDefs.some(([id]) => id === m.tab) ? m.tab : "library";
+  const tabBtns = tabDefs
+    .map(([id, label]) => `<button class="em-tab ${tab === id ? "on" : ""}" data-action="emblem-modal-tab" data-tab="${id}">${escapeHtml(label)}</button>`)
+    .join("");
+
+  const isSvg = cfg.currentLib ? /\.svg$/i.test(cfg.currentLib) : false;
+  const colourSwatch = (val: string, cls: string, label: string) =>
+    `<button class="tint-swatch ${cls} ${(cfg!.currentColor ?? "") === val ? "selected" : ""}" data-action="set-emblem-color" data-color="${val}" title="${label}" aria-label="${label}">${val === "" ? icon("close", 12) : ""}</button>`;
+
+  const body =
+    tab === "upload"
+      ? `<label class="em-drop"><span class="em-drop-cue">${icon("upload", 22)}<span>Click to upload your own image</span></span><input type="file" accept="image/*" data-action="${cfg.upA}" hidden /></label>`
+      : tab === "colour"
+        ? `<div class="em-colour">${
+            isSvg
+              ? `<p class="em-colour-note">Tint this vector mark:</p><div class="em-swatches">${colourSwatch("", "tint-none", "Original")}${colourSwatch("ink", "tint-ink", "Ink")}${colourSwatch("blue", "tint-blue", "Blue")}${colourSwatch("red", "tint-red", "Red")}</div>`
+              : `<p class="muted">Colour tinting only applies to the vector (SVG) marks. Pick one from the Library first.</p>`
+          }</div>`
+        : `<div class="em-scroll">${iconLibraryGrid(cfg.libA, cfg.currentLib)}</div>`;
+
+  return `
+  <div class="modal-root">
+    <div class="modal-backdrop" data-action="close-modal"></div>
+    <div class="modal-panel em-modal" role="dialog" aria-modal="true" aria-label="Choose an emblem">
+      <header class="modal-header">
+        <div class="em-head"><span class="em-preview">${cfg.preview}</span><h2 class="modal-title">Choose an emblem</h2></div>
+        <button class="modal-close" data-action="close-modal" aria-label="Close">${icon("close", 18)}</button>
+      </header>
+      <div class="em-tabs" role="tablist">${tabBtns}</div>
+      <div class="em-body">${body}</div>
+      <div class="em-foot">
+        <button class="bar-btn" data-action="${cfg.rndA}">${icon("shuffle", 15)} Random</button>
+        ${cfg.hasImage ? `<button class="bar-btn danger" data-action="${cfg.clrA}">${icon("close", 15)} Remove</button>` : ""}
+        <button class="cta-btn em-done" data-action="close-modal">${icon("check", 16)} Done</button>
+      </div>
+    </div>
+  </div>`;
+}
+
 export function render(state: AppState): string {
   const body = (() => {
     switch (state.route.view) {
@@ -2429,5 +2507,5 @@ export function render(state: AppState): string {
         return changelogView();
     }
   })();
-  return `${body}${optionsModal(state)}${tourPopover(state)}`;
+  return `${body}${optionsModal(state)}${emblemModal(state)}${tourPopover(state)}`;
 }

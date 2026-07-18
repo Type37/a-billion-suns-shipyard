@@ -368,6 +368,20 @@ function handleClick(e: MouseEvent): void {
       store.setState((s) => updateList(s, id, (l) => ({ ...l, emblem: emblemId })));
       break;
     }
+    case "open-emblem-modal": {
+      const tgt = target.dataset["target"];
+      const emblemTarget = tgt === "faction" || tgt === "outfit" ? tgt : "list";
+      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "emblem", target: emblemTarget, tab: "library" } } }));
+      break;
+    }
+    case "emblem-modal-tab": {
+      const raw = target.dataset["tab"];
+      const tab = raw === "upload" || raw === "colour" ? raw : "library";
+      store.setState((s) =>
+        s.ui.modal?.kind === "emblem" ? { ...s, ui: { ...s.ui, modal: { ...s.ui.modal, tab } } } : s,
+      );
+      break;
+    }
     case "clear-emblem-image": {
       const id = currentListId();
       if (!id) return;

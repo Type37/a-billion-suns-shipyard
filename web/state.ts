@@ -150,6 +150,7 @@ export interface AppState {
     /** An open modal dialog. */
     modal?:
       | { kind: "new-fleet"; era: Era; limit: number; factionId?: string; showAll: boolean; customOpen?: boolean }
+      | { kind: "emblem"; target: "list" | "faction" | "outfit"; tab: "library" | "upload" | "colour" }
       | { kind: "options" };
     /** In-progress first-visit coachmark tour, once the user has advanced past step 0. */
     tour?: { tourId: string; step: number };

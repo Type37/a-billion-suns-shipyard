@@ -32,7 +32,7 @@ import {
 } from "../src/data/junkspace-solo.ts";
 import { auxSlotText, escapeHtml, formatDate, primarySlotText } from "./format.ts";
 import { emblem, emblemMark, icon, massGlyph, statChips } from "./icons.ts";
-import { emblemPickerUI, libraryUrl } from "./emblems.ts";
+import { libraryUrl } from "./emblems.ts";
 import gunnerIcon from "./pilots/gunner.png";
 import haulerIcon from "./pilots/hauler.png";
 import junkerIcon from "./pilots/junker.png";
@@ -429,13 +429,8 @@ export function soloOutfitView(state: AppState): string {
 
 function outfitEmblemPicker(o: SavedOutfit): string {
   const img = o.emblemImage ?? libraryUrl(o.emblemLib);
-  return emblemPickerUI({
-    previewHtml: emblemMark(o.emblem, img, 44),
-    uploadAction: "outfit-emblem-upload",
-    libAction: "outfit-set-lib",
-    randomAction: "outfit-random-emblem",
-    clearAction: "outfit-clear-emblem",
-    hasImage: Boolean(img),
-    currentLib: o.emblemLib,
-  });
+  return `<button class="emblem-choose-btn" data-action="open-emblem-modal" data-target="outfit">
+    <span class="emblem-choose-preview">${emblemMark(o.emblem, img, 40)}</span>
+    <span class="emblem-choose-label">${icon("image", 15)} Choose emblem</span>
+  </button>`;
 }

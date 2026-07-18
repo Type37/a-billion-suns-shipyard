@@ -2019,8 +2019,10 @@ button { font-family: inherit; }
    the command-token delta). Boxed so they read as the two numbers that matter
    at pick-time, not a four-way data dump. */
 .nfd-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
-.nfd-stat { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border: 1px solid var(--hair); background: var(--blue-wash); }
+.nfd-stat { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border: 1px solid var(--hair); background: var(--blue-wash); }
 .nfd-stat-label { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); }
+/* Value and its dice / command glyphs share one line. */
+.nfd-stat-figure { display: flex; align-items: center; gap: 10px; min-height: 24px; }
 .nfd-stat-val { font-family: var(--display); font-weight: 800; font-size: 22px; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
 /* Both boxes share the same glyph row so their dice / token line up: blue,
    left-aligned, on a fixed line so the two boxes match height even when one

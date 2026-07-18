@@ -245,42 +245,58 @@ function decodeTitle(el: HTMLElement, text: string): void {
   requestAnimationFrame(frame);
 }
 
-// Age of Unity: the title reveals left-to-right under a clip-path with a slight
-// opacity lift - composed, ordered, inevitable.
-function wipeTitle(el: HTMLElement, text: string): void {
+// Age of Unity: the title comes in like the Star Wars logo - huge and distant,
+// then recedes into place, fading up only as it shrinks. Composed, inevitable.
+function recedeTitle(el: HTMLElement, text: string): void {
   el.textContent = text;
   el.appendChild(titleRule());
+  el.style.transformOrigin = "50% 50%";
   el.animate(
     [
-      { clipPath: "inset(0 100% 0 0)", opacity: 0.4 },
-      { clipPath: "inset(0 0 0 0)", opacity: 1 },
+      { opacity: 0, transform: "scale(2.1)" },
+      { opacity: 0.12, transform: "scale(1.45)", offset: 0.45 },
+      { opacity: 1, transform: "scale(1)" },
     ],
-    { duration: 340, fill: "forwards", easing: "cubic-bezier(.3,.7,.2,1)" },
+    { duration: 520, fill: "forwards", easing: "cubic-bezier(.2,.75,.2,1)" },
   );
 }
 
-// Armageddon: the title crashes in oversized, overshoots and shudders, then a
-// red underline draws in only once it has landed - violent, abrupt.
+// Armageddon: the title thumps straight down and squashes on impact, then
+// rebounds - contained to the text itself (vertical only, no sideways shake),
+// and the red underline draws in only once it has landed.
 function slamTitle(el: HTMLElement, text: string): void {
   el.textContent = text;
   el.appendChild(titleRule());
-  el.classList.add("is-landing"); // hold the underline collapsed through the slam
-  el.style.transformOrigin = "0% 50%";
+  el.classList.add("is-landing"); // hold the underline collapsed through the thump
+  el.style.transformOrigin = "50% 100%"; // land on the baseline
   el.animate(
     [
-      { opacity: 0, transform: "scale(1.9)" },
-      { opacity: 1, transform: "scale(.96)", offset: 0.6 },
-      { transform: "translate(3px,-2px)", offset: 0.78 },
-      { transform: "translate(-3px,2px)", offset: 0.9 },
-      { transform: "translate(0,0) scale(1)" },
+      { opacity: 0, transform: "translateY(-18px) scaleY(1.14)" },
+      { opacity: 1, transform: "translateY(0) scaleY(0.84)", offset: 0.5 },
+      { transform: "translateY(0) scaleY(1.07)", offset: 0.72 },
+      { transform: "translateY(0) scaleY(1)" },
     ],
-    { duration: 340, easing: "cubic-bezier(.2,.9,.2,1)", fill: "forwards" },
+    { duration: 360, easing: "cubic-bezier(.2,.9,.2,1)", fill: "forwards" },
   );
-  // Only once the title has landed (slam is 340ms): drop the hold, and the CSS
-  // transition on .nfd-rule draws the red underline in. A timer rather than the
-  // animation's finish event, so the underline never gets stranded if the finish
+  // Once the title has landed, drop the hold; the CSS transition on the
+  // underline draws it in. A timer, so it never gets stranded if the finish
   // event is missed.
-  window.setTimeout(() => el.classList.remove("is-landing"), 360);
+  window.setTimeout(() => el.classList.remove("is-landing"), 380);
+}
+
+// The dice / command glyphs pop in with a short left-to-right stagger just after
+// the title, so the two figures feel like they resolve into place.
+function animateStatGlyphs(): void {
+  const glyphs = document.querySelectorAll<HTMLElement>(".nfd-stats .dice-ico, .nfd-stats .cmd-token");
+  glyphs.forEach((g, i) => {
+    g.animate(
+      [
+        { opacity: 0, transform: "translateY(5px) scale(0.6)" },
+        { opacity: 1, transform: "translateY(0) scale(1)" },
+      ],
+      { duration: 300, delay: 140 + i * 70, easing: "cubic-bezier(.2,.9,.3,1.4)", fill: "backwards" },
+    );
+  });
 }
 
 function animateFactionTitle(): void {
@@ -304,7 +320,8 @@ function animateFactionTitle(): void {
 
   if (era === "hyper") decodeTitle(el, title);
   else if (era === "arma") slamTitle(el, title);
-  else wipeTitle(el, title);
+  else recedeTitle(el, title);
+  animateStatGlyphs();
 }
 
 // The tour popover is a real DOM node in the rendered string, but it targets

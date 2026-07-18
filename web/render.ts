@@ -516,13 +516,17 @@ function factionDetailPane(f: Faction): string {
       <div class="nfd-stats">
         <div class="nfd-stat">
           <span class="nfd-stat-label">Initiative</span>
-          <span class="nfd-stat-val">${escapeHtml(f.initiative)}</span>
-          ${diceRow(f.initiative, 22)}
+          <span class="nfd-stat-figure">
+            <span class="nfd-stat-val">${escapeHtml(f.initiative)}</span>
+            ${diceRow(f.initiative, 20)}
+          </span>
         </div>
         <div class="nfd-stat">
           <span class="nfd-stat-label">CMD / round</span>
-          <span class="nfd-stat-val">${escapeHtml(f.cmdTokens)}</span>
-          <span class="dice-row">${commandToken(22)}</span>
+          <span class="nfd-stat-figure">
+            <span class="nfd-stat-val">${escapeHtml(f.cmdTokens)}</span>
+            <span class="dice-row">${commandToken(20)}</span>
+          </span>
         </div>
       </div>
       <div class="nfd-ability">

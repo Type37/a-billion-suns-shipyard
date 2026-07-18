@@ -9,6 +9,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.22",
+    date: "2026-07-17",
+    title: "Dice on the value's line, and better title motion",
+    items: [
+      "In the faction panel, the Initiative dice and the command symbol now sit on the same line as their value (3D6 shown with three dice, the command total with its mark), and the glyphs pop in with a short stagger.",
+      "Age of Unity titles now recede into place like the Star Wars logo, arriving huge and distant and settling as they fade up.",
+      "Armageddon titles now thump straight down and squash on impact rather than shaking side to side, so only the text moves, not the whole panel.",
+    ],
+  },
+  {
     version: "0.8.21",
     date: "2026-07-17",
     title: "Options menu with backups, and custom ships in the compendium",

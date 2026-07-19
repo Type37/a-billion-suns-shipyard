@@ -2906,7 +2906,12 @@ a .icon,
 .learn-dg .dg-measure line { stroke: var(--ink-3); stroke-width: 1; }
 .learn-dg .dg-measure-text { font-family: var(--narrow); font-size: 10px; font-weight: 700; fill: var(--ink-3); text-anchor: middle; }
 .learn-dg .dg-track { fill: none; stroke: var(--hair); stroke-width: 1.5; stroke-dasharray: 5 5; }
-.learn-dg .dg-pivot-arc path { fill: none; stroke: var(--blue); stroke-width: 2; }
+/* The pivot is a rotation marker sitting on the start line, not a curved path
+   across the diagram - a curve read as though the ship travelled an arc. */
+.learn-dg .dg-turn-ring { fill: none; stroke: var(--hair); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.learn-dg .dg-turn-arrow { fill: none; stroke: var(--blue); stroke-width: 2.4; }
+.learn-dg .dg-straight { stroke: var(--ink-3); stroke-width: 2; }
+.learn-dg .dg-straight-2 { stroke: var(--blue); }
 .learn-dg .dg-arc-fill { fill: var(--blue); fill-opacity: 0.14; }
 .learn-dg .dg-arc-pri { fill: var(--red); fill-opacity: 0.16; }
 .learn-dg .dg-shot { stroke: var(--red); stroke-width: 2; stroke-linecap: round; }
@@ -2922,9 +2927,15 @@ a .icon,
 @keyframes dg-grow { 0% { transform: scale(0.2); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 @keyframes dg-ring { 0% { r: 9; opacity: 1; } 100% { r: 30; opacity: 0; } }
 @keyframes dg-pivot-then-run {
-  0%, 18% { transform: translate(60px, 96px) rotate(-90deg); }
-  34%, 42% { transform: translate(60px, 96px) rotate(0deg); }
-  86%, 100% { transform: translate(250px, 96px) rotate(0deg); }
+  0%, 16% { transform: translate(62px, 92px) rotate(-90deg); }
+  32%, 40% { transform: translate(62px, 92px) rotate(0deg); }
+  88%, 100% { transform: translate(250px, 92px) rotate(0deg); }
+}
+/* Two full steps, with a beat between them so the second reads as a second. */
+@keyframes dg-double-run {
+  0%, 8% { transform: translate(52px, 96px) rotate(0deg); }
+  40%, 52% { transform: translate(150px, 96px) rotate(0deg); }
+  88%, 100% { transform: translate(250px, 96px) rotate(0deg); }
 }
 @keyframes dg-fade-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes dg-fire { 0%, 40% { opacity: 0; stroke-dashoffset: 130; } 55% { opacity: 1; } 100% { opacity: 0.9; stroke-dashoffset: 0; } }
@@ -3189,7 +3200,8 @@ a .icon,
    Play Mode tracked the round but never showed the ships the round is about,
    which is why testers called it useless. Every unit, its stats, its weapons,
    and a hull tracker per ship. */
-.play-fleet { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--hair-soft); }
+.play-fleet { margin-top: 0; }
+.play-cols .play-fleet .pf-list { grid-template-columns: 1fr; }
 .pf-hint { font-family: var(--sans); font-size: 11px; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--ink-3); margin-left: 8px; }
 .pf-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 10px; margin-top: 10px; }
 .pf-unit { border: 1px solid var(--hair); padding: 9px 11px; }
@@ -3202,3 +3214,28 @@ a .icon,
 .pf-track { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
 .pf-track-row { display: flex; flex-wrap: wrap; gap: 4px; }
 .pf-hp { width: 15px; height: 15px; border: 1.5px solid var(--ink-3); display: inline-block; }
+
+.learn-dg .dg-dbl-mover { animation: dg-double-run 3400ms ease-in-out infinite; }
+
+/* Footnotes. Qualifiers and "this rule from the other edition is not here" notes
+   read as answers to questions nobody asked when they sit in the main list, so
+   they drop below it in a quieter voice. */
+.learn-fn {
+  margin: 8px 0 0; padding-left: 12px; border-left: 2px solid var(--hair);
+  font-size: 12.5px; line-height: 1.5; color: var(--ink-3); max-width: 64ch;
+}
+
+/* Builder header groups. Each group wraps as a whole rather than its members
+   scattering independently, so the ... menu can never end up alone on a line. */
+.mf-grp { display: flex; align-items: center; gap: 8px 12px; min-width: 0; }
+.mf-grp-id { flex: 1 1 260px; }
+.mf-grp-id .mf-name { flex: 1 1 auto; min-width: 0; }
+.mf-grp-id .mf-menu { margin-left: auto; flex: none; }
+.mf-grp-fac { flex: 0 1 auto; }
+.mf-grp-budget { flex: 0 0 auto; margin-left: auto; }
+@media (max-width: 900px) {
+  .mf-topline { gap: 10px 14px; }
+  .mf-grp-budget { margin-left: 0; flex: 1 1 100%; }
+  .mf-grp-fac { flex: 1 1 100%; }
+}
+.learn-sub-min { font-family: var(--display); font-weight: 800; font-size: 14px; margin: 16px 0 3px; color: var(--ink); }

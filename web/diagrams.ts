@@ -109,22 +109,65 @@ function dragSelectDiagram(): string {
   </svg>`;
 }
 
-/** Movement Step: pivot on the spot by any amount, then run straight ahead. */
+/**
+ * Movement Step. Pivot on the spot by any amount, then move STRAIGHT ahead up to
+ * Thrust. The earlier drawing put a curved arc across the middle of the frame,
+ * which read as though the ship travelled a curve - it does not, and testers
+ * said so. The turn is now shown as a rotation in place at the start line, with
+ * the travel drawn as one straight rule to the Thrust mark.
+ */
 function movementDiagram(): string {
+  const START = 62, END = 250, Y = 92;
   return `
   <svg class="learn-dg" viewBox="0 0 320 150" role="img"
-       aria-label="Movement Step: pivot any amount on the spot, then move straight ahead up to the ship's Thrust value.">
-    ${LABEL(160, 16, "Pivot, then move up to Thrust", "dg-title")}
-    <path class="dg-track" d="M60 96 L250 96"/>
-    <g class="dg-pivot-arc" transform="translate(60 96)">
-      <path d="M0 -26 A26 26 0 0 1 22 -14"/>
+       aria-label="Movement Step: pivot on the spot by any amount, then move straight ahead up to the ship's Thrust value.">
+    ${LABEL(160, 15, "Pivot on the spot, then move straight", "dg-title")}
+
+    <!-- The turn happens here, before any travel: a rotation marker at the start. -->
+    <g class="dg-turnmark" transform="translate(${START} ${Y})">
+      <circle class="dg-turn-ring" r="19"/>
+      <path class="dg-turn-arrow" d="M0 -19 A19 19 0 0 1 16 -10"/>
     </g>
+    ${LABEL(START, Y + 36, "pivot", "dg-mini")}
+
+    <!-- Travel: one straight line, nothing curved. -->
+    <line class="dg-straight" x1="${START}" y1="${Y}" x2="${END}" y2="${Y}"/>
     <g class="dg-mover">${SHIP(0, 0, 90, "dg-ship")}</g>
-    <g class="dg-measure dg-measure-late" transform="translate(60 118)">
-      <line x1="0" y1="0" x2="190" y2="0"/>
+
+    <g class="dg-measure dg-measure-late" transform="translate(${START} ${Y + 22})">
+      <line x1="0" y1="0" x2="${END - START}" y2="0"/>
       <line x1="0" y1="-5" x2="0" y2="5"/>
-      <line x1="190" y1="-5" x2="190" y2="5"/>
-      ${LABEL(95, 16, "Thrust", "dg-measure-text")}
+      <line x1="${END - START}" y1="-5" x2="${END - START}" y2="5"/>
+      ${LABEL((END - START) / 2, 16, 'up to Thrust', "dg-measure-text")}
+    </g>
+  </svg>`;
+}
+
+/**
+ * Power to Engines: the double move. Spend 1 CMD at the start of the movement
+ * step and take the whole step twice - pivot and move, then pivot and move
+ * again. Worth its own picture because it is the one command that changes where
+ * a ship can physically reach, and the walkthrough never mentioned it.
+ */
+function doubleMoveDiagram(): string {
+  const Y = 96, A = 52, B = 150, C = 250;
+  return `
+  <svg class="learn-dg" viewBox="0 0 320 150" role="img"
+       aria-label="Power to Engines: spend one CMD token at the start of the movement step to take that step twice - pivot and move, then pivot and move again.">
+    ${LABEL(160, 15, "Power to Engines — move twice", "dg-title")}
+    <line class="dg-straight" x1="${A}" y1="${Y}" x2="${B}" y2="${Y}"/>
+    <line class="dg-straight dg-straight-2" x1="${B}" y1="${Y}" x2="${C}" y2="${Y}"/>
+    <g class="dg-dbl-mover">${SHIP(0, 0, 90, "dg-ship")}</g>
+    <g class="dg-measure" transform="translate(${A} ${Y + 24})">
+      <line x1="0" y1="0" x2="${B - A}" y2="0"/>
+      <line x1="0" y1="-5" x2="0" y2="5"/>
+      <line x1="${B - A}" y1="-5" x2="${B - A}" y2="5"/>
+      ${LABEL((B - A) / 2, 16, "Thrust", "dg-measure-text")}
+    </g>
+    <g class="dg-measure" transform="translate(${B} ${Y + 24})">
+      <line x1="0" y1="0" x2="${C - B}" y2="0"/>
+      <line x1="${C - B}" y1="-5" x2="${C - B}" y2="5"/>
+      ${LABEL((C - B) / 2, 16, "Thrust again", "dg-measure-text")}
     </g>
   </svg>`;
 }
@@ -371,6 +414,7 @@ const DIAGRAMS: Record<string, () => string> = {
   command: commandDiagram,
   jump: jumpDiagram,
   "drag-select": dragSelectDiagram,
+  "double-move": doubleMoveDiagram,
   movement: movementDiagram,
   passive: passiveDiagram,
   action: actionDiagram,

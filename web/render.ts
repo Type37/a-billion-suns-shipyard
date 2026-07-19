@@ -1267,18 +1267,32 @@ function builderView(state: AppState): string {
 
   <main class="builder ${!unlimited && remaining < 0 ? "is-over" : ""}">
     <header class="mf-head">
+      <!--
+        Three groups, each a unit that wraps as a whole: what this fleet IS
+        (emblem, name, and the menu that acts on it), what it is BUILT FROM
+        (faction and era), and what it COSTS (spent / limit / free). Everything
+        used to be one flat run of siblings, so on a phone the ... menu wrapped
+        onto a line of its own under the budget and read as an orphan - which is
+        what "nothing is logically grouped" meant.
+      -->
       <div class="mf-topline">
-        <span class="mf-emblem">${emblemPicker}</span>
-        <input class="mf-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled fleet" data-action="fleet-name" />
-        <span class="mf-fac">${factionControl}</span>
-        ${era ? `<span class="mf-era-badge" title="Era you are building for">${escapeHtml(era)}</span>` : ""}
-        <span class="mf-budget">
-          <span class="mf-tally">
-            <span class="mf-tally-now">${credits(total)}</span>${limitControl}
-            <span class="mf-tally-free">${unlimited ? "unlimited" : remaining < 0 ? `${credits(-remaining)} over` : `${credits(remaining)} free`}</span>
+        <div class="mf-grp mf-grp-id">
+          <span class="mf-emblem">${emblemPicker}</span>
+          <input class="mf-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled fleet" data-action="fleet-name" />
+          ${moreMenu}
+        </div>
+        <div class="mf-grp mf-grp-fac">
+          <span class="mf-fac">${factionControl}</span>
+          ${era ? `<span class="mf-era-badge" title="Era you are building for">${escapeHtml(era)}</span>` : ""}
+        </div>
+        <div class="mf-grp mf-grp-budget">
+          <span class="mf-budget">
+            <span class="mf-tally">
+              <span class="mf-tally-now">${credits(total)}</span>${limitControl}
+              <span class="mf-tally-free">${unlimited ? "unlimited" : remaining < 0 ? `${credits(-remaining)} over` : `${credits(remaining)} free`}</span>
+            </span>
           </span>
-        </span>
-        ${moreMenu}
+        </div>
       </div>
       <div class="mf-meter"><span class="mf-meter-fill" style="width:${unlimited ? 0 : list.fleet.creditsLimit > 0 ? Math.min(100, (total / list.fleet.creditsLimit) * 100) : 0}%"></span></div>
     </header>
@@ -2339,11 +2353,16 @@ function playView(state: AppState): string {
           ${counter(scoreLabel, play.vp, "play-vp")}
           ${counter("Opponent " + scoreLabel.toLowerCase(), play.oppVp, "play-oppvp")}
         </div>
+        ${
+          // Your fleet ABOVE the command reference. The commands are a long block
+          // of rules text you consult occasionally; the fleet is what you look at
+          // constantly. Below them it landed 1803px down the page on a phone -
+          // past two full screens - which is what "can't see your fleet" meant.
+          playFleetPanel(list, faction, customs)
+        }
         ${playCommandsPanel(list, play.cmd, faction)}
       </div>
     </div>
-
-    ${playFleetPanel(list, faction, customs)}
 
   </main>
   ${toast(state)}
@@ -2856,29 +2875,36 @@ function learnView(state: AppState): string {
           `${learnDiagram("jump")}
            <h3 class="learn-sub">On your turn, do one thing</h3>
            <ul class="learn-rules">
-             <li>Open a Jump Point, Jump In a unit, or Pass. None of these costs a CMD token.</li>
+             <li>Open a Jump Point, Jump In a unit, or Pass.</li>
              <li>Turn order follows Initiative: the Initiative holder chooses who goes first.</li>
              <li>The phase ends once every player has passed in a row.</li>
            </ul>
+           <p class="learn-fn">All three are free. Some faction rules and commands add a cost of their own.</p>
+
            <h3 class="learn-sub">Jumping a unit in</h3>
            <ul class="learn-rules">
-             <li>The unit deploys wholly within 6" of a friendly Jump Point. The range is flat &mdash; it is not reduced by the unit's Mass.</li>
-             <li>Arriving does no damage to anything nearby. There is no Jump Shock in the core rules.</li>
-             <li>Jump Strain: a unit may only jump once per round. Jump In, Jump Hop or Jump Out &mdash; pick one.</li>
+             <li>The unit comes out of your Reserves and deploys wholly within 6" of a friendly Jump Point.</li>
+             <li>Unit coherence applies on arrival, exactly as it does after moving: every ship in the unit must end within 6" of every other ship in it.</li>
+             <li>Arriving is harmless to everything around it.</li>
+             <li>Jump Strain: each unit jumps once per round. Jump In, Jump Hop or Jump Out &mdash; pick one.</li>
              ${bullets(csStep("Special rules"), /^Rapid Ingress/)}
            </ul>
+           <p class="learn-fn">The 6" is a flat distance for every unit, whatever its Mass. Nothing takes damage from a ship arriving &mdash; the Jump Shock rule from first edition is not in these rules.</p>
            ${learnDiagram("jump-strain")}
+
            <h3 class="learn-sub">Placing a Jump Point</h3>
            <ul class="learn-rules">
-             <li>Jump Points are placed on the table and belong to the player who opened them.</li>
-             <li>Gravity Well: no Jump Point may be placed, and no jumping may happen, within 9" of a Planetoid.</li>
-             <li>Blockading an enemy Jump Point does not change who owns it, and does not stop its owner using it to Jump In or Jump Hop.</li>
+             <li>Jump Points sit on the table and belong to the player who opened them.</li>
+             <li>Gravity Well: a Jump Point must be more than 9" from a Planetoid, and no jumping happens inside that 9" either.</li>
+             <li>Blockading an enemy Jump Point scores you points, but the Jump Point still belongs to its owner and still works for them.</li>
            </ul>
            ${learnDiagram("gravity-well")}
+
            <h3 class="learn-sub">Leaving by jump</h3>
            <ul class="learn-rules">
              <li>Jump Hop: if all ships are within 6" of a friendly Jump Point, remove them and set up within 6" of a friendly Jump Point in another Sector.</li>
              <li>Jump Out: if all ships are within 6" of a friendly Jump Point, remove them to your Reserves.</li>
+             <li>Both count as the unit&rsquo;s one jump for the round, and both discard its Activated token.</li>
            </ul>`,
         )}
         ${phaseAccordion(
@@ -2887,7 +2913,14 @@ function learnView(state: AppState): string {
            <p class="learn-note">A lead unit plus unactivated units within 6" of it; Combined Mass 10 or less.</p>
            ${learnDiagram("drag-select")}
            <p class="learn-note">Then every unit in the battlegroup works through three steps, finishing each step before the next one starts.</p>
-           ${activationStep(0, learnDiagram("movement"))}
+           ${activationStep(
+             0,
+             `${learnDiagram("movement")}
+              <p class="learn-fn">A single pivot of more than 90&deg; costs this unit its Primary attacks for the activation (Inertial Strain). A unit that moved under 3" and did not jump becomes an Easy Target: enemies re-roll attack dice against it.</p>
+              <h4 class="learn-sub-min">Doubling your move</h4>
+              <p class="learn-note">Spend 1 CMD on <b>Power to Engines</b> at the start of a unit&rsquo;s movement step and it takes the whole step twice &mdash; pivot and move, then pivot and move again. It is the only way a ship covers more than its Thrust in one activation.</p>
+              ${learnDiagram("double-move")}`,
+           )}
            ${activationStep(
              1,
              `${learnDiagram("passive")}

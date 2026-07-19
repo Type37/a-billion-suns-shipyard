@@ -9,6 +9,20 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.73",
+    date: "2026-07-19",
+    title: "Second batch of tester fixes",
+    items: [
+      "Redrew the movement diagram. It had a curve across the middle of the frame, which read as though the ship travelled an arc — it does not. The turn is now a rotation marker on the start line and the travel is one straight rule to the Thrust mark.",
+      "Added the doubling. Power to Engines lets a unit take its whole movement step twice, and the walkthrough had never mentioned the one command that changes where a ship can physically reach. It has its own diagram now.",
+      "Filled in the Jump In rules that were missing: the unit comes out of Reserves, unit coherence applies on arrival exactly as it does after moving, Jump Hop and Jump Out both count as that unit’s one jump for the round, and turn order follows Initiative.",
+      "Stopped writing rules as denials. \"The range is flat — it is not reduced by the unit’s Mass\" only raises the question of why it would be. Qualifiers and \"this rule is not in these rules\" notes now sit under the list as footnotes, in a quieter voice.",
+      "Also added Inertial Strain and Easy Target to the movement step — both change how you move and neither was mentioned.",
+      "Play Mode puts your fleet above the command reference. The commands are a long block of rules text you consult occasionally; the fleet is what you look at constantly, and it was landing 1803 pixels down the page on a phone.",
+      "Grouped the builder header. Everything was one flat run of controls, so on a phone the ... menu wrapped onto a line by itself under the budget. It is three groups now: what the fleet is, what it is built from, what it costs.",
+    ],
+  },
+  {
     version: "0.8.72",
     date: "2026-07-19",
     title: "Mass is back, and the home page works again",

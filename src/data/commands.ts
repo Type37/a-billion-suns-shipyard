@@ -52,3 +52,42 @@ export const CORE_COMMANDS: CoreCommand[] = [
   { name: "Red Alert", cost: 1, phases: [2], text: "A friendly ship without an Activated token that would be destroyed is not; it regains 1HP. At the end of its next activation it drops to 0HP (no second Red Alert), unless it jumped out." },
   { name: "Requisition", cost: 1, shipyardOnly: true, phases: [1], text: "On your Jump In turn, form a new unit from Shipyard ships, pay their Credit cost, and jump them in as if from Reserves." },
 ];
+
+/** One phase of the round. Transcribed from the Quick Reference. */
+export interface RoundPhase {
+  name: string;
+  text: string;
+}
+
+/**
+ * The four phases of a round, verbatim from the Quick Reference. Kept as source
+ * text rather than paraphrased: a summary written from memory got the Tactical
+ * Phase wrong, describing an activation as "move, then fire any weapons whose
+ * arc covers a target" - which skips the Passive Attacks Step entirely and
+ * implies firing is automatic rather than one of the Actions you may choose.
+ */
+export const ROUND_PHASES: RoundPhase[] = [
+  {
+    name: "Command Phase",
+    text: "Gain CMD tokens (set by your faction). Make an Initiative Check: the winner picks who has Initiative; each loser gets +1 CMD token.",
+  },
+  {
+    name: "Jump Phase",
+    text: "Take turns. On your turn: Open a Jump Point, Jump In a unit (deploy within 6\" of a friendly Jump Point), or Pass. Ends when all players have passed.",
+  },
+  {
+    name: "Tactical Phase",
+    text: "Take turns. Drag to Select a battlegroup and activate it, finishing each step for every unit before the next. Give each activated unit an Activated token. Ends when all units have activated.",
+  },
+  {
+    name: "End Phase",
+    text: "Check mission scoring. Clear Activated tokens. Discard unused CMD tokens. Begin a new round.",
+  },
+];
+
+/** The three steps every unit works through when it activates. Quick Reference. */
+export const ACTIVATION_STEPS: RoundPhase[] = [
+  { name: "Movement Step", text: "Pivot any amount, then move ahead up to the Thrust value." },
+  { name: "Passive Attacks Step", text: "Suffer passive attacks from enemies in range and arc." },
+  { name: "Action Step", text: "Take one Action." },
+];

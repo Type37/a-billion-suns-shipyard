@@ -2434,7 +2434,9 @@ button { font-family: inherit; }
    Learn to Play: guided walkthrough
    --------------------------------------------------------------------------- */
 .flip-x { transform: scaleX(-1); }
-.learn-main { max-width: 920px; margin: 0 auto; padding: clamp(20px, 3vw, 34px) clamp(16px, 4vw, 40px) 72px; }
+/* #app > * sets max-width:100% and carries ID specificity, so a bare class
+   selector here loses to it and the page ran the full width of the glass. */
+#app > .learn-main { max-width: 780px; margin: 0 auto; padding: clamp(20px, 3vw, 34px) clamp(16px, 4vw, 40px) 72px; }
 
 /* Progress dots along the top */
 .learn-progress { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 28px; }
@@ -2468,15 +2470,20 @@ button { font-family: inherit; }
 .lf-arc { font-family: var(--sans); font-weight: 800; font-size: 10px; letter-spacing: 0.03em; }
 .lf-arc-pri { color: var(--blue); }
 .lf-arc-aux { color: var(--ink-3); }
-.learn-legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 13px; color: var(--ink-2); }
+.learn-legend {
+  list-style: disc; margin: 16px 0 0; padding-left: 20px;
+  display: grid; gap: 5px; font-size: 14px; line-height: 1.5; color: var(--ink-2); max-width: 56ch;
+}
+.learn-legend li::marker { color: var(--ink-3); }
+.learn-legend b { margin-right: 4px; }
 .learn-legend b { color: var(--ink); }
 
 /* Round phases */
-.learn-phases { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 20px; }
-.learn-phase { border: 1px solid var(--hair); border-top: 3px solid var(--blue); padding: 14px 16px; }
-.learn-phase .lp-n { font-family: var(--display); font-weight: 900; font-size: 13px; color: var(--blue); }
-.learn-phase b { display: block; font-family: var(--display); font-weight: 800; font-size: 15px; margin: 2px 0 5px; color: var(--ink); }
-.learn-phase span:last-child { font-size: 13px; line-height: 1.45; color: var(--ink-2); }
+.learn-phases { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 8px; max-width: 68ch; }
+.learn-phase { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 10px; align-items: start; border: 1px solid var(--hair); border-left: 3px solid var(--blue); padding: 10px 14px; }
+.learn-phase .lp-n { font-family: var(--display); font-weight: 900; font-size: 16px; line-height: 1.35; color: var(--blue); }
+.learn-phase b { display: block; font-family: var(--display); font-weight: 800; font-size: 14px; margin: 0 0 3px; color: var(--ink); }
+.learn-phase div > span { display: block; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
 
 /* Split: diagram + victory points */
 .learn-split { display: grid; grid-template-columns: minmax(240px, 1fr) 1fr; gap: 28px; align-items: center; }
@@ -2859,4 +2866,20 @@ a .icon,
 @media (max-width: 560px) {
   .frule { grid-template-columns: 1fr; }
   .frule-vitals { flex-direction: row; gap: 20px; }
+}
+
+
+/* Learn to Play: a sub-heading, a quiet note, and the link out to the source. */
+.learn-sub { font-family: var(--display); font-weight: 800; font-size: 18px; margin: 26px 0 4px; color: var(--ink); }
+.learn-note { font-size: 13.5px; line-height: 1.5; color: var(--ink-2); max-width: 62ch; margin: 0; }
+.learn-ref { margin-top: 20px; }
+.learn-ref a { display: inline-flex; align-items: center; gap: 7px; font-family: var(--sans); font-weight: 700; font-size: 13px; color: var(--blue); }
+.learn-phases-steps .learn-phase { border-left-color: var(--red); }
+
+/* Nothing on a wide monitor should run the full width of the glass. Same
+   specificity problem as above for anything that is a direct child of #app. */
+#app > .print-page { max-width: 1000px; margin-left: auto; margin-right: auto; }
+#app > .solo-body { max-width: 1240px; margin-left: auto; margin-right: auto; }
+.solo-body, .setup-band > .setup-head, .workspace, .mf-body {
+  max-width: 1240px; margin-left: auto; margin-right: auto;
 }

@@ -9,6 +9,18 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.64",
+    date: "2026-07-18",
+    title: "Learn to Play says what the rules say",
+    items: [
+      "Corrected the round page. It described an activation as \"move each ship up to its Thrust, then fire any weapons whose arc covers a target\", which is wrong: it skips the Passive Attacks Step and makes firing sound automatic when Open Fire is one Action you may choose. The phases are now the Quick Reference’s own text, and the third one is the Tactical Phase, not \"Battle\".",
+      "Added the three activation steps: Movement, Passive Attacks, Action.",
+      "Learn to Play links out to the Quick Reference PDF.",
+      "The ship stat glossary is a bullet list.",
+      "Pages no longer run the full width of a wide monitor. Learn to Play holds a readable measure, and Play Mode, the print page and the builder all have a ceiling.",
+    ],
+  },
+  {
     version: "0.8.63",
     date: "2026-07-18",
     title: "One shape for a faction rule",

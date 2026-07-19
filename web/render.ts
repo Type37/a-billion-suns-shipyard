@@ -4,7 +4,7 @@ import { validateFleet, type ValidationIssue } from "../src/validation.ts";
 import { GENERIC_HVP } from "../src/data/index.ts";
 import { JUNKSPACE_SHIPS } from "../src/data/junkspace.ts";
 import { TRAINING_FLEET } from "../src/data/training-fleet.ts";
-import { CORE_ACTIONS, CORE_COMMANDS } from "../src/data/commands.ts";
+import { ACTIVATION_STEPS, CORE_ACTIONS, CORE_COMMANDS, ROUND_PHASES } from "../src/data/commands.ts";
 import { deriveCommandEffects, effectiveCost } from "../src/command-effects.ts";
 import type { CommandCostChange, CommandEffects, RuleSource } from "../src/command-effects.ts";
 import { allFactions, factionsByEra, findFaction, makeCatalog, ERA_ORDER } from "./catalog.ts";
@@ -2680,27 +2680,39 @@ function learnView(state: AppState): string {
       <h1 class="learn-title">The Training Fleet</h1>
       <p class="learn-lede">This is your ready-made fleet for the tutorial &mdash; real ships with real stats. You'll read a ship by four numbers and its weapons.</p>
       ${learnFleetTable()}
-      <div class="learn-legend">
-        <span><b>Mass</b> how big &amp; how many it can carry</span>
-        <span><b>Thrust</b> how far it moves, in inches</span>
-        <span><b>Sil</b> its hit die and its starting HP</span>
-        <span><b>Shields</b> damage soaked each hit</span>
-        <span><span class="lf-arc lf-arc-pri">PRI</span> narrow 45&deg; cone ahead</span>
-        <span><span class="lf-arc lf-arc-aux">AUX</span> full 180&deg; front arc</span>
-      </div>
+      <ul class="learn-legend">
+        <li><b>Mass</b> how big &amp; how many it can carry</li>
+        <li><b>Thrust</b> how far it moves, in inches</li>
+        <li><b>Sil</b> its hit die and its starting HP</li>
+        <li><b>Shields</b> damage soaked each hit</li>
+        <li><span class="lf-arc lf-arc-pri">PRI</span> narrow 45&deg; cone ahead</li>
+        <li><span class="lf-arc lf-arc-aux">AUX</span> full 180&deg; front arc</li>
+      </ul>
     </div>`,
-    // 2 - The round
+    // 2 - The round. Phase names and wording come from ROUND_PHASES /
+    // ACTIVATION_STEPS, which are transcribed from the Quick Reference rather
+    // than summarised - a hand-written summary here previously called the
+    // Tactical Phase "Battle" and described an activation as move-then-shoot,
+    // which omits the Passive Attacks Step and makes firing sound automatic.
     `<div class="learn-screen">
       <p class="learn-eyebrow">Step 3 &middot; How a round works</p>
-      <h1 class="learn-title">Move, then shoot</h1>
-      <p class="learn-lede">Each of the four rounds runs through the same phases. The heart of it is activating a battlegroup: move each ship up to its Thrust, then fire any weapons whose arc covers a target.</p>
+      <h1 class="learn-title">The round</h1>
+      <ol class="learn-phases">
+        ${ROUND_PHASES.map(
+          (p, i) =>
+            `<li class="learn-phase"><span class="lp-n">${i + 1}</span><div><b>${escapeHtml(p.name)}</b><span>${escapeHtml(p.text)}</span></div></li>`,
+        ).join("")}
+      </ol>
+      <h2 class="learn-sub">Activating a unit</h2>
+      <p class="learn-note">In the Tactical Phase, every unit in the battlegroup finishes each step before the next one starts.</p>
+      <ol class="learn-phases learn-phases-steps">
+        ${ACTIVATION_STEPS.map(
+          (p, i) =>
+            `<li class="learn-phase"><span class="lp-n">${i + 1}</span><div><b>${escapeHtml(p.name)}</b><span>${escapeHtml(p.text)}</span></div></li>`,
+        ).join("")}
+      </ol>
       ${learnActivationDemo()}
-      <div class="learn-phases">
-        <div class="learn-phase"><span class="lp-n">1</span><b>Command</b><span>Gain command tokens to spend on special orders.</span></div>
-        <div class="learn-phase"><span class="lp-n">2</span><b>Jump</b><span>Jump reserve ships into play at your jump points.</span></div>
-        <div class="learn-phase"><span class="lp-n">3</span><b>Battle</b><span>Take turns activating battlegroups: move, then shoot.</span></div>
-        <div class="learn-phase"><span class="lp-n">4</span><b>End</b><span>Score objectives, then start the next round.</span></div>
-      </div>
+      <p class="learn-note learn-ref"><a href="./ABS-2E-Quick-Reference.pdf" target="_blank" rel="noopener">${icon("scroll", 15)} Read the full Quick Reference (PDF)</a></p>
     </div>`,
     // 3 - The table
     `<div class="learn-screen">

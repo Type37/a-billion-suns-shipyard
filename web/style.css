@@ -1027,7 +1027,7 @@ button { font-family: inherit; }
 /* Cards are cut out and held at the table, so they are dense by design: the
    layout is name + count with cost, a 2x2 stat block, then each weapon as its
    arc and name over its figures. */
-.print-card { border: 1px solid var(--ink); padding: 6px 8px; break-inside: avoid; page-break-inside: avoid; }
+.print-card { border: 1px solid var(--hair); padding: 6px 8px; break-inside: avoid; page-break-inside: avoid; }
 .pc-head { display: flex; align-items: baseline; gap: 6px; border-bottom: 1px solid var(--hair); padding-bottom: 3px; margin-bottom: 4px; }
 .pc-name { font-family: var(--display); font-weight: 800; font-size: 14px; line-height: 1.15; flex: 1; }
 .pc-x { font-weight: 900; color: var(--blue); }
@@ -1083,11 +1083,11 @@ button { font-family: inherit; }
 .print-page { max-width: 940px; margin: 0 auto; padding: 20px; width: 100%; min-width: 0; }
 .print-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; }
 
-.sheet { background: #fff; border: 1px solid var(--ink); padding: clamp(16px, 2.4vw, 26px); }
-.sheet-head { display: flex; align-items: center; gap: 12px; padding-bottom: 6px; border-bottom: 2px solid var(--ink); }
+.sheet { background: #fff; border: 1px solid var(--hair); padding: clamp(14px, 2vw, 22px); }
+.sheet-head { display: flex; align-items: center; gap: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--ink-3); }
 .sheet-emblem { color: var(--blue); flex-shrink: 0; }
 .sheet-title-block { flex: 1; }
-.sheet-title { font-family: var(--display); font-weight: 900; font-size: clamp(22px, 3.4vw, 32px); letter-spacing: -0.02em; text-transform: uppercase; line-height: 0.95; }
+.sheet-title { font-family: var(--display); font-weight: 800; font-size: clamp(19px, 2.8vw, 26px); letter-spacing: -0.02em; text-transform: uppercase; line-height: 0.98; }
 .sheet-subtitle { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-top: 4px; }
 .sheet-totals { text-align: right; }
 .sheet-total-line { font-family: var(--display); font-weight: 800; font-size: 20px; font-variant-numeric: tabular-nums; }
@@ -1102,14 +1102,14 @@ button { font-family: inherit; }
    tokens beside it. Read at the top of every round, so it is the one thing on
    the sheet worth setting large. */
 .sheet-vitals { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 8px 0 4px; }
-.sv-item { display: flex; flex-direction: column; gap: 5px; padding: 8px 11px; border: 1px solid var(--hair); background: var(--blue-wash); }
+.sv-item { display: flex; flex-direction: column; gap: 4px; padding: 6px 9px; border: 1px solid var(--hair); background: none; }
 .sv-label { font-family: var(--sans); font-size: 9px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); }
 .sv-figure { display: flex; align-items: center; gap: 9px; min-height: 20px; }
 .sv-value { font-family: var(--display); font-weight: 800; font-size: 20px; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
 .sv-figure .dice-row { gap: 3px; }
 .is-inksaver .sv-item { background: none; }
 .sheet-section { font-family: var(--display); font-size: 12px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink); background: none; padding: 0 0 2px; margin: 10px 0 5px; border-bottom: 1px solid var(--ink); }
-.print-rule { margin-top: 7px; border-left: 2px solid var(--blue); padding: 1px 0 1px 9px; }
+.print-rule { margin-top: 7px; border-left: 1px solid var(--ink-3); padding: 1px 0 1px 9px; }
 .print-rule h3 { font-family: var(--display); font-size: 14px; margin-bottom: 3px; }
 .print-rule p { font-family: var(--serif); font-size: 12px; line-height: 1.32; }
 
@@ -1164,7 +1164,7 @@ button { font-family: inherit; }
 .pr-track-ship:last-child { margin-bottom: 0; }
 .pr-req { width: 74px; }
 .pr-req-box { display: inline-block; width: 13px; height: 13px; border: 1px solid var(--ink-2); margin: 0 3px 3px 0; }
-.print-roster tfoot td { border-top: 1.5px solid var(--ink); padding: 4px 5px; font-weight: 800; }
+.print-roster tfoot td { border-top: 1px solid var(--ink-3); padding: 4px 5px; font-weight: 700; }
 .pr-total-label { text-align: right; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
 
 .print-unit { margin-bottom: 18px; border: 1px solid var(--ink); break-inside: avoid; }
@@ -1180,7 +1180,7 @@ button { font-family: inherit; }
 .print-weapons td { font-family: var(--serif); font-size: 13px; }
 .print-note { font-size: 12px; color: var(--ink-2); padding: 6px 14px; font-style: italic; }
 
-.print-hvp { border-left: 2px solid var(--red); padding: 1px 0 1px 9px; margin-bottom: 5px; break-inside: avoid; }
+.print-hvp { border-left: 1px solid var(--ink-3); padding: 1px 0 1px 9px; margin-bottom: 5px; break-inside: avoid; }
 .print-hvp h4 { font-family: var(--display); font-size: 12.5px; margin-bottom: 1px; }
 .print-hvp p { font-family: var(--serif); font-size: 11.5px; line-height: 1.3; }
 .print-hvp-slot { font-family: var(--sans); font-size: 10px; font-weight: 600; letter-spacing: 0.02em; color: var(--ink-3); text-transform: none; }
@@ -1206,8 +1206,8 @@ button { font-family: inherit; }
 .ref-subpoints li::before { content: "\2022"; position: absolute; left: 2px; color: var(--blue); }
 .print-guide-intro { font-family: var(--serif); font-size: 14px; line-height: 1.55; margin-bottom: 16px; }
 
-.print-score th, .print-score td { border: 1px solid var(--ink-3); padding: 5px 8px; font-size: 12px; }
-.print-score thead th { background: none; color: var(--ink); border-bottom: 2px solid var(--ink); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; text-align: center; }
+.print-score th, .print-score td { border: 1px solid var(--hair); padding: 4px 7px; font-size: 11px; }
+.print-score thead th { background: none; color: var(--ink-2); border-bottom: 1px solid var(--ink-3); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; text-align: center; }
 .print-score tbody th { text-align: left; font-weight: 700; background: none; }
 .print-score tbody td { height: 26px; }
 .sheet-foot { margin-top: 16px; padding-top: 8px; border-top: 1px solid var(--hair-soft); font-size: 10px; color: var(--ink-3); }
@@ -1354,7 +1354,15 @@ button { font-family: inherit; }
    now - everything below it (Counters, Initiative, Scoring) is either a
    once-in-a-while tool or pure reference. A tinted background and a blue
    accent edge give it a visual claim the plain cards below don't have. */
-.phase-checklist { margin-top: 14px; max-width: 62ch; background: var(--blue-wash); border-left: 3px solid var(--blue); padding: 14px 18px; }
+/* Reserve the height of the longest phase (five steps). The phases run three to
+   five steps, so without this the block resized by up to 68px on every change -
+   and "Next phase", the button you press every single turn, moved out from under
+   the pointer that had just pressed it. A little slack beats a moving target. */
+.phase-checklist {
+  margin-top: 14px; max-width: 62ch; background: var(--blue-wash);
+  border-left: 3px solid var(--blue); padding: 14px 18px;
+  min-height: 227px;
+}
 .phase-checklist-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-bottom: 6px; }
 .phase-checklist-title { font-family: var(--display); font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink); }
 .phase-checklist-count { font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
@@ -2756,3 +2764,25 @@ a .icon,
 .print-card .stat-chips { gap: 2px 10px; }
 .print-card .stat-chip { border: none; padding: 0; font-size: 11px; }
 .print-card .stat-lbl { font-size: 8.5px; }
+
+
+/* Generic personnel are the shared pool every fleet can draw on; the faction's
+   own are the distinctive ones. Printing both in the same black made a page of
+   twelve read as undifferentiated. Generic sits back in grey. */
+.print-hvp.is-generic h4,
+.print-hvp.is-generic p { color: var(--ink-3); }
+.print-hvp.is-generic { border-left-color: var(--hair); }
+
+/* Less ink overall. The sheet is a working document, not a poster: hairline
+   rules, no solid fills, and the blue accents dropped to ink where they were
+   only decoration. */
+.sheet .print-ref-cost { color: var(--ink-2); }
+.sheet .pr-cost { color: var(--ink-2); }
+.sheet .pc-x, .sheet .pr-unit-x { color: var(--ink-2); }
+.sheet .print-ref-mod { color: var(--ink-3); }
+.sheet .slot-arc { color: var(--ink-3); }
+.sheet .stat-ico { color: var(--ink-3); }
+.sheet .credits-glyph { color: var(--ink-2); }
+
+/* The firing-arcs reference, below the controls rather than among them. */
+.play-arcs { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--hair-soft); }

@@ -9,6 +9,18 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.60",
+    date: "2026-07-18",
+    title: "Play Mode holds still; the sheet uses less ink",
+    items: [
+      "Play Mode no longer moves under you. The firing-arcs diagram only exists in the Tactical phase, and it sat among the controls — a 591 pixel block appearing and vanishing, which threw the counters and the Next phase button up to 433 pixels up or down the page every time you changed phase. Reference material now sits below the controls, and the checklist reserves the height of its longest phase. Pressing Next phase five times in a row now moves nothing at all.",
+      "Removed the Units, Actions & commands and Available High-Value Personnel headings from both print layouts. Each was a full-width rule across the page labelling something already obvious.",
+      "Generic personnel print in grey, the faction's own in black. Twelve blocks in the same black read as one undifferentiated wall.",
+      "Removed the legality check from the printed sheet. It is a build-time question; at the table the list is already what it is.",
+      "Less ink throughout: hairline rules instead of heavy black ones, no solid fills, and the blue accents dropped back to ink where they were only decoration.",
+    ],
+  },
+  {
     version: "0.8.59",
     date: "2026-07-18",
     title: "Print cards rebuilt to the sketch",

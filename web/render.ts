@@ -1561,7 +1561,7 @@ function printView(state: AppState): string {
            "")
         : "";
       return `
-      <section class="print-hvp">
+      <section class="print-hvp ${GENERIC_HVP.some((g) => g.id === sel.hvpId) ? "is-generic" : ""}">
         <h4>${escapeHtml(displayName)} <span class="print-hvp-slot">${carrier ? `starts on ${escapeHtml(carrier)}` : "carrier: _______________"}</span></h4>
         <p>${ruleText(def.rule)}</p>
       </section>`;
@@ -1575,10 +1575,13 @@ function printView(state: AppState): string {
   // per unit, which is where the assignment is actually written and amended, so
   // a second blank on each of these twelve blocks was twelve lines of ink
   // recording the same thing in a worse place.
+  // Generic personnel are the shared pool; the faction's own are the ones worth
+  // reading first. Printed in the same black, twelve blocks read as one
+  // undifferentiated wall, so the generics sit back in grey.
   const availableHvpBlocks = availableHvp
     .map(
       (def) => `
-      <section class="print-hvp">
+      <section class="print-hvp ${GENERIC_HVP.some((g) => g.id === def.id) ? "is-generic" : ""}">
         <h4>${escapeHtml(def.name)}</h4>
         <p>${ruleText(def.rule)}</p>
       </section>`,
@@ -1632,7 +1635,6 @@ function printView(state: AppState): string {
     : "";
 
   const commandsSection = `
-      <h2 class="sheet-section">Actions &amp; commands</h2>
       <div class="print-ref-cols">
         <div class="print-ref-col">
           <h4 class="print-ref-h">Actions <span class="print-ref-sub">one per activation</span></h4>
@@ -1693,7 +1695,7 @@ function printView(state: AppState): string {
         </div>
         <div class="sheet-totals">
           <p class="sheet-total-line">${credits(total)}${list.mode === "hypergrowth" && list.unlimitedShipyards ? " · unlimited shipyard" : ` of ${credits(list.fleet.creditsLimit)}`}</p>
-          <p class="sheet-count">${list.fleet.units.length} ${list.fleet.units.length === 1 ? "unit" : "units"}${printIssues === null ? "" : printIssues === 0 ? ` · <span class="sheet-legal">Legal</span>` : ` · <span class="sheet-illegal">${printIssues} to resolve</span>`}</p>
+          <p class="sheet-count">${list.fleet.units.length} ${list.fleet.units.length === 1 ? "unit" : "units"}</p>
         </div>
       </header>
 
@@ -1732,7 +1734,7 @@ function printView(state: AppState): string {
       ${
         opts.format === "guide" && guideAvailable
           ? `<h2 class="sheet-section">How to play</h2>${trainingPrintBlocks(list.mode)}`
-          : `<h2 class="sheet-section">${isShipyard ? "Shipyard" : "Units"}</h2>${(opts.format === "cards" ? cardBlocks : unitBlocks) || '<p class="print-note">No units.</p>'}`
+          : `${(opts.format === "cards" ? cardBlocks : unitBlocks) || '<p class="print-note">No units.</p>'}`
       }
 
       ${
@@ -1747,9 +1749,9 @@ function printView(state: AppState): string {
 
       ${
         isUnity
-          ? `<h2 class="sheet-section">Available High-Value Personnel</h2><p class="print-note">Assign these to the HVP column above once your missions are generated. ${HVP_MECHANICS}</p>${availableHvpBlocks}`
+          ? `<p class="print-note">Assign these to the HVP column above once your missions are generated. ${HVP_MECHANICS}</p>${availableHvpBlocks}`
           : hvpBlocks
-            ? `<h2 class="sheet-section">High-Value Personnel</h2><p class="print-note">${HVP_MECHANICS}</p>${hvpBlocks}`
+            ? `<p class="print-note">${HVP_MECHANICS}</p>${hvpBlocks}`
             : ""
       }
 
@@ -2265,14 +2267,7 @@ function playView(state: AppState): string {
         <span class="phase-checklist-count">${doneCount} of ${currentPhase?.steps.length ?? 0}</span>
       </div>
       ${checklistHtml}
-      ${
-        play.phase === 2
-          ? `<p class="phase-diagram-caption">Primary weapons only fire in the narrow cone dead ahead; auxiliary weapons cover the whole front half.</p>${tacticalDiagram("arcs")}`
-          : ""
-      }
     </div>
-
-    ${playCommandsPanel(list, play.phase, play.cmd, faction)}
 
     <div class="solo-grid" style="margin-top:20px">
       <section class="solo-card solo-card-primary">
@@ -2306,6 +2301,25 @@ function playView(state: AppState): string {
         ${faction ? `<h4 class="ref-sub">${escapeHtml(faction.rule.name)}</h4><p class="rule-card-text">${ruleText(faction.rule.text)}</p>` : ""}
       </section>
     </div>
+
+    ${
+      // Reference material lives below the controls, deliberately. Both of these
+      // change size with the phase - the command list runs from one card to
+      // seven, and the arcs diagram is a 591px block that only the Tactical
+      // phase has - and while they sat above the counters and the Next phase
+      // button, every phase change threw those up to 433px up or down the page.
+      // That is what made Play Mode feel like it moved under you. Nothing the
+      // player presses now sits below anything that resizes.
+      playCommandsPanel(list, play.phase, play.cmd, faction)
+    }
+    ${
+      play.phase === 2
+        ? `<section class="play-arcs">
+             <p class="phase-diagram-caption">Primary weapons only fire in the narrow cone dead ahead; auxiliary weapons cover the whole front half.</p>
+             ${tacticalDiagram("arcs")}
+           </section>`
+        : ""
+    }
   </main>
   ${toast(state)}
   ${footer()}`;

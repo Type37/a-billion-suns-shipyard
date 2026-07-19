@@ -2609,17 +2609,17 @@ button { font-family: inherit; }
 .em-foot .em-done { margin-left: auto; }
 
 /* Play Mode: the commands legal in the current phase, with cost and full text. */
-.pc-cmds { margin-top: 20px; border: 1px solid var(--hair); background: var(--paper); padding: 16px 18px; }
-.pc-cmds-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.pc-cmds { margin-top: 20px; border: 1px solid var(--hair); background: var(--paper); padding: 11px 13px; }
+.pc-cmds-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
 .pc-cmds-left { font-family: var(--display); font-weight: 800; font-size: 14px; color: var(--blue); font-variant-numeric: tabular-nums; }
 .pc-cmds-left.is-out { color: var(--red-deep); }
-.pc-cmd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
-.pc-cmd { border: 1px solid var(--hair-soft); border-left: 3px solid var(--blue); background: var(--ground); padding: 10px 12px; }
+.pc-cmd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 6px; }
+.pc-cmd { border: 1px solid var(--hair-soft); border-left: 2px solid var(--blue); background: var(--ground); padding: 6px 9px; }
 .pc-cmd.is-short { border-left-color: var(--hair); opacity: 0.55; }
 .pc-cmd-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-.pc-cmd-name { font-family: var(--display); font-weight: 800; font-size: 14px; color: var(--ink); margin: 0; }
+.pc-cmd-name { font-family: var(--display); font-weight: 800; font-size: 13px; color: var(--ink); margin: 0; }
 .pc-cmd-cost { font-family: var(--sans); font-weight: 800; font-size: 10px; color: var(--blue); white-space: nowrap; }
-.pc-cmd-text { font-family: var(--serif); font-size: 12.5px; line-height: 1.4; color: var(--ink-2); margin: 4px 0 0; }
+.pc-cmd-text { font-family: var(--serif); font-size: 11.5px; line-height: 1.34; color: var(--ink-2); margin: 2px 0 0; }
 .pc-cmd-note { font-size: 11.5px; font-style: italic; color: var(--ink-3); margin: 10px 0 0; }
 /* Where a command came from, or what one of your rules does to it. */
 .pc-cmd-from { display: block; font-size: 11px; color: var(--red); margin-top: 4px; }
@@ -2992,3 +2992,44 @@ a .icon,
 .learn-substep a:hover { border-color: var(--blue); color: var(--blue); }
 .learn-substep b { font-family: var(--display); font-weight: 800; font-size: 13px; }
 .learn-substep span { font-size: 12px; color: var(--ink-3); }
+
+/* Passive attacks: the mover runs down its path and the shots only land once it
+   is inside the arc, so the timing of the two animations is the explanation. */
+.learn-dg .dg-arc-aux { fill: var(--red); fill-opacity: 0.11; }
+.learn-dg .dg-path { fill: none; stroke: var(--hair); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.learn-dg .dg-enemy-away { opacity: 0.5; }
+.learn-dg .dg-mini-arc { fill: var(--red); }
+@keyframes dg-passive-move {
+  0%, 10% { transform: translate(300px, 150px); }
+  55%, 100% { transform: translate(134px, 104px); }
+}
+@keyframes dg-passive-fire {
+  0%, 52% { opacity: 0; }
+  60% { opacity: 1; }
+  92%, 100% { opacity: 0; }
+}
+.learn-dg .dg-passive-mover { animation: dg-passive-move 3200ms ease-in-out infinite; }
+.learn-dg .dg-passive-shots line { animation: dg-passive-fire 3200ms linear infinite; stroke-dasharray: none; }
+.learn-dg .dg-pshot-2 { animation-delay: 120ms; }
+
+/* ------------------------------------------------------------ play mode layout
+
+   Two columns so the turn loop fits one screen. It was 1.81 screens tall with
+   the checklist, the counters, Next phase and the command list at 290 / 554 /
+   773 / 1095px - four things you touch every turn, none of them visible at the
+   same time. Left is what you are doing, right is what you are spending. */
+.play-cols { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 16px 26px; align-items: start; margin-top: 14px; }
+.play-col { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.play-cols .phase-checklist { margin-top: 0; max-width: none; }
+.play-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.play-actions .cta-btn { flex: 1 1 auto; justify-content: center; }
+.play-cols .pc-cmds { margin-top: 0; }
+.play-cols .play-counters { margin: 0; }
+.play-ref { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--hair-soft); display: flex; flex-direction: column; gap: 14px; }
+.play-reset { display: flex; }
+.play-arcs { margin-top: 0; padding-top: 0; border-top: none; }
+/* The masthead was 137px of mostly title; it only needs to say where you are. */
+.setup-band .page-title { font-size: clamp(20px, 2.6vw, 26px); }
+@media (max-width: 900px) {
+  .play-cols { grid-template-columns: 1fr; }
+}

@@ -113,26 +113,45 @@ function movementDiagram(): string {
 }
 
 /**
- * Passive Attacks Step: having moved, the unit suffers fire from any enemy
- * whose range and arc already cover it. Nothing the moving player chooses -
- * which is exactly the step a move-then-shoot summary loses.
+ * Passive Attacks Step. The rule is specific and the old drawing was not: a
+ * passive (unactivated) enemy fires when an active unit moves THROUGH or ENDS
+ * IN the range and arc of its AUXILIARY weapons - the 180 degree front arc, not
+ * a generic wedge. So the diagram has to show the movement causing it: your
+ * unit's path starts clear of the arc and ends inside it, and the shots only
+ * appear once it is in there. A second enemy is drawn facing away, in range but
+ * arc-excluded, because "in range AND arc" is two conditions and a picture with
+ * one enemy cannot show that.
  */
 function passiveDiagram(): string {
   return `
-  <svg class="learn-dg" viewBox="0 0 320 150" role="img"
-       aria-label="Passive Attacks Step: enemies whose range and arc cover the unit fire on it automatically.">
-    ${LABEL(160, 16, "Enemies in range and arc fire", "dg-title")}
-    <g transform="translate(66 96)">
-      <path class="dg-arc-fill" d="M0 0 L58 -34 A67 67 0 0 1 58 34 Z"/>
+  <svg class="learn-dg" viewBox="0 0 340 186" role="img"
+       aria-label="Passive Attacks Step: an unactivated enemy fires its auxiliary weapons at your unit when your unit moves through or ends inside that enemy's 180 degree auxiliary arc. An enemy facing away does not fire, even in range.">
+    ${LABEL(170, 15, "Move into an enemy's AUX arc and it fires", "dg-title")}
+
+    <!-- Passive enemy, facing right: its auxiliary arc is the 180 degrees ahead. -->
+    <g transform="translate(74 104)">
+      <path class="dg-arc-fill dg-arc-aux" d="M0 -72 A72 72 0 0 1 0 72 Z"/>
       ${SHIP(0, 0, 90, "dg-ship dg-enemy")}
+      ${LABEL(0, 30, "passive", "dg-mini")}
     </g>
-    ${SHIP(214, 96, -90, "dg-ship dg-target")}
-    <g class="dg-shots">
-      <line class="dg-shot dg-shot-1" x1="80" y1="92" x2="204" y2="92"/>
-      <line class="dg-shot dg-shot-2" x1="80" y1="100" x2="204" y2="100"/>
+    ${LABEL(120, 52, 'AUX 180°', "dg-mini dg-mini-arc")}
+
+    <!-- Your unit's path: begins outside the arc, ends inside it. -->
+    <path class="dg-path" d="M300 150 L196 118 L134 104"/>
+    <g class="dg-passive-mover">${SHIP(0, 0, -110, "dg-ship")}</g>
+    ${LABEL(300, 168, "your unit moves", "dg-mini")}
+
+    <!-- Fire only once the mover is inside the arc. -->
+    <g class="dg-passive-shots">
+      <line class="dg-shot dg-pshot-1" x1="88" y1="100" x2="128" y2="102"/>
+      <line class="dg-shot dg-pshot-2" x1="88" y1="108" x2="128" y2="108"/>
     </g>
-    ${LABEL(66, 126, "enemy", "dg-mini")}
-    ${LABEL(214, 126, "your unit", "dg-mini")}
+
+    <!-- In range, but facing away: no arc, no attack. -->
+    <g transform="translate(232 48)">
+      ${SHIP(0, 0, -90, "dg-ship dg-enemy dg-enemy-away")}
+      ${LABEL(0, 26, "facing away — no shot", "dg-mini dg-mini-out")}
+    </g>
   </svg>`;
 }
 

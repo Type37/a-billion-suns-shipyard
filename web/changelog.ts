@@ -9,6 +9,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.67",
+    date: "2026-07-18",
+    title: "Passive attacks explained; Play Mode fits a screen",
+    items: [
+      "Redrew the passive attacks diagram. The old one had an enemy and a target side by side with a vague wedge between them, which showed nothing: the rule is that a passive enemy fires when your unit moves through or ends inside the arc of its AUXILIARY weapons — the 180 degree front arc. Your unit now travels a path that starts clear of the arc and ends inside it, and the shots only fire once it is in there. A second enemy sits in range but facing away and never fires, because “in range AND arc” is two conditions.",
+      "Explained what the step actually means, under the step: it triggers on moving through or ending in the arc, only unactivated enemies fire, auxiliary weapons only, once per enemy unit per activation of your battlegroup, only units that moved can be hit, and facilities have a 360 degree arc so they always fire.",
+      "Play Mode fits a screen. The checklist, counters, Next phase and the command list sat at 290, 554, 773 and 1095 pixels down the page — four things you touch every turn, never visible together. It is two columns now: what you are doing on the left, what you are spending on the right, reference below. 1.81 screens of scrolling down to 1.53, and the command list is a third shorter.",
+    ],
+  },
+  {
     version: "0.8.66",
     date: "2026-07-18",
     title: "Every command, always",

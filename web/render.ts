@@ -2218,6 +2218,14 @@ function playView(state: AppState): string {
 
   const notes = (SCORING_NOTES[list.mode] ?? []).map((n) => `<li>${escapeHtml(n)}</li>`).join("");
 
+  const checklistBlock = `<div class="phase-checklist">
+      <div class="phase-checklist-head">
+        <h3 class="phase-checklist-title">${escapeHtml(currentPhase?.name ?? "")}</h3>
+        <span class="phase-checklist-count">${doneCount} of ${currentPhase?.steps.length ?? 0}</span>
+      </div>
+      ${checklistHtml}
+    </div>`;
+
   return `
   ${topbar()}
   <section class="setup-band">
@@ -2230,62 +2238,53 @@ function playView(state: AppState): string {
   </section>
   <main class="solo-body">
     <div class="phase-track">${phaseBtns}</div>
-    <div class="phase-checklist">
-      <div class="phase-checklist-head">
-        <h3 class="phase-checklist-title">${escapeHtml(currentPhase?.name ?? "")}</h3>
-        <span class="phase-checklist-count">${doneCount} of ${currentPhase?.steps.length ?? 0}</span>
+    <!--
+      Two columns, because the turn loop was spread over 1.81 screens: the
+      checklist at 290px, the counters at 554, Next phase at 773 and the command
+      list at 1095 - entirely below the fold. You were scrolling between the four
+      things you touch on every single turn. Left column is what you are doing,
+      right column is what you are spending; reference sits below both.
+    -->
+    <div class="play-cols">
+      <div class="play-col play-col-do">
+        ${checklistBlock}
+        <div class="play-actions">
+          <button class="cta-btn" data-action="play-next">${icon("chevronRight", 16)} Next phase</button>
+          <button class="ghost-btn" data-action="play-initiative" data-dice="${faction ? escapeHtml(faction.initiative) : "3D6"}">${icon("die", 15)} Roll ${faction ? escapeHtml(faction.initiative) : "3D6"}</button>
+        </div>
+        ${
+          last && last.table.startsWith("Initiative check")
+            ? `<div class="roll-result"><div class="roll-die">${last.value}</div><div class="roll-body"><p class="roll-table">${escapeHtml(last.table)}</p><p class="roll-headline">${escapeHtml(last.result)}</p>${last.detail ? `<p class="roll-detail">${escapeHtml(last.detail)}</p>` : ""}</div></div>`
+            : ""
+        }
       </div>
-      ${checklistHtml}
-    </div>
 
-    <div class="solo-grid" style="margin-top:20px">
-      <section class="solo-card solo-card-primary">
+      <div class="play-col play-col-spend">
         <div class="play-counters">
           ${counter("Round", play.round, "play-round")}
           ${counter("CMD tokens", play.cmd, "play-cmd")}
           ${counter(scoreLabel, play.vp, "play-vp")}
           ${counter("Opponent " + scoreLabel.toLowerCase(), play.oppVp, "play-oppvp")}
         </div>
-        <div class="roster-actions" style="padding:14px 0 0">
-          <button class="cta-btn" data-action="play-next">${icon("chevronRight", 16)} Next phase</button>
-          <button class="ghost-btn danger" data-action="play-reset">Reset the game</button>
-        </div>
-      </section>
-
-      <section class="solo-card solo-card-quiet">
-        <button class="bar-btn" data-action="play-initiative" data-dice="${faction ? escapeHtml(faction.initiative) : "3D6"}">Roll ${faction ? escapeHtml(faction.initiative) : "3D6"}</button>
-        ${
-          last && last.table.startsWith("Initiative check")
-            ? `<div class="roll-result"><div class="roll-die">${last.value}</div><div class="roll-body"><p class="roll-table">${escapeHtml(last.table)}</p><p class="roll-headline">${escapeHtml(last.result)}</p>${last.detail ? `<p class="roll-detail">${escapeHtml(last.detail)}</p>` : ""}</div></div>`
-            : ""
-        }
-      </section>
-
-      <section class="solo-card solo-card-quiet">
-        ${notes ? `<ul class="rule-list">${notes}</ul>` : '<p class="muted">Check your mission sheet for scoring.</p>'}
-        ${faction ? factionRuleBlock(faction, "compact") : ""}
-      </section>
+        ${playCommandsPanel(list, play.cmd, faction)}
+      </div>
     </div>
 
-    ${
-      // Reference material lives below the controls, deliberately. Both of these
-      // change size with the phase - the command list runs from one card to
-      // seven, and the arcs diagram is a 591px block that only the Tactical
-      // arcs diagram is a 591px block that only the Tactical phase has - and
-      // while they sat above the counters and the Next phase button, every phase
-      // change threw those up to 433px around the page. Nothing the player
-      // presses now sits below anything that resizes. (The command list itself no
-      // longer changes with the phase, but the diagram still does.)
-      playCommandsPanel(list, play.cmd, faction)
-    }
-    ${
-      play.phase === 2
-        ? `<section class="play-arcs">
-             <p class="phase-diagram-caption">Primary weapons only fire in the narrow cone dead ahead; auxiliary weapons cover the whole front half.</p>
-             ${tacticalDiagram("arcs")}
-           </section>`
-        : ""
-    }
+    <!-- Reference below the controls: it resizes with the phase, and nothing the
+         player presses may sit underneath something that resizes. -->
+    <section class="play-ref">
+      ${
+        play.phase === 2
+          ? `<div class="play-arcs">
+               <p class="phase-diagram-caption">Primary weapons only fire in the narrow cone dead ahead; auxiliary weapons cover the whole front half.</p>
+               ${tacticalDiagram("arcs")}
+             </div>`
+          : ""
+      }
+      ${notes ? `<ul class="rule-list">${notes}</ul>` : ""}
+      ${faction ? factionRuleBlock(faction, "compact") : ""}
+      <div class="play-reset"><button class="ghost-btn danger" data-action="play-reset">${icon("close", 14)} Reset the game</button></div>
+    </section>
   </main>
   ${toast(state)}
   ${footer()}`;
@@ -2799,7 +2798,20 @@ function learnView(state: AppState): string {
          ).join("")}
        </ol>
        ${learnDiagram("movement")}
+
+       <h2 class="learn-sub">What the Passive Attacks Step means</h2>
+       <p class="learn-note">This is the one step you do not choose. Having moved, your unit is shot at &mdash; free of charge, by enemies who are not even activating.</p>
        ${learnDiagram("passive")}
+       <ul class="learn-rules">
+         <li>It triggers when an active unit moves <b>through or ends in</b> the range and arc of a passive enemy's auxiliary weapons.</li>
+         <li>Passive means unactivated: an enemy that has already activated this round does not fire.</li>
+         <li>They fire <b>auxiliary weapons only</b> &mdash; the 180&deg; front arc, never the primary 45&deg; cone.</li>
+         <li>Each passive enemy unit fires <b>once per activation</b> of your battlegroup. It can fire again when your next battlegroup activates.</li>
+         <li>Only units that actually moved in this activation can be targeted.</li>
+         <li>Facilities have a 360&deg; arc and so always fire in this step at every active unit in range.</li>
+       </ul>
+       <p class="learn-note">So a long dash across the table is not free: you take fire from everything whose front arc you cross on the way. Moving less than 3" has its own cost though &mdash; Easy Target lets enemies re-roll attack dice against you.</p>
+
        ${learnDiagram("action")}
        <p class="learn-note">Give each activated unit an Activated token. The phase ends when all units have activated.</p>`,
     ),

@@ -548,7 +548,19 @@ button { font-family: inherit; }
 .fleet-card-cost { font-family: var(--display); font-weight: 800; font-size: 17px; color: var(--ink); font-variant-numeric: tabular-nums; }
 .fleet-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px 8px 16px; border-top: 1px solid var(--hair-soft); margin-top: auto; }
 .fleet-card-date { font-family: var(--sans); font-size: 11px; font-weight: 600; color: var(--ink-3); }
-.fleet-card-actions { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+.fleet-card-actions { display: inline-flex; gap: 4px; flex-wrap: nowrap; }
+/* Icon-only on the card: three actions everyone already knows, in a strip
+   where three bordered text buttons were most of the card's furniture. Each
+   carries a title and an aria-label, so the name is still available. */
+.card-act {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; padding: 0; cursor: pointer;
+  background: none; border: 1px solid transparent; color: var(--ink-3);
+  transition: color 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+.card-act:hover { color: var(--blue); border-color: var(--hair); background: var(--blue-wash); }
+.card-act.is-danger:hover { color: var(--red); border-color: var(--red); background: transparent; }
+.card-act:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
 
 .fleets-empty { margin-top: 26px; font-family: var(--display); font-weight: 800; font-size: clamp(20px, 3vw, 26px); color: var(--ink); line-height: 1.25; }
 .fleets-empty-sub { font-family: var(--sans); font-size: 13.5px; font-weight: 500; color: var(--ink-2); }
@@ -847,8 +859,14 @@ button { font-family: inherit; }
 /* Compact catalog rows: name + inline stats + cost on one line, a single muted
    weapons line under it. Deliberately dense so a faction's ships fit with
    little or no scrolling. */
+/* Two tracks: the ship, then the ADD control. There used to be a third 44px
+   track in front for the ship-size glyph. That glyph was retired, so rows
+   without art had only two children for three tracks - the body landed in the
+   44px track and every ship name wrapped one word per line, with ADD sitting
+   out in the middle of the row where the stats should be. Art, where a row has
+   it, adds its own track back. */
 .ship-row {
-  display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 14px;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 14px;
   border-bottom: 1px solid var(--hair-soft); border-left: 3px solid transparent; background: var(--paper);
   transition: border-color 0.12s ease, background 0.12s ease;
 }
@@ -873,6 +891,7 @@ button { font-family: inherit; }
   font-family: var(--display); font-weight: 800; font-size: 11px; font-variant-numeric: tabular-nums; line-height: 1;
 }
 .ship-thumb { display: block; object-fit: cover; border: 1px solid var(--ink-3); background: var(--ground); }
+.ship-row.has-art { grid-template-columns: 44px minmax(0, 1fr) auto; }
 .ship-row.has-art .ship-thumb { width: 44px; height: 32px; }
 .ship-row-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 .ship-name { flex: 1 1 auto; min-width: 0; font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: -0.01em; white-space: normal; }
@@ -1080,9 +1099,11 @@ button { font-family: inherit; }
 }
 .pcw-figures span + span { border-left: 1px solid var(--hair); padding-left: 9px; }
 .pc-carry { font-size: 10px; font-style: italic; color: var(--ink-2); margin-top: 3px; }
-.pc-track { margin-top: 4px; display: flex; flex-direction: column; gap: 2px; }
+.pc-track { margin-top: 6px; padding-top: 5px; border-top: 1px solid var(--hair-soft); display: flex; flex-direction: column; gap: 2px; }
+.pc-track-h { font-family: var(--display); font-weight: 800; font-size: 9px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-2); margin: 0 0 3px; }
+.pc-track-sub { font-family: var(--sans); font-weight: 600; font-size: 8.5px; letter-spacing: 0; text-transform: none; color: var(--ink-3); margin-left: 5px; }
 .pc-track-row { display: flex; align-items: center; gap: 5px; }
-.pc-track-label { font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-3); min-width: 26px; }
+.pc-track-label { font-family: var(--narrow, var(--sans)); font-size: 8.5px; font-weight: 700; color: var(--ink-3); min-width: 34px; }
 .pr-hp { display: inline-flex; flex-wrap: wrap; gap: 3px; }
 .pr-hp-box { width: 11px; height: 11px; border: 1px solid var(--ink-2); display: inline-block; }
 .print-track-strip { display: flex; gap: 24px; flex-wrap: wrap; margin: 7px 0; padding: 5px 0; border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); }
@@ -1616,24 +1637,33 @@ button { font-family: inherit; }
      label; nothing here is icon-only. It still wraps if a label cannot fit. */
   .topbar { height: auto; min-height: 54px; flex-wrap: wrap; padding: 9px clamp(12px, 4vw, 16px); gap: 8px 10px; }
   .wordmark-sub { display: none; }
-  /* All five on ONE row, Options included. Sized to content but allowed to
-     shrink, so a long label narrows rather than pushing the last item onto a
-     line by itself. */
-  .topnav { width: 100%; flex-wrap: nowrap; gap: 4px; }
-  /* All four fit on ONE row by letting a long label wrap inside its own button
-     (white-space: normal) instead of being clipped by nowrap or dropped to an
-     icon. Every item keeps its icon AND its full text; nothing is truncated. */
+  /* All five on ONE row, Options included, and the row runs edge to edge: the
+     topbar's side padding was 30px that the five targets needed more than the
+     margin did. */
+  .topnav {
+    width: auto; flex: 1 1 100%; flex-wrap: nowrap; gap: 3px;
+    /* Negative margins cancel the topbar's side padding: those 30px were worth
+       more to five thumb targets than they were to the margin. flex-grow does
+       the widening - a fixed width:100% would ignore the negative margins. */
+    margin: 0 calc(-1 * clamp(12px, 4vw, 16px));
+    padding: 0 3px;
+  }
   /* One definition for every item on the rail, links and the Options button
-     alike, so they cannot drift apart. */
+     alike, so they cannot drift apart. A long label wraps inside its own box
+     (white-space: normal, and hyphens as the last resort on the narrowest
+     phones) rather than being clipped or dropped to a bare icon. */
   .topnav a, .topnav-btn {
-    /* flex-basis auto, not 0: with 0 every item got an identical share and the
-       longest label ("Compendium") overflowed its own border while short ones
-       sat in half-empty boxes. Sizing to content, and allowed to shrink so all
-       five fit one row. */
-    flex: 0 1 auto; min-width: 0;
+    /* Equal shares, so all five targets are exactly the same size. This is a
+       thumb target, and five different-width thumb targets is the reason the
+       row felt fiddly. A long label wraps inside its own box (white-space is
+       normal below) rather than overflowing it, which is what went wrong the
+       last time this was flex-basis 0. */
+    flex: 1 1 0; min-width: 0;
     flex-direction: column; align-items: center; justify-content: center; text-align: center;
-    white-space: normal; overflow-wrap: break-word; line-height: 1.2; gap: 3px;
-    padding: 7px 3px; font-size: 10px; letter-spacing: 0.02em;
+    white-space: normal; overflow-wrap: break-word; hyphens: auto; line-height: 1.2; gap: 3px;
+    /* Sized so the longest single word, "Compendium", fits inside an equal
+       fifth of the row without breaking mid-word or spilling its border. */
+    padding: 7px 1px; font-size: 9.5px; letter-spacing: 0;
     border: 1px solid rgba(255, 255, 255, 0.18);
   }
   .topnav a svg, .topnav-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
@@ -1754,7 +1784,10 @@ button { font-family: inherit; }
    from the padding and the type. Never drops a label. */
 @media (max-width: 340px) {
   .topnav { gap: 3px; }
-  .topnav a, .topnav-btn { font-size: 9.5px; padding: 8px 2px; }
+  /* A fifth of a 320px screen is narrower than the word "Compendium" at any
+     readable size, so here the word breaks across two lines. Ugly, but it is
+     the only option that keeps every label whole and every target equal. */
+  .topnav a, .topnav-btn { font-size: 9.5px; padding: 8px 1px; overflow-wrap: anywhere; }
 }
 
 /* ============================================================ ROSTER ROWS + MODAL */
@@ -3149,12 +3182,25 @@ a .icon,
 .play-bar-id a:hover { text-decoration: underline; }
 .play-bar-round { display: flex; align-items: center; gap: 9px; margin-left: auto; }
 .play-bar-round .control-label { margin: 0; }
-.play-bar-round .round-value { min-width: 1.4ch; }
+.play-bar-round { margin-block: 0; }
+.play-bar-round .round-value { min-width: 1.4ch; font-size: 28px; line-height: 1; }
+.play-bar-of { font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-3); }
+/* A credit total below zero is the normal state of early Hypergrowth, so it is
+   marked rather than hidden: the player needs to see the debt they are in. */
+.round-value.is-debt { color: var(--red); }
+.play-debt-note { font-family: var(--serif); font-size: 12.5px; line-height: 1.45; color: var(--ink-2); margin: 8px 0 0; }
 .play-bar-of { font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }
 .play-bar-reset { flex: none; }
 /* Three counters, always one row. The fourth used to wrap and cost ~80px of
    height for a single number; Round now lives in the header instead. */
 .play-cols .play-counters { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+/* Three counters share one row, and in the credit modes the value reads "¢90bn"
+   rather than "7". At a fixed 40px with a 50px floor the middle one pushed a
+   stepper past the right edge of the page, so inside these counters the figure
+   scales and the row is allowed to shrink to its track. */
+.play-counters .play-counter { min-width: 0; }
+.play-counters .round-control { min-width: 0; justify-content: space-between; }
+.play-counters .round-value { min-width: 0; font-size: clamp(20px, 2.6vw, 32px); }
 @media (max-width: 620px) { .play-cols .play-counters { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 /* Sits at the bottom of the (usually shorter) left column, filling the space
    the taller command list leaves next to it instead of leaving it blank. */

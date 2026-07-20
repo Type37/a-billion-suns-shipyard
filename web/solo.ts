@@ -30,7 +30,7 @@ import {
   SOLO_BLIP_RULES,
   PERKS_BY_CLASS,
 } from "../src/data/junkspace-solo.ts";
-import { escapeHtml, formatDate } from "./format.ts";
+import { escapeHtml, formatDate, ruleText } from "./format.ts";
 import { icon, statChips } from "./icons.ts";
 import { emblemView, weaponsTable } from "./render.ts";
 import { libraryUrl } from "./emblems.ts";
@@ -178,7 +178,7 @@ function outfitTab(o: SavedOutfit): string {
           <div class="pilot-field">
             <span class="pilot-field-label">Pilot class</span>
             <div class="pilot-picker" role="group" aria-label="Pilot class">${pilotPicker}</div>
-            ${activePerk ? `<p class="pilot-ability"><b>${escapeHtml(activePerk.perkName)}.</b> ${escapeHtml(activePerk.text)}</p>` : ""}
+            ${activePerk ? `<p class="pilot-ability"><b>${escapeHtml(activePerk.perkName)}.</b> ${ruleText(activePerk.text)}</p>` : ""}
           </div>
           <label class="inline-field">Pilot name
             <input class="ship-name-input" type="text" value="${escapeHtml(s.pilotName ?? "")}" placeholder="Call sign" data-action="outfit-pilot-name" data-ship="${s.id}" />
@@ -197,20 +197,17 @@ function outfitTab(o: SavedOutfit): string {
     </section>
     <aside class="roster">
       <div class="roster-sheet">
-        <header class="roster-head">
-          <span class="roster-emblem">${emblemView(o, 44)}</span>
-          <div>
-            <h2 class="roster-title">${escapeHtml(o.name || "Unnamed outfit")}</h2>
-            <p class="roster-subtitle">Junkspace outfit</p>
-          </div>
-        </header>
+        <!--
+          No name-and-emblem header here. The setup band directly above this
+          panel already shows both, and shows them editable; repeating them
+          200px lower was the same outfit introduced to you twice.
+        -->
         <div class="band-readout solo-readout ${over ? "over" : ""}">
           <div class="readout"><span class="readout-label">Budget</span><span class="readout-value">${ck(OUTFIT_BUDGET_K)}</span></div>
           <div class="readout"><span class="readout-label">Spent</span><span class="readout-value">${ck(cost)}</span></div>
           <div class="readout"><span class="readout-label">Left</span><span class="readout-value ${over ? "negative" : ""}">${over ? "−" : ""}${ck(Math.abs(remaining))}</span></div>
-          <div class="readout"><span class="readout-label">Ships</span><span class="readout-value">${o.ships.length}/${OUTFIT_MAX_SHIPS}</span></div>
         </div>
-        <h3 class="roster-section">Ships ${full ? '<span class="muted">outfit full</span>' : ""}</h3>
+        <h3 class="roster-section">Ships <span class="muted">${o.ships.length}/${OUTFIT_MAX_SHIPS}${full ? " &middot; outfit full" : ""}</span></h3>
         ${shipRows || '<p class="muted roster-hint">Add up to five ships from the left. In Junkspace every unit is a single ship, and each needs a pilot class.</p>'}
         ${over ? '<div class="inspection fail"><p class="issue-error">Over budget by ' + ck(-remaining) + ".</p></div>" : ""}
         <div class="roster-actions">
@@ -244,8 +241,8 @@ function rollerPanel(state: AppState): string {
             <div class="roll-die">${last.value}</div>
             <div class="roll-body">
               <p class="roll-table">${escapeHtml(last.table)}</p>
-              <p class="roll-headline">${escapeHtml(last.result)}</p>
-              ${last.detail ? `<p class="roll-detail">${escapeHtml(last.detail)}</p>` : ""}
+              <p class="roll-headline">${ruleText(last.result)}</p>
+              ${last.detail ? `<p class="roll-detail">${ruleText(last.detail)}</p>` : ""}
             </div>
           </div>`
         : '<p class="muted" style="margin-top:14px">No roll yet.</p>'
@@ -256,7 +253,7 @@ function rollerPanel(state: AppState): string {
 function playTab(state: AppState, o: SavedOutfit): string {
   const alert = o.alertLevel;
   const pct = Math.min(100, (alert / 10) * 100);
-  const phases = SOLO_PHASES.map((p) => `<li><strong>${escapeHtml(p.name)}.</strong> ${escapeHtml(p.text)}</li>`).join("");
+  const phases = SOLO_PHASES.map((p) => `<li><strong>${escapeHtml(p.name)}.</strong> ${ruleText(p.text)}</li>`).join("");
   return `
   <div class="solo-grid">
     <section class="solo-card">
@@ -269,10 +266,9 @@ function playTab(state: AppState, o: SavedOutfit): string {
         <button class="bar-btn" data-action="alert-adjust" data-delta="1">+1 End Phase</button>
         <button class="bar-btn" data-action="alert-adjust" data-delta="1">+1 reveal Mass 2-3</button>
         <button class="bar-btn" data-action="alert-adjust" data-delta="-2">-2 destroy Mass 2-3</button>
-        <button class="ghost-btn" data-action="alert-adjust" data-delta="1">+1</button>
         <button class="ghost-btn" data-action="alert-adjust" data-delta="-1">-1</button>
       </div>
-      <ul class="rule-list small">${SOLO_ALERT_RULES.map((r) => `<li>${escapeHtml(r)}</li>`).join("")}</ul>
+      <ul class="rule-list small">${SOLO_ALERT_RULES.map((r) => `<li>${ruleText(r)}</li>`).join("")}</ul>
     </section>
     <section class="solo-card">
       <h3 class="roster-section">Round</h3>
@@ -347,20 +343,20 @@ function campaignTab(o: SavedOutfit): string {
 // --- Reference tab ----------------------------------------------------------
 
 function referenceTab(): string {
-  const steps = SOLO_SETUP_STEPS.map((s) => `<li><strong>${escapeHtml(s.name)}.</strong> ${escapeHtml(s.text)}</li>`).join("");
-  const phases = SOLO_PHASES.map((p) => `<li><strong>${escapeHtml(p.name)}.</strong> ${escapeHtml(p.text)}</li>`).join("");
-  const blips = SOLO_BLIP_RULES.map((r) => `<li>${escapeHtml(r)}</li>`).join("");
-  const behaviour = BEHAVIOUR_ROUTINES.map((r) => `<li>${escapeHtml(r)}</li>`).join("");
+  const steps = SOLO_SETUP_STEPS.map((s) => `<li><strong>${escapeHtml(s.name)}.</strong> ${ruleText(s.text)}</li>`).join("");
+  const phases = SOLO_PHASES.map((p) => `<li><strong>${escapeHtml(p.name)}.</strong> ${ruleText(p.text)}</li>`).join("");
+  const blips = SOLO_BLIP_RULES.map((r) => `<li>${ruleText(r)}</li>`).join("");
+  const behaviour = BEHAVIOUR_ROUTINES.map((r) => `<li>${ruleText(r)}</li>`).join("");
   const rollRows = (rows: typeof RANDOM_BEHAVIOUR) =>
-    rows.map((r) => `<tr><td class="cell-num">${r.roll}</td><td>${escapeHtml(r.result)}${r.detail ? `<br><span class="muted">${escapeHtml(r.detail)}</span>` : ""}</td></tr>`).join("");
+    rows.map((r) => `<tr><td class="cell-num">${r.roll}</td><td>${ruleText(r.result)}${r.detail ? `<br><span class="muted">${ruleText(r.detail)}</span>` : ""}</td></tr>`).join("");
   const jobs = JUNKSPACE_JOBS.map(
-    (j) => `<article class="ref-item"><h4>${j.key}. ${escapeHtml(j.name)}</h4><p>${escapeHtml(j.text)}</p></article>`,
+    (j) => `<article class="ref-item"><h4>${j.key}. ${escapeHtml(j.name)}</h4><p>${ruleText(j.text)}</p></article>`,
   ).join("");
   const pirates = JUNKSPACE_PIRATES.map(
     (p) => `<tr><td class="cell-num">${p.blip}</td><td>${escapeHtml(p.name)}</td><td>${p.mass}</td><td>${p.thrust}"</td><td>${p.silhouette}</td><td>${p.shields}</td><td>${escapeHtml(p.primary)}</td><td>${escapeHtml(p.auxiliary)}</td></tr>`,
   ).join("");
   const perkBlock = (name: string, list: readonly { n: number; name: string; text: string }[]) =>
-    `<h4 class="ref-sub">${name}</h4><ul class="rule-list small">${list.map((p) => `<li><strong>${p.n}. ${escapeHtml(p.name)}:</strong> ${escapeHtml(p.text)}</li>`).join("")}</ul>`;
+    `<h4 class="ref-sub">${name}</h4><ul class="rule-list small">${list.map((p) => `<li><strong>${p.n}. ${escapeHtml(p.name)}:</strong> ${ruleText(p.text)}</li>`).join("")}</ul>`;
 
   return `
   <div class="reference">
@@ -374,7 +370,7 @@ function referenceTab(): string {
     </section>
     <section class="ref-section">
       <h3 class="sheet-section">Alert Level</h3>
-      <ul class="rule-list">${SOLO_ALERT_RULES.map((r) => `<li>${escapeHtml(r)}</li>`).join("")}</ul>
+      <ul class="rule-list">${SOLO_ALERT_RULES.map((r) => `<li>${ruleText(r)}</li>`).join("")}</ul>
     </section>
     <section class="ref-section">
       <h3 class="sheet-section">Blips</h3>
@@ -391,7 +387,7 @@ function referenceTab(): string {
     <section class="ref-section">
       <h3 class="sheet-section">Aggressors</h3>
       <div class="table-scroll"><table class="ref-table pirates"><thead><tr><th>Blip</th><th>Class</th><th>Mass</th><th>Thrust</th><th>Sil</th><th>Shields</th><th>Primary</th><th>Auxiliary</th></tr></thead><tbody>${pirates}</tbody></table></div>
-      <p class="print-note">${escapeHtml(PIRATE_RULE)}</p>
+      <p class="print-note">${ruleText(PIRATE_RULE)}</p>
     </section>
     <section class="ref-section">
       <h3 class="sheet-section">The Jobs</h3>

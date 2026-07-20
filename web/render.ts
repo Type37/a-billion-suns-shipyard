@@ -295,7 +295,7 @@ function commandEffectsFor(list: SavedList, faction: Faction | undefined): Comma
 /** "0 CMD" / "1 CMD", with the qualifiers a rule attaches. */
 function costChangeSuffix(change: CommandCostChange): string {
   const bits = [change.scope, change.limit].filter(Boolean).join(", ");
-  return bits ? ` (${escapeHtml(bits)})` : "";
+  return bits ? ` (${ruleText(bits)})` : "";
 }
 
 // Auto-numbered unit names: the first unit of a ship class gets the ship's
@@ -560,9 +560,9 @@ function fleetsView(state: AppState): string {
         <div class="fleet-card-foot">
           <span class="fleet-card-date">Updated ${formatDate(l.updatedAt)}</span>
           <span class="fleet-card-actions">
-            <button class="ghost-btn" data-action="duplicate-list" data-id="${l.id}" title="Duplicate this fleet">${icon("duplicate", 16)} Duplicate</button>
-            <button class="ghost-btn" data-action="share-list" data-id="${l.id}" title="Copy a share link">${icon("link", 16)} Share</button>
-            <button class="ghost-btn danger" data-action="delete-list" data-id="${l.id}" title="Delete this fleet">${icon("trash", 16)} Delete</button>
+            <button class="card-act" data-action="duplicate-list" data-id="${l.id}" title="Duplicate this fleet" aria-label="Duplicate this fleet">${icon("ix-duplicate", 18)}</button>
+            <button class="card-act" data-action="share-list" data-id="${l.id}" title="Copy a share link" aria-label="Copy a share link">${icon("ix-share", 18)}</button>
+            <button class="card-act is-danger" data-action="delete-list" data-id="${l.id}" title="Delete this fleet" aria-label="Delete this fleet">${icon("ix-trash", 18)}</button>
           </span>
         </div>
       </article>`;
@@ -786,7 +786,7 @@ function cardWeapons(ship: ShipClass): string {
   const one = (w: Weapon, arc: "primary" | "aux") => `
     <div class="pcw">
       <div class="pcw-head">
-        <span class="pcw-arc">${arc === "primary" ? "PRI" : "AUX"}${icon(arc === "primary" ? "arc-primary" : "arc-aux", 11, "slot-arc")}</span>
+        <span class="pcw-arc">${arc === "primary" ? "PRI" : "AUX"}${icon(arc === "primary" ? "arc-primary" : "arc-aux", 13, "slot-arc")}</span>
         <span class="pcw-name">${escapeHtml(w.name)}</span>
       </div>
       <div class="pcw-figures">
@@ -805,7 +805,7 @@ function cardWeapons(ship: ShipClass): string {
     rows.push(`
     <div class="pcw">
       <div class="pcw-head">
-        <span class="pcw-arc">AUX${icon("arc-aux", 11, "slot-arc")}</span>
+        <span class="pcw-arc">AUX${icon("arc-aux", 13, "slot-arc")}</span>
         <span class="pcw-name">${escapeHtml(ship.auxiliaryFitting ?? "Utility Bays")}</span>
       </div>
     </div>`);
@@ -829,7 +829,7 @@ export function weaponsTable(ship: ShipClass): string {
     const arcLabel = arc === "primary" ? "Primary, 45 degree arc" : "Auxiliary, 180 degree arc";
     const arcAbbr = arc === "primary" ? "PRI" : "AUX";
     return `<div class="wt-row" role="row">
-      <span class="wt-arc" role="cell"><span class="visually-hidden">${arcLabel}</span><span class="wt-arc-abbr">${arcAbbr}</span>${icon(arc === "primary" ? "arc-primary" : "arc-aux", 12, "slot-arc")}</span>
+      <span class="wt-arc" role="cell"><span class="visually-hidden">${arcLabel}</span><span class="wt-arc-abbr">${arcAbbr}</span>${icon(arc === "primary" ? "arc-primary" : "arc-aux", 14, "slot-arc")}</span>
       <span class="wt-name" role="cell">${escapeHtml(w.name)}</span>
       <span class="wt-num wt-rng" role="cell"><span class="wt-inline-lbl">Range </span>${w.rangeMin}-${w.rangeMax}"</span>
       <span class="wt-num wt-atk" role="cell"><span class="wt-inline-lbl">Attack </span>${w.count}${w.die}</span>
@@ -1542,7 +1542,23 @@ function printView(state: AppState): string {
         ${cardWeapons(ship)}
         ${named.length ? `<p class="pc-ships">${escapeHtml(named.join(" / "))}</p>` : ""}
         ${carried.length ? `<p class="pc-carry">Carrying: ${escapeHtml(carried.join("; "))}</p>` : ""}
-        ${opts.trackers ? `<div class="pc-track">${Array.from({ length: u.count }, () => `<span class="pc-track-row"><span class="pc-track-label">Hull</span>${hpBoxes(ship.silhouette)}</span>`).join("")}</div>` : ""}
+        ${
+          // One row per ship in the unit, one box per point of Silhouette,
+          // because Silhouette is the ship's starting HP (src/types.ts). It
+          // used to print as an unheaded block of empty squares, which read as
+          // a printing fault rather than a damage tracker. It says what it is
+          // now, and each ship's row is numbered so you can tell them apart.
+          opts.trackers
+            ? `<div class="pc-track">
+                 <p class="pc-track-h">Damage <span class="pc-track-sub">one box per HP, cross off as taken</span></p>
+                 ${Array.from(
+                   { length: u.count },
+                   (_, i) =>
+                     `<span class="pc-track-row"><span class="pc-track-label">${u.count > 1 ? `Ship ${i + 1}` : "Hull"}</span>${hpBoxes(ship.silhouette)}</span>`,
+                 ).join("")}
+               </div>`
+            : ""
+        }
       </article>`;
     })
     .join("");
@@ -1619,7 +1635,7 @@ function printView(state: AppState): string {
   const effects = commandEffectsFor(list, faction);
   const usableCommands = CORE_COMMANDS.filter((c) => !c.shipyardOnly || isShipyard);
   const commandEntry = (name: string, cost: number, text: string, extra: string) =>
-    `<dt>${escapeHtml(name)} <span class="print-ref-cost">${cost} CMD</span></dt><dd>${escapeHtml(text)}${extra}</dd>`;
+    `<dt>${escapeHtml(name)} <span class="print-ref-cost">${cost} CMD</span></dt><dd>${ruleText(text)}${extra}</dd>`;
 
   const coreEntries = usableCommands
     .map((c) => {
@@ -1629,14 +1645,14 @@ function printView(state: AppState): string {
         : "";
       const mods = effects.notes
         .filter((n) => n.command === c.name)
-        .map((n) => `<span class="print-ref-mod">${escapeHtml(n.text)} — ${escapeHtml(n.source)}</span>`)
+        .map((n) => `<span class="print-ref-mod">${ruleText(n.text)} — ${escapeHtml(n.source)}</span>`)
         .join("");
       // Print the original cost struck through when a rule undercuts it, so the
       // reader can see it IS the discounted one and not a misprint.
       const costCell = change
         ? `<span class="print-ref-cost"><s>${c.cost}</s> ${cost} CMD</span>`
         : `<span class="print-ref-cost">${c.cost} CMD</span>`;
-      return `<dt>${escapeHtml(c.name)} ${costCell}</dt><dd>${escapeHtml(c.text)}${discount}${mods}</dd>`;
+      return `<dt>${escapeHtml(c.name)} ${costCell}</dt><dd>${ruleText(c.text)}${discount}${mods}</dd>`;
     })
     .join("");
 
@@ -1648,7 +1664,7 @@ function printView(state: AppState): string {
   const grantedBlock = "";
   const globalBlock = effects.global.length
     ? `<p class="print-ref-note">${effects.global
-        .map((n) => `${escapeHtml(n.text)} <em>(${escapeHtml(n.source)})</em>`)
+        .map((n) => `${ruleText(n.text)} <em>(${escapeHtml(n.source)})</em>`)
         .join(" ")}</p>`
     : "";
 
@@ -1657,7 +1673,7 @@ function printView(state: AppState): string {
         <div class="print-ref-col">
           <h4 class="print-ref-h">Actions <span class="print-ref-sub">one per activation</span></h4>
           <dl class="print-ref-list">
-            ${CORE_ACTIONS.map((a) => `<dt>${escapeHtml(a.name)}</dt><dd>${escapeHtml(a.text)}</dd>`).join("")}
+            ${CORE_ACTIONS.map((a) => `<dt>${escapeHtml(a.name)}</dt><dd>${ruleText(a.text)}</dd>`).join("")}
           </dl>
         </div>
         <div class="print-ref-col">
@@ -1785,8 +1801,8 @@ function foundryListView(state: AppState): string {
       <tr>
         <td class="cell-name"><a href="#/foundry/${f.id}">${escapeHtml(f.name)}</a></td>
         <td>${f.era}</td>
-        <td class="cell-num">${f.ships.length} ship classes</td>
-        <td class="cell-num">${f.hvp.length} personnel</td>
+        <td class="cell-num">${f.ships.length}</td>
+        <td class="cell-num">${f.hvp.length}</td>
         <td class="cell-actions">
           <button class="ghost-btn" data-action="clone-faction" data-source="${f.id}" title="Duplicate this faction">${icon("duplicate", 16)} Duplicate</button>
           <button class="ghost-btn" data-action="copy-faction" data-id="${f.id}" title="Copy as JSON to share">${icon("scroll", 16)} Copy</button>
@@ -1956,7 +1972,12 @@ function foundryEditView(state: AppState, factionId: string): string {
   <main class="foundry-main">
     <p class="breadcrumb"><a href="#/foundry">Custom Rules</a> / ${escapeHtml(f.name)}</p>
     <div class="cf-title-row">
-      <h1 class="page-title">${escapeHtml(f.name)}</h1>
+      <!--
+        No <h1> of the faction's name here. The breadcrumb above ends in it and
+        the "Faction name" field below holds the same string a third time, live
+        and editable. One of the three had to go, and the heading was the one
+        that did nothing the other two do not.
+      -->
       ${
         f.ships.length
           ? `<button class="bar-btn" data-action="open-new-fleet-with-faction" data-faction="${f.id}">${icon("flag", 14)} Build a fleet with this faction</button>`
@@ -2195,7 +2216,7 @@ function playCommandsPanel(list: SavedList, cmdLeft: number, faction: Faction | 
             ? `<span class="pc-cmd-from">${c.cost} CMD${costChangeSuffix(c.change)} — ${escapeHtml(c.change.source)}</span>`
             : "";
           const mods = c.notes
-            .map((n) => `<span class="pc-cmd-from">${escapeHtml(n.text)} — ${escapeHtml(n.source)}</span>`)
+            .map((n) => `<span class="pc-cmd-from">${ruleText(n.text)} — ${escapeHtml(n.source)}</span>`)
             .join("");
           const costLabel = c.change ? `<s>${c.base}</s> ${c.cost} CMD` : `${c.cost} CMD`;
           return `
@@ -2204,13 +2225,13 @@ function playCommandsPanel(list: SavedList, cmdLeft: number, faction: Faction | 
             <h4 class="pc-cmd-name">${escapeHtml(c.name)}</h4>
             <span class="pc-cmd-cost">${costLabel}</span>
           </header>
-          <p class="pc-cmd-text">${escapeHtml(c.text)}</p>
+          <p class="pc-cmd-text">${ruleText(c.text)}</p>
           ${from}${disc}${mods}
         </article>`;
         })
         .join("")}</div>
       ${effects.global
-        .map((n) => `<p class="pc-cmd-note">${escapeHtml(n.text)} <em>(${escapeHtml(n.source)})</em></p>`)
+        .map((n) => `<p class="pc-cmd-note">${ruleText(n.text)} <em>(${escapeHtml(n.source)})</em></p>`)
         .join("")}`
     : `<p class="pc-cmd-none">No commands are spent in this phase.</p>`;
   return `
@@ -2259,27 +2280,38 @@ function playView(state: AppState): string {
       (step, i) => `
     <label class="phase-check ${checks[i] ? "done" : ""}">
       <input type="checkbox" data-action="play-check-step" data-index="${i}" ${checks[i] ? "checked" : ""} />
-      <span>${escapeHtml(step)}</span>
+      <span>${ruleText(step)}</span>
     </label>`,
     )
     .join("");
 
-  const counter = (label: string, value: number, action: string, step = 1) => `
+  // Scores in the credit modes are counted in ¢bn and awarded in twenties
+  // ("¢20bn per Sector you control"), so they step by ten and read as money.
+  // Victory points step by one and read as a bare number.
+  const scoreStep = isCredits ? 10 : 1;
+  const scoreFmt = (n: number) => (isCredits ? credits(n) : String(n));
+  const counter = (
+    label: string,
+    value: number,
+    action: string,
+    step = 1,
+    fmt: (n: number) => string = (n) => String(n),
+  ) => `
     <div class="play-counter">
       <span class="control-label">${label}</span>
       <div class="round-control">
         <button class="stepper-btn" data-action="${action}" data-delta="${-step}" aria-label="Decrease ${escapeHtml(label)}" title="Decrease ${escapeHtml(label)}">${icon("minus", 16)}</button>
-        <span class="round-value">${value}</span>
+        <span class="round-value ${value < 0 ? "is-debt" : ""}">${fmt(value)}</span>
         <button class="stepper-btn" data-action="${action}" data-delta="${step}" aria-label="Increase ${escapeHtml(label)}" title="Increase ${escapeHtml(label)}">${icon("plus", 16)}</button>
       </div>
     </div>`;
 
-  const notes = (SCORING_NOTES[list.mode] ?? []).map((n) => `<li>${escapeHtml(n)}</li>`).join("");
+  const notes = (SCORING_NOTES[list.mode] ?? []).map((n) => `<li>${ruleText(n)}</li>`).join("");
 
   const checklistBlock = `<div class="phase-checklist">
       <div class="phase-checklist-head">
-        <h3 class="phase-checklist-title">${escapeHtml(currentPhase?.name ?? "")}</h3>
-        <span class="phase-checklist-count">${doneCount} of ${currentPhase?.steps.length ?? 0}</span>
+        <!-- No phase name here: the switcher immediately above is already showing it. -->
+        <span class="phase-checklist-count">${doneCount} of ${currentPhase?.steps.length ?? 0} done</span>
       </div>
       ${checklistHtml}
     </div>`;
@@ -2304,15 +2336,16 @@ function playView(state: AppState): string {
   <main class="solo-body play-body">
     <header class="play-bar">
       <p class="play-bar-id"><a href="#/list/${list.id}">${escapeHtml(list.fleet.name || "Unnamed fleet")}</a> <span aria-hidden="true">/</span> Play mode</p>
-      <div class="play-bar-round">
+      <!--
+        A readout, not a control. The round only ever moves one way and it moves
+        by itself: Next phase past the End Phase rolls it over. A pair of steppers
+        beside it was two more things to look at that nobody needed to press.
+      -->
+      <p class="play-bar-round">
         <span class="control-label">Round</span>
-        <div class="round-control">
-          <button class="stepper-btn" data-action="play-round" data-delta="-1" aria-label="Previous round" title="Previous round">${icon("minus", 15)}</button>
-          <span class="round-value">${play.round}</span>
-          <button class="stepper-btn" data-action="play-round" data-delta="1" aria-label="Next round" title="Next round">${icon("plus", 15)}</button>
-        </div>
+        <span class="round-value">${play.round}</span>
         <span class="play-bar-of">of ${maxRound}</span>
-      </div>
+      </p>
     </header>
     <div class="phase-track">${phaseBtns}</div>
     <!--
@@ -2349,9 +2382,17 @@ function playView(state: AppState): string {
       <div class="play-col play-col-spend">
         <div class="play-counters">
           ${counter("CMD tokens", play.cmd, "play-cmd")}
-          ${counter(scoreLabel, play.vp, "play-vp")}
-          ${counter("Opponent " + scoreLabel.toLowerCase(), play.oppVp, "play-oppvp")}
+          ${counter(scoreLabel, play.vp, "play-vp", scoreStep, scoreFmt)}
+          ${counter("Opponent " + scoreLabel.toLowerCase(), play.oppVp, "play-oppvp", scoreStep, scoreFmt)}
         </div>
+        ${
+          // Hypergrowth alone runs a debt: you requisition out of your Shipyard
+          // before you have earned anything, so the counter goes below zero and
+          // the rule that says so is quoted here rather than paraphrased.
+          list.mode === "hypergrowth"
+            ? `<p class="play-debt-note">${ruleText("You start with 0 credits, and recover that expenditure by earning credits from the objectives.")}</p>`
+            : ""
+        }
         ${
           // Your fleet ABOVE the command reference. The commands are a long block
           // of rules text you consult occasionally; the fleet is what you look at
@@ -2786,7 +2827,7 @@ function learnView(state: AppState): string {
   const bullets = (b: GuideStep | undefined, match?: RegExp) =>
     (b?.points ?? [])
       .filter((t) => !match || match.test(t))
-      .map((t) => `<li>${escapeHtml(t)}</li>`)
+      .map((t) => `<li>${ruleText(t)}</li>`)
       .join("");
 
   // One activation step: its name, its Quick Reference line, its diagram and its
@@ -2801,7 +2842,7 @@ function learnView(state: AppState): string {
     const a = ACTIVATION_STEPS[i]!;
     return `<section class="learn-step">
       <h3 class="learn-step-h"><span class="learn-step-n">${i + 1}</span>${escapeHtml(a.name)}</h3>
-      <p class="learn-note">${escapeHtml(a.text)}</p>
+      <p class="learn-note">${ruleText(a.text)}</p>
       ${body}
     </section>`;
   };
@@ -2819,7 +2860,7 @@ function learnView(state: AppState): string {
         <span class="learn-acc-n">${i + 1}</span>
         <span class="learn-acc-text">
           <span class="learn-acc-title">${escapeHtml(ph.name)}</span>
-          <span class="learn-acc-lede">${escapeHtml(ph.text)}</span>
+          <span class="learn-acc-lede">${ruleText(ph.text)}</span>
         </span>
         ${icon("chevronRight", 17, "learn-acc-chev")}
       </summary>
@@ -2845,13 +2886,13 @@ function learnView(state: AppState): string {
     // 2 - The table
     `<div class="learn-screen">
       <h1 class="learn-title">Setup and winning</h1>
-      <p class="learn-lede">${escapeHtml(csStep("Setup")?.text ?? "")}</p>
+      <p class="learn-lede">${ruleText(csStep("Setup")?.text ?? "")}</p>
       ${learnDiagram("deployment")}
       <h2 class="learn-sub">Blockading</h2>
       <ul class="learn-rules">${bullets(csStep("Special rules"), /^Blockading/)}</ul>
       <h2 class="learn-sub">Victory points</h2>
       <ul class="learn-rules">${bullets(csStep("Victory points"))}</ul>
-      <p class="learn-note">${escapeHtml(csStep("Game end and victory")?.text ?? "")}</p>
+      <p class="learn-note">${ruleText(csStep("Game end and victory")?.text ?? "")}</p>
     </div>`,
     // 3 - The round. Four accordions, one per phase, each stated exactly once.
     `<div class="learn-screen">
@@ -2946,7 +2987,7 @@ function learnView(state: AppState): string {
              <li>Discard any CMD tokens you did not spend. They do not carry over, so a token saved for later is a token wasted. (Some faction rules change this.)</li>
              <li>Begin the next round. The game ends after Round 4.</li>
            </ul>
-           <p class="learn-note">${escapeHtml(csStep("Game end and victory")?.text ?? "")}</p>`,
+           <p class="learn-note">${ruleText(csStep("Game end and victory")?.text ?? "")}</p>`,
         )}
       </div>
     </div>`,

@@ -9,6 +9,24 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.78",
+    date: "2026-07-19",
+    title: "Mass is Ⓜ again, and the catalog rows are fixed",
+    items: [
+      "Mass is the circled M everywhere, the symbol the rulebook itself uses. It had been drawn as a hexagon, which is a shape the game never uses for anything.",
+      "Put the Ⓜ back into the rules text that had lost it. Roughly thirty places rendered rules prose through the plain escaper rather than the one that draws the symbol: the whole of Solo mode, the printed Actions and Commands reference, the Play Mode command cards and checklists, and most of Learn to Play.",
+      "Stopped dropping a qualifying clause from a printed rule for being over sixty characters long. That silently deleted a condition and printed the rest as though it applied unconditionally.",
+      "Fixed the ship class rows. They had three layout columns but only two things to put in them, so every ship name wrapped one word per line and the ADD button sat in the middle of the row on top of the stats. The rows are half the height they were.",
+      "Redrew the firing arc symbols. Both now stand on the same short hull bar, so a narrow spike (the 45 degree cone) and a dome (the full 180) can be told apart at a glance instead of reading as two identical smudges.",
+      "The five top navigation targets are exactly the same size on phones, and the row runs edge to edge.",
+      "Duplicate, Share and Delete on a fleet card are icons now.",
+      "Play Mode: the round is a readout, not a pair of buttons. It only ever moves one way and Next phase already moves it.",
+      "Hypergrowth credits can go below zero, because that is how the mode is played: you requisition ships out of your Shipyard before you have earned anything. A debt shows in red. Credit scores now step in twenties and read as money, matching the ¢20bn the objectives pay.",
+      "The damage boxes on a print card say what they are, and each ship in a unit gets its own numbered row. They used to print as an unlabelled block of empty squares.",
+      "Removed things that were on screen twice: the outfit name and emblem in Solo, an unlabelled duplicate of the +1 Alert button, the phase name repeated under the phase switcher, the faction name printed three times in the Custom Rules editor, and the column headings repeated inside every cell of the faction table.",
+    ],
+  },
+  {
     version: "0.8.77",
     date: "2026-07-19",
     title: "Options is part of the rail now",

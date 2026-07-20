@@ -122,7 +122,11 @@ const COST_REDUCE = /reduces\s+the\s+cost\s+of\s+the\s+(.+?)\s+commands?\s+to\s+
  */
 function readScope(raw: string): string | undefined {
   const s = raw.replace(/^[\s\S]*?[.;]\s*/, "").trim();
-  if (!s || s.length > 60) return undefined;
+  // No length cap. There used to be one - anything over 60 characters was
+  // dropped - which silently deleted a qualifier from a published rule and
+  // printed the rest as though it applied unconditionally. A long clause is
+  // still the rule; length is not a correctness signal.
+  if (!s) return undefined;
   // "Each unit in this fleet" / "Ships in this fleet" carry no information -
   // that is just "your fleet", which the reader already knows.
   if (/^(each\s+unit|units?|ships?)\s+in\s+this\s+fleet$/i.test(s)) return undefined;

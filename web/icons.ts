@@ -24,6 +24,15 @@ const PATHS: Record<string, string> = {
   home: '<path d="M4 11 12 4 20 11"/><path d="M6 10 V20 H18 V10"/>',
   pencil: '<path d="M4 20 5 16 16.5 4.5 19.5 7.5 8 19 Z"/><line x1="14.5" y1="6.5" x2="17.5" y2="9.5"/>',
   duplicate: '<rect x="8" y="8" width="12" height="12"/><path d="M16 4 H4 V16"/>',
+  // Siemens iX-style solid marks for the three card actions. Solid, geometric,
+  // 2px corner radii: they read at 18px on a card where the stroke set goes
+  // muddy, and the card shows them without labels.
+  "ix-duplicate":
+    '<g fill="currentColor" stroke="none"><path d="M9 2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-1v-2h1V4H9v1H7V4a2 2 0 0 1 2-2Z"/><rect x="3" y="7" width="13" height="15" rx="2"/></g>',
+  "ix-share":
+    '<g fill="currentColor" stroke="none"><circle cx="18.5" cy="5" r="3.2"/><circle cx="18.5" cy="19" r="3.2"/><circle cx="5.5" cy="12" r="3.2"/><path d="m7.9 9.9 8.2-4.1.9 1.8-8.2 4.1zm0 4.2.9-1.8 8.2 4.1-.9 1.8z"/></g>',
+  "ix-trash":
+    '<g fill="currentColor" stroke="none"><path d="M9.5 2h5a1.5 1.5 0 0 1 1.5 1.5V5h5v2H3V5h5V3.5A1.5 1.5 0 0 1 9.5 2Zm.5 3h4v-1h-4z"/><path d="M5 8h14l-.8 12.1A2 2 0 0 1 16.2 22H7.8a2 2 0 0 1-2-1.9zm4 2v9h1.6v-9zm4.4 0v9H15v-9z"/></g>',
   trash: '<path d="M5 7 H19"/><path d="M9 7 V5 H15 V7"/><path d="M7 7 8 20 H16 L17 7"/>',
   save: '<path d="M5 4 H16 L20 8 V20 H5 Z"/><rect x="8" y="13" width="8" height="7"/><rect x="8" y="4" width="7" height="4"/>',
   chevronDown: '<polyline points="6 9 12 15 18 9"/>',
@@ -48,17 +57,27 @@ const PATHS: Record<string, string> = {
   image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.8" fill="currentColor" stroke="none"/><path d="M4 18 9 12 13 16 16 13 20 18" fill="none"/>',
   die: '<rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="9" cy="9" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="9" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="9" cy="15" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="15" r="1.5" fill="currentColor" stroke="none"/>',
   // ship-stat glyphs, drawn on the 24 grid to sit inline with numbers
-  "stat-mass": '<path fill="currentColor" stroke="none" d="M12 2 21 7 21 17 12 22 3 17 3 7 Z"/>',
+  // Mass is Ⓜ - the circled M, the game's own symbol for it. It was a hexagon
+  // for a while, which is a shape the rulebook never uses for anything. The
+  // same mark is drawn inline inside rules prose by ruleText() in format.ts;
+  // if one changes, change the other.
+  "stat-mass":
+    '<circle cx="12" cy="12" r="10.2"/><polyline points="7.4 16.6 7.4 7.4 12 12.8 16.6 7.4 16.6 16.6" stroke-linejoin="round"/>',
   "stat-thrust":
     '<path fill="currentColor" stroke="none" d="m13.061 4.939l-2.122 2.122L15.879 12l-4.94 4.939l2.122 2.122L20.121 12z"/><path fill="currentColor" stroke="none" d="M6.061 19.061L13.121 12l-7.06-7.061l-2.122 2.122L8.879 12l-4.94 4.939z"/>',
   "stat-silhouette": '<circle cx="12" cy="12" r="7"/><line x1="12" y1="1.5" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22.5" y2="12"/>',
   "stat-shields": '<path d="M12 3 20 6 V11 C20 16 16.5 19.5 12 21 C7.5 19.5 4 16 4 11 V6 Z"/>',
   // ship silhouettes by Mass class: filled geometric hulls, not stroked
-  // Firing-arc glyphs: a filled wedge fanning out from a ship's nose, same
-  // radius for both so only the angle (not a fictional "reach") differs -
-  // primary is the narrow 45 degree cone dead ahead, auxiliary the full 180.
-  "arc-primary": '<path fill="currentColor" stroke="none" d="M12 21 8.17 11.76A10 10 0 0 1 15.83 11.76Z"/>',
-  "arc-aux": '<path fill="currentColor" stroke="none" d="M12 21 2 21A10 10 0 0 1 22 21Z"/>',
+  // Firing-arc glyphs. Both sit on the same short hull bar, which is what makes
+  // them readable at 12px: the eye compares two shapes standing on a shared
+  // baseline instead of two blue blobs of unknown orientation. A narrow spike
+  // is the 45 degree cone dead ahead; a dome is the full 180. The angles are
+  // drawn true - the cone is 42 degrees of the 45, the dome a real half-disc -
+  // so the picture is not lying about coverage.
+  "arc-primary":
+    '<g fill="currentColor" stroke="none"><path d="M12 18.4 7.9 7.9A11.2 11.2 0 0 1 16.1 7.9Z"/><rect x="7.4" y="18.4" width="9.2" height="3"/></g>',
+  "arc-aux":
+    '<g fill="currentColor" stroke="none"><path d="M1.6 18.4A10.4 10.4 0 0 1 22.4 18.4Z"/><rect x="7.4" y="18.4" width="9.2" height="3"/></g>',
 };
 
 // Fleet emblems: crisp geometric insignia on the 24 grid. Filled where a bold

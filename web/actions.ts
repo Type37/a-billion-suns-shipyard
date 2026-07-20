@@ -131,6 +131,15 @@ function showToast(message: string): void {
   }, 2200);
 }
 
+/**
+ * The floor for a score counter. Hypergrowth is played in credits and you spend
+ * them before you earn them, so it has no floor; every other mode scores victory
+ * points, which cannot be negative.
+ */
+function floorScore(mode: GameMode, value: number): number {
+  return mode === "hypergrowth" ? value : Math.max(0, value);
+}
+
 function currentListId(): string | null {
   const r = store.getState().route;
   return r.view === "builder" || r.view === "print" || r.view === "play" ? r.listId : null;
@@ -1119,10 +1128,15 @@ function handleClick(e: MouseEvent): void {
               return { ...l, play: { ...p, round: Math.max(1, Math.min(maxRound, p.round + delta)) } };
             case "play-cmd":
               return { ...l, play: { ...p, cmd: Math.max(0, p.cmd + delta) } };
+            // Hypergrowth is played in credits, and you requisition ships out of
+            // your Shipyard before you have earned anything: "You start with 0
+            // credits, and recover that expenditure by earning credits from the
+            // objectives." A debt is the normal state of the first two rounds,
+            // so the counter must go below zero there. Victory points cannot.
             case "play-vp":
-              return { ...l, play: { ...p, vp: Math.max(0, p.vp + delta) } };
+              return { ...l, play: { ...p, vp: floorScore(l.mode, p.vp + delta) } };
             case "play-oppvp":
-              return { ...l, play: { ...p, oppVp: Math.max(0, p.oppVp + delta) } };
+              return { ...l, play: { ...p, oppVp: floorScore(l.mode, p.oppVp + delta) } };
             case "play-reset":
               return confirm("Reset the round, phase, CMD, and scores for this game?")
                 ? { ...l, play: freshPlayState(faction) }

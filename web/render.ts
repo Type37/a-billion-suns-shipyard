@@ -13,8 +13,8 @@ import {
   commandRow,
   diceRow,
   emblemMark,
+  fleetsMark,
   icon,
-  massGlyph,
   statChips,
   tacticalDiagram,
 } from "./icons.ts";
@@ -419,7 +419,7 @@ function topbar(): string {
     <a class="wordmark" href="#/">${icon("logo", 26)}<span class="wordmark-text">A Billion Suns 2e</span><span class="wordmark-sub">Shipyard</span></a>
     <nav class="topnav" aria-label="Main">
       <span class="nav-pill" aria-hidden="true"></span>
-      <a href="#/fleets">${icon("flag", 16)} Fleets</a>
+      <a href="#/fleets">${fleetsMark(17)} Fleets</a>
       <a href="#/solo">${icon("book", 16)} Solo</a>
       <a href="#/ships">${icon("compare", 16)} Compendium</a>
       <a href="#/foundry">${icon("wrench", 16)} Custom Rules</a>
@@ -865,7 +865,6 @@ function catalogShipRow(ship: ShipClass, ownerFaction: Faction, composite: boole
   // appears when you add a unit without reflowing (and shifting) the catalog.
   return `
   <article class="ship-row is-option ${ship.image ? "has-art" : ""}" data-action="add-unit" data-ship="${addId}" role="button" tabindex="0" title="Add a unit of ${escapeHtml(ship.name)}">
-    <div class="ship-row-glyph">${ship.image ? `<img class="ship-thumb" src="${ship.image}" alt="" loading="lazy" />` : massGlyph(ship.mass, 22)}${owned > 0 ? `<span class="owned-badge" title="${owned} in fleet">${owned}</span>` : ""}</div>
     <div class="ship-row-body">
       <div class="ship-row-head">
         <h4 class="ship-name">${escapeHtml(ship.name)}</h4>
@@ -1136,7 +1135,7 @@ function builderView(state: AppState): string {
       return `
       <div class="roster-unit ${r ? "" : "unresolved"}" data-roster-key="${u.id}">
         <span class="ru-id">
-          <span class="roster-unit-glyph">${r ? massGlyph(r.ship.mass, 22) : icon("warning", 20)}</span>
+          ${r ? "" : `<span class="roster-unit-glyph">${icon("warning", 20)}</span>`}
           <span class="ru-main">
             ${
               isStocking
@@ -2137,7 +2136,6 @@ function playFleetPanel(list: SavedList, faction: Faction | undefined, customs: 
       return `
       <article class="pf-unit">
         <header class="pf-head">
-          <span class="pf-glyph">${massGlyph(ship.mass, 20)}</span>
           <span class="pf-name">${escapeHtml(title)}${u.count > 1 ? ` <span class="pf-x">&times;${u.count}</span>` : ""}</span>
         </header>
         <div class="pf-stats">${statChips(ship, true)}</div>

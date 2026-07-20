@@ -9,6 +9,19 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.74",
+    date: "2026-07-19",
+    title: "New marks, and the ship-size glyphs retired",
+    items: [
+      "Two new emblems: Ascending Bars (white on blue) and Exchange Loop (black on white).",
+      "New Thrust symbol — a double chevron.",
+      "New Fleets symbol in the top navigation.",
+      "Removed the ship-size glyphs everywhere. Mass is a number on the stat block; it does not also need a silhouette beside it.",
+      "Fixed the top navigation on phones. Every item was forced to an identical width, so \"Compendium\" overflowed its own border while \"Solo\" sat in a half-empty box. Each one is sized to its own label now.",
+      "Rebuilt the Learn to Play progress rail. The stretching rules between steps pushed the first and last to opposite edges with a long empty span between them; the steps are self-contained chips that reflow cleanly now.",
+    ],
+  },
+  {
     version: "0.8.73",
     date: "2026-07-19",
     title: "Second batch of tester fixes",

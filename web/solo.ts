@@ -31,7 +31,7 @@ import {
   PERKS_BY_CLASS,
 } from "../src/data/junkspace-solo.ts";
 import { escapeHtml, formatDate } from "./format.ts";
-import { icon, massGlyph, statChips } from "./icons.ts";
+import { icon, statChips } from "./icons.ts";
 import { emblemView, weaponsTable } from "./render.ts";
 import { libraryUrl } from "./emblems.ts";
 import gunnerIcon from "./pilots/gunner.png";
@@ -130,7 +130,6 @@ function soloShipCatalog(): string {
   return JUNKSPACE_SHIPS.map(
     (s) => `
     <article class="ship-row is-option" data-action="outfit-add-ship" data-ship="${s.id}" role="button" tabindex="0">
-      <div class="ship-row-glyph">${massGlyph(s.mass, 22)}</div>
       <div class="ship-row-body">
         <div class="ship-row-head">
           <h4 class="ship-name">${escapeHtml(s.name)}</h4>
@@ -164,7 +163,7 @@ function outfitTab(o: SavedOutfit): string {
       return `
       <article class="roster-unit" data-roster-key="${s.id}">
         <div class="roster-unit-head">
-          <span class="roster-unit-glyph">${def ? massGlyph(def.mass, 22) : icon("warning", 20)}</span>
+          ${def ? "" : `<span class="roster-unit-glyph">${icon("warning", 20)}</span>`}
           <input class="unit-name-input" type="text" value="${escapeHtml(s.shipName ?? "")}" placeholder="${escapeHtml(def?.name ?? "Ship")}" data-action="outfit-ship-name" data-ship="${s.id}" />
           <span class="roster-unit-cost">${ck(def?.cost ?? 0)}</span>
         </div>

@@ -41,14 +41,11 @@ const PATHS: Record<string, string> = {
   die: '<rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="9" cy="9" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="9" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="9" cy="15" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="15" r="1.5" fill="currentColor" stroke="none"/>',
   // ship-stat glyphs, drawn on the 24 grid to sit inline with numbers
   "stat-mass": '<path fill="currentColor" stroke="none" d="M12 2 21 7 21 17 12 22 3 17 3 7 Z"/>',
-  "stat-thrust": '<path d="M3 7 10 12 3 17 Z" fill="currentColor" stroke="none"/><path d="M12 7 19 12 12 17 Z" fill="currentColor" stroke="none"/>',
+  "stat-thrust":
+    '<path fill="currentColor" stroke="none" d="m13.061 4.939l-2.122 2.122L15.879 12l-4.94 4.939l2.122 2.122L20.121 12z"/><path fill="currentColor" stroke="none" d="M6.061 19.061L13.121 12l-7.06-7.061l-2.122 2.122L8.879 12l-4.94 4.939z"/>',
   "stat-silhouette": '<circle cx="12" cy="12" r="7"/><line x1="12" y1="1.5" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22.5" y2="12"/>',
   "stat-shields": '<path d="M12 3 20 6 V11 C20 16 16.5 19.5 12 21 C7.5 19.5 4 16 4 11 V6 Z"/>',
   // ship silhouettes by Mass class: filled geometric hulls, not stroked
-  mass0: '<path fill="currentColor" stroke="none" d="M12 4 20 20 12 16 4 20 Z"/>',
-  mass1: '<path fill="currentColor" stroke="none" d="M12 3 15 9 15 17 18 21 6 21 9 17 9 9 Z"/>',
-  mass2: '<path fill="currentColor" stroke="none" d="M12 2 16 7 16 14 20 18 20 21 4 21 4 18 8 14 8 7 Z"/>',
-  mass3: '<path fill="currentColor" stroke="none" d="M12 2 15 5 15 9 20 13 20 22 14 22 14 18 10 18 10 22 4 22 4 13 9 9 9 5 Z"/>',
   // Firing-arc glyphs: a filled wedge fanning out from a ship's nose, same
   // radius for both so only the angle (not a fictional "reach") differs -
   // primary is the narrow 45 degree cone dead ahead, auxiliary the full 180.
@@ -82,10 +79,6 @@ export function emblem(name: string, size = 28, cls = ""): string {
   return `<svg class="emblem ${cls}" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true">${body}</svg>`;
 }
 
-
-export function massGlyph(mass: number, size = 20): string {
-  return icon(`mass${Math.max(0, Math.min(3, mass))}`, size, "mass-glyph");
-}
 
 /**
  * A row of die glyphs matching an Initiative pool: "2D6" -> two dice, "3D6" ->
@@ -157,11 +150,11 @@ export function statChips(
   // icon + number is a puzzle. Compact only shrinks the type, it never drops
   // the label (the labels use a condensed face so they stay cheap in width).
   //
-  // Mass is ALWAYS here. It was briefly dropped from rows that draw massGlyph(),
-  // on the reasoning that the glyph made the chip redundant - but the glyph is a
-  // hull silhouette keyed to the mass tier, not a numeral. Removing the chip
-  // removed the only readable Mass value in the app, and the first thing testers
-  // asked was where Mass had gone.
+  // Mass is ALWAYS here. It was briefly dropped from rows that drew a hull
+  // silhouette beside them, on the reasoning that the shape made the chip
+  // redundant - but a silhouette is not a numeral, so that removed the only
+  // readable Mass value in the app. Those silhouettes are gone entirely now;
+  // this chip is the whole story.
   const chip = (name: string, label: string, val: string) =>
     `<span class="stat-chip ${compact ? "stat-chip-mini" : ""}">${icon(name, compact ? 12 : 14, "stat-ico")}<span class="stat-lbl">${label}</span><span class="stat-val">${val}</span></span>`;
   return `<span class="stat-chips ${compact ? "stat-chips-mini" : ""}">${chip("stat-mass", "Mass", String(s.mass))}${chip("stat-thrust", "Thrust", `${s.thrust}"`)}${chip("stat-silhouette", "Sil", String(s.silhouette))}${chip("stat-shields", "Shields", String(s.shields))}</span>`;
@@ -254,4 +247,36 @@ const CREDITS_VB = { w: 44.81, h: 41.45 };
 export function creditsGlyph(size = 12): string {
   const w = (size * CREDITS_VB.w) / CREDITS_VB.h;
   return `<svg class="credits-glyph" width="${w.toFixed(2)}" height="${size}" viewBox="0 0 ${CREDITS_VB.w} ${CREDITS_VB.h}" fill="currentColor" aria-hidden="true" focusable="false">${CREDITS_INNER}</svg>`;
+}
+
+
+/**
+ * The Fleets mark. Unlike everything else in this file it carries its own fills
+ * and gradients rather than inheriting currentColor, so it needs a dedicated
+ * renderer - and unique gradient ids per call, because two copies on one page
+ * sharing an id makes the second definition win for both.
+ */
+let fleetsMarkSeq = 0;
+export function fleetsMark(size = 16, cls = ""): string {
+  const n = ++fleetsMarkSeq;
+  const a = `fleetsA${n}`;
+  const b = `fleetsB${n}`;
+  return `<svg class="icon icon-fleets ${cls}" width="${size}" height="${size}" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+    <g fill="none">
+      <path fill="url(#${a})" d="M15.5 7H7l-.5-2L7 3h8.5A1.5 1.5 0 0 1 17 4.5v1A1.5 1.5 0 0 1 15.5 7"/>
+      <path fill="url(#${a})" d="M7 12h8.5a1.5 1.5 0 0 0 1.5-1.5v-1A1.5 1.5 0 0 0 15.5 8H7l-.5 2z"/>
+      <path fill="url(#${a})" d="M7 17h8.5a1.5 1.5 0 0 0 1.5-1.5v-1a1.5 1.5 0 0 0-1.5-1.5H7l-.5 2z"/>
+      <path fill="url(#${b})" d="M7 7V3H4.5A1.5 1.5 0 0 0 3 4.5v1A1.5 1.5 0 0 0 4.5 7z"/>
+      <path fill="url(#${b})" d="M7 8v4H4.5A1.5 1.5 0 0 1 3 10.5v-1A1.5 1.5 0 0 1 4.5 8z"/>
+      <path fill="url(#${b})" d="M7 13v4H4.5A1.5 1.5 0 0 1 3 15.5v-1A1.5 1.5 0 0 1 4.5 13z"/>
+      <defs>
+        <linearGradient id="${a}" x1="4.925" x2="16.953" y1="1" y2="16.207" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#36dff1"/><stop offset="1" stop-color="#0094f0"/>
+        </linearGradient>
+        <linearGradient id="${b}" x1="3.951" x2="9.941" y1="4.861" y2="7.594" gradientUnits="userSpaceOnUse">
+          <stop offset=".125" stop-color="#9c6cfe"/><stop offset="1" stop-color="#7a41dc"/>
+        </linearGradient>
+      </defs>
+    </g>
+  </svg>`;
 }

@@ -1616,12 +1616,16 @@ button { font-family: inherit; }
      label; nothing here is icon-only. It still wraps if a label cannot fit. */
   .topbar { height: auto; min-height: 54px; flex-wrap: wrap; padding: 9px clamp(12px, 4vw, 16px); gap: 8px 10px; }
   .wordmark-sub { display: none; }
-  .topnav { width: 100%; flex-wrap: nowrap; gap: 4px; }
+  .topnav { width: 100%; flex-wrap: wrap; gap: 5px; }
   /* All four fit on ONE row by letting a long label wrap inside its own button
      (white-space: normal) instead of being clipped by nowrap or dropped to an
      icon. Every item keeps its icon AND its full text; nothing is truncated. */
   .topnav a {
-    flex: 1 1 0; min-width: 0;
+    /* flex-basis auto, not 0: with 0 every item got an identical share and the
+       longest label ("Compendium") overflowed its own border while short ones
+       sat in half-empty boxes. Sizing to content and letting them grow keeps
+       every box snug around its own label. */
+    flex: 1 1 auto; min-width: 0;
     flex-direction: column; align-items: center; justify-content: center; text-align: center;
     white-space: normal; overflow-wrap: break-word; line-height: 1.2; gap: 3px;
     padding: 7px 3px; font-size: 10px; letter-spacing: 0.02em;
@@ -2446,15 +2450,17 @@ button { font-family: inherit; }
 #app > .learn-main { max-width: 780px; margin: 0 auto; padding: clamp(20px, 3vw, 34px) clamp(16px, 4vw, 40px) 72px; }
 
 /* Progress dots along the top */
-.learn-progress { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 28px; }
-.learn-dot { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--ink-3); padding: 5px 4px; }
+/* A wrapping row of equal chips. The old rail used stretchy separators, which
+   pushed the last step to the far edge and left a long empty span mid-row. */
+.learn-progress { display: flex; align-items: flex-start; gap: 6px 8px; flex-wrap: wrap; margin-bottom: 22px; }
+.learn-dot { display: inline-flex; align-items: center; gap: 7px; text-decoration: none; color: var(--ink-3); padding: 6px 8px; border: 1px solid transparent; }
 .learn-dot-n { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 1.5px solid var(--hair); font-family: var(--display); font-weight: 800; font-size: 12px; color: var(--ink-3); }
 .learn-dot-l { font-family: var(--sans); font-size: 12px; font-weight: 700; }
 .learn-dot.on .learn-dot-n { background: var(--blue); border-color: var(--blue); color: #fff; }
 .learn-dot.on .learn-dot-l { color: var(--ink); }
 .learn-dot.done .learn-dot-n { border-color: var(--blue); color: var(--blue); }
 .learn-dot:hover .learn-dot-l { color: var(--ink); }
-.learn-dot-sep { flex: 1 1 8px; height: 1px; background: var(--hair-soft); min-width: 8px; }
+.learn-dot-sep { display: none; }
 
 .learn-eyebrow { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; font-size: 11px; color: var(--red); margin: 0 0 8px; }
 .learn-title { font-family: var(--display); font-weight: 900; font-size: clamp(28px, 4.4vw, 44px); line-height: 1.04; letter-spacing: -0.01em; margin: 0 0 14px; color: var(--ink); }
@@ -3239,3 +3245,20 @@ a .icon,
   .mf-grp-fac { flex: 1 1 100%; }
 }
 .learn-sub-min { font-family: var(--display); font-weight: 800; font-size: 14px; margin: 16px 0 3px; color: var(--ink); }
+
+
+/* Learn rail, responsive. Each step is a self-contained chip; the sub-steps hang
+   under their parent as a short indented column. Nothing stretches, so the row
+   reflows cleanly instead of leaving a lopsided gap. */
+.learn-dot-group { flex: 0 1 auto; }
+.learn-dot.on { border-color: var(--blue); color: var(--ink); }
+.learn-dot.done { color: var(--ink-2); }
+.learn-dot-subs { gap: 1px; }
+.learn-dot.is-sub { padding: 4px 8px; font-size: 12px; }
+@media (max-width: 700px) {
+  .learn-progress { gap: 4px 6px; margin-bottom: 18px; }
+  .learn-dot { padding: 5px 7px; gap: 6px; }
+  .learn-dot-l { font-size: 12px; }
+  .learn-dot-group { flex: 1 1 auto; }
+  .learn-dot-subs { margin-left: 8px; padding-left: 10px; }
+}

@@ -1764,6 +1764,33 @@ button { font-family: inherit; }
      .weap-table .wt-h is matched at its own specificity, not as a bare .wt-h -
      the base rule is (0,2,0) and would otherwise win on specificity, not order. */
   .stat-chip-mini { font-size: 13px; }
+
+  /* Hyper-tight stat blocks on phones. The four figures are a single glanceable
+     unit, so the space BETWEEN them is dead weight on a screen this narrow -
+     but the type is not, and none of this touches the sizes above. Padding and
+     gaps only: rows lose their gutter entirely, chips lose their trailing pad,
+     and the line box is pulled in to the type. Scoped to the places that draw a
+     ship's stats, so the bordered chip used elsewhere is left alone. */
+  .builder .stat-chips,
+  .ship-row .stat-chips,
+  .roster-unit .stat-chips,
+  .solo-body .stat-chips,
+  .mf-manifest .mf-list .roster-unit .ru-details .stat-chips,
+  .ru-details .stat-chips {
+    gap: 0 9px;
+  }
+  /* Via .stat-chips, not the container alone: `.builder .stat-chip` is declared
+     later in this file at the same specificity and would otherwise win on
+     order. Three classes beats two. */
+  .builder .stat-chips .stat-chip,
+  .ship-row .stat-chips .stat-chip,
+  .roster-unit .stat-chips .stat-chip,
+  .solo-body .stat-chips .stat-chip {
+    padding: 0 2px 0 0;
+    gap: 3px;
+    column-gap: 3px;
+    line-height: 1.15;
+  }
   .stat-lbl, .readout-label, .control-label, .mf-h-count,
   .faction-plaque-rule, .faction-era-label { font-size: 11px; }
 
@@ -2857,6 +2884,25 @@ button { font-family: inherit; }
    at any column width.
    --------------------------------------------------------------------------- */
 .ship-row-body, .roster-unit { container-type: inline-size; }
+
+/* A ship's name never gets cut off. The roster row is `minmax(0, 1fr) auto`,
+   and the controls track (stepper, cost, delete) is a fixed ~272px, so the name
+   track takes whatever is left and shrinks below its own content - at a 428px
+   roster column "Epistle-Class Gunship" needs 169px and got 133, so it read
+   "Epistle-Class Gun". It is an <input>, so it cannot wrap its way out.
+   Below the width where both fit on one line, the name takes a line of its own
+   and the controls drop beneath it. Costs a row of height; never costs a name.
+
+   The container is the LIST, not the row: a container query cannot style its own
+   container, and .roster-unit is one already (for the weapons table below). */
+.mf-list { container: roster / inline-size; }
+@container roster (max-width: 470px) {
+  .mf-manifest .mf-list .roster-unit {
+    grid-template-areas: "id id" "controls controls" "details details";
+  }
+  .mf-manifest .mf-list .roster-unit .ru-controls { justify-content: flex-start; }
+}
+
 @container (max-width: 360px) {
   .wt-row {
     display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px;

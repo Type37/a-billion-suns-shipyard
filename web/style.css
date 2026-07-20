@@ -1616,22 +1616,32 @@ button { font-family: inherit; }
      label; nothing here is icon-only. It still wraps if a label cannot fit. */
   .topbar { height: auto; min-height: 54px; flex-wrap: wrap; padding: 9px clamp(12px, 4vw, 16px); gap: 8px 10px; }
   .wordmark-sub { display: none; }
-  .topnav { width: 100%; flex-wrap: wrap; gap: 5px; }
+  /* All five on ONE row, Options included. Sized to content but allowed to
+     shrink, so a long label narrows rather than pushing the last item onto a
+     line by itself. */
+  .topnav { width: 100%; flex-wrap: nowrap; gap: 4px; }
   /* All four fit on ONE row by letting a long label wrap inside its own button
      (white-space: normal) instead of being clipped by nowrap or dropped to an
      icon. Every item keeps its icon AND its full text; nothing is truncated. */
   .topnav a {
     /* flex-basis auto, not 0: with 0 every item got an identical share and the
        longest label ("Compendium") overflowed its own border while short ones
-       sat in half-empty boxes. Sizing to content and letting them grow keeps
-       every box snug around its own label. */
-    flex: 1 1 auto; min-width: 0;
+       sat in half-empty boxes. Sizing to content, and allowed to shrink so all
+       five fit one row. */
+    flex: 0 1 auto; min-width: 0;
     flex-direction: column; align-items: center; justify-content: center; text-align: center;
     white-space: normal; overflow-wrap: break-word; line-height: 1.2; gap: 3px;
     padding: 7px 3px; font-size: 10px; letter-spacing: 0.02em;
     border: 1px solid rgba(255, 255, 255, 0.18);
   }
-  .topnav a svg { width: 15px; height: 15px; flex-shrink: 0; }
+  .topnav a svg, .topnav-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+  .topnav-btn {
+    flex: 0 1 auto; min-width: 0;
+    flex-direction: column; align-items: center; justify-content: center; text-align: center;
+    white-space: normal; overflow-wrap: break-word; line-height: 1.2; gap: 3px;
+    padding: 7px 3px; font-size: 10px; letter-spacing: 0.02em;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
   .nav-pill { display: none; }
 
   /* Readability floor. Nothing a player reads at arm's length across a table
@@ -2978,18 +2988,26 @@ a .icon,
 .learn-rules li::marker { color: var(--ink-3); }
 .learn-phase b a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--hair); }
 .learn-phase b a:hover { color: var(--blue); border-bottom-color: var(--blue); }
-/* The four phases hang vertically off "The round" on a rail, so the indent says
-   they are parts of step 4 rather than steps 5 to 8 of a longer walkthrough. */
-.learn-progress { align-items: flex-start; }
-.learn-dot-group { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
-.learn-dot-subs { display: flex; flex-direction: column; align-items: flex-start; margin: 2px 0 0 11px; padding-left: 14px; border-left: 1px solid var(--hair); }
+/* Two stacked rows: the five main steps, then the four phases of step 4 beneath
+   them on their own rail. Nesting the phases inside step 4's chip made that chip
+   four links wide and pushed "Battle" to the far edge of the row. */
+.learn-progress { flex-direction: column; align-items: stretch; gap: 6px; }
+.learn-rail { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+.learn-dot-subs {
+  display: flex; flex-direction: row; flex-wrap: wrap; align-items: center;
+  gap: 2px 4px; padding: 3px 0 3px 10px;
+  border-left: 2px solid var(--hair);
+}
+.learn-subs-tag {
+  font-family: var(--display); font-weight: 800; font-size: 10.5px;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3);
+  padding: 3px 6px 3px 0;
+}
 .learn-dot.is-sub { padding: 3px 4px; }
 .learn-dot.is-sub .learn-dot-n { display: none; }
 .learn-dot.is-sub .learn-dot-l { font-size: 11.5px; font-weight: 600; color: var(--ink-3); }
 .learn-dot.is-sub:hover .learn-dot-l { color: var(--ink); }
 .learn-dot.is-sub.on .learn-dot-l { color: var(--blue); font-weight: 800; }
-/* The connectors sit on the main row, not at the top of the tallest group. */
-.learn-dot-sep { margin-top: 17px; }
 
 /* Phase accordions. Each phase is one of these and appears nowhere else on the
    page, which is the whole point: the name is written once, in the header. */
@@ -3247,18 +3265,15 @@ a .icon,
 .learn-sub-min { font-family: var(--display); font-weight: 800; font-size: 14px; margin: 16px 0 3px; color: var(--ink); }
 
 
-/* Learn rail, responsive. Each step is a self-contained chip; the sub-steps hang
-   under their parent as a short indented column. Nothing stretches, so the row
-   reflows cleanly instead of leaving a lopsided gap. */
-.learn-dot-group { flex: 0 1 auto; }
+/* Learn rail, responsive. Each step is a self-contained chip that never grows,
+   so the row reflows cleanly instead of leaving a lopsided gap. */
+.learn-dot { flex: 0 0 auto; }
 .learn-dot.on { border-color: var(--blue); color: var(--ink); }
 .learn-dot.done { color: var(--ink-2); }
-.learn-dot-subs { gap: 1px; }
+
 .learn-dot.is-sub { padding: 4px 8px; font-size: 12px; }
 @media (max-width: 700px) {
-  .learn-progress { gap: 4px 6px; margin-bottom: 18px; }
+  .learn-progress { gap: 5px; margin-bottom: 18px; }
   .learn-dot { padding: 5px 7px; gap: 6px; }
   .learn-dot-l { font-size: 12px; }
-  .learn-dot-group { flex: 1 1 auto; }
-  .learn-dot-subs { margin-left: 8px; padding-left: 10px; }
 }

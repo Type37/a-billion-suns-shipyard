@@ -14,6 +14,7 @@ import {
   diceRow,
   emblemMark,
   fleetsMark,
+  optionsMark,
   icon,
   statChips,
   tacticalDiagram,
@@ -423,7 +424,7 @@ function topbar(): string {
       <a href="#/solo">${icon("solo", 17)} Solo</a>
       <a href="#/ships">${icon("compendium", 17)} Compendium</a>
       <a href="#/foundry">${icon("custom-rules", 17)} Custom Rules</a>
-      <button class="topnav-btn" data-action="open-options" title="Options">${icon("sliders", 16)} Options</button>
+      <button class="topnav-btn" data-action="open-options" title="Options">${optionsMark(17)} Options</button>
     </nav>
   </header>`;
 }
@@ -510,9 +511,9 @@ function homeView(state: AppState): string {
       ${tutorialCallout(state)}
       <nav class="index">
         ${row("01", "#/fleets", "Fleets", "Build, save, print, and share army lists for any faction and era.")}
-        ${row("02", "#/solo", "Solo Play", "One player, dice-driven Hostiles, and a debt to clear in eight games.")}
-        ${row("03", "#/ships", "Ship Compendium", "Every ship in the game in one filterable, sortable table.")}
-        ${row("04", "#/learn", "Learn to Play", "A guided walkthrough with a ready-made Training Fleet: the mission, the round structure, then straight into a live game.")}
+        ${row("02", "#/solo", "Solo Play", "Play the Junkspace in solo/campaign mode.")}
+        ${row("03", "#/ships", "Ship Compendium", "Compare all ships and stats.")}
+        ${row("04", "#/learn", "Learn to Play", "A guided walkthrough of the rules.")}
         ${row("05", "#/foundry", "Custom Rules", "Design your own factions, ship classes, and personnel.")}
       </nav>
     </div>
@@ -2754,26 +2755,26 @@ function learnView(state: AppState): string {
   const step = state.route.view === "learn" ? state.route.step : 0;
   const anchor = state.route.view === "learn" ? state.route.anchor : undefined;
 
-  // The four phases hang vertically off "The round" rather than running on in
-  // the same horizontal track. Inline, they read as steps 5-8 of a nine-step
-  // walkthrough - which is what they used to be - and the row wrapped onto a
-  // second line at any normal width, so "Battle" ended up underneath "Command"
-  // looking like its child. Stacked, the indent says what they are: four parts
-  // of step 4, not four more steps.
-  const progress = LEARN_STEPS.map((s2, i) => {
-    const dot = `<a class="learn-dot ${i === step ? "on" : ""} ${i < step ? "done" : ""}" href="#/learn${i > 0 ? "/" + i : ""}"><span class="learn-dot-n">${i + 1}</span><span class="learn-dot-l">${escapeHtml(s2.label)}</span></a>`;
-    if (!s2.phases) return `<div class="learn-dot-group">${dot}</div>`;
-    const subs = ROUND_PHASES.map((p2) => {
-      const slug = phaseSlug(p2.name);
-      const on = i === step && anchor === slug;
-      return `<a class="learn-dot is-sub ${on ? "on" : ""}" href="#/learn/${i}/${slug}"><span class="learn-dot-l">${escapeHtml(p2.name.replace(" Phase", ""))}</span></a>`;
-    }).join("");
-    return `<div class="learn-dot-group">${dot}<div class="learn-dot-subs">${subs}</div></div>`;
-  })
+  // Two rows, not one. The phase links used to live inside step 4's chip, which
+  // made that one chip as wide as four links and shoved "Battle" out to the far
+  // edge with a dead span between them. They are their own row now: the main
+  // track of five steps on top, the four phases of step 4 underneath it.
+  const chips = LEARN_STEPS.map(
+    (s2, i) =>
+      `<a class="learn-dot ${i === step ? "on" : ""} ${i < step ? "done" : ""}" href="#/learn${i > 0 ? "/" + i : ""}"><span class="learn-dot-n">${i + 1}</span><span class="learn-dot-l">${escapeHtml(s2.label)}</span></a>`,
+  )
     .concat([
-      `<div class="learn-dot-group"><button class="learn-dot learn-dot-go" data-action="learn-launch"><span class="learn-dot-n">${LEARN_STEPS.length + 1}</span><span class="learn-dot-l">Battle</span></button></div>`,
+      `<button class="learn-dot learn-dot-go" data-action="learn-launch"><span class="learn-dot-n">${LEARN_STEPS.length + 1}</span><span class="learn-dot-l">Battle</span></button>`,
     ])
-    .join('<span class="learn-dot-sep" aria-hidden="true"></span>');
+    .join("");
+
+  const phaseStep = LEARN_STEPS.findIndex((s2) => s2.phases);
+  const subs = ROUND_PHASES.map((p2) => {
+    const slug = phaseSlug(p2.name);
+    const on = phaseStep === step && anchor === slug;
+    return `<a class="learn-dot is-sub ${on ? "on" : ""}" href="#/learn/${phaseStep}/${slug}"><span class="learn-dot-l">${escapeHtml(p2.name.replace(" Phase", ""))}</span></a>`;
+  }).join("");
+  const progress = `<div class="learn-rail">${chips}</div><div class="learn-dot-subs"><span class="learn-subs-tag">Step ${phaseStep + 1}</span>${subs}</div>`;
 
   // Rules text on these pages comes from TRAINING_GUIDES (transcribed from the
   // Combat Simulator scenario) and ROUND_PHASES / ACTIVATION_STEPS (transcribed

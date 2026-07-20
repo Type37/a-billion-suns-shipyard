@@ -9,6 +9,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.76",
+    date: "2026-07-19",
+    title: "Options joins the row, and the Learn rail straightens out",
+    items: [
+      "New symbol for Options, and Options now sits on the same line as the rest of the top navigation instead of dropping to a row of its own.",
+      "Plainer names on the main menu: Solo Play, Learn to Play and Ship Compendium, each with a one-line description of what it does.",
+      "Straightened the Learn to Play progress rail. The four phases used to live inside the \"The round\" chip, which made that one chip four links wide and shoved \"Battle\" out to the far edge with a dead gap in between. The five steps run across the top now, with the four phases on their own short rail underneath.",
+    ],
+  },
+  {
     version: "0.8.75",
     date: "2026-07-19",
     title: "The rest of the new symbols",

@@ -297,3 +297,48 @@ export function fleetsMark(size = 16, cls = ""): string {
     </g>
   </svg>`;
 }
+
+
+/**
+ * The Options mark. Like fleetsMark it brings its own gradients, so it needs
+ * per-call ids - two copies sharing one id would make the later definition win
+ * for both.
+ */
+let optionsMarkSeq = 0;
+export function optionsMark(size = 16, cls = ""): string {
+  const n = ++optionsMarkSeq;
+  const bar = `optBar${n}`;
+  const g1 = `optG1${n}`;
+  const g2 = `optG2${n}`;
+  const k1 = `optK1${n}`;
+  const k2 = `optK2${n}`;
+  const track = (y: number) =>
+    `<path fill="url(#${bar})" d="M14 ${y}.5a.5.5 0 0 0-.5-.5h-11l-.09.008A.5.5 0 0 0 2.5 ${y + 1}h11l.09-.008A.5.5 0 0 0 14 ${y}.5"/>`;
+  return `<svg class="icon icon-options ${cls}" width="${size}" height="${size}" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+    <g fill="none">
+      ${track(11)}
+      <path fill="url(#${g2})" d="M14 11.5a.5.5 0 0 0-.5-.5h-11l-.09.008A.5.5 0 0 0 2.5 12h11l.09-.008A.5.5 0 0 0 14 11.5"/>
+      ${track(4)}
+      <path fill="url(#${g1})" d="M14 4.5a.5.5 0 0 0-.5-.5h-11l-.09.008A.5.5 0 0 0 2.5 5h11l.09-.008A.5.5 0 0 0 14 4.5"/>
+      <circle cx="6" cy="11.5" r="2" fill="url(#${k2})"/>
+      <circle cx="10" cy="4.5" r="2" fill="url(#${k1})"/>
+      <defs>
+        <radialGradient id="${g1}" cx="0" cy="0" r="1" gradientTransform="matrix(3 0 0 2.3326 10 4.5)" gradientUnits="userSpaceOnUse">
+          <stop offset=".549" stop-color="#70777d"/><stop offset="1" stop-color="#70777d" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="${g2}" cx="0" cy="0" r="1" gradientTransform="matrix(3 0 0 2.3326 6 11.5)" gradientUnits="userSpaceOnUse">
+          <stop offset=".549" stop-color="#70777d"/><stop offset="1" stop-color="#70777d" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="${bar}" x1="14.75" x2="7.421" y1="12.8" y2="-1.064" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#8c959b"/><stop offset="1" stop-color="#a3acb5"/>
+        </linearGradient>
+        <linearGradient id="${k2}" x1="4.4" x2="7.6" y1="9.5" y2="13.5" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#29b4fb"/><stop offset="1" stop-color="#2764e7"/>
+        </linearGradient>
+        <linearGradient id="${k1}" x1="8.4" x2="11.6" y1="2.5" y2="6.5" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#29b4fb"/><stop offset="1" stop-color="#2764e7"/>
+        </linearGradient>
+      </defs>
+    </g>
+  </svg>`;
+}

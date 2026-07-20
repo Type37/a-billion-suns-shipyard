@@ -286,7 +286,11 @@ function enhanceNav(): void {
   const nav = document.querySelector<HTMLElement>(".topnav");
   const pill = nav?.querySelector<HTMLElement>(".nav-pill");
   if (!nav || !pill) return;
-  const links = Array.from(nav.querySelectorAll<HTMLAnchorElement>("a"));
+  // Options is a <button>, not a link, but it is an item on this rail like any
+  // other: the pill has to follow the pointer onto it, or it reads as something
+  // bolted on beside the nav rather than part of it.
+  const items = Array.from(nav.querySelectorAll<HTMLElement>("a, .topnav-btn"));
+  const links = items.filter((el): el is HTMLAnchorElement => el.tagName === "A");
   const path = location.hash.replace(/^#/, "") || "/";
   const active = links.find((a) => {
     const h = a.getAttribute("href")?.replace(/^#/, "") ?? "";
@@ -317,7 +321,7 @@ function enhanceNav(): void {
   place(active);
   void pill.offsetWidth; // force reflow so the instant placement commits
   pill.style.transition = "";
-  links.forEach((a) => a.addEventListener("mouseenter", () => place(a)));
+  items.forEach((el) => el.addEventListener("mouseenter", () => place(el)));
   nav.addEventListener("mouseleave", () => place(active));
 }
 

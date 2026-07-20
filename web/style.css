@@ -1623,7 +1623,9 @@ button { font-family: inherit; }
   /* All four fit on ONE row by letting a long label wrap inside its own button
      (white-space: normal) instead of being clipped by nowrap or dropped to an
      icon. Every item keeps its icon AND its full text; nothing is truncated. */
-  .topnav a {
+  /* One definition for every item on the rail, links and the Options button
+     alike, so they cannot drift apart. */
+  .topnav a, .topnav-btn {
     /* flex-basis auto, not 0: with 0 every item got an identical share and the
        longest label ("Compendium") overflowed its own border while short ones
        sat in half-empty boxes. Sizing to content, and allowed to shrink so all
@@ -1635,13 +1637,6 @@ button { font-family: inherit; }
     border: 1px solid rgba(255, 255, 255, 0.18);
   }
   .topnav a svg, .topnav-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
-  .topnav-btn {
-    flex: 0 1 auto; min-width: 0;
-    flex-direction: column; align-items: center; justify-content: center; text-align: center;
-    white-space: normal; overflow-wrap: break-word; line-height: 1.2; gap: 3px;
-    padding: 7px 3px; font-size: 10px; letter-spacing: 0.02em;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-  }
   .nav-pill { display: none; }
 
   /* Readability floor. Nothing a player reads at arm's length across a table
@@ -1759,7 +1754,7 @@ button { font-family: inherit; }
    from the padding and the type. Never drops a label. */
 @media (max-width: 340px) {
   .topnav { gap: 3px; }
-  .topnav a { font-size: 9.5px; padding: 8px 2px; }
+  .topnav a, .topnav-btn { font-size: 9.5px; padding: 8px 2px; }
 }
 
 /* ============================================================ ROSTER ROWS + MODAL */

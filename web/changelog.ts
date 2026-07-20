@@ -9,6 +9,14 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.77",
+    date: "2026-07-19",
+    title: "Options is part of the rail now",
+    items: [
+      "Options is a full member of the top navigation rather than a button sitting next to it. The sliding highlight follows the pointer onto it like any other item, and it is styled from the same rule as the links so the two cannot drift apart.",
+    ],
+  },
+  {
     version: "0.8.76",
     date: "2026-07-19",
     title: "Options joins the row, and the Learn rail straightens out",

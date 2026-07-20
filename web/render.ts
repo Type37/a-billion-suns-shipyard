@@ -420,9 +420,9 @@ function topbar(): string {
     <nav class="topnav" aria-label="Main">
       <span class="nav-pill" aria-hidden="true"></span>
       <a href="#/fleets">${fleetsMark(17)} Fleets</a>
-      <a href="#/solo">${icon("book", 16)} Solo</a>
-      <a href="#/ships">${icon("compare", 16)} Compendium</a>
-      <a href="#/foundry">${icon("wrench", 16)} Custom Rules</a>
+      <a href="#/solo">${icon("solo", 17)} Solo</a>
+      <a href="#/ships">${icon("compendium", 17)} Compendium</a>
+      <a href="#/foundry">${icon("custom-rules", 17)} Custom Rules</a>
       <button class="topnav-btn" data-action="open-options" title="Options">${icon("sliders", 16)} Options</button>
     </nav>
   </header>`;

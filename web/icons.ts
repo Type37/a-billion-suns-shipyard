@@ -6,6 +6,14 @@ import creditsRaw from "./Credits.svg?raw";
 const PATHS: Record<string, string> = {
   // wordmark companion: a planet disc with a single orbit line
   logo: '<circle cx="12" cy="12" r="5.5"/><ellipse cx="12" cy="12" rx="10" ry="3.4" transform="rotate(-18 12 12)"/>',
+  // Nav marks: an EVA figure for Solo, a bookmarked volume for the Compendium,
+  // and a block grid with a plus for Custom Rules.
+  solo:
+    '<g fill="currentColor" stroke="none"><path d="M17.15 10.59c4.08 0 7.27 3.13 7.61 7.12c.03.38-.27.7-.65.69l-6.96.01a3.91 3.91 0 1 1 0-7.82M11.5 5a.5.5 0 1 0 0-1a.5.5 0 0 0 0 1"/><path d="M16.425 7h-.165q-.22 0-.442.015A4.718 4.718 0 0 0 11.28 1H8.19A4.19 4.19 0 0 0 4 5.19v1.15c0 1.066.676 1.887 1.544 2.21l-.397.416A7.702 7.702 0 0 0 10.71 22h4.79v1h-3.62c-.76 0-1.38.62-1.38 1.38v.37c0 .41.34.75.75.75s.75-.33.75-.76v-.24h8.28c.66 0 1.28-.37 1.56-.96a1.67 1.67 0 0 0-.038-1.54h4.038c1.803 0 3.283-1.534 3.123-3.397C28.445 12.147 22.945 7.083 16.425 7M17 23v-1h2.931l.539.69c.06.08.04.15.02.2s-.07.11-.17.11zm-4.73-12.29c.49-.54 1.216-1.01 2.017-1.319A5.6 5.6 0 0 1 16.26 9h.14c5.51.07 10.14 4.36 10.57 9.77c.06.67-.47 1.23-1.13 1.23H10.71a5.702 5.702 0 0 1-4.12-9.65L10.75 6H10V3h1.28c.848 0 1.607.39 2.106 1A2.7 2.7 0 0 1 14 5.72c0 .72-.29 1.42-.8 1.93l-4.98 4.98c-.29.29-.29.77 0 1.06s.77.29 1.06 0zM9 3v3H7.966c-.288 0-.577.09-.816.25l-.6.39a.36.36 0 0 1-.55-.3V5.19a2.2 2.2 0 0 1 .072-.558l.007-.029l.016-.052A2.19 2.19 0 0 1 8.19 3zm6.5 26.51V25.5H17v4.46c0 .58-.48 1.05-1.06 1.05h-1.19a.749.749 0 1 1 0-1.5z"/></g>',
+  compendium:
+    '<path fill="currentColor" stroke="none" d="M18 2h-6v7L9.5 7.5L7 9V2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4a2 2 0 0 0-2-2m-.32 16.41c-.11.09-1.21.84-1.63 1.09c-.42.29-2.05 1.22-1.79-.58c.63-3.64 1.85-5.8.39-4.86c-.38.23-.6.37-.74.44c-.13.11-.12.1-.23-.09s-.15-.18-.01-.28c0 0 2.23-1.79 3.05-1.85c.78-.07.59.89.52 1.33c-.46 1.85-1.3 4.54-1.17 4.93c.11.39.93-.23 1.37-.54c0 0 .06-.07.17.05c.11.17.22.25.07.36m-.71-7.35c-.57 0-1.03-.46-1.03-1.03S16.4 9 16.97 9S18 9.46 18 10.03s-.46 1.03-1.03 1.03"/>',
+  "custom-rules":
+    '<path fill="currentColor" stroke="none" fill-opacity=".16" d="M8.4 14H5.6A1.6 1.6 0 0 0 4 15.6v2.8A1.6 1.6 0 0 0 5.6 20h2.8a1.6 1.6 0 0 0 1.6-1.6v-2.8A1.6 1.6 0 0 0 8.4 14m10-10h-2.8A1.6 1.6 0 0 0 14 5.6v2.8a1.6 1.6 0 0 0 1.6 1.6h2.8A1.6 1.6 0 0 0 20 8.4V5.6A1.6 1.6 0 0 0 18.4 4"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.5" d="M14 17h6m-3 3v-6M5.6 4h2.8A1.6 1.6 0 0 1 10 5.6v2.8A1.6 1.6 0 0 1 8.4 10H5.6A1.6 1.6 0 0 1 4 8.4V5.6A1.6 1.6 0 0 1 5.6 4m0 10h2.8a1.6 1.6 0 0 1 1.6 1.6v2.8A1.6 1.6 0 0 1 8.4 20H5.6A1.6 1.6 0 0 1 4 18.4v-2.8A1.6 1.6 0 0 1 5.6 14m10-10h2.8A1.6 1.6 0 0 1 20 5.6v2.8a1.6 1.6 0 0 1-1.6 1.6h-2.8A1.6 1.6 0 0 1 14 8.4V5.6A1.6 1.6 0 0 1 15.6 4"/>',
   plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
   minus: '<line x1="5" y1="12" x2="19" y2="12"/>',
   close: '<line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/>',
@@ -68,10 +76,19 @@ export const EMBLEMS: Record<string, string> = {
   crosshair: '<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2.4" fill="currentColor" stroke="none"/><g stroke="currentColor" stroke-width="2"><line x1="12" y1="1.5" x2="12" y2="5.5"/><line x1="12" y1="18.5" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="5.5" y2="12"/><line x1="18.5" y1="12" x2="22.5" y2="12"/></g>',
 };
 
+// Most icons here are drawn on a 24-unit grid; the few that arrive on another
+// one declare it rather than being redrawn. Paths that carry their own fill or
+// stroke override the wrapper's defaults, which is how the solid nav marks sit
+// alongside the stroke-only set.
+const ICON_VIEWBOX: Record<string, string> = {
+  solo: "0 0 32 32",
+};
+
 export function icon(name: string, size = 18, cls = ""): string {
   const body = PATHS[name];
   if (!body) return "";
-  return `<svg class="icon ${cls}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true">${body}</svg>`;
+  const vb = ICON_VIEWBOX[name] ?? "0 0 24 24";
+  return `<svg class="icon ${cls}" width="${size}" height="${size}" viewBox="${vb}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true">${body}</svg>`;
 }
 
 export function emblem(name: string, size = 28, cls = ""): string {

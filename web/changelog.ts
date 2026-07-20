@@ -9,6 +9,14 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "0.8.75",
+    date: "2026-07-19",
+    title: "The rest of the new symbols",
+    items: [
+      "New symbols for Solo, Ship Compendium and Custom Rules in the top navigation, completing the set started with Fleets.",
+    ],
+  },
+  {
     version: "0.8.74",
     date: "2026-07-19",
     title: "New marks, and the ship-size glyphs retired",

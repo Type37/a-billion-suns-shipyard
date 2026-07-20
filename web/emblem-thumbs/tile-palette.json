@@ -1,0 +1,9335 @@
+[
+{
+"file": "tiles/misc-s29.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 5,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+82,
+0,
+0
+],
+[
+173,
+0,
+0
+],
+[
+173,
+170,
+173
+],
+[
+255,
+170,
+173
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.1607843137254902,
+"sat": 1.0,
+"rgb": [
+82,
+0,
+0
+],
+"neutral": false
+},
+{
+"file": "pfp (48).png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+0,
+0
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.5,
+"sat": 1.0,
+"rgb": [
+255,
+0,
+0
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p71.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+255,
+0,
+0
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.5,
+"sat": 1.0,
+"rgb": [
+255,
+0,
+0
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p96.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+0,
+0
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.5,
+"sat": 1.0,
+"rgb": [
+255,
+0,
+0
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s1.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+230,
+230,
+230
+],
+[
+0,
+0,
+0
+],
+[
+255,
+0,
+0
+],
+[
+237,
+249,
+101
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.5,
+"sat": 1.0,
+"rgb": [
+255,
+0,
+0
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s19.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+255,
+255,
+255
+],
+[
+255,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.5,
+"sat": 1.0,
+"rgb": [
+255,
+0,
+0
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s31.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+255,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.5,
+"sat": 1.0,
+"rgb": [
+255,
+0,
+0
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s4.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+222,
+227,
+214
+],
+[
+0,
+0,
+0
+],
+[
+255,
+24,
+8
+]
+],
+"needsDark": false,
+"hue": 0.010796221322537103,
+"light": 0.5156862745098039,
+"sat": 1.0,
+"rgb": [
+255,
+24,
+8
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p50.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+25,
+25,
+25
+],
+[
+255,
+255,
+255
+],
+[
+255,
+25,
+25
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.5490196078431373,
+"sat": 1.0,
+"rgb": [
+255,
+25,
+25
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p54.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+10
+],
+[
+255,
+52,
+47
+]
+],
+"needsDark": false,
+"hue": 0.004006410256410242,
+"light": 0.592156862745098,
+"sat": 1.0,
+"rgb": [
+255,
+52,
+47
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p25.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+68,
+68,
+68
+],
+[
+170,
+1,
+1
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.3352941176470588,
+"sat": 0.9883040935672515,
+"rgb": [
+170,
+1,
+1
+],
+"neutral": false
+},
+{
+"file": "HINF_Infinity_Emblem.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+198,
+9,
+5
+]
+],
+"needsDark": false,
+"hue": 0.0034542314335060387,
+"light": 0.39803921568627454,
+"sat": 0.9507389162561576,
+"rgb": [
+198,
+9,
+5
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p45.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+19,
+3,
+10
+],
+[
+230,
+21,
+21
+],
+[
+0,
+19,
+115
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.49215686274509807,
+"sat": 0.8326693227091633,
+"rgb": [
+230,
+21,
+21
+],
+"neutral": false
+},
+{
+"file": "military/HINF_-_Emblem_icon_-_Winged_Victory.png",
+"folder": "military",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+218,
+218,
+218
+],
+[
+230,
+51,
+42
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.007978723404255336,
+"light": 0.5333333333333333,
+"sat": 0.7899159663865546,
+"rgb": [
+230,
+51,
+42
+],
+"neutral": false
+},
+{
+"file": "Patterns/HINF_-_Emblem_icon_-_Kaleidoshot.png",
+"folder": "Patterns",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+81,
+84,
+89
+],
+[
+153,
+153,
+153
+],
+[
+196,
+48,
+48
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.47843137254901963,
+"sat": 0.6065573770491803,
+"rgb": [
+196,
+48,
+48
+],
+"neutral": false
+},
+{
+"file": "nonhuman/HINF_-_Emblem_icon_-_Chosen.png",
+"folder": "nonhuman",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+1,
+1
+],
+[
+150,
+40,
+40
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.37254901960784315,
+"sat": 0.5789473684210527,
+"rgb": [
+150,
+40,
+40
+],
+"neutral": false
+},
+{
+"file": "Patterns/HINF_-_Emblem_icon_-_Rose_Crest.png",
+"folder": "Patterns",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+71,
+28,
+28
+],
+[
+85,
+137,
+80
+],
+[
+221,
+88,
+88
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.19411764705882353,
+"sat": 0.43434343434343436,
+"rgb": [
+71,
+28,
+28
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Truth_Tines.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+195,
+66,
+0
+],
+[
+57,
+35,
+33
+],
+[
+225,
+175,
+19
+]
+],
+"needsDark": false,
+"hue": 0.05641025641025641,
+"light": 0.38235294117647056,
+"sat": 1.0,
+"rgb": [
+195,
+66,
+0
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s41.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+77,
+1
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.04986876640419948,
+"light": 0.5019607843137255,
+"sat": 1.0,
+"rgb": [
+255,
+77,
+1
+],
+"neutral": false
+},
+{
+"file": "traxus-hex.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+77,
+1
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.04986876640419948,
+"light": 0.5019607843137255,
+"sat": 1.0,
+"rgb": [
+255,
+77,
+1
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s17.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+255,
+56,
+8
+],
+[
+0,
+0,
+0
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.03238866396761133,
+"light": 0.5156862745098039,
+"sat": 1.0,
+"rgb": [
+255,
+56,
+8
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p75.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+93,
+20
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.05177304964539009,
+"light": 0.5392156862745098,
+"sat": 1.0,
+"rgb": [
+255,
+93,
+20
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p27.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+255,
+255,
+255
+],
+[
+0,
+0,
+0
+],
+[
+226,
+38,
+1
+]
+],
+"needsDark": false,
+"hue": 0.02740740740740742,
+"light": 0.44509803921568625,
+"sat": 0.9911894273127754,
+"rgb": [
+226,
+38,
+1
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p39.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+226,
+38,
+1
+],
+[
+0,
+0,
+0
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.02740740740740742,
+"light": 0.44509803921568625,
+"sat": 0.9911894273127754,
+"rgb": [
+226,
+38,
+1
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Eld.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+248,
+157,
+109
+],
+[
+184,
+80,
+81
+],
+[
+224,
+224,
+224
+]
+],
+"needsDark": false,
+"hue": 0.057553956834532405,
+"light": 0.7,
+"sat": 0.9084967320261441,
+"rgb": [
+248,
+157,
+109
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p37.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+242,
+71,
+35
+]
+],
+"needsDark": false,
+"hue": 0.02898550724637683,
+"light": 0.5431372549019607,
+"sat": 0.8884120171673819,
+"rgb": [
+242,
+71,
+35
+],
+"neutral": false
+},
+{
+"file": "skull/HINF_-_Emblem_icon_-_Ghoulie_Glee.png",
+"folder": "skull",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+153,
+153,
+153
+],
+[
+204,
+204,
+204
+],
+[
+229,
+96,
+45
+]
+],
+"needsDark": false,
+"hue": 0.04619565217391303,
+"light": 0.5372549019607843,
+"sat": 0.7796610169491525,
+"rgb": [
+229,
+96,
+45
+],
+"neutral": false
+},
+{
+"file": "nonhuman/HINF_Banished_Emblem.png",
+"folder": "nonhuman",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+36,
+36,
+36
+],
+[
+224,
+82,
+32
+]
+],
+"needsDark": false,
+"hue": 0.04340277777777777,
+"light": 0.5019607843137255,
+"sat": 0.7559055118110236,
+"rgb": [
+224,
+82,
+32
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s39.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+237,
+237,
+231
+],
+[
+229,
+102,
+80
+],
+[
+128,
+128,
+128
+]
+],
+"needsDark": true,
+"hue": 0.024608501118568233,
+"light": 0.6058823529411765,
+"sat": 0.7412935323383084,
+"rgb": [
+229,
+102,
+80
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Unicorn_of_Fire.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+247,
+173,
+60
+],
+[
+100,
+20,
+12
+],
+[
+255,
+235,
+196
+],
+[
+239,
+57,
+36
+]
+],
+"needsDark": false,
+"hue": 0.10071301247771837,
+"light": 0.6019607843137255,
+"sat": 0.9211822660098525,
+"rgb": [
+247,
+173,
+60
+],
+"neutral": false
+},
+{
+"file": "Patterns/HINF_-_Emblem_icon_-_Asian_and_Pacific_Islander_Heritage_Month_2022.png",
+"folder": "Patterns",
+"kind": "raster",
+"colors": 5,
+"palette": [
+[
+255,
+255,
+255
+],
+[
+242,
+155,
+49
+],
+[
+122,
+65,
+156
+],
+[
+255,
+100,
+143
+],
+[
+26,
+186,
+192
+]
+],
+"needsDark": false,
+"hue": 0.09153713298791018,
+"light": 0.5705882352941176,
+"sat": 0.8812785388127853,
+"rgb": [
+242,
+155,
+49
+],
+"neutral": false
+},
+{
+"file": "Patterns/HINF_-_Emblem_icon_-_Kaleidovolt.png",
+"folder": "Patterns",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+79,
+79,
+79
+],
+[
+228,
+139,
+69
+],
+[
+214,
+71,
+71
+],
+[
+255,
+236,
+0
+]
+],
+"needsDark": false,
+"hue": 0.07337526205450733,
+"light": 0.5823529411764706,
+"sat": 0.7464788732394365,
+"rgb": [
+228,
+139,
+69
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s12.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+21,
+21,
+21
+],
+[
+182,
+190,
+180
+],
+[
+189,
+110,
+28
+]
+],
+"needsDark": false,
+"hue": 0.08488612836438923,
+"light": 0.4254901960784314,
+"sat": 0.7419354838709676,
+"rgb": [
+189,
+110,
+28
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s13.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+21,
+21,
+21
+],
+[
+185,
+193,
+185
+],
+[
+189,
+110,
+28
+]
+],
+"needsDark": false,
+"hue": 0.08488612836438923,
+"light": 0.4254901960784314,
+"sat": 0.7419354838709676,
+"rgb": [
+189,
+110,
+28
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Foundation_Celebration.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 5,
+"palette": [
+[
+227,
+167,
+92
+],
+[
+255,
+219,
+138
+],
+[
+0,
+0,
+0
+],
+[
+215,
+25,
+32
+],
+[
+0,
+142,
+176
+]
+],
+"needsDark": false,
+"hue": 0.0925925925925926,
+"light": 0.6254901960784314,
+"sat": 0.7068062827225129,
+"rgb": [
+227,
+167,
+92
+],
+"neutral": false
+},
+{
+"file": "military/HINF_Signum_Bronze_Emblem.png",
+"folder": "military",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+70,
+38,
+16
+],
+[
+109,
+76,
+48
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.06790123456790122,
+"light": 0.16862745098039217,
+"sat": 0.627906976744186,
+"rgb": [
+70,
+38,
+16
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p19.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+196,
+138,
+54
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.09859154929577463,
+"light": 0.4901960784313726,
+"sat": 0.568,
+"rgb": [
+196,
+138,
+54
+],
+"neutral": false
+},
+{
+"file": "faith/cross.svg",
+"folder": "faith",
+"kind": "svg",
+"colors": 3,
+"palette": [
+[
+221,
+179,
+143
+],
+[
+255,
+255,
+255
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.07692307692307689,
+"light": 0.7137254901960784,
+"sat": 0.5342465753424658,
+"rgb": [
+221,
+179,
+143
+],
+"neutral": false
+},
+{
+"file": "HINF_I_Love_Bees_Emblem.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+77,
+54,
+26
+],
+[
+234,
+164,
+55
+],
+[
+199,
+16,
+16
+]
+],
+"needsDark": false,
+"hue": 0.09150326797385622,
+"light": 0.2019607843137255,
+"sat": 0.4951456310679611,
+"rgb": [
+77,
+54,
+26
+],
+"neutral": false
+},
+{
+"file": "Patterns/HINF_-_Emblem_icon_-_Floral_Crest.png",
+"folder": "Patterns",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+99,
+66,
+40
+],
+[
+209,
+171,
+134
+],
+[
+246,
+228,
+206
+]
+],
+"needsDark": false,
+"hue": 0.07344632768361582,
+"light": 0.27254901960784317,
+"sat": 0.42446043165467623,
+"rgb": [
+99,
+66,
+40
+],
+"neutral": false
+},
+{
+"file": "Patterns/HINF_-_Emblem_icon_-_BHM'23.png",
+"folder": "Patterns",
+"kind": "raster",
+"colors": 5,
+"palette": [
+[
+255,
+255,
+255
+],
+[
+28,
+30,
+31
+],
+[
+129,
+104,
+65
+],
+[
+209,
+35,
+39
+],
+[
+0,
+146,
+69
+]
+],
+"needsDark": false,
+"hue": 0.1015625,
+"light": 0.3803921568627451,
+"sat": 0.32989690721649484,
+"rgb": [
+129,
+104,
+65
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p13.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+203,
+186,
+160
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.10077519379844961,
+"light": 0.7117647058823529,
+"sat": 0.2925170068027209,
+"rgb": [
+203,
+186,
+160
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s11.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+203,
+187,
+161
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.10317460317460315,
+"light": 0.7137254901960783,
+"sat": 0.2876712328767122,
+"rgb": [
+203,
+187,
+161
+],
+"neutral": false
+},
+{
+"file": "Ascending Bars Keyline.svg",
+"folder": "(root)",
+"kind": "svg",
+"colors": 3,
+"palette": [
+[
+232,
+168,
+0
+],
+[
+205,
+235,
+214
+],
+[
+10,
+14,
+20
+]
+],
+"needsDark": false,
+"hue": 0.1206896551724138,
+"light": 0.4549019607843137,
+"sat": 1.0,
+"rgb": [
+232,
+168,
+0
+],
+"neutral": false
+},
+{
+"file": "Ascending Bars.svg",
+"folder": "(root)",
+"kind": "svg",
+"colors": 2,
+"palette": [
+[
+232,
+168,
+0
+],
+[
+205,
+235,
+214
+]
+],
+"needsDark": false,
+"hue": 0.1206896551724138,
+"light": 0.4549019607843137,
+"sat": 1.0,
+"rgb": [
+232,
+168,
+0
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Azimuth.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+254,
+218,
+0
+],
+[
+33,
+93,
+171
+]
+],
+"needsDark": false,
+"hue": 0.14304461942257216,
+"light": 0.4980392156862745,
+"sat": 1.0,
+"rgb": [
+254,
+218,
+0
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Draco.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+254,
+218,
+0
+],
+[
+33,
+93,
+171
+],
+[
+242,
+242,
+243
+]
+],
+"needsDark": false,
+"hue": 0.14304461942257216,
+"light": 0.4980392156862745,
+"sat": 1.0,
+"rgb": [
+254,
+218,
+0
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Planetary.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+219,
+0
+],
+[
+17,
+118,
+192
+]
+],
+"needsDark": false,
+"hue": 0.14313725490196078,
+"light": 0.5,
+"sat": 1.0,
+"rgb": [
+255,
+219,
+0
+],
+"neutral": false
+},
+{
+"file": "Icon_Electirc_Dawn.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+52,
+50,
+46
+],
+[
+255,
+198,
+57
+],
+[
+33,
+61,
+181
+]
+],
+"needsDark": false,
+"hue": 0.11868686868686869,
+"light": 0.611764705882353,
+"sat": 1.0,
+"rgb": [
+255,
+198,
+57
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_The_Assemblies.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+248,
+208,
+27
+],
+[
+35,
+45,
+55
+],
+[
+87,
+88,
+92
+]
+],
+"needsDark": false,
+"hue": 0.13650075414781296,
+"light": 0.5392156862745098,
+"sat": 0.9404255319148938,
+"rgb": [
+248,
+208,
+27
+],
+"neutral": false
+},
+{
+"file": "HINF_Meridian_Light_Horse_Emblem.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+240,
+169,
+41
+],
+[
+86,
+135,
+15
+],
+[
+43,
+56,
+15
+]
+],
+"needsDark": false,
+"hue": 0.10720268006700168,
+"light": 0.5509803921568628,
+"sat": 0.868995633187773,
+"rgb": [
+240,
+169,
+41
+],
+"neutral": false
+},
+{
+"file": "skull/HINF_Radioactive_Emblem.png",
+"folder": "skull",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+241,
+209,
+79
+],
+[
+88,
+89,
+91
+],
+[
+0,
+0,
+0
+],
+[
+133,
+196,
+65
+]
+],
+"needsDark": false,
+"hue": 0.1337448559670782,
+"light": 0.6274509803921569,
+"sat": 0.8526315789473684,
+"rgb": [
+241,
+209,
+79
+],
+"neutral": false
+},
+{
+"file": "skull/HINF_Skull_King_Emblem.png",
+"folder": "skull",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+232,
+232,
+232
+],
+[
+233,
+173,
+33
+],
+[
+60,
+75,
+91
+],
+[
+254,
+227,
+108
+]
+],
+"needsDark": false,
+"hue": 0.11666666666666668,
+"light": 0.5215686274509804,
+"sat": 0.8196721311475409,
+"rgb": [
+233,
+173,
+33
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_BHM_'24.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+163,
+145,
+28
+],
+[
+36,
+23,
+20
+],
+[
+239,
+219,
+120
+],
+[
+247,
+76,
+42
+]
+],
+"needsDark": false,
+"hue": 0.14444444444444446,
+"light": 0.37450980392156863,
+"sat": 0.7068062827225129,
+"rgb": [
+163,
+145,
+28
+],
+"neutral": false
+},
+{
+"file": "Patterns/HINF_-_Emblem_icon_-_Kaleidochip.png",
+"folder": "Patterns",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+121,
+119,
+120
+],
+[
+48,
+47,
+52
+],
+[
+148,
+114,
+49
+],
+[
+188,
+188,
+188
+]
+],
+"needsDark": false,
+"hue": 0.10942760942760943,
+"light": 0.3862745098039216,
+"sat": 0.5025380710659899,
+"rgb": [
+148,
+114,
+49
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Oscillation.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+202,
+171,
+99
+],
+[
+67,
+46,
+128
+]
+],
+"needsDark": false,
+"hue": 0.11650485436893203,
+"light": 0.5901960784313726,
+"sat": 0.4928229665071769,
+"rgb": [
+202,
+171,
+99
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p97.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+242,
+233,
+218
+],
+[
+167,
+215,
+15
+],
+[
+3,
+0,
+13
+]
+],
+"needsDark": false,
+"hue": 0.1041666666666667,
+"light": 0.9019607843137254,
+"sat": 0.4799999999999998,
+"rgb": [
+242,
+233,
+218
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Unicorn_of_Earth.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+224,
+210,
+183
+],
+[
+80,
+51,
+22
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.10975609756097558,
+"light": 0.7980392156862746,
+"sat": 0.3980582524271844,
+"rgb": [
+224,
+210,
+183
+],
+"neutral": false
+},
+{
+"file": "Icon_Zap.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+222,
+219,
+198
+],
+[
+214,
+135,
+21
+],
+[
+178,
+178,
+159
+]
+],
+"needsDark": false,
+"hue": 0.1458333333333332,
+"light": 0.8235294117647058,
+"sat": 0.26666666666666666,
+"rgb": [
+222,
+219,
+198
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Phoenix.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+204,
+192,
+168
+],
+[
+50,
+81,
+117
+]
+],
+"needsDark": false,
+"hue": 0.11111111111111106,
+"light": 0.7294117647058824,
+"sat": 0.2608695652173914,
+"rgb": [
+204,
+192,
+168
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p40.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+254,
+255,
+3
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.16732804232804233,
+"light": 0.5058823529411764,
+"sat": 1.0,
+"rgb": [
+254,
+255,
+3
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p86.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+254,
+255,
+3
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.16732804232804233,
+"light": 0.5058823529411764,
+"sat": 1.0,
+"rgb": [
+254,
+255,
+3
+],
+"neutral": false
+},
+{
+"file": "HINF_Stainless_Emblem.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+140,
+122,
+91
+],
+[
+63,
+63,
+63
+],
+[
+255,
+253,
+184
+]
+],
+"needsDark": false,
+"hue": 0.16197183098591553,
+"light": 0.8607843137254902,
+"sat": 1.0,
+"rgb": [
+255,
+253,
+184
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p5.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+10,
+10,
+10
+],
+[
+241,
+228,
+25
+]
+],
+"needsDark": false,
+"hue": 0.1566358024691358,
+"light": 0.5215686274509804,
+"sat": 0.8852459016393442,
+"rgb": [
+241,
+228,
+25
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p49.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+20,
+20,
+20
+],
+[
+239,
+237,
+92
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.16439909297052155,
+"light": 0.6490196078431373,
+"sat": 0.8212290502793296,
+"rgb": [
+239,
+237,
+92
+],
+"neutral": false
+},
+{
+"file": "military/HINF_Griffin_Emblem.png",
+"folder": "military",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+4,
+7,
+7
+],
+[
+221,
+223,
+66
+],
+[
+254,
+253,
+235
+]
+],
+"needsDark": false,
+"hue": 0.16878980891719744,
+"light": 0.5666666666666667,
+"sat": 0.7104072398190046,
+"rgb": [
+221,
+223,
+66
+],
+"neutral": false
+},
+{
+"file": "military/HINF_Signum_Onyx_Emblem.png",
+"folder": "military",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+201,
+197,
+94
+],
+[
+17,
+17,
+17
+],
+[
+74,
+33,
+135
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.1604361370716511,
+"light": 0.5784313725490196,
+"sat": 0.49767441860465106,
+"rgb": [
+201,
+197,
+94
+],
+"neutral": false
+},
+{
+"file": "military/HINF_Signum_Gold_Emblem.png",
+"folder": "military",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+153,
+157,
+58
+],
+[
+20,
+16,
+12
+],
+[
+196,
+201,
+109
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.17340067340067344,
+"light": 0.4215686274509804,
+"sat": 0.46046511627906983,
+"rgb": [
+153,
+157,
+58
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p74.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+12,
+12,
+12
+],
+[
+255,
+255,
+255
+],
+[
+175,
+234,
+0
+],
+[
+83,
+99,
+35
+]
+],
+"needsDark": false,
+"hue": 0.20868945868945868,
+"light": 0.4588235294117647,
+"sat": 1.0,
+"rgb": [
+175,
+234,
+0
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p87.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+25,
+25,
+25
+],
+[
+178,
+238,
+0
+]
+],
+"needsDark": false,
+"hue": 0.20868347338935575,
+"light": 0.4666666666666667,
+"sat": 1.0,
+"rgb": [
+178,
+238,
+0
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p72.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+211,
+255,
+0
+]
+],
+"needsDark": false,
+"hue": 0.19542483660130724,
+"light": 0.5,
+"sat": 1.0,
+"rgb": [
+211,
+255,
+0
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s46.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+195,
+255,
+0
+]
+],
+"needsDark": false,
+"hue": 0.2058823529411765,
+"light": 0.5,
+"sat": 1.0,
+"rgb": [
+195,
+255,
+0
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s23.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+211,
+255,
+1
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.19553805774278218,
+"light": 0.5019607843137255,
+"sat": 1.0,
+"rgb": [
+211,
+255,
+1
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p82.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+192,
+254,
+4
+]
+],
+"needsDark": false,
+"hue": 0.20800000000000005,
+"light": 0.5058823529411764,
+"sat": 0.9920634920634921,
+"rgb": [
+192,
+254,
+4
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p63.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+193,
+254,
+4
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.20733333333333337,
+"light": 0.5058823529411764,
+"sat": 0.9920634920634921,
+"rgb": [
+193,
+254,
+4
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p76.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+195,
+254,
+12
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.2073002754820937,
+"light": 0.5215686274509804,
+"sat": 0.9918032786885246,
+"rgb": [
+195,
+254,
+12
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p24.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+37,
+37,
+37
+],
+[
+190,
+252,
+6
+]
+],
+"needsDark": false,
+"hue": 0.2086720867208672,
+"light": 0.5058823529411764,
+"sat": 0.9761904761904763,
+"rgb": [
+190,
+252,
+6
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p68.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+201,
+244,
+29
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.20000000000000004,
+"light": 0.5352941176470588,
+"sat": 0.907172995780591,
+"rgb": [
+201,
+244,
+29
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p57.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+210,
+228,
+118
+],
+[
+0,
+0,
+0
+],
+[
+199,
+195,
+239
+],
+[
+243,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.193939393939394,
+"light": 0.6784313725490196,
+"sat": 0.6707317073170732,
+"rgb": [
+210,
+228,
+118
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Earth_Day_'22.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+171,
+195,
+85
+],
+[
+10,
+86,
+161
+],
+[
+66,
+66,
+66
+],
+[
+107,
+105,
+104
+]
+],
+"needsDark": false,
+"hue": 0.20303030303030303,
+"light": 0.5490196078431372,
+"sat": 0.4782608695652173,
+"rgb": [
+171,
+195,
+85
+],
+"neutral": false
+},
+{
+"file": "military/HINF_Red_One_Emblem.png",
+"folder": "military",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+88,
+104,
+37
+],
+[
+211,
+196,
+158
+],
+[
+209,
+21,
+32
+],
+[
+216,
+161,
+89
+]
+],
+"needsDark": false,
+"hue": 0.20646766169154232,
+"light": 0.27647058823529413,
+"sat": 0.4751773049645389,
+"rgb": [
+88,
+104,
+37
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p11.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+164,
+255,
+40
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.23720930232558138,
+"light": 0.5784313725490196,
+"sat": 1.0,
+"rgb": [
+164,
+255,
+40
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p85.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+177,
+255,
+49
+],
+[
+0,
+0,
+10
+]
+],
+"needsDark": false,
+"hue": 0.22977346278317148,
+"light": 0.596078431372549,
+"sat": 1.0,
+"rgb": [
+177,
+255,
+49
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p56.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+8,
+8,
+10
+],
+[
+182,
+236,
+107
+],
+[
+180,
+0,
+46
+]
+],
+"needsDark": false,
+"hue": 0.23643410852713176,
+"light": 0.6725490196078432,
+"sat": 0.7724550898203594,
+"rgb": [
+182,
+236,
+107
+],
+"neutral": false
+},
+{
+"file": "skull/HINF_Emerald_Nightmare_Emblem.png",
+"folder": "skull",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+26,
+26,
+26
+],
+[
+144,
+220,
+71
+],
+[
+213,
+255,
+85
+]
+],
+"needsDark": false,
+"hue": 0.2516778523489933,
+"light": 0.5705882352941176,
+"sat": 0.6803652968036531,
+"rgb": [
+144,
+220,
+71
+],
+"neutral": false
+},
+{
+"file": "skull/HINF_-_Recursive_Composition_emblem_icon.png",
+"folder": "skull",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+30,
+30,
+30
+],
+[
+170,
+170,
+170
+],
+[
+164,
+218,
+88
+],
+[
+97,
+90,
+168
+]
+],
+"needsDark": false,
+"hue": 0.23589743589743586,
+"light": 0.6,
+"sat": 0.6372549019607843,
+"rgb": [
+164,
+218,
+88
+],
+"neutral": false
+},
+{
+"file": "military/PACLogo_Frame_Recreated.svg",
+"folder": "military",
+"kind": "svg",
+"colors": 1,
+"palette": [
+[
+100,
+145,
+40
+]
+],
+"needsDark": false,
+"hue": 0.23809523809523805,
+"light": 0.3627450980392157,
+"sat": 0.5675675675675675,
+"rgb": [
+100,
+145,
+40
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Phalanx.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+141,
+198,
+65
+],
+[
+146,
+146,
+146
+],
+[
+9,
+150,
+75
+]
+],
+"needsDark": false,
+"hue": 0.23809523809523805,
+"light": 0.5156862745098039,
+"sat": 0.5384615384615384,
+"rgb": [
+141,
+198,
+65
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Ordnance_Disposal.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+51,
+51,
+51
+],
+[
+137,
+198,
+68
+],
+[
+146,
+146,
+146
+],
+[
+18,
+158,
+87
+]
+],
+"needsDark": false,
+"hue": 0.2448717948717949,
+"light": 0.5215686274509804,
+"sat": 0.5327868852459016,
+"rgb": [
+137,
+198,
+68
+],
+"neutral": false
+},
+{
+"file": "tsw-dragon-logo.jpg",
+"folder": "(root)",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+255,
+255,
+255
+],
+[
+100,
+154,
+60
+],
+[
+39,
+51,
+29
+]
+],
+"needsDark": false,
+"hue": 0.2624113475177305,
+"light": 0.41960784313725485,
+"sat": 0.4392523364485981,
+"rgb": [
+100,
+154,
+60
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Celtic_Clover.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+76,
+187,
+23
+]
+],
+"needsDark": false,
+"hue": 0.27947154471544716,
+"light": 0.4117647058823529,
+"sat": 0.780952380952381,
+"rgb": [
+76,
+187,
+23
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Fangs.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+25,
+25,
+25
+],
+[
+92,
+185,
+71
+]
+],
+"needsDark": false,
+"hue": 0.3026315789473684,
+"light": 0.5019607843137255,
+"sat": 0.4488188976377953,
+"rgb": [
+92,
+185,
+71
+],
+"neutral": false
+},
+{
+"file": "skull/HINF_-_Emblem_icon_-_PMC.png",
+"folder": "skull",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+0,
+16,
+20
+],
+[
+0,
+234,
+22
+],
+[
+43,
+86,
+63
+]
+],
+"needsDark": false,
+"hue": 0.349002849002849,
+"light": 0.4588235294117647,
+"sat": 1.0,
+"rgb": [
+0,
+234,
+22
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p61.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+12,
+12,
+12
+],
+[
+0,
+255,
+0
+]
+],
+"needsDark": false,
+"hue": 0.3333333333333333,
+"light": 0.5,
+"sat": 1.0,
+"rgb": [
+0,
+255,
+0
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s49.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+0,
+255,
+0
+]
+],
+"needsDark": false,
+"hue": 0.3333333333333333,
+"light": 0.5,
+"sat": 1.0,
+"rgb": [
+0,
+255,
+0
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s28.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+4,
+237,
+4
+],
+[
+124,
+255,
+253
+]
+],
+"needsDark": false,
+"hue": 0.3333333333333333,
+"light": 0.4725490196078431,
+"sat": 0.9668049792531122,
+"rgb": [
+4,
+237,
+4
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p42.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+64,
+255,
+89
+],
+[
+0,
+1,
+2
+]
+],
+"needsDark": false,
+"hue": 0.3551483420593368,
+"light": 0.6254901960784314,
+"sat": 1.0,
+"rgb": [
+64,
+255,
+89
+],
+"neutral": false
+},
+{
+"file": "sticker (5).png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+255,
+255,
+255
+],
+[
+33,
+24,
+16
+],
+[
+0,
+186,
+99
+],
+[
+231,
+243,
+16
+]
+],
+"needsDark": false,
+"hue": 0.4220430107526882,
+"light": 0.36470588235294116,
+"sat": 1.0,
+"rgb": [
+0,
+186,
+99
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s20.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+255,
+255,
+255
+],
+[
+33,
+24,
+16
+],
+[
+0,
+186,
+99
+],
+[
+231,
+243,
+16
+]
+],
+"needsDark": false,
+"hue": 0.4220430107526882,
+"light": 0.36470588235294116,
+"sat": 1.0,
+"rgb": [
+0,
+186,
+99
+],
+"neutral": false
+},
+{
+"file": "HINF_Opulent_Butterfly_Emblem_Icon.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+125,
+255,
+193
+],
+[
+58,
+221,
+143
+],
+[
+25,
+89,
+82
+],
+[
+239,
+25,
+174
+]
+],
+"needsDark": false,
+"hue": 0.4205128205128205,
+"light": 0.7450980392156863,
+"sat": 1.0,
+"rgb": [
+125,
+255,
+193
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Juneteenth.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+3,
+133,
+67
+],
+[
+25,
+25,
+25
+],
+[
+247,
+148,
+29
+],
+[
+174,
+50,
+50
+]
+],
+"needsDark": false,
+"hue": 0.4153846153846154,
+"light": 0.26666666666666666,
+"sat": 0.9558823529411766,
+"rgb": [
+3,
+133,
+67
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p89.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+149,
+246,
+194
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.41065292096219924,
+"light": 0.7745098039215687,
+"sat": 0.8434782608695655,
+"rgb": [
+149,
+246,
+194
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Delta_Diamond.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+17,
+160,
+75
+],
+[
+248,
+236,
+30
+],
+[
+236,
+123,
+37
+],
+[
+164,
+40,
+129
+]
+],
+"needsDark": false,
+"hue": 0.40093240093240096,
+"light": 0.34705882352941175,
+"sat": 0.807909604519774,
+"rgb": [
+17,
+160,
+75
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s24.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 7,
+"palette": [
+[
+255,
+255,
+255
+],
+[
+20,
+161,
+94
+],
+[
+163,
+255,
+29
+],
+[
+77,
+122,
+19
+],
+[
+28,
+227,
+67
+],
+[
+50,
+63,
+22
+],
+[
+7,
+14,
+9
+]
+],
+"needsDark": false,
+"hue": 0.42080378250591016,
+"light": 0.3549019607843137,
+"sat": 0.7790055248618786,
+"rgb": [
+20,
+161,
+94
+],
+"neutral": false
+},
+{
+"file": "pfp (50).png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+89,
+203,
+152
+],
+[
+35,
+34,
+32
+]
+],
+"needsDark": false,
+"hue": 0.4254385964912281,
+"light": 0.5725490196078431,
+"sat": 0.5229357798165136,
+"rgb": [
+89,
+203,
+152
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p98.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+89,
+203,
+152
+],
+[
+35,
+34,
+32
+]
+],
+"needsDark": false,
+"hue": 0.4254385964912281,
+"light": 0.5725490196078431,
+"sat": 0.5229357798165136,
+"rgb": [
+89,
+203,
+152
+],
+"neutral": false
+},
+{
+"file": "heavy industries.jpg",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+75,
+75,
+75
+],
+[
+60,
+184,
+121
+]
+],
+"needsDark": false,
+"hue": 0.4153225806451613,
+"light": 0.4784313725490196,
+"sat": 0.5081967213114754,
+"rgb": [
+60,
+184,
+121
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p102.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+200,
+233,
+216
+],
+[
+29,
+30,
+32
+]
+],
+"needsDark": false,
+"hue": 0.41414141414141414,
+"light": 0.8490196078431372,
+"sat": 0.4285714285714283,
+"rgb": [
+200,
+233,
+216
+],
+"neutral": false
+},
+{
+"file": "Patterns/HINF_-_Emblem_icon_-_Kaleidobolt.png",
+"folder": "Patterns",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+0,
+45,
+41
+],
+[
+91,
+206,
+184
+],
+[
+0,
+112,
+106
+]
+],
+"needsDark": false,
+"hue": 0.4681159420289855,
+"light": 0.5823529411764706,
+"sat": 0.539906103286385,
+"rgb": [
+91,
+206,
+184
+],
+"neutral": false
+},
+{
+"file": "Patterns/HINF_-_Emblem_icon_-_Floral_Awakening.png",
+"folder": "Patterns",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+23,
+68,
+55
+],
+[
+128,
+183,
+123
+],
+[
+173,
+141,
+224
+]
+],
+"needsDark": false,
+"hue": 0.4518518518518519,
+"light": 0.1784313725490196,
+"sat": 0.49450549450549447,
+"rgb": [
+23,
+68,
+55
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p21.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+37,
+37,
+37
+],
+[
+72,
+174,
+151
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.46241830065359474,
+"light": 0.4823529411764706,
+"sat": 0.41463414634146345,
+"rgb": [
+72,
+174,
+151
+],
+"neutral": false
+},
+{
+"file": "nonhuman/HINF_-_Emblem_icon_-_Keystone.png",
+"folder": "nonhuman",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+92,
+92,
+90
+],
+[
+0,
+255,
+255
+],
+[
+33,
+32,
+30
+]
+],
+"needsDark": false,
+"hue": 0.5,
+"light": 0.5,
+"sat": 1.0,
+"rgb": [
+0,
+255,
+255
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p70.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+0,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.5,
+"light": 0.5,
+"sat": 1.0,
+"rgb": [
+0,
+255,
+255
+],
+"neutral": false
+},
+{
+"file": "nonhuman/HINF_-_Emblem_icon_-_Zeta.png",
+"folder": "nonhuman",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+8,
+62,
+62
+],
+[
+255,
+253,
+246
+]
+],
+"needsDark": false,
+"hue": 0.5,
+"light": 0.13725490196078433,
+"sat": 0.7714285714285714,
+"rgb": [
+8,
+62,
+62
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p7.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+145,
+225,
+230
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.5098039215686274,
+"light": 0.7352941176470589,
+"sat": 0.6296296296296295,
+"rgb": [
+145,
+225,
+230
+],
+"neutral": false
+},
+{
+"file": "pfp (40).png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+19,
+19,
+22
+],
+[
+1,
+171,
+206
+]
+],
+"needsDark": false,
+"hue": 0.5284552845528455,
+"light": 0.40588235294117647,
+"sat": 0.9903381642512078,
+"rgb": [
+1,
+171,
+206
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p88.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+19,
+19,
+22
+],
+[
+1,
+171,
+206
+],
+[
+49,
+17,
+154
+]
+],
+"needsDark": false,
+"hue": 0.5284552845528455,
+"light": 0.40588235294117647,
+"sat": 0.9903381642512078,
+"rgb": [
+1,
+171,
+206
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Closing_In.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+3,
+99,
+127
+],
+[
+110,
+175,
+193
+],
+[
+178,
+218,
+239
+],
+[
+232,
+78,
+27
+]
+],
+"needsDark": false,
+"hue": 0.5376344086021505,
+"light": 0.2549019607843137,
+"sat": 0.9538461538461539,
+"rgb": [
+3,
+99,
+127
+],
+"neutral": false
+},
+{
+"file": "military/HINF_-_Emblem_icon_-_Battlegroup_Arrowfall.png",
+"folder": "military",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+12,
+103,
+147
+],
+[
+242,
+188,
+80
+],
+[
+196,
+149,
+65
+]
+],
+"needsDark": false,
+"hue": 0.554320987654321,
+"light": 0.31176470588235294,
+"sat": 0.8490566037735847,
+"rgb": [
+12,
+103,
+147
+],
+"neutral": false
+},
+{
+"file": "nonhuman/HINF_Brooch_Emblem_Icon.png",
+"folder": "nonhuman",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+21,
+147,
+210
+],
+[
+26,
+35,
+111
+],
+[
+157,
+20,
+54
+]
+],
+"needsDark": false,
+"hue": 0.5555555555555555,
+"light": 0.45294117647058824,
+"sat": 0.8181818181818181,
+"rgb": [
+21,
+147,
+210
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Unicorn_of_Ice.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+210,
+237,
+243
+],
+[
+60,
+103,
+138
+],
+[
+107,
+184,
+209
+]
+],
+"needsDark": false,
+"hue": 0.5303030303030302,
+"light": 0.888235294117647,
+"sat": 0.5789473684210523,
+"rgb": [
+210,
+237,
+243
+],
+"neutral": false
+},
+{
+"file": "Patterns/HINF_-_Emblem_icon_-_AAPIH_'23.png",
+"folder": "Patterns",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+23,
+71,
+78
+],
+[
+156,
+237,
+255
+],
+[
+204,
+125,
+23
+],
+[
+255,
+224,
+143
+]
+],
+"needsDark": false,
+"hue": 0.5212121212121211,
+"light": 0.19803921568627453,
+"sat": 0.5445544554455445,
+"rgb": [
+23,
+71,
+78
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Special_Warfare_Center.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+37,
+89,
+112
+],
+[
+239,
+72,
+78
+],
+[
+159,
+195,
+211
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.5511111111111111,
+"light": 0.29215686274509806,
+"sat": 0.5033557046979865,
+"rgb": [
+37,
+89,
+112
+],
+"neutral": false
+},
+{
+"file": "megamart.jpg",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+255,
+255
+],
+[
+57,
+127,
+139
+]
+],
+"needsDark": false,
+"hue": 0.524390243902439,
+"light": 0.38431372549019605,
+"sat": 0.41836734693877553,
+"rgb": [
+57,
+127,
+139
+],
+"neutral": false
+},
+{
+"file": "HINF_Pioneer_Group_Zeta_Emblem.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+20,
+25,
+26
+],
+[
+137,
+172,
+182
+],
+[
+222,
+236,
+246
+]
+],
+"needsDark": false,
+"hue": 0.5370370370370371,
+"light": 0.6254901960784314,
+"sat": 0.23560209424083778,
+"rgb": [
+137,
+172,
+182
+],
+"neutral": false
+},
+{
+"file": "Patterns/HINF_-_Emblem_icon_-_Kaleidoblades.png",
+"folder": "Patterns",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+0,
+41,
+66
+],
+[
+48,
+101,
+145
+],
+[
+92,
+166,
+204
+]
+],
+"needsDark": false,
+"hue": 0.5631313131313131,
+"light": 0.12941176470588237,
+"sat": 1.0,
+"rgb": [
+0,
+41,
+66
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Chesspiece.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+132,
+183,
+254
+],
+[
+15,
+107,
+172
+],
+[
+0,
+59,
+96
+],
+[
+198,
+206,
+255
+]
+],
+"needsDark": false,
+"hue": 0.5969945355191256,
+"light": 0.7568627450980392,
+"sat": 0.9838709677419355,
+"rgb": [
+132,
+183,
+254
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Ashrisen.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+33,
+93,
+171
+],
+[
+254,
+218,
+0
+],
+[
+242,
+242,
+243
+]
+],
+"needsDark": false,
+"hue": 0.5942028985507246,
+"light": 0.39999999999999997,
+"sat": 0.6764705882352942,
+"rgb": [
+33,
+93,
+171
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Decipher.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+31,
+85,
+157
+],
+[
+245,
+210,
+1
+],
+[
+242,
+242,
+243
+]
+],
+"needsDark": false,
+"hue": 0.5952380952380952,
+"light": 0.3686274509803922,
+"sat": 0.6702127659574468,
+"rgb": [
+31,
+85,
+157
+],
+"neutral": false
+},
+{
+"file": "tsw-illuminati-logo.jpg",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+255,
+255
+],
+[
+38,
+97,
+157
+]
+],
+"needsDark": false,
+"hue": 0.5840336134453782,
+"light": 0.3823529411764706,
+"sat": 0.6102564102564102,
+"rgb": [
+38,
+97,
+157
+],
+"neutral": false
+},
+{
+"file": "HINF_Windfall_Emblem.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+13,
+30,
+51
+],
+[
+254,
+250,
+209
+],
+[
+246,
+139,
+57
+]
+],
+"needsDark": false,
+"hue": 0.5921052631578947,
+"light": 0.12549019607843137,
+"sat": 0.5937500000000001,
+"rgb": [
+13,
+30,
+51
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Otherworld.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+8,
+23,
+38
+],
+[
+178,
+151,
+148
+],
+[
+45,
+112,
+158
+],
+[
+218,
+246,
+245
+]
+],
+"needsDark": false,
+"hue": 0.5678466076696166,
+"light": 0.39803921568627454,
+"sat": 0.5566502463054187,
+"rgb": [
+45,
+112,
+158
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Crowned.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+40,
+82,
+124
+],
+[
+52,
+118,
+183
+],
+[
+85,
+149,
+242
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.5833333333333334,
+"light": 0.32156862745098036,
+"sat": 0.5121951219512195,
+"rgb": [
+40,
+82,
+124
+],
+"neutral": false
+},
+{
+"file": "military/HINF_Signum_Diamond_Emblem.png",
+"folder": "military",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+145,
+184,
+219
+],
+[
+10,
+23,
+43
+],
+[
+88,
+110,
+176
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.5788288288288288,
+"light": 0.7137254901960783,
+"sat": 0.5068493150684932,
+"rgb": [
+145,
+184,
+219
+],
+"neutral": false
+},
+{
+"file": "HINF_Sabre_Response_Emblem.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+35,
+58,
+82
+],
+[
+255,
+255,
+255
+],
+[
+54,
+101,
+135
+],
+[
+86,
+159,
+204
+]
+],
+"needsDark": false,
+"hue": 0.5851063829787234,
+"light": 0.22941176470588237,
+"sat": 0.4017094017094017,
+"rgb": [
+35,
+58,
+82
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p36.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+0,
+25,
+70
+],
+[
+30,
+105,
+245
+],
+[
+250,
+74,
+90
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.6071428571428572,
+"light": 0.13725490196078433,
+"sat": 1.0,
+"rgb": [
+0,
+25,
+70
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p51.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+37,
+255
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.6424836601307189,
+"light": 0.5,
+"sat": 1.0,
+"rgb": [
+0,
+37,
+255
+],
+"neutral": false
+},
+{
+"file": "tiles/unity-s2.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+1,
+19,
+115
+],
+[
+235,
+18,
+18
+],
+[
+170,
+16,
+16
+]
+],
+"needsDark": false,
+"hue": 0.6403508771929824,
+"light": 0.22745098039215686,
+"sat": 0.9827586206896552,
+"rgb": [
+1,
+19,
+115
+],
+"neutral": false
+},
+{
+"file": "tiles/unity-s3.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+1,
+19,
+115
+],
+[
+231,
+21,
+21
+]
+],
+"needsDark": false,
+"hue": 0.6403508771929824,
+"light": 0.22745098039215686,
+"sat": 0.9827586206896552,
+"rgb": [
+1,
+19,
+115
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s25.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+33,
+105,
+247
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.6105919003115264,
+"light": 0.5490196078431373,
+"sat": 0.9304347826086957,
+"rgb": [
+33,
+105,
+247
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p20.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+6,
+51,
+149
+],
+[
+255,
+18,
+23
+]
+],
+"needsDark": false,
+"hue": 0.6142191142191141,
+"light": 0.303921568627451,
+"sat": 0.9225806451612902,
+"rgb": [
+6,
+51,
+149
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p100.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+29,
+104,
+245
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.6087962962962963,
+"light": 0.5372549019607843,
+"sat": 0.9152542372881357,
+"rgb": [
+29,
+104,
+245
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p3.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+30,
+105,
+245
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.6085271317829458,
+"light": 0.5392156862745098,
+"sat": 0.9148936170212768,
+"rgb": [
+30,
+105,
+245
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p9.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+30,
+105,
+245
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.6085271317829458,
+"light": 0.5392156862745098,
+"sat": 0.9148936170212768,
+"rgb": [
+30,
+105,
+245
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s45.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+82,
+138,
+247
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.6101010101010101,
+"light": 0.6450980392156863,
+"sat": 0.9116022099447514,
+"rgb": [
+82,
+138,
+247
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p84.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+56,
+113,
+241
+],
+[
+31,
+31,
+31
+]
+],
+"needsDark": false,
+"hue": 0.6153153153153154,
+"light": 0.5823529411764705,
+"sat": 0.8685446009389671,
+"rgb": [
+56,
+113,
+241
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p41.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+39,
+101,
+232
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.6131260794473229,
+"light": 0.5313725490196078,
+"sat": 0.8075313807531379,
+"rgb": [
+39,
+101,
+232
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Sorvad_Breach.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+78,
+126,
+220
+],
+[
+86,
+86,
+86
+],
+[
+46,
+74,
+137
+],
+[
+132,
+132,
+132
+]
+],
+"needsDark": false,
+"hue": 0.6103286384976526,
+"light": 0.5843137254901961,
+"sat": 0.669811320754717,
+"rgb": [
+78,
+126,
+220
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p15.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+155,
+176,
+233
+],
+[
+221,
+226,
+234
+]
+],
+"needsDark": false,
+"hue": 0.6217948717948718,
+"light": 0.7607843137254902,
+"sat": 0.6393442622950818,
+"rgb": [
+155,
+176,
+233
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p32.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+100,
+133,
+218
+],
+[
+215,
+226,
+250
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.6200564971751413,
+"light": 0.6235294117647059,
+"sat": 0.6145833333333333,
+"rgb": [
+100,
+133,
+218
+],
+"neutral": false
+},
+{
+"file": "Patterns/HINF_-_Emblem_icon_-_Hispanic_Heritage_Month.png",
+"folder": "Patterns",
+"kind": "raster",
+"colors": 5,
+"palette": [
+[
+23,
+50,
+96
+],
+[
+255,
+248,
+113
+],
+[
+7,
+178,
+40
+],
+[
+27,
+137,
+124
+],
+[
+255,
+22,
+222
+]
+],
+"needsDark": false,
+"hue": 0.6050228310502282,
+"light": 0.23333333333333334,
+"sat": 0.6134453781512604,
+"rgb": [
+23,
+50,
+96
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Signal_Source.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+255,
+255,
+255
+],
+[
+139,
+148,
+198
+],
+[
+83,
+83,
+165
+]
+],
+"needsDark": false,
+"hue": 0.6412429378531073,
+"light": 0.6607843137254902,
+"sat": 0.3410404624277457,
+"rgb": [
+139,
+148,
+198
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p18.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+26,
+31,
+50
+],
+[
+130,
+233,
+241
+]
+],
+"needsDark": false,
+"hue": 0.6319444444444445,
+"light": 0.14901960784313725,
+"sat": 0.3157894736842105,
+"rgb": [
+26,
+31,
+50
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p34.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+14,
+0,
+115
+],
+[
+30,
+105,
+245
+]
+],
+"needsDark": false,
+"hue": 0.6869565217391305,
+"light": 0.22549019607843138,
+"sat": 1.0,
+"rgb": [
+14,
+0,
+115
+],
+"neutral": false
+},
+{
+"file": "tiles/gen-omega-s34.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 8,
+"palette": [
+[
+24,
+20,
+24
+],
+[
+0,
+0,
+148
+],
+[
+24,
+146,
+0
+],
+[
+148,
+255,
+41
+],
+[
+255,
+255,
+255
+],
+[
+148,
+37,
+239
+],
+[
+0,
+0,
+210
+],
+[
+225,
+103,
+245
+]
+],
+"needsDark": false,
+"hue": 0.6666666666666666,
+"light": 0.2901960784313726,
+"sat": 1.0,
+"rgb": [
+0,
+0,
+148
+],
+"neutral": false
+},
+{
+"file": "sticker (32).png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+198
+],
+[
+255,
+97,
+24
+]
+],
+"needsDark": false,
+"hue": 0.6666666666666666,
+"light": 0.38823529411764707,
+"sat": 1.0,
+"rgb": [
+0,
+0,
+198
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s47.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+198
+],
+[
+255,
+97,
+24
+]
+],
+"needsDark": false,
+"hue": 0.6666666666666666,
+"light": 0.38823529411764707,
+"sat": 1.0,
+"rgb": [
+0,
+0,
+198
+],
+"neutral": false
+},
+{
+"file": "corpo/SinoViet_Logo.png",
+"folder": "corpo",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+0,
+0,
+254
+],
+[
+255,
+26,
+0
+],
+[
+0,
+102,
+0
+]
+],
+"needsDark": false,
+"hue": 0.6666666666666666,
+"light": 0.4980392156862745,
+"sat": 1.0,
+"rgb": [
+0,
+0,
+254
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p53.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+49,
+31,
+255
+],
+[
+0,
+0,
+0
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.6800595238095237,
+"light": 0.5607843137254902,
+"sat": 1.0,
+"rgb": [
+49,
+31,
+255
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p58.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+49,
+31,
+255
+],
+[
+0,
+0,
+0
+],
+[
+183,
+176,
+254
+],
+[
+255,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.6800595238095237,
+"light": 0.5607843137254902,
+"sat": 1.0,
+"rgb": [
+49,
+31,
+255
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p73.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+46,
+42,
+255
+],
+[
+148,
+255,
+42
+]
+],
+"needsDark": false,
+"hue": 0.6697965571205008,
+"light": 0.5823529411764706,
+"sat": 1.0,
+"rgb": [
+46,
+42,
+255
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p55.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+91,
+103,
+255
+],
+[
+0,
+0,
+15
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.6544715447154471,
+"light": 0.6784313725490196,
+"sat": 1.0,
+"rgb": [
+91,
+103,
+255
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s8.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+222,
+222,
+224
+],
+[
+13,
+6,
+99
+]
+],
+"needsDark": false,
+"hue": 0.6792114695340502,
+"light": 0.20588235294117646,
+"sat": 0.8857142857142859,
+"rgb": [
+13,
+6,
+99
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p22.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+61,
+49,
+223
+],
+[
+238,
+253,
+77
+],
+[
+96,
+93,
+153
+]
+],
+"needsDark": false,
+"hue": 0.6781609195402298,
+"light": 0.5333333333333333,
+"sat": 0.7310924369747899,
+"rgb": [
+61,
+49,
+223
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p59.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+23,
+34,
+124
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.6485148514851485,
+"light": 0.28823529411764703,
+"sat": 0.6870748299319728,
+"rgb": [
+23,
+34,
+124
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p17.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+45,
+45,
+45
+],
+[
+112,
+120,
+202
+]
+],
+"needsDark": false,
+"hue": 0.6518518518518519,
+"light": 0.615686274509804,
+"sat": 0.4591836734693876,
+"rgb": [
+112,
+120,
+202
+],
+"neutral": false
+},
+{
+"file": "HINF_Sol_Testing_Grounds_Emblem.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+45,
+43,
+111
+],
+[
+233,
+244,
+247
+],
+[
+129,
+190,
+232
+]
+],
+"needsDark": false,
+"hue": 0.6715686274509803,
+"light": 0.3019607843137255,
+"sat": 0.4415584415584415,
+"rgb": [
+45,
+43,
+111
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_New_Heights.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+47,
+41,
+99
+],
+[
+251,
+139,
+36
+]
+],
+"needsDark": false,
+"hue": 0.6839080459770116,
+"light": 0.27450980392156865,
+"sat": 0.41428571428571426,
+"rgb": [
+47,
+41,
+99
+],
+"neutral": false
+},
+{
+"file": "military/HINF_Signum_Platinum_Emblem.png",
+"folder": "military",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+133,
+135,
+197
+],
+[
+18,
+10,
+40
+],
+[
+194,
+202,
+212
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.6614583333333334,
+"light": 0.6470588235294118,
+"sat": 0.3555555555555555,
+"rgb": [
+133,
+135,
+197
+],
+"neutral": false
+},
+{
+"file": "nonhuman/HINF_-_Emblem_icon_-_Siqtar_Wing.png",
+"folder": "nonhuman",
+"kind": "raster",
+"colors": 5,
+"palette": [
+[
+28,
+26,
+51
+],
+[
+82,
+66,
+140
+],
+[
+119,
+106,
+216
+],
+[
+230,
+230,
+230
+],
+[
+114,
+242,
+146
+]
+],
+"needsDark": false,
+"hue": 0.68,
+"light": 0.15098039215686276,
+"sat": 0.3246753246753247,
+"rgb": [
+28,
+26,
+51
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p2.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+49,
+0,
+252
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.6990740740740741,
+"light": 0.49411764705882355,
+"sat": 1.0,
+"rgb": [
+49,
+0,
+252
+],
+"neutral": false
+},
+{
+"file": "tiles/gen-omega-s18.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+197,
+179,
+255
+],
+[
+34,
+32,
+46
+]
+],
+"needsDark": false,
+"hue": 0.7061403508771931,
+"light": 0.8509803921568627,
+"sat": 1.0,
+"rgb": [
+197,
+179,
+255
+],
+"neutral": false
+},
+{
+"file": "pfp (17).png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+155,
+131,
+244
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.7020648967551623,
+"light": 0.7352941176470589,
+"sat": 0.8370370370370374,
+"rgb": [
+155,
+131,
+244
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p65.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+155,
+131,
+244
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.7020648967551623,
+"light": 0.7352941176470589,
+"sat": 0.8370370370370374,
+"rgb": [
+155,
+131,
+244
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s42.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+153,
+133,
+239
+],
+[
+172,
+244,
+198
+]
+],
+"needsDark": false,
+"hue": 0.6981132075471698,
+"light": 0.7294117647058824,
+"sat": 0.7681159420289855,
+"rgb": [
+153,
+133,
+239
+],
+"neutral": false
+},
+{
+"file": "glitch/HINF_Legendary_Crossing_Emblem_Icon.png",
+"folder": "glitch",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+101,
+114,
+114
+],
+[
+69,
+36,
+206
+],
+[
+216,
+216,
+216
+],
+[
+26,
+26,
+26
+]
+],
+"needsDark": false,
+"hue": 0.6990196078431373,
+"light": 0.4745098039215686,
+"sat": 0.7024793388429753,
+"rgb": [
+69,
+36,
+206
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s15.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+179,
+131,
+213
+],
+[
+255,
+255,
+255
+],
+[
+227,
+255,
+191
+]
+],
+"needsDark": false,
+"hue": 0.7642276422764227,
+"light": 0.6745098039215687,
+"sat": 0.49397590361445803,
+"rgb": [
+179,
+131,
+213
+],
+"neutral": false
+},
+{
+"file": "skull/HINF_-_Emblem_icon_-_Jolly_Roger.png",
+"folder": "skull",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+82,
+50,
+132
+],
+[
+229,
+227,
+209
+],
+[
+142,
+72,
+204
+]
+],
+"needsDark": false,
+"hue": 0.7317073170731708,
+"light": 0.3568627450980392,
+"sat": 0.45054945054945067,
+"rgb": [
+82,
+50,
+132
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p79.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+19,
+19,
+22
+],
+[
+203,
+187,
+226
+]
+],
+"needsDark": false,
+"hue": 0.7350427350427351,
+"light": 0.8098039215686275,
+"sat": 0.40206185567010305,
+"rgb": [
+203,
+187,
+226
+],
+"neutral": false
+},
+{
+"file": "tiles/gen-omega-p6.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+105,
+75,
+135
+],
+[
+224,
+229,
+214
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.75,
+"light": 0.4117647058823529,
+"sat": 0.2857142857142857,
+"rgb": [
+105,
+75,
+135
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p52.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+239,
+0,
+255
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.8228758169934641,
+"light": 0.5,
+"sat": 1.0,
+"rgb": [
+239,
+0,
+255
+],
+"neutral": false
+},
+{
+"file": "nonhuman/ElGrineerExiliadoGlyph.png",
+"folder": "nonhuman",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+204,
+209,
+207
+],
+[
+0,
+0,
+0
+],
+[
+255,
+1,
+237
+]
+],
+"needsDark": false,
+"hue": 0.8451443569553806,
+"light": 0.5019607843137255,
+"sat": 1.0,
+"rgb": [
+255,
+1,
+237
+],
+"neutral": false
+},
+{
+"file": "corpo/hexcorp.png",
+"folder": "corpo",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+102,
+255
+]
+],
+"needsDark": false,
+"hue": 0.8333333333333334,
+"light": 0.7,
+"sat": 1.0,
+"rgb": [
+255,
+102,
+255
+],
+"neutral": false
+},
+{
+"file": "tiles/gen-omega-s7.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 7,
+"palette": [
+[
+154,
+0,
+126
+],
+[
+203,
+231,
+61
+],
+[
+22,
+4,
+4
+],
+[
+4,
+114,
+114
+],
+[
+72,
+2,
+192
+],
+[
+60,
+195,
+157
+],
+[
+0,
+0,
+240
+]
+],
+"needsDark": false,
+"hue": 0.8636363636363636,
+"light": 0.30196078431372547,
+"sat": 1.0,
+"rgb": [
+154,
+0,
+126
+],
+"neutral": false
+},
+{
+"file": "tiles/gen-omega-s22.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 5,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+255,
+0,
+215
+],
+[
+178,
+178,
+178
+],
+[
+255,
+255,
+255
+],
+[
+192,
+254,
+4
+]
+],
+"needsDark": false,
+"hue": 0.8594771241830066,
+"light": 0.5,
+"sat": 1.0,
+"rgb": [
+255,
+0,
+215
+],
+"neutral": false
+},
+{
+"file": "tiles/gen-omega-p67.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+13,
+13,
+13
+],
+[
+50,
+50,
+50
+],
+[
+255,
+13,
+215
+]
+],
+"needsDark": false,
+"hue": 0.8608815426997245,
+"light": 0.5254901960784314,
+"sat": 1.0,
+"rgb": [
+255,
+13,
+215
+],
+"neutral": false
+},
+{
+"file": "tiles/gen-omega-s21.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+255,
+20,
+190
+]
+],
+"needsDark": false,
+"hue": 0.8794326241134751,
+"light": 0.5392156862745098,
+"sat": 1.0,
+"rgb": [
+255,
+20,
+190
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p77.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+21,
+190
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.8796296296296297,
+"light": 0.5411764705882353,
+"sat": 1.0,
+"rgb": [
+255,
+21,
+190
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s48.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+62,
+52,
+79
+],
+[
+150,
+169,
+174
+],
+[
+230,
+232,
+233
+],
+[
+204,
+98,
+168
+]
+],
+"needsDark": false,
+"hue": 0.889937106918239,
+"light": 0.592156862745098,
+"sat": 0.5096153846153847,
+"rgb": [
+204,
+98,
+168
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s26.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+255,
+0,
+114
+]
+],
+"needsDark": false,
+"hue": 0.9254901960784314,
+"light": 0.5,
+"sat": 1.0,
+"rgb": [
+255,
+0,
+114
+],
+"neutral": false
+},
+{
+"file": "pfp (46).png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+249,
+170,
+217
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.9008438818565401,
+"light": 0.8215686274509804,
+"sat": 0.8681318681318683,
+"rgb": [
+249,
+170,
+217
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p94.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+249,
+170,
+217
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.9008438818565401,
+"light": 0.8215686274509804,
+"sat": 0.8681318681318683,
+"rgb": [
+249,
+170,
+217
+],
+"neutral": false
+},
+{
+"file": "tiles/gen-omega-s44.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+239,
+190,
+214
+],
+[
+66,
+36,
+90
+],
+[
+107,
+69,
+148
+]
+],
+"needsDark": false,
+"hue": 0.9183673469387755,
+"light": 0.8411764705882353,
+"sat": 0.6049382716049383,
+"rgb": [
+239,
+190,
+214
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p47.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+246,
+240,
+254
+],
+[
+235,
+195,
+210
+]
+],
+"needsDark": false,
+"hue": 0.9375,
+"light": 0.8431372549019607,
+"sat": 0.49999999999999967,
+"rgb": [
+235,
+195,
+210
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p62.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+12,
+12,
+12
+],
+[
+255,
+9,
+97
+]
+],
+"needsDark": false,
+"hue": 0.940379403794038,
+"light": 0.5176470588235295,
+"sat": 1.0,
+"rgb": [
+255,
+9,
+97
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p69.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+10,
+96
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.9414965986394558,
+"light": 0.5196078431372549,
+"sat": 1.0,
+"rgb": [
+255,
+10,
+96
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s37.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+239,
+70,
+98
+],
+[
+51,
+35,
+37
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.9723865877712031,
+"light": 0.6058823529411765,
+"sat": 0.8407960199004975,
+"rgb": [
+239,
+70,
+98
+],
+"neutral": false
+},
+{
+"file": "HINF_UEG_Cartographic_Corps_Emblem.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+52,
+23,
+32
+],
+[
+182,
+51,
+76
+]
+],
+"needsDark": false,
+"hue": 0.9482758620689655,
+"light": 0.14705882352941177,
+"sat": 0.38666666666666666,
+"rgb": [
+52,
+23,
+32
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p16.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+18,
+23
+],
+[
+238,
+228,
+184
+]
+],
+"needsDark": false,
+"hue": 0.9964838255977496,
+"light": 0.5352941176470588,
+"sat": 1.0,
+"rgb": [
+255,
+18,
+23
+],
+"neutral": false
+},
+{
+"file": "pfp (16).png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+19,
+29
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.9929378531073446,
+"light": 0.5372549019607843,
+"sat": 1.0,
+"rgb": [
+255,
+19,
+29
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p64.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+19,
+29
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.9929378531073446,
+"light": 0.5372549019607843,
+"sat": 1.0,
+"rgb": [
+255,
+19,
+29
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s10.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 3,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+255,
+19,
+29
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.9929378531073446,
+"light": 0.5372549019607843,
+"sat": 1.0,
+"rgb": [
+255,
+19,
+29
+],
+"neutral": false
+},
+{
+"file": "pfp (56).png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+255,
+20,
+29
+]
+],
+"needsDark": false,
+"hue": 0.9936170212765958,
+"light": 0.5392156862745098,
+"sat": 1.0,
+"rgb": [
+255,
+20,
+29
+],
+"neutral": false
+},
+{
+"file": "sticker (28).png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+20,
+33
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.9907801418439717,
+"light": 0.5392156862745098,
+"sat": 1.0,
+"rgb": [
+255,
+20,
+33
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p10.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+255,
+20,
+29
+]
+],
+"needsDark": false,
+"hue": 0.9936170212765958,
+"light": 0.5392156862745098,
+"sat": 1.0,
+"rgb": [
+255,
+20,
+29
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p104.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+255,
+20,
+29
+]
+],
+"needsDark": false,
+"hue": 0.9936170212765958,
+"light": 0.5392156862745098,
+"sat": 1.0,
+"rgb": [
+255,
+20,
+29
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p14.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+20,
+29
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.9936170212765958,
+"light": 0.5392156862745098,
+"sat": 1.0,
+"rgb": [
+255,
+20,
+29
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s14.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+255,
+20,
+28
+]
+],
+"needsDark": false,
+"hue": 0.9943262411347518,
+"light": 0.5392156862745098,
+"sat": 1.0,
+"rgb": [
+255,
+20,
+28
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s43.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+20,
+33
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.9907801418439717,
+"light": 0.5392156862745098,
+"sat": 1.0,
+"rgb": [
+255,
+20,
+33
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p28.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+62,
+83
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.9818652849740933,
+"light": 0.6215686274509804,
+"sat": 1.0,
+"rgb": [
+255,
+62,
+83
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p8.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+250,
+75,
+90
+]
+],
+"needsDark": false,
+"hue": 0.9857142857142858,
+"light": 0.6372549019607843,
+"sat": 0.9459459459459462,
+"rgb": [
+250,
+75,
+90
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p26.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+27,
+27,
+27
+],
+[
+153,
+12,
+14
+]
+],
+"needsDark": false,
+"hue": 0.9976359338061466,
+"light": 0.32352941176470584,
+"sat": 0.8545454545454547,
+"rgb": [
+153,
+12,
+14
+],
+"neutral": false
+},
+{
+"file": "HINF_Grand_Play_Emblem.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+207,
+206,
+206
+],
+[
+77,
+77,
+77
+],
+[
+237,
+28,
+36
+],
+[
+255,
+102,
+124
+]
+],
+"needsDark": false,
+"hue": 0.9936204146730463,
+"light": 0.5196078431372549,
+"sat": 0.8530612244897959,
+"rgb": [
+237,
+28,
+36
+],
+"neutral": false
+},
+{
+"file": "tiles/basic-p29.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+193,
+16,
+18
+]
+],
+"needsDark": false,
+"hue": 0.9981167608286252,
+"light": 0.40980392156862744,
+"sat": 0.84688995215311,
+"rgb": [
+193,
+16,
+18
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s5.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+193,
+16,
+18
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.9981167608286252,
+"light": 0.40980392156862744,
+"sat": 0.84688995215311,
+"rgb": [
+193,
+16,
+18
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-s6.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+9,
+9,
+9
+],
+[
+191,
+16,
+18
+]
+],
+"needsDark": false,
+"hue": 0.9980952380952381,
+"light": 0.40588235294117647,
+"sat": 0.8454106280193237,
+"rgb": [
+191,
+16,
+18
+],
+"neutral": false
+},
+{
+"file": "tsw-templars-logo.jpg",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+255,
+255
+],
+[
+100,
+11,
+15
+]
+],
+"needsDark": false,
+"hue": 0.9925093632958801,
+"light": 0.21764705882352942,
+"sat": 0.8018018018018017,
+"rgb": [
+100,
+11,
+15
+],
+"neutral": false
+},
+{
+"file": "tiles/misc-p44.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+170,
+25,
+27
+],
+[
+13,
+13,
+13
+]
+],
+"needsDark": false,
+"hue": 0.9977011494252874,
+"light": 0.38235294117647056,
+"sat": 0.7435897435897436,
+"rgb": [
+170,
+25,
+27
+],
+"neutral": false
+},
+{
+"file": "HINF_-_Emblem_icon_-_Trivector.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+128,
+21,
+23
+],
+[
+200,
+33,
+39
+],
+[
+255,
+255,
+255
+],
+[
+244,
+177,
+47
+]
+],
+"needsDark": false,
+"hue": 0.9968847352024922,
+"light": 0.29215686274509806,
+"sat": 0.7181208053691275,
+"rgb": [
+128,
+21,
+23
+],
+"neutral": false
+},
+{
+"file": "HINF_NAVLOGCOM_Emblem.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 5,
+"palette": [
+[
+130,
+48,
+54
+],
+[
+239,
+65,
+54
+],
+[
+135,
+135,
+135
+],
+[
+230,
+231,
+232
+],
+[
+68,
+25,
+30
+]
+],
+"needsDark": false,
+"hue": 0.9878048780487805,
+"light": 0.34901960784313724,
+"sat": 0.46067415730337075,
+"rgb": [
+130,
+48,
+54
+],
+"neutral": false
+},
+{
+"file": "citadel.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+34,
+31,
+31
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.12745098039215685,
+"sat": 0.046153846153846156,
+"rgb": [
+34,
+31,
+31
+],
+"neutral": true
+},
+{
+"file": "authoritarian/cytclone.png",
+"folder": "authoritarian",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "lucre/FactionSigilBusinessLevel10_b.png",
+"folder": "lucre",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "lucre/FactionSigilBusinessLevel1_b.png",
+"folder": "lucre",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "lucre/FactionSigilBusinessLevel2_b.png",
+"folder": "lucre",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "lucre/FactionSigilBusinessLevel3_b.png",
+"folder": "lucre",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "lucre/FactionSigilBusinessLevel4_b.png",
+"folder": "lucre",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "lucre/FactionSigilBusinessLevel6_b.png",
+"folder": "lucre",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "lucre/FactionSigilBusinessLevel7_b.png",
+"folder": "lucre",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "lucre/FactionSigilBusinessLevel8_b.png",
+"folder": "lucre",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "lucre/FactionSigilBusinessLevel9_b.png",
+"folder": "lucre",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "military/Merch_UNSC_Logo_Black.svg",
+"folder": "military",
+"kind": "svg",
+"colors": 1,
+"palette": [
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "military/systems-alliance.png",
+"folder": "military",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "military/UNSC_Navy_Logo.svg",
+"folder": "military",
+"kind": "svg",
+"colors": 1,
+"palette": [
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "News Inc.jpg",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "nonhuman/CovenantEye.svg",
+"folder": "nonhuman",
+"kind": "svg",
+"colors": 1,
+"palette": [
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "steel/FactionSigilRebelsLevel10_b.png",
+"folder": "steel",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "steel/FactionSigilRebelsLevel2_b.png",
+"folder": "steel",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "steel/FactionSigilRebelsLevel7_b.png",
+"folder": "steel",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "steel/FactionSigilRebelsLevel9_b.png",
+"folder": "steel",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "tiles/basic-p1.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "tiles/basic-p60.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "tiles/misc-p23.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+226,
+255,
+227
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "tiles/misc-p35.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "tiles/misc-p43.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+36,
+36,
+36
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "tiles/misc-s16.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "tiles/misc-s30.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+225,
+225,
+225
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "tiles/misc-s35.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+0,
+0,
+0
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0,
+"sat": 0.0,
+"rgb": [
+0,
+0,
+0
+],
+"neutral": true
+},
+{
+"file": "tiles/misc-s36.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+3,
+3,
+3
+],
+[
+233,
+233,
+233
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.011764705882352941,
+"sat": 0.0,
+"rgb": [
+3,
+3,
+3
+],
+"neutral": true
+},
+{
+"file": "history/Union.png",
+"folder": "history",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+5,
+5,
+5
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.0196078431372549,
+"sat": 0.0,
+"rgb": [
+5,
+5,
+5
+],
+"neutral": true
+},
+{
+"file": "tiles/basic-p81.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+13,
+13,
+13
+],
+[
+251,
+254,
+254
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.050980392156862744,
+"sat": 0.0,
+"rgb": [
+13,
+13,
+13
+],
+"neutral": true
+},
+{
+"file": "tiles/basic-p93.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+22,
+22,
+22
+],
+[
+251,
+254,
+254
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.08627450980392157,
+"sat": 0.0,
+"rgb": [
+22,
+22,
+22
+],
+"neutral": true
+},
+{
+"file": "tiles/misc-p83.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+32,
+32,
+32
+],
+[
+195,
+205,
+201
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 0.12549019607843137,
+"sat": 0.0,
+"rgb": [
+32,
+32,
+32
+],
+"neutral": true
+},
+{
+"file": "steel/Protectorate Sigil.png",
+"folder": "steel",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+254,
+254,
+254
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 0.996078431372549,
+"sat": 0.0,
+"rgb": [
+254,
+254,
+254
+],
+"neutral": true
+},
+{
+"file": "arrowdwn.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+255,
+255
+],
+[
+41,
+37,
+38
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "authoritarian/combine1.png",
+"folder": "authoritarian",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+255,
+255
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "corpo/recycle-arrows.png",
+"folder": "corpo",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+255,
+255
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "corpo/Seekers.png",
+"folder": "corpo",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "Emissary Sigil.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "Empyrean Sigil.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "Exchange Loop.svg",
+"folder": "(root)",
+"kind": "svg",
+"colors": 2,
+"palette": [
+[
+255,
+255,
+255
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "hexagons/Atomic Sigil.png",
+"folder": "hexagons",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "hexagons/Fractal Sigil.png",
+"folder": "hexagons",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "hexagons/Hexan Sigil.png",
+"folder": "hexagons",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "hexagons/Labyrinth Sigil.png",
+"folder": "hexagons",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "hexagons/Manifold Sigil.png",
+"folder": "hexagons",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "hexagons/Multivariate Sigil.png",
+"folder": "hexagons",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "hexagons/Oracle Sigil.png",
+"folder": "hexagons",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "hexagons/Pattern Match Sigil.png",
+"folder": "hexagons",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "hexagons/Query Sigil.png",
+"folder": "hexagons",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "hexagons/Searching Sigil.png",
+"folder": "hexagons",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "military/170363-blacklight.jpg",
+"folder": "military",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+255,
+255
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "Nava Sigil.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "Ostron Trusted Sigil.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "pfp (47).png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+255,
+255
+],
+[
+54,
+54,
+54
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "pfp (55).png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+255,
+255
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "Potential Sigil.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "Prisma Sigil.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "steel/Armada Sigil.png",
+"folder": "steel",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "steel/Defiance Sigil.png",
+"folder": "steel",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "steel/Freedom Fighter Sigil.png",
+"folder": "steel",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "steel/Unyielding Sigil.png",
+"folder": "steel",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "tiles/basic-p103.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+255,
+255
+],
+[
+0,
+0,
+0
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "tiles/misc-p95.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+255,
+255,
+255
+],
+[
+54,
+54,
+54
+]
+],
+"needsDark": false,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "Trailer Entrant Sigil.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "Vox Solaris Operative Sigil.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+255,
+255,
+255
+]
+],
+"needsDark": true,
+"hue": 0.0,
+"light": 1.0,
+"sat": 0.0,
+"rgb": [
+255,
+255,
+255
+],
+"neutral": true
+},
+{
+"file": "military/HINF_Silver_Rank_Icon.png",
+"folder": "military",
+"kind": "raster",
+"colors": 4,
+"palette": [
+[
+87,
+114,
+116
+],
+[
+20,
+16,
+12
+],
+[
+138,
+149,
+149
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.5114942528735632,
+"light": 0.39803921568627454,
+"sat": 0.14285714285714282,
+"rgb": [
+87,
+114,
+116
+],
+"neutral": true
+},
+{
+"file": "Icon_Guild.png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+66,
+69,
+69
+],
+[
+198,
+189,
+173
+]
+],
+"needsDark": false,
+"hue": 0.5,
+"light": 0.2647058823529412,
+"sat": 0.022222222222222143,
+"rgb": [
+66,
+69,
+69
+],
+"neutral": true
+},
+{
+"file": "corpo/truecommand-light.svg",
+"folder": "corpo",
+"kind": "svg",
+"colors": 1,
+"palette": [
+[
+10,
+14,
+20
+]
+],
+"needsDark": false,
+"hue": 0.6,
+"light": 0.058823529411764705,
+"sat": 0.3333333333333333,
+"rgb": [
+10,
+14,
+20
+],
+"neutral": true
+},
+{
+"file": "corpo-ink/hexcorp.png",
+"folder": "corpo-ink",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+10,
+14,
+20
+]
+],
+"needsDark": false,
+"hue": 0.6,
+"light": 0.058823529411764705,
+"sat": 0.3333333333333333,
+"rgb": [
+10,
+14,
+20
+],
+"neutral": true
+},
+{
+"file": "corpo-ink/Seekers.png",
+"folder": "corpo-ink",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+10,
+14,
+20
+]
+],
+"needsDark": false,
+"hue": 0.6,
+"light": 0.058823529411764705,
+"sat": 0.3333333333333333,
+"rgb": [
+10,
+14,
+20
+],
+"neutral": true
+},
+{
+"file": "hexagons-ink/Atomic Sigil.png",
+"folder": "hexagons-ink",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+10,
+14,
+20
+]
+],
+"needsDark": false,
+"hue": 0.6,
+"light": 0.058823529411764705,
+"sat": 0.3333333333333333,
+"rgb": [
+10,
+14,
+20
+],
+"neutral": true
+},
+{
+"file": "hexagons-ink/Fractal Sigil.png",
+"folder": "hexagons-ink",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+10,
+14,
+20
+]
+],
+"needsDark": false,
+"hue": 0.6,
+"light": 0.058823529411764705,
+"sat": 0.3333333333333333,
+"rgb": [
+10,
+14,
+20
+],
+"neutral": true
+},
+{
+"file": "hexagons-ink/Hexan Sigil.png",
+"folder": "hexagons-ink",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+10,
+14,
+20
+]
+],
+"needsDark": false,
+"hue": 0.6,
+"light": 0.058823529411764705,
+"sat": 0.3333333333333333,
+"rgb": [
+10,
+14,
+20
+],
+"neutral": true
+},
+{
+"file": "hexagons-ink/Labyrinth Sigil.png",
+"folder": "hexagons-ink",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+10,
+14,
+20
+]
+],
+"needsDark": false,
+"hue": 0.6,
+"light": 0.058823529411764705,
+"sat": 0.3333333333333333,
+"rgb": [
+10,
+14,
+20
+],
+"neutral": true
+},
+{
+"file": "hexagons-ink/Manifold Sigil.png",
+"folder": "hexagons-ink",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+10,
+14,
+20
+]
+],
+"needsDark": false,
+"hue": 0.6,
+"light": 0.058823529411764705,
+"sat": 0.3333333333333333,
+"rgb": [
+10,
+14,
+20
+],
+"neutral": true
+},
+{
+"file": "hexagons-ink/Multivariate Sigil.png",
+"folder": "hexagons-ink",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+10,
+14,
+20
+]
+],
+"needsDark": false,
+"hue": 0.6,
+"light": 0.058823529411764705,
+"sat": 0.3333333333333333,
+"rgb": [
+10,
+14,
+20
+],
+"neutral": true
+},
+{
+"file": "hexagons-ink/Oracle Sigil.png",
+"folder": "hexagons-ink",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+10,
+14,
+20
+]
+],
+"needsDark": false,
+"hue": 0.6,
+"light": 0.058823529411764705,
+"sat": 0.3333333333333333,
+"rgb": [
+10,
+14,
+20
+],
+"neutral": true
+},
+{
+"file": "hexagons-ink/Pattern Match Sigil.png",
+"folder": "hexagons-ink",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+10,
+14,
+20
+]
+],
+"needsDark": false,
+"hue": 0.6,
+"light": 0.058823529411764705,
+"sat": 0.3333333333333333,
+"rgb": [
+10,
+14,
+20
+],
+"neutral": true
+},
+{
+"file": "hexagons-ink/Query Sigil.png",
+"folder": "hexagons-ink",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+10,
+14,
+20
+]
+],
+"needsDark": false,
+"hue": 0.6,
+"light": 0.058823529411764705,
+"sat": 0.3333333333333333,
+"rgb": [
+10,
+14,
+20
+],
+"neutral": true
+},
+{
+"file": "hexagons-ink/Searching Sigil.png",
+"folder": "hexagons-ink",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+10,
+14,
+20
+]
+],
+"needsDark": false,
+"hue": 0.6,
+"light": 0.058823529411764705,
+"sat": 0.3333333333333333,
+"rgb": [
+10,
+14,
+20
+],
+"neutral": true
+},
+{
+"file": "steel-ink/Armada Sigil.png",
+"folder": "steel-ink",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+10,
+14,
+20
+]
+],
+"needsDark": false,
+"hue": 0.6,
+"light": 0.058823529411764705,
+"sat": 0.3333333333333333,
+"rgb": [
+10,
+14,
+20
+],
+"neutral": true
+},
+{
+"file": "steel-ink/Defiance Sigil.png",
+"folder": "steel-ink",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+10,
+14,
+20
+]
+],
+"needsDark": false,
+"hue": 0.6,
+"light": 0.058823529411764705,
+"sat": 0.3333333333333333,
+"rgb": [
+10,
+14,
+20
+],
+"neutral": true
+},
+{
+"file": "steel-ink/Freedom Fighter Sigil.png",
+"folder": "steel-ink",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+10,
+14,
+20
+]
+],
+"needsDark": false,
+"hue": 0.6,
+"light": 0.058823529411764705,
+"sat": 0.3333333333333333,
+"rgb": [
+10,
+14,
+20
+],
+"neutral": true
+},
+{
+"file": "steel-ink/Protectorate Sigil.png",
+"folder": "steel-ink",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+10,
+14,
+20
+]
+],
+"needsDark": false,
+"hue": 0.6,
+"light": 0.058823529411764705,
+"sat": 0.3333333333333333,
+"rgb": [
+10,
+14,
+20
+],
+"neutral": true
+},
+{
+"file": "steel-ink/Unyielding Sigil.png",
+"folder": "steel-ink",
+"kind": "raster",
+"colors": 1,
+"palette": [
+[
+10,
+14,
+20
+]
+],
+"needsDark": false,
+"hue": 0.6,
+"light": 0.058823529411764705,
+"sat": 0.3333333333333333,
+"rgb": [
+10,
+14,
+20
+],
+"neutral": true
+},
+{
+"file": "tiles/misc-s27.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+16,
+20,
+24
+],
+[
+181,
+199,
+198
+]
+],
+"needsDark": false,
+"hue": 0.5833333333333334,
+"light": 0.0784313725490196,
+"sat": 0.2,
+"rgb": [
+16,
+20,
+24
+],
+"neutral": true
+},
+{
+"file": "tiles/misc-p101.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+20,
+22,
+29
+],
+[
+227,
+230,
+234
+]
+],
+"needsDark": false,
+"hue": 0.6296296296296297,
+"light": 0.09607843137254901,
+"sat": 0.1836734693877551,
+"rgb": [
+20,
+22,
+29
+],
+"neutral": true
+},
+{
+"file": "tiles/misc-p12.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+11,
+12,
+14
+],
+[
+255,
+255,
+255
+]
+],
+"needsDark": false,
+"hue": 0.6111111111111112,
+"light": 0.049019607843137254,
+"sat": 0.12,
+"rgb": [
+11,
+12,
+14
+],
+"neutral": true
+},
+{
+"file": "pfp (18).png",
+"folder": "(root)",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+50,
+43,
+47
+],
+[
+195,
+169,
+184
+]
+],
+"needsDark": false,
+"hue": 0.9047619047619047,
+"light": 0.1823529411764706,
+"sat": 0.07526881720430102,
+"rgb": [
+50,
+43,
+47
+],
+"neutral": true
+},
+{
+"file": "tiles/misc-p66.png",
+"folder": "tiles",
+"kind": "raster",
+"colors": 2,
+"palette": [
+[
+50,
+43,
+47
+],
+[
+195,
+169,
+184
+]
+],
+"needsDark": false,
+"hue": 0.9047619047619047,
+"light": 0.1823529411764706,
+"sat": 0.07526881720430102,
+"rgb": [
+50,
+43,
+47
+],
+"neutral": true
+}
+]

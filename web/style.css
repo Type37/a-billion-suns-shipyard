@@ -386,6 +386,55 @@ button { font-family: inherit; }
 }
 @media (max-width: 760px) { .gif-inner { gap: 6px 16px; } .game-info-footer { margin-top: 40px; } }
 
+/* ---------------------------------------------------------------- iPhone
+   Two things phones need that desktop never shows you.
+
+   1. SAFE AREAS. With viewport-fit=cover (index.html) the page gets the whole
+      screen, including the strip behind the Dynamic Island and the one the
+      home indicator sits in. Everything that touches an edge has to pad itself
+      out of those, or the first nav item ends up under the island in landscape
+      and the footer under the home bar in portrait. env() is 0 everywhere that
+      has no notch, so these are inert on desktop.
+
+   2. TAP TARGETS. Apple's floor is 44x44. Applied under a coarse-pointer query
+      rather than a width query, so it follows the input device rather than a
+      guess about screen size: a small laptop window keeps its compact controls,
+      a phone gets thumbs-worth of target. */
+@supports (padding: env(safe-area-inset-left)) {
+  /* Only the things that actually touch a screen edge, and only on their own
+     padding - NOT on .topbar, whose horizontal padding the nav cancels with a
+     negative margin to run edge to edge. Setting both fought each other and
+     pushed the nav 31px wider than the screen. */
+  .topnav { padding-left: max(3px, env(safe-area-inset-left)); padding-right: max(3px, env(safe-area-inset-right)); }
+  .game-info-footer { padding-bottom: max(18px, env(safe-area-inset-bottom)); }
+  /* The one fixed-position element on the page: it would otherwise sit on top
+     of the home indicator, which is exactly where a thumb rests. */
+  .toast { bottom: max(28px, calc(env(safe-area-inset-bottom) + 16px)); }
+}
+
+/* Width OR coarse pointer: the pointer query is the honest test but it cannot
+   be checked in a desktop browser, and a phone-width window should get thumb
+   targets regardless of what it claims about its input device. */
+@media (max-width: 760px), (pointer: coarse) {
+  /* A real 44px target, without making every button visually chunky: the box
+     grows to 44 but the paint stays where it was. */
+  .bar-btn, .ghost-btn, .cta-btn, .stepper-btn, .nf-opt, .card-act,
+  .mf-menu-btn, .mf-tally-cap, .nf-custom-btn, .switcher-opt, .learn-btn,
+  .cg-build, .comp-groupcheck, .control-group, .add-cue, .pr-drop,
+  .learn-dot, .tour-close, .tour-next, .play-bar-id a {
+    min-height: 44px;
+  }
+  .learn-dot, .tour-close, .tour-next { display: inline-flex; align-items: center; }
+  /* The faction name is the way into the editor, so it is a control, not prose. */
+  .cell-name a { display: inline-flex; align-items: center; min-height: 44px; }
+  .play-bar-id a { display: inline-flex; align-items: center; }
+  .cg-build { display: inline-flex; align-items: center; justify-content: center; }
+  .nf-custom-btn, .mf-tally-cap { display: inline-flex; align-items: center; justify-content: center; }
+  /* Footer links are 19px of text. Padding, not min-height, so the row does not
+     become four fat bars stacked up the bottom of the screen. */
+  .gif-inner > a { padding-top: 10px; padding-bottom: 10px; }
+}
+
 /* --------------------------------------------------------------------- toast */
 
 .toast {

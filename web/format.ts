@@ -56,23 +56,24 @@ export function escapeHtml(s: string): string {
 
 /**
  * Escape rules prose for display. Same as escapeHtml, but also swaps the
- * circled-M Mass symbol (Ⓜ, U+24C2) - which the body fonts don't include and
- * which fell back to a stray "@"-looking glyph - for a styled inline circled M
- * that renders on any font, in the app and in print. Use for any faction rule,
- * HVP rule, or tutorial text; do NOT use for <textarea> values (the raw symbol
- * must survive a round-trip there).
+ * circled-m Mass symbol (ⓜ, U+24DC) - which none of the body fonts include, so
+ * as a bare character it falls back to whatever the OS has and renders in a
+ * foreign face at the wrong weight - for the real glyph as inline SVG, which
+ * renders identically everywhere, on screen and in print. Use for any faction
+ * rule, HVP rule, or tutorial text; do NOT use for <textarea> values (the raw
+ * character must survive a round-trip there).
  */
 export function ruleText(s: string): string {
   // The SAME drawing as the stat-mass icon, not a second one that happens to
-  // also be a circled M. It used to be an SVG <text> M here and a stroked M
-  // there, and the two did not match on the page - the letterform, the weight
-  // and the circle radius all differed.
+  // also be a circled m - see MASS_MARK in icons.ts for where the outline comes
+  // from. Filled, so no stroke attributes here.
   const mass =
-    '<svg class="mass-inline" viewBox="0 0 24 24" role="img" aria-label="Mass"' +
-    ' fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square">' +
-    MASS_MARK +
-    "</svg>";
-  return escapeHtml(s).replace(/Ⓜ/g, mass);
+    '<svg class="mass-inline" viewBox="0 0 24 24" role="img" aria-label="Mass">' + MASS_MARK + "</svg>";
+  // U+24DC is the correct character (circled lowercase m, what the book prints).
+  // U+24C2 (the capital) is accepted too: it is what the data used until the
+  // codepoint was corrected, and custom factions people have already written
+  // and saved in their own browsers still contain it.
+  return escapeHtml(s).replace(/[ⓜⓂ]/g, mass);
 }
 
 export function formatDate(iso: string): string {

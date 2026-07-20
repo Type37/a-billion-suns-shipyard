@@ -38,7 +38,7 @@ export const VYKE: Faction = {
     { id: "clade-principle", name: "Clade-Principle",
       rule: "When you Drag to Select, if this unit is selected as the Lead Unit, you can select units within 12\" to join the battlegroup." },
     { id: "drone-warden", name: "Drone-Warden",
-      rule: "Ships in this fleet increase the range of their Mother's Wing effect to 3Ⓜ\"." },
+      rule: "Ships in this fleet increase the range of their Mother's Wing effect to 3ⓜ\"." },
     { id: "molt-priest", name: "Molt-Priest",
       rule: "This unit gains the command Ecdysis (1 CMD): Discard 1 damage token from every friendly unit within 15\". Once per Round." },
     { id: "seer-empath", name: "Seer-Empath",

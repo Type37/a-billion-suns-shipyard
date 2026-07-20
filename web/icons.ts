@@ -4,14 +4,29 @@ import creditsRaw from "./Credits.svg?raw";
 // a 24-unit grid so they align with the type baseline. No icon fonts.
 
 /**
- * The Mass mark: Ⓜ, the circled M, the game's own symbol. THE definition - it is
- * used both as the `stat-mass` icon and, by `ruleText()` in format.ts, inline
- * inside rules prose. Those were two separate drawings for a while (a stroked M
- * here, an SVG <text> M there) and they did not match each other on the page.
- * One mark, one place. Stroke-based, so it inherits icon()'s wrapper.
+ * The Mass mark: ⓜ, U+24DC, CIRCLED LATIN SMALL LETTER M - the circled
+ * LOWERCASE m, which is what the rulebook prints (see the Tough rule, PDF page
+ * 142). Not the capital Ⓜ (U+24C2), and not a hexagon.
+ *
+ * NOT drawn by hand. This is the actual glyph outline, converted straight out of
+ * the font the book renders it in. The layout sets that run in Akzidenz Grotesk
+ * Pro, but Akzidenz has no U+24DC, so InDesign fell back to MS Gothic for this
+ * one character - the circled m you see printed IS MS Gothic's. Extracted from
+ * C:/Windows/Fonts/msgothic.ttc with fontTools, glyph uni24DC, and mapped from
+ * its 256-unit em box (6,-31)-(252,215) into this 24x24 viewBox.
+ *
+ * THE definition: used both as the `stat-mass` icon and, by `ruleText()` in
+ * format.ts, inline inside rules prose. Those were two separate hand drawings
+ * for a while and did not match each other on the page. Filled, so it carries
+ * its own fill and overrides icon()'s stroke wrapper.
  */
+// The outline is untouched; the hairline stroke on top is optical compensation,
+// not a redraw. MS Gothic's ring is 0.93 units thick in this 24-unit box - about
+// 1/25 of the diameter - so at the 13px the compact stat chips use it lands on
+// 0.5 of a device pixel and greys out to a smudge. Stroking the same path in the
+// same colour brings the ring back over 1px without changing its shape.
 export const MASS_MARK =
-  '<circle cx="12" cy="12" r="10.2"/><polyline points="7.4 16.6 7.4 7.4 12 12.8 16.6 7.4 16.6 16.6" stroke-linejoin="round"/>';
+  '<path fill="currentColor" stroke="currentColor" stroke-width="0.45" d="M20.13 3.87Q23.5 7.23 23.5 12Q23.5 16.77 20.13 20.13Q16.77 23.5 12 23.5Q7.23 23.5 3.87 20.13Q0.5 16.77 0.5 12Q0.5 7.23 3.87 3.87Q7.23 0.5 12 0.5Q16.77 0.5 20.13 3.87ZM4.52 4.52Q1.43 7.61 1.43 12Q1.43 16.39 4.52 19.48Q7.61 22.57 12 22.57Q16.39 22.57 19.48 19.48Q22.57 16.39 22.57 12Q22.57 7.61 19.48 4.52Q16.39 1.43 12 1.43Q7.61 1.43 4.52 4.52ZM5.83 11.07V17.42H3.96V6.76H5.83V8.07Q7.23 6.39 9.01 6.39Q10.78 6.39 11.72 7.33Q12.37 7.98 12.56 8.54Q14.24 6.39 16.58 6.39Q18.17 6.39 19.2 7.42Q20.04 8.26 20.04 10.13V17.42H18.17V10.5Q18.17 9.29 17.52 8.63Q16.96 8.07 16.02 8.07Q14.9 8.07 14.06 8.91Q12.84 10.13 12.84 11.35V17.42H10.97V10.04Q10.97 9.1 10.41 8.54Q9.94 8.07 8.91 8.07Q7.61 8.07 6.67 9.01Q5.83 9.85 5.83 11.07Z"/>';
 
 const PATHS: Record<string, string> = {
   // wordmark companion: a planet disc with a single orbit line
@@ -202,8 +217,14 @@ export function statChips(
   // this chip is the whole story.
   // Each glyph carries its own stat's colour class, so the four are told apart
   // by shape AND hue before the label is read.
-  const chip = (name: string, label: string, val: string) =>
-    `<span class="stat-chip ${compact ? "stat-chip-mini" : ""}">${icon(name, compact ? 13 : 15, `stat-ico stat-ico-${name.replace("stat-", "")}`)}<span class="stat-lbl">${label}</span><span class="stat-val">${val}</span></span>`;
+  // Mass is drawn 3px larger than its neighbours. It is a ring with a letter
+  // inside where the others are solid marks, and a ring needs more box to read:
+  // at the same 13px the hairline circle greyed out to a smudge. Same optical
+  // weight, different measured size.
+  const chip = (name: string, label: string, val: string) => {
+    const size = name === "stat-mass" ? (compact ? 16 : 18) : compact ? 13 : 15;
+    return `<span class="stat-chip ${compact ? "stat-chip-mini" : ""}">${icon(name, size, `stat-ico stat-ico-${name.replace("stat-", "")}`)}<span class="stat-lbl">${label}</span><span class="stat-val">${val}</span></span>`;
+  };
   return `<span class="stat-chips ${compact ? "stat-chips-mini" : ""}">${chip("stat-mass", "Mass", String(s.mass))}${chip("stat-thrust", "Thrust", `${s.thrust}"`)}${chip("stat-silhouette", "Sil", String(s.silhouette))}${chip("stat-shields", "Shields", String(s.shields))}</span>`;
 }
 

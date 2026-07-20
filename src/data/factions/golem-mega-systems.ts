@@ -39,7 +39,7 @@ export const GOLEM_MEGA_SYSTEMS: Faction = {
     // is almost certainly the Mass symbol (rendered "M-in-circle" elsewhere in this
     // codebase), i.e. "place M-1 (M minus 1) Drones".
     { id: "assimilation-cluster", name: "Assimilation Cluster",
-      rule: "When this fleet destroys an enemy ship, place Ⓜ-1 (Ⓜ minus 1) Drones within 3\" of it (to a minimum of 0) before it is removed." },
+      rule: "When this fleet destroys an enemy ship, place ⓜ-1 (ⓜ minus 1) Drones within 3\" of it (to a minimum of 0) before it is removed." },
     { id: "adaptive-configuration-processor", name: "Adaptive Configuration Processor",
       rule: "This fleet gains access to the following command: Rapid Reconfiguration (1 CMD): Before attacking, spend 1 CMD to exchange all the dice in your attack dice pool as follows: 1D12 = 1D10 = 2D8 = 4D6. All the dice have to end up as the same type." },
     { id: "forge-overseer-core", name: "Forge-Overseer Core",
@@ -54,7 +54,7 @@ export const GOLEM_MEGA_SYSTEMS: Faction = {
     // dropped glyph in the gap. Read as the Mass symbol by analogy with the
     // dropped glyphs in Assimilation Cluster, i.e. "for every M Drones".
     { id: "auto-repair-relay", name: "Auto-Repair Relay",
-      rule: "At the end of any friendly unit's activation, you may remove any number of friendly Drones within 6\" of that unit: for every Ⓜ Drones removed in this way, this unit recovers 1 HP." },
+      rule: "At the end of any friendly unit's activation, you may remove any number of friendly Drones within 6\" of that unit: for every ⓜ Drones removed in this way, this unit recovers 1 HP." },
   ],
   playstyle: "Golem Mega-Systems is a living machine, evolving as the battle unfolds, and able to adapt to counter the strengths or exploit the weakness of the enemy. Damage to your ships spawns ever more drones, the utility of which vary depending on the HVP you pick (representing various machine minds or specialist facilities on board your ships). You can build aggressively with Assimilation Cluster, Forge-Overseer and Targeting Matrix, construct a defensive aegis with Auto-Repair Relay and Fabrication Cycler, or make a more tactically flexible hive-machine with Adaptive Configuration Processor and a Resource Allocation Algorithm.",
 };

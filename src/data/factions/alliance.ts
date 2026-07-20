@@ -40,7 +40,7 @@ export const ALLIANCE: Faction = {
     { id: "gorgronti-safety-inspector", name: "Gorgronti Safety Inspector",
       rule: "Gorgronti units in this fleet may re-roll failed Shields saving throws once per salvo." },
     { id: "rannari-hunt-mistress", name: "Rannari Hunt-Mistress",
-      rule: "When a Rannari unit in this fleet attacks, reduce the target's Shields value by the target's Ⓜ." },
+      rule: "When a Rannari unit in this fleet attacks, reduce the target's Shields value by the target's ⓜ." },
     { id: "rannari-void-stalker", name: "Rannari Void Stalker",
       rule: "Rannari units in this fleet roll a D6 at the start of their activation: increase their Thrust by that many inches for the rest of this activation." },
     { id: "yynnx-cipher-warden", name: "Yynnx Cipher Warden",

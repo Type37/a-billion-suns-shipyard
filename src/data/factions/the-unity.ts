@@ -42,7 +42,7 @@ export const THE_UNITY: Faction = {
     // Drone-Warden (p.163) uses the circled-M range symbol ("to 3M-circle\""), so the
     // dropped glyph is read as that symbol in both places here.
     { id: "chief-engineer", name: "Chief Engineer",
-      rule: "Ships in this fleet increase the range of their Mother's Wing effect by +Ⓜ\" (i.e. 3Ⓜ\")." },
+      rule: "Ships in this fleet increase the range of their Mother's Wing effect by +ⓜ\" (i.e. 3ⓜ\")." },
     { id: "commissar", name: "Commissar",
       rule: "While under Mother's Wing, ships in this fleet subtract 1 from the result of each of their attack dice, to a minimum of 1. This increases the chance of critical hits, but doesn't prevent duds." },
     { id: "flight-controller", name: "Flight Controller",

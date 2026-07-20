@@ -10,7 +10,7 @@ export const HEAVY_INDUSTRIES: Faction = {
   cmdTokens: "7",
   rule: {
     name: "Tough",
-    text: "Units in this fleet ignore the first Ⓜ damage received in each Salvo, to a minimum of 1 damage.",
+    text: "Units in this fleet ignore the first ⓜ damage received in each Salvo, to a minimum of 1 damage.",
   },
   ships: [
     { id: "pegasus-recon-wing", name: "Pegasus Recon Wing", mass: 0, thrust: 8, silhouette: 2, shields: 0,

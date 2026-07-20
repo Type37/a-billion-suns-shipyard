@@ -74,7 +74,7 @@ interface GuideStep {
 // book's own section headings are the step titles, and sub-rules the book
 // prints as lists are carried in `points`. Only mechanical smoothing is applied:
 // dropped "see page XX" cross-references, and the circled-M mass symbol rendered
-// as Ⓜ. This is the source of both the on-screen guide and the printable "Steps"
+// as ⓜ. This is the source of both the on-screen guide and the printable "Steps"
 // sheet, so a player reads the real, complete rules either way.
 const TRAINING_GUIDES: Partial<Record<GameMode, { intro: string; steps: GuideStep[]; notes: GuideStep[] }>> = {
   "combat-simulator": {
@@ -96,7 +96,7 @@ const TRAINING_GUIDES: Partial<Record<GameMode, { intro: string; steps: GuideSte
         text: "Before the game, gather three High Value Personnel (HVP) tokens or miniatures that are distinguishable as belonging to you. Place them on friendly ships of Mass 1 or higher. HVP tokens are asset tokens. Units can carry any number of HVP tokens. All three of your HVP are Seasoned Captains.",
         points: [
           "Seasoned Captain: Units in this unit's battlegroup can use the Red Alert command for 0 CMD, once per Round.",
-          "Red Alert (1 CMD): When a friendly ship without an Activated token would be destroyed, spend 1 CMD token: it isn't destroyed, and regains Ⓜ HP instead. At the end of your next activation, if this ship is still in play, it is reduced to 0HP, and you cannot use Red Alert to save it.",
+          "Red Alert (1 CMD): When a friendly ship without an Activated token would be destroyed, spend 1 CMD token: it isn't destroyed, and regains ⓜ HP instead. At the end of your next activation, if this ship is still in play, it is reduced to 0HP, and you cannot use Red Alert to save it.",
         ],
       },
       {

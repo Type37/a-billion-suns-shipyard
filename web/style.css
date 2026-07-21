@@ -3433,6 +3433,28 @@ a .icon,
 /* Trimmed rather than restyled: every value in here is spacing, and on the one
    phase that carries the arc legend the screen was 28px short of fitting. */
 .play-cols .phase-checklist { margin-top: 0; max-width: none; padding: 12px 16px; min-height: 214px; }
+
+/* Phase steps fold. Mobile-first: a tap-to-open card so the play screen fits
+   without scrolling past a wall of steps. On desktop (>=700px) the toggle is
+   gone and the steps are always shown, keeping the stable column height. */
+.phase-fold { margin-top: 12px; border: 1px solid var(--hair-soft); background: var(--paper); }
+.phase-fold-summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 9px; padding: 11px 14px; font-family: var(--sans); font-weight: 700; font-size: 13px; color: var(--ink); }
+.phase-fold-summary::-webkit-details-marker { display: none; }
+.phase-fold-summary .phase-checklist-count { margin-left: auto; }
+.phase-fold-caret { color: var(--blue); flex: none; transition: transform 0.15s var(--ease); }
+.phase-fold[open] .phase-fold-caret { transform: rotate(180deg); }
+.phase-fold .phase-checklist { margin-top: 0; min-height: 0; border-left: none; }
+@media (min-width: 700px) {
+  .phase-fold { margin-top: 14px; border: none; background: none; }
+  .phase-fold > .phase-fold-summary { display: none; }
+  /* Force the steps visible whether or not the <details> is open: display:block
+     for Firefox/Safari (which hide content children), and content-visibility on
+     ::details-content for Chromium 128+ (which hides via the pseudo-element). */
+  .phase-fold > .phase-fold-body { display: block; }
+  .phase-fold::details-content { content-visibility: visible; }
+  .phase-fold .phase-checklist { min-height: 214px; border-left: 3px solid var(--blue); }
+}
+
 .play-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .play-actions .cta-btn { flex: 1 1 auto; justify-content: center; }
 .play-cols .pc-cmds { margin-top: 0; }

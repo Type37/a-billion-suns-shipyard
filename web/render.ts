@@ -2636,18 +2636,19 @@ function playView(state: AppState): string {
     ? (SCORING_NOTES[list.mode] ?? []).map((n) => `<li>${ruleText(n)}</li>`).join("")
     : "";
 
-  const checklistBlock = `<div class="phase-checklist">
-      ${
-        stepCount > 0
-          ? `<div class="phase-checklist-head">
-        <!-- No phase name here: the switcher immediately above is already showing it. -->
-        <span class="phase-checklist-count">${doneCount} of ${stepCount} done</span>
-      </div>`
-          : ""
-      }
-      ${checklistHtml}
-      ${scoringNotes ? `<div class="phase-scoring"><ul class="rule-list">${scoringNotes}</ul></div>` : ""}
-    </div>`;
+  // On a phone the phase steps fold behind a tap so the play screen fits; on
+  // desktop the toggle disappears and they are always shown (see .phase-fold).
+  const checklistBlock = `<details class="phase-fold" data-persist="phase-fold">
+      <summary class="phase-fold-summary">
+        ${icon("chevronDown", 15, "phase-fold-caret")}
+        <span class="phase-fold-label">${currentPhase?.reference ? "This phase" : "Steps"}</span>
+        ${stepCount > 0 ? `<span class="phase-checklist-count">${doneCount} of ${stepCount} done</span>` : ""}
+      </summary>
+      <div class="phase-checklist phase-fold-body">
+        ${checklistHtml}
+        ${scoringNotes ? `<div class="phase-scoring"><ul class="rule-list">${scoringNotes}</ul></div>` : ""}
+      </div>
+    </details>`;
 
   // Hypergrowth is played from a Shipyard, so its Play Mode is laid out
   // differently: the faction ability and the Commands sit together (commands

@@ -94,15 +94,14 @@ const PATHS: Record<string, string> = {
     '<g fill="currentColor" stroke="none"><path d="M12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6"/><path fill-rule="evenodd" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10m6-10a6 6 0 1 1-12 0a6 6 0 0 1 12 0" clip-rule="evenodd"/></g>',
   "stat-shields":
     '<path fill="currentColor" stroke="none" d="M11.25 2.073c-.606.113-1.318.357-2.412.732L8.265 3c-3.007 1.03-4.51 1.544-4.887 2.082C3.008 5.608 3 7.15 3 10.21l8.25-2.75zm0 6.967L3 11.79v.201c0 5.638 4.239 8.374 6.899 9.536c.51.223.84.367 1.351.432zm1.5 12.92V9.04L21 11.79v.201c0 5.638-4.239 8.374-6.899 9.536c-.51.223-.84.367-1.351.432m0-14.499V2.072c.606.113 1.318.357 2.412.732l.573.196c3.007 1.029 4.51 1.543 4.887 2.081c.37.526.378 2.068.378 5.127z"/>',
-  // Firing-arc glyphs, redrawn to the hand sketch: PRIMARY is a narrow filled
-  // wedge (the 45 degree cone) rising out of a thin dome outline (the 180 it is
-  // a slice of), poking through the crown; AUXILIARY is that same dome, filled
-  // solid, for the full 180. Both share the baseline at y=18 so the eye compares
-  // two shapes on one ground line rather than two blue blobs.
+  // Firing-arc glyphs: two solid filled sectors on the same baseline, told apart
+  // purely by how wide they open. PRIMARY is a narrow ~45 degree cone straight
+  // ahead; AUXILIARY is a full 180 degree half-disc. Filled (not outlined) so
+  // they still read as distinct shapes at 13px.
   "arc-primary":
-    '<path fill="none" stroke="currentColor" stroke-width="1.5" d="M2 18A11 9 0 0 1 22 18"/><path fill="currentColor" stroke="none" d="M12 18 10.2 4.4 13.8 4.4Z"/>',
+    '<path fill="currentColor" stroke="none" d="M12 20 L7.5 7 A13.76 13.76 0 0 1 16.5 7 Z"/>',
   "arc-aux":
-    '<path fill="currentColor" stroke="none" d="M2 18A11 9 0 0 1 22 18Z"/>',
+    '<path fill="currentColor" stroke="none" d="M1 20 A11 11 0 0 1 23 20 Z"/>',
 };
 
 // Fleet emblems: crisp geometric insignia on the 24 grid. Filled where a bold

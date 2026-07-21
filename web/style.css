@@ -2204,9 +2204,9 @@ button { font-family: inherit; }
 /* Stats on the left, weapon lines to the RIGHT of them (they wrap below only on
    a genuinely narrow phone). The global .weap-lines is flex-basis:100%, so it is
    overridden here to sit alongside the stat block instead of under it. */
-.sy-ship-data { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px 22px; margin-top: 5px; }
+.sy-ship-data { display: flex; flex-wrap: nowrap; align-items: flex-start; gap: 6px 22px; margin-top: 5px; }
 .sy-ship-data .stat-chips { flex: 0 0 auto; }
-.sy-ship-data .weap-lines { flex: 1 1 auto; flex-basis: auto; margin-top: 0; min-width: 200px; }
+.sy-ship-data .weap-lines { flex: 1 1 auto; flex-basis: auto; margin-top: 0; min-width: 0; }
 
 /* A note replacing the list when No Limit is on (no shipyard is built in
    advance, so there is nothing to pre-buy). */

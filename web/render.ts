@@ -2379,8 +2379,7 @@ function playFleetPanel(list: SavedList, faction: Faction | undefined, customs: 
         <header class="pf-head">
           <span class="pf-name">${escapeHtml(title)}${u.count > 1 ? ` <span class="pf-x">&times;${u.count}</span>` : ""}</span>
         </header>
-        <div class="pf-stats">${statChips(ship, true)}</div>
-        ${weaponsTable(ship)}
+        <div class="pf-data">${statChips(ship, true)}${weaponsTable(ship)}</div>
         ${carried.length ? `<p class="pf-carry">Carrying: ${escapeHtml(carried.join("; "))}</p>` : ""}
         <div class="pf-track">${Array.from(
           { length: u.count },
@@ -2461,8 +2460,7 @@ function playShipyardTracker(list: SavedList, faction: Faction | undefined, cust
           <span class="pf-name">${escapeHtml(ship.name)} <span class="sy-req-cost">${credits(ship.cost)}</span>${total !== Infinity && total > 1 ? ` <span class="pf-x">&times;${total}</span>` : ""}</span>
           <span class="sy-req-tally"><span class="sy-req-yard">${yardLabel}</span> yard <span class="sy-req-sep">·</span> ${inPlay} in play <span class="sy-req-sep">·</span> ${reserve} reserve</span>
         </header>
-        <div class="pf-stats">${statChips(ship, true)}</div>
-        ${weaponsTable(ship)}
+        <div class="pf-data">${statChips(ship, true)}${weaponsTable(ship)}</div>
         <div class="sy-req-acts">
           <button class="sy-req-btn" data-action="play-deploy" data-ship="${cid}" ${yard > 0 ? "" : "disabled"}>Deploy · ${credits(ship.cost)}</button>
           ${btn("play-jumpout", "Jumped out", inPlay > 0)}
@@ -2667,16 +2665,6 @@ function playView(state: AppState): string {
     last && last.table.startsWith("Initiative check")
       ? `<div class="roll-result"><div class="roll-die">${last.value}</div><div class="roll-body"><p class="roll-table">${escapeHtml(last.table)}</p><p class="roll-headline">${escapeHtml(last.result)}</p>${last.detail ? `<p class="roll-detail">${escapeHtml(last.detail)}</p>` : ""}</div></div>`
       : "";
-  const arcsBlock =
-    play.phase === 2
-      ? `<div class="play-arcs">
-           <p class="play-arc-line"><span class="lf-arc lf-arc-pri">${icon("arc-primary", 15, "slot-arc")}PRI</span> narrow 45&deg; cone dead ahead</p>
-           <p class="play-arc-line"><span class="lf-arc lf-arc-aux">${icon("arc-aux", 15, "slot-arc")}AUX</span> full 180&deg; front arc</p>
-         </div>`
-      : "";
-  const debtNote = isShipyard
-    ? `<p class="play-debt-note">${ruleText("You start with 0 credits, and recover that expenditure by earning credits from the objectives.")}</p>`
-    : "";
 
   // This screen is used standing at a table mid-turn, so it has one job the rest
   // of the app doesn't: fit on the screen. Everything below is in service of
@@ -2720,21 +2708,18 @@ function playView(state: AppState): string {
         ${checklistBlock}
         <div class="play-actions">
           <button class="cta-btn" data-action="play-next">${icon("chevronRight", 16)} Next phase</button>
-          <button class="ghost-btn" data-action="play-initiative" data-dice="${faction ? escapeHtml(faction.initiative) : "3D6"}">${icon("die", 15)} Roll ${faction ? escapeHtml(faction.initiative) : "3D6"}</button>
         </div>
         ${rollResult}
-        ${factionBlock ? `<div class="play-notes">${factionBlock}</div>` : ""}
-        ${commandsPanel}
-        ${arcsBlock}
-      </div>
-
-      <div class="play-col play-col-spend">
         <div class="play-counters">
           ${counter("CMD tokens", play.cmd, "play-cmd", 1, (n) => String(n), icon("cmd-delta", 15, "cmd-delta-glyph"))}
           ${counter(scoreLabel, play.vp, "play-vp", scoreStep, scoreFmt)}
           ${counter("Opponent " + scoreLabel.toLowerCase(), play.oppVp, "play-oppvp", scoreStep, scoreFmt)}
         </div>
-        ${debtNote}
+        ${factionBlock ? `<div class="play-notes">${factionBlock}</div>` : ""}
+        ${commandsPanel}
+      </div>
+
+      <div class="play-col play-col-spend">
         ${playShipyardTracker(list, faction, customs)}
       </div>
     </div>`
@@ -2745,19 +2730,17 @@ function playView(state: AppState): string {
         ${checklistBlock}
         <div class="play-actions">
           <button class="cta-btn" data-action="play-next">${icon("chevronRight", 16)} Next phase</button>
-          <button class="ghost-btn" data-action="play-initiative" data-dice="${faction ? escapeHtml(faction.initiative) : "3D6"}">${icon("die", 15)} Roll ${faction ? escapeHtml(faction.initiative) : "3D6"}</button>
         </div>
         ${rollResult}
-        ${factionBlock ? `<div class="play-notes">${factionBlock}</div>` : ""}
-        ${arcsBlock}
-      </div>
-
-      <div class="play-col play-col-spend">
         <div class="play-counters">
           ${counter("CMD tokens", play.cmd, "play-cmd", 1, (n) => String(n), icon("cmd-delta", 15, "cmd-delta-glyph"))}
           ${counter(scoreLabel, play.vp, "play-vp", scoreStep, scoreFmt)}
           ${counter("Opponent " + scoreLabel.toLowerCase(), play.oppVp, "play-oppvp", scoreStep, scoreFmt)}
         </div>
+        ${factionBlock ? `<div class="play-notes">${factionBlock}</div>` : ""}
+      </div>
+
+      <div class="play-col play-col-spend">
         ${playFleetPanel(list, faction, customs)}
         ${commandsPanel}
       </div>

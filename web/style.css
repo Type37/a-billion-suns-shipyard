@@ -346,6 +346,16 @@ button { font-family: inherit; }
 }
 .topnav-btn { background: none; cursor: pointer; }
 .topnav a:hover, .topnav-btn:hover { color: #fff; text-decoration: none; }
+/* Nav fold: on a phone the whole nav collapses behind a hamburger (see the
+   max-width block below). On desktop the hamburger is hidden and the nav is the
+   normal flat row, shown whether or not the <details> is open. */
+.nav-fold { position: relative; }
+.nav-fold-btn { display: none; }
+@media (min-width: 721px) {
+  .nav-fold > .nav-fold-btn { display: none; }
+  .nav-fold > .topnav { display: flex; }
+  .nav-fold::details-content { content-visibility: visible; }
+}
 /* The sliding nav highlight, the CTA shine sweep, the index rows that slide on
    hover, the switcher thumb, the meter fills - all of it is decoration, and a
    reader who has asked the OS for less motion should get none of it. Colour and
@@ -1736,43 +1746,38 @@ button { font-family: inherit; }
      overflow here is safe and does not disturb desktop sticky positioning. */
   body { overflow-x: hidden; }
 
-  /* Topbar: wordmark on top, nav as ONE row beneath it. The old 2x2 grid cost
-     two 44px rows plus the wordmark - 142px of a 667px phone, on every view,
-     before any content. One row halves that. Every item keeps its icon AND its
-     label; nothing here is icon-only. It still wraps if a label cannot fit. */
-  .topbar { height: auto; min-height: 54px; flex-wrap: wrap; padding: 9px clamp(12px, 4vw, 16px); gap: 8px 10px; }
+  /* Topbar on a phone: wordmark on the left, a single hamburger on the right.
+     The five targets fold into a dropdown behind it (the old cram-them-all-on-
+     one-row approach put five 9.5px labels edge to edge). One tidy row now. */
+  .topbar { height: 54px; min-height: 54px; flex-wrap: nowrap; padding: 0 clamp(12px, 4vw, 16px); gap: 12px; }
   .wordmark-sub { display: none; }
-  /* All five on ONE row, Options included, and the row runs edge to edge: the
-     topbar's side padding was 30px that the five targets needed more than the
-     margin did. */
-  .topnav {
-    width: auto; flex: 1 1 100%; flex-wrap: nowrap; gap: 3px;
-    /* Negative margins cancel the topbar's side padding: those 30px were worth
-       more to five thumb targets than they were to the margin. flex-grow does
-       the widening - a fixed width:100% would ignore the negative margins. */
-    margin: 0 calc(-1 * clamp(12px, 4vw, 16px));
-    padding: 0 3px;
-  }
-  /* One definition for every item on the rail, links and the Options button
-     alike, so they cannot drift apart. A long label wraps inside its own box
-     (white-space: normal, and hyphens as the last resort on the narrowest
-     phones) rather than being clipped or dropped to a bare icon. */
-  .topnav a, .topnav-btn {
-    /* Equal shares, so all five targets are exactly the same size. This is a
-       thumb target, and five different-width thumb targets is the reason the
-       row felt fiddly. A long label wraps inside its own box (white-space is
-       normal below) rather than overflowing it, which is what went wrong the
-       last time this was flex-basis 0. */
-    flex: 1 1 0; min-width: 0;
-    flex-direction: column; align-items: center; justify-content: center; text-align: center;
-    white-space: normal; overflow-wrap: break-word; hyphens: auto; line-height: 1.2; gap: 3px;
-    /* Sized so the longest single word, "Compendium", fits inside an equal
-       fifth of the row without breaking mid-word or spilling its border. */
-    padding: 7px 1px; font-size: 9.5px; letter-spacing: 0;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-  }
-  .topnav a svg, .topnav-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
   .nav-pill { display: none; }
+
+  .nav-fold { position: relative; margin-left: auto; }
+  .nav-fold > .nav-fold-btn {
+    display: inline-flex; align-items: center; gap: 8px; list-style: none; cursor: pointer;
+    padding: 9px 13px; color: #fff; font-family: var(--sans); font-weight: 700; font-size: 12px;
+    text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid rgba(255, 255, 255, 0.32);
+  }
+  .nav-fold > .nav-fold-btn::-webkit-details-marker { display: none; }
+  .nav-fold[open] > .nav-fold-btn { background: rgba(255, 255, 255, 0.16); }
+  .nav-fold > .nav-fold-btn svg { width: 18px; height: 18px; }
+
+  /* The dropdown: absolute, so opening it never shoves the page. Items are a
+     vertical stack, each icon + label on its own row, full-width thumb targets. */
+  .nav-fold > .topnav {
+    position: absolute; top: calc(100% + 9px); right: 0; z-index: 60;
+    flex-direction: column; align-items: stretch; gap: 2px; width: min(244px, 78vw);
+    margin: 0; padding: 6px; background: var(--blue-deep);
+    border: 1px solid rgba(255, 255, 255, 0.22); box-shadow: 0 16px 36px rgba(0, 0, 0, 0.34);
+  }
+  .nav-fold > .topnav a, .nav-fold > .topnav .topnav-btn {
+    flex: 0 0 auto; width: 100%; flex-direction: row; align-items: center; justify-content: flex-start;
+    text-align: left; gap: 11px; white-space: normal; line-height: 1.2;
+    padding: 12px 12px; font-size: 12.5px; letter-spacing: 0.03em; border: none;
+  }
+  .nav-fold > .topnav a:hover, .nav-fold > .topnav .topnav-btn:hover { background: rgba(255, 255, 255, 0.12); }
+  .nav-fold > .topnav a svg, .nav-fold > .topnav .topnav-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
 
   /* Readability floor. Nothing a player reads at arm's length across a table
      goes below 11px; the stat chips they scan most come up to 13px.
@@ -3552,19 +3557,31 @@ a .icon,
 /* Each class shows its unit cost by the name; Deploy repeats it on the button. */
 .sy-req-cost { font-family: var(--display); font-weight: 800; font-size: 13px; color: var(--blue); font-variant-numeric: tabular-nums; }
 
-/* Requisition ledger: a tap-to-open record of everything you have deployed and
-   what it cost. Not always on screen - a popover off its own button, so opening
-   it shifts nothing. Persists open across Deploys so the total climbs live. */
-.sy-ledger { position: relative; margin: 0 20px 10px; }
-.sy-ledger-btn { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--hair); background: var(--paper); font-family: var(--sans); font-size: 13px; font-weight: 700; color: var(--ink); }
+/* Shipyard heading row: "Your shipyard" on the left, the Ledger to its right. */
+.sy-shipyard-head { display: flex; align-items: stretch; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--hair-soft); }
+.sy-shipyard-head .roster-section { border-bottom: none; flex: 1 1 auto; }
+.sy-shipyard-head .sy-ledger { display: flex; align-items: center; padding-right: 16px; }
+
+/* Requisition ledger: a tap-to-open activity log of everything you moved in, out
+   and to Reserves, with the cost of each requisition and a running total. A
+   popover off its own button, so opening it shifts nothing. Persists open across
+   moves so the log grows live. Opens flush to the RIGHT edge (it lives there). */
+.sy-ledger { position: relative; }
+.sy-ledger-btn { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px; border: 1px solid var(--hair); background: var(--paper); font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--ink); white-space: nowrap; }
 .sy-ledger-btn::-webkit-details-marker { display: none; }
 .sy-ledger[open] .sy-ledger-btn { border-color: var(--blue); color: var(--blue); }
 .sy-ledger-total { font-family: var(--display); font-weight: 800; color: var(--blue); font-variant-numeric: tabular-nums; }
-.sy-ledger-panel { position: absolute; z-index: 25; top: calc(100% + 6px); left: 0; width: max-content; max-width: min(340px, 88vw); background: var(--paper); border: 2px solid var(--hair); padding: 12px 14px; box-shadow: 0 12px 32px rgba(11, 22, 51, 0.18); }
-.sy-ledger-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.sy-ledger-list li { display: flex; align-items: baseline; gap: 8px; font-family: var(--sans); font-size: 13px; color: var(--ink); }
-.sy-ledger-n { font-weight: 800; font-variant-numeric: tabular-nums; }
+.sy-ledger-panel { position: absolute; z-index: 25; top: calc(100% + 6px); right: 0; width: max-content; min-width: 240px; max-width: min(340px, 88vw); max-height: 60vh; overflow-y: auto; background: var(--paper); border: 2px solid var(--hair); padding: 12px 14px; box-shadow: 0 12px 32px rgba(11, 22, 51, 0.18); }
+.sy-ledger-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+.sy-log { display: flex; align-items: baseline; gap: 7px; font-family: var(--sans); font-size: 12.5px; color: var(--ink); padding-left: 10px; border-left: 2px solid var(--hair-soft); }
+.sy-log-deploy { border-left-color: var(--blue); }
+.sy-log-jumpout { border-left-color: var(--amber); }
+.sy-log-jumpin { border-left-color: var(--go); }
+.sy-log-verb { font-weight: 800; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3); flex: none; }
+.sy-log-ship { font-weight: 600; }
+.sy-log-move { font-size: 11px; color: var(--ink-3); }
 .sy-ledger-cost { margin-left: auto; font-family: var(--display); font-weight: 700; color: var(--blue); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sy-log-move { margin-left: auto; }
 .sy-ledger-sum { display: flex; justify-content: space-between; gap: 12px; margin: 10px 0 0; padding-top: 8px; border-top: 1px solid var(--hair-soft); font-family: var(--display); font-weight: 800; }
 .sy-ledger-sum span { color: var(--blue); font-variant-numeric: tabular-nums; }
 .sy-ledger-empty { margin: 0; font-family: var(--serif); font-size: 13px; line-height: 1.45; color: var(--ink-3); max-width: 240px; }

@@ -418,14 +418,21 @@ function topbar(): string {
   return `
   <header class="topbar">
     <a class="wordmark" href="#/">${icon("logo", 26)}<span class="wordmark-text">A Billion Suns 2e</span><span class="wordmark-sub">Shipyard</span></a>
-    <nav class="topnav" aria-label="Main">
-      <span class="nav-pill" aria-hidden="true"></span>
-      <a href="#/fleets">${fleetsMark(17)} Fleets</a>
-      <a href="#/solo">${icon("solo", 17)} Solo</a>
-      <a href="#/ships">${icon("compendium", 17)} Compendium</a>
-      <a href="#/foundry">${icon("custom-rules", 17)} Custom Rules</a>
-      <button class="topnav-btn" data-action="open-options" title="Options">${optionsMark(17)} Options</button>
-    </nav>
+    <!--
+      On a phone the five nav targets fold into a menu behind the hamburger; on
+      desktop the summary is hidden and the nav is the usual flat row (.nav-fold).
+    -->
+    <details class="nav-fold">
+      <summary class="nav-fold-btn" aria-label="Menu">${icon("menu", 20)}<span class="nav-fold-label">Menu</span></summary>
+      <nav class="topnav" aria-label="Main">
+        <span class="nav-pill" aria-hidden="true"></span>
+        <a href="#/fleets">${fleetsMark(17)} Fleets</a>
+        <a href="#/solo">${icon("solo", 17)} Solo</a>
+        <a href="#/ships">${icon("compendium", 17)} Compendium</a>
+        <a href="#/foundry">${icon("custom-rules", 17)} Custom Rules</a>
+        <button class="topnav-btn" data-action="open-options" title="Options">${optionsMark(17)} Options</button>
+      </nav>
+    </details>
   </header>`;
 }
 
@@ -2410,33 +2417,25 @@ function playShipyardTracker(list: SavedList, faction: Faction | undefined, cust
   }
   const req = list.play?.req ?? {};
 
-  // Ledger: every requisition (deployed = in play + reserve, struck off the yard)
-  // and what it cost, plus the running total. Deploying a ship logs its cost here
-  // the instant you press Deploy, so you can always see what you have paid for.
-  const ledgerItems: { name: string; n: number; cost: number }[] = [];
-  let totalSpent = 0;
-  for (const cid of order) {
-    const r = resolveShip(cid, faction, customs);
-    if (!r) continue;
-    const deployed = (req[cid]?.play ?? 0) + (req[cid]?.reserve ?? 0);
-    if (deployed > 0) {
-      const cost = deployed * r.ship.cost;
-      ledgerItems.push({ name: r.ship.name, n: deployed, cost });
-      totalSpent += cost;
-    }
-  }
+  // Ledger: the full activity log - every Deploy / Jumped out / Jump in, newest
+  // first, with the Credit cost of each requisition and a running total spent.
+  // It sits to the RIGHT of the heading and opens on a tap.
+  const logEntries = list.play?.log ?? [];
+  const totalSpent = logEntries.filter((e) => e.kind === "deploy").reduce((n, e) => n + e.cost, 0);
+  const logVerb = { deploy: "Deployed", jumpout: "Jumped out", jumpin: "Jumped in" } as const;
+  const logHtml = logEntries.length
+    ? `<ul class="sy-ledger-list">${[...logEntries]
+        .reverse()
+        .map(
+          (e) =>
+            `<li class="sy-log sy-log-${e.kind}"><span class="sy-log-verb">${logVerb[e.kind]}</span> <span class="sy-log-ship">${escapeHtml(e.ship)}</span>${e.kind === "deploy" ? `<span class="sy-ledger-cost">${credits(e.cost)}</span>` : `<span class="sy-log-move">${e.kind === "jumpout" ? "to reserve" : "to play"}</span>`}</li>`,
+        )
+        .join("")}</ul>
+       <p class="sy-ledger-sum">Total requisitioned <span>${credits(totalSpent)}</span></p>`
+    : `<p class="sy-ledger-empty">No activity yet. Deploy a ship, jump it out to Reserves or back in, and every move is logged here.</p>`;
   const ledger = `<details class="sy-ledger" data-persist="sy-ledger">
-      <summary class="sy-ledger-btn">${icon("scroll", 15)} Requisition ledger <span class="sy-ledger-total">${credits(totalSpent)}</span></summary>
-      <div class="sy-ledger-panel">
-        ${
-          ledgerItems.length
-            ? `<ul class="sy-ledger-list">${ledgerItems
-                .map((it) => `<li><span class="sy-ledger-n">${it.n}×</span> ${escapeHtml(it.name)} <span class="sy-ledger-cost">${credits(it.cost)}</span></li>`)
-                .join("")}</ul>
-               <p class="sy-ledger-sum">Total requisitioned <span>${credits(totalSpent)}</span></p>`
-            : `<p class="sy-ledger-empty">Nothing requisitioned yet. Deploy a ship and its cost is logged here.</p>`
-        }
-      </div>
+      <summary class="sy-ledger-btn">${icon("scroll", 14)} Ledger <span class="sy-ledger-total">${credits(totalSpent)}</span></summary>
+      <div class="sy-ledger-panel">${logHtml}</div>
     </details>`;
 
   const rows = order
@@ -2472,8 +2471,10 @@ function playShipyardTracker(list: SavedList, faction: Faction | undefined, cust
     .join("");
   if (!rows) return "";
   return `<section class="play-fleet play-shipyard">
-    <h3 class="roster-section">Your shipyard</h3>
-    ${ledger}
+    <div class="sy-shipyard-head">
+      <h3 class="roster-section">Your shipyard</h3>
+      ${ledger}
+    </div>
     <div class="pf-list sy-req-list">${rows}</div>
   </section>`;
 }

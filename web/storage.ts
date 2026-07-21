@@ -28,6 +28,12 @@ export interface PlayState {
    * yard figure only ever falls.
    */
   req?: Record<string, { play: number; reserve: number }>;
+  /**
+   * Append-only activity log for the Shipyard: every Deploy / Jumped out / Jump
+   * in, newest last. Feeds the ledger so you can see the whole history of what
+   * you moved in, out and to Reserves, with the Credit cost of each requisition.
+   */
+  log?: { kind: "deploy" | "jumpout" | "jumpin"; ship: string; cost: number }[];
 }
 
 export interface SavedList {

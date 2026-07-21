@@ -1274,21 +1274,26 @@ function handleClick(e: MouseEvent): void {
           let { play, reserve } = cur;
           let vp = p.vp;
           const yard = total - play - reserve;
+          const log = [...(p.log ?? [])];
+          const name = ship?.name ?? shipId;
           // Deploying (Requisition) pays the ship's Credit cost - Credits drop,
           // usually into debt. Jumping out to Reserves or back In costs nothing
-          // more; you already paid when you requisitioned.
+          // more; you already paid when you requisitioned. Every move is logged.
           if (action === "play-deploy" && yard > 0) {
             play += 1;
             vp -= ship?.cost ?? 0;
+            log.push({ kind: "deploy", ship: name, cost: ship?.cost ?? 0 });
           } else if (action === "play-jumpout" && play > 0) {
             play -= 1;
             reserve += 1;
+            log.push({ kind: "jumpout", ship: name, cost: 0 });
           } else if (action === "play-jumpin" && reserve > 0) {
             reserve -= 1;
             play += 1;
+            log.push({ kind: "jumpin", ship: name, cost: 0 });
           } else return l;
           req[shipId] = { play, reserve };
-          return { ...l, play: { ...p, req, vp } };
+          return { ...l, play: { ...p, req, vp, log } };
         }),
       );
       break;

@@ -1752,6 +1752,11 @@ button { font-family: inherit; }
   .topbar { height: 54px; min-height: 54px; flex-wrap: nowrap; padding: 0 clamp(12px, 4vw, 16px); gap: 12px; }
   .wordmark-sub { display: none; }
   .nav-pill { display: none; }
+  /* One line beside the hamburger: at 360 the full wordmark broke to
+     "A BILLION SUNS / 2E". Smaller and unbreakable instead. */
+  .wordmark { min-width: 0; }
+  .wordmark-text { font-size: 15px; white-space: nowrap; }
+  .wordmark svg { flex-shrink: 0; }
 
   .nav-fold { position: relative; margin-left: auto; }
   .nav-fold > .nav-fold-btn {
@@ -2139,8 +2144,11 @@ button { font-family: inherit; }
    what it is BUILT FROM (faction, era). Two stacked groups, each wrapping as a
    whole. Reuses the builder's .mf-name / .mf-fac / .mf-era-badge / .mf-menu. */
 .sy-head { padding: 12px 0 8px; }
-.sy-id { display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap; }
-.sy-name { flex: 1 1 auto; }
+/* One row, never wrapping: the name shrinks so the ... menu keeps its place
+   beside it. Left to wrap, the menu dropped onto a line of its own on a phone
+   and ate a whole row for one button. */
+.sy-id { display: flex; align-items: center; gap: 8px 10px; flex-wrap: nowrap; }
+.sy-name { flex: 1 1 0; min-width: 0; }
 .sy-fac { display: flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; margin-top: 6px; }
 
 /* Faction block: the faction rule verbatim with Initiative and CMD/round. */
@@ -2279,7 +2287,11 @@ button { font-family: inherit; }
    gradient does the "satisfying" work here, the motion does. Count and
    position come from --switcher-count/--switcher-selected custom properties
    set inline per instance, so this is one ruleset for 2, 3, 4, or more. */
-.switcher { position: relative; display: grid; grid-template-columns: repeat(var(--switcher-count), 1fr); border: 1px solid var(--hair); }
+/* minmax(0, 1fr), NOT 1fr: a bare 1fr has an auto minimum, so a long option
+   ("Command", "Tactical") grew past its equal share and the others shrank. The
+   sliding thumb is positioned in equal 100%/count steps, so unequal options put
+   the highlight over the wrong tab. Forcing equal columns keeps them aligned. */
+.switcher { position: relative; display: grid; grid-template-columns: repeat(var(--switcher-count), minmax(0, 1fr)); border: 1px solid var(--hair); }
 .mf-h .switcher { margin-left: auto; }
 .switcher-thumb {
   position: absolute; inset: 0; width: calc(100% / var(--switcher-count)); background: var(--blue);
@@ -2462,7 +2474,11 @@ button { font-family: inherit; }
   /* Era switcher: let long labels ("Age of Unity", "Armageddon") shrink and
      wrap inside their equal cells instead of overflowing and clipping. The
      sliding thumb stays aligned because it is sized from the option count. */
-  .switcher-opt { padding: 8px 5px; font-size: 12px; white-space: normal; line-height: 1.1; gap: 4px; }
+  .switcher-opt { padding: 8px 3px; font-size: 12px; white-space: normal; line-height: 1.1; gap: 4px; }
+  /* Four equal quarters of a 360px screen is ~85px a tab; at 12px letterspaced
+     "COMMAND" needs ~100px and would wrap. Tighten just the phase track. */
+  .phase-track .switcher-opt { font-size: 10.5px; letter-spacing: 0.01em; padding: 8px 2px; }
+  .phase-track .phase-n { width: 15px; height: 15px; font-size: 9px; }
 
   /* Credits-cap popover: the preset segment is too wide for a phone, so cap
      the panel width and let the presets wrap - it opens rightward from the
@@ -3504,6 +3520,10 @@ a .icon,
 .play-counters .round-control { min-width: 0; justify-content: space-between; }
 .play-counters .round-value { min-width: 0; font-size: clamp(20px, 2.6vw, 32px); }
 @media (max-width: 620px) { .play-cols .play-counters { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* Below ~410px a signed credit value ("-70bn", and worse "-250bn") no longer
+   fits between the two steppers in a half-width counter and gets clipped. One
+   full-width column per counter gives every figure room. */
+@media (max-width: 410px) { .play-cols .play-counters { grid-template-columns: minmax(0, 1fr); } }
 /* Sits at the bottom of the (usually shorter) left column, filling the space
    the taller command list leaves next to it instead of leaving it blank. */
 .play-notes { margin-top: 4px; padding-top: 10px; border-top: 1px solid var(--hair-soft); display: flex; flex-direction: column; gap: 10px; }
@@ -3557,10 +3577,17 @@ a .icon,
 /* Each class shows its unit cost by the name; Deploy repeats it on the button. */
 .sy-req-cost { font-family: var(--display); font-weight: 800; font-size: 13px; color: var(--blue); font-variant-numeric: tabular-nums; }
 
-/* Shipyard heading row: "Your shipyard" on the left, the Ledger to its right. */
-.sy-shipyard-head { display: flex; align-items: stretch; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--hair-soft); }
-.sy-shipyard-head .roster-section { border-bottom: none; flex: 1 1 auto; }
-.sy-shipyard-head .sy-ledger { display: flex; align-items: center; padding-right: 16px; }
+/* Shipyard heading row: "Your shipyard" on the left, the Ledger to its right.
+   The title never wraps (it went to 4 lines beside the ledger on a 360 phone);
+   the ledger holds its size and the title takes what's left. */
+.sy-shipyard-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--hair-soft); }
+.sy-shipyard-head .roster-section { border-bottom: none; flex: 1 1 auto; white-space: nowrap; min-width: 0; }
+.sy-shipyard-head .sy-ledger { flex: none; display: flex; align-items: center; padding-right: 16px; }
+@media (max-width: 480px) {
+  .sy-shipyard-head .roster-section { padding-left: 20px; }
+  .sy-shipyard-head .roster-section::before { left: 6px; }
+  .sy-shipyard-head .sy-ledger { padding-right: 10px; }
+}
 
 /* Requisition ledger: a tap-to-open activity log of everything you moved in, out
    and to Reserves, with the cost of each requisition and a running total. A

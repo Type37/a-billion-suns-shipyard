@@ -41,7 +41,7 @@ import { fleetName, randomFleetName } from "./src/fleet-names.ts";
 
 fleetName("vyke", 1);              // "1st Ravening Shoal"   (deterministic)
 fleetName("gen-omega", 7);         // "7th Vengeful Crusade"
-randomFleetName("megamart", 4);    // e.g. "4th Doorstep Delivery"
+randomFleetName("megamart", 4);    // e.g. "4th Doorstep Convoy"
 randomFleetName("megamart", 4, 12345); // seeded → reproducible
 fleetName("my-homebrew", 1);       // "1st Wandering Fleet"  (default fallback)
 ```
@@ -53,17 +53,17 @@ vocabulary — title noun + adjective bank:
 | Faction (id) | Title | Sample adjectives |
 | --- | --- | --- |
 | The Vyke (`vyke`) | **Shoal** | Ravening · Boiling · Seething · Voracious · Teeming |
-| AEGIS (`aegis`) | **Protocol** | Sanctioned · Hardened · Vigilant · Encrypted · Failsafe |
+| AEGIS (`aegis`) | **Wardens** | Sanctioned · Hardened · Vigilant · Encrypted · Failsafe |
 | Gen Ω (`gen-omega`) | **Crusade** | Ascendant · Martyred · Wrathful · Undying · Sacred |
 | The Alliance (`alliance`) | **Coalition** | Fractious · Manifold · Sovereign · Discordant · Myriad |
 | Golem Mega-Systems (`golem-mega-systems`) | **Swarm** | Harvesting · Grinding · Tireless · Strip · Consuming |
-| The Discord (`the-discord`) | **Squadron** | Ace · Screaming · Renegade · Maverick · Hotshot |
+| The Discord (`the-discord`) | **Armada** | Ace · Screaming · Renegade · Maverick · Hotshot |
 | The Ordinate (`the-ordinate`) | **Communion** | Foreseen · Ordained · Calculated · Prophetic · Anointed |
 | The Unity (`the-unity`) | **Vanguard** | United · Onward · Marching · Steadfast · Resolute |
-| Galactic Credit (`galactic-credit`) | **Portfolio** | Liquidation · Leveraged · Compound · Hostile · Dividend |
+| Galactic Credit (`galactic-credit`) | **Venture** | Liquidation · Leveraged · Compound · Hostile · Dividend |
 | Heavy Industries (`heavy-industries`) | **Combine** | Ironclad · Forged · Riveted · Tempered · Reinforced |
-| Megamart (`megamart`) | **Delivery** | Doorstep · Same-Day · Express · Bulk · Rush |
-| News Inc. (`news-inc`) | **Broadcast** | Breaking · Live · Primetime · Headline · Viral |
+| Megamart (`megamart`) | **Convoy** | Doorstep · Same-Day · Express · Bulk · Rush |
+| News Inc. (`news-inc`) | **Dispatch** | Breaking · Live · Primetime · Headline · Viral |
 | *unknown / custom* | **Fleet** | Wandering · Roaming · Questing · Ranging · Errant |
 
 Each bank holds ten adjectives; the table shows the first five. To add or tweak a

@@ -36,8 +36,8 @@ test("fleetName cycles the adjective bank and keeps counting ordinals", () => {
   // Fleet 1 and fleet (len+1) reuse the same adjective but differ in ordinal.
   const first = fleetName("aegis", 1);
   const wrapped = fleetName("aegis", len + 1);
-  assert.ok(first.endsWith(`${bank.adjectives[0]} Protocol`));
-  assert.ok(wrapped.endsWith(`${bank.adjectives[0]} Protocol`));
+  assert.ok(first.endsWith(`${bank.adjectives[0]} ${bank.title}`));
+  assert.ok(wrapped.endsWith(`${bank.adjectives[0]} ${bank.title}`));
   assert.equal(first.startsWith("1st "), true);
   assert.equal(wrapped.startsWith(`${toOrdinal(len + 1)} `), true);
 });

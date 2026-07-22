@@ -22,11 +22,11 @@
 //   // same name. Great for stable, repeatable rosters and tests.
 //   fleetName("vyke", 1);   // -> "1st Ravening Shoal"
 //   fleetName("vyke", 2);   // -> "2nd Boiling Shoal"
-//   fleetName("aegis", 1);  // -> "1st Sanctioned Protocol"
+//   fleetName("aegis", 1);  // -> "1st Sanctioned Wardens"
 //
 //   // Random: pick any adjective from the faction's bank. Pass a seed for a
 //   // reproducible-but-shuffled result, or omit it for true randomness.
-//   randomFleetName("megamart", 4);          // -> e.g. "4th Doorstep Delivery"
+//   randomFleetName("megamart", 4);          // -> e.g. "4th Doorstep Convoy"
 //   randomFleetName("megamart", 4, 12345);   // -> stable for that seed
 //
 //   // Unknown / custom faction ids fall back to a neutral bank:
@@ -77,8 +77,9 @@ export const FLEET_NAME_BANKS: Record<string, FleetNameBank> = {
     ],
   },
   aegis: {
-    // Protocol Shards: cold, networked AI defence grid.
-    title: "Protocol",
+    // Protocol Shards: cold, networked AI defence grid. "Wardens" (cf. ES2's
+    // Riftborn) reads as a guarding formation.
+    title: "Wardens",
     adjectives: [
       "Sanctioned", "Hardened", "Vigilant", "Encrypted", "Failsafe",
       "Sentinel", "Recursive", "Absolute", "Unyielding", "Zero-Fault",
@@ -112,7 +113,7 @@ export const FLEET_NAME_BANKS: Record<string, FleetNameBank> = {
   },
   "the-discord": {
     // Aces and Heroes: hotshot fighter jocks.
-    title: "Squadron",
+    title: "Armada",
     adjectives: [
       "Ace", "Screaming", "Renegade", "Daredevil", "Maverick",
       "Reckless", "Gilded", "Hotshot", "Legendary", "Fearless",
@@ -137,8 +138,8 @@ export const FLEET_NAME_BANKS: Record<string, FleetNameBank> = {
 
   // --- Hypergrowth era (corporate factions) -----------------------------
   "galactic-credit": {
-    // Credit Control: predatory finance.
-    title: "Portfolio",
+    // Credit Control: predatory finance. "Venture" mirrors ES2's Lumeris.
+    title: "Venture",
     adjectives: [
       "Liquidation", "Leveraged", "Compound", "Foreclosure", "Aggregate",
       "Blue-Chip", "Hostile", "Prime", "Dividend", "Insolvent",
@@ -153,16 +154,18 @@ export const FLEET_NAME_BANKS: Record<string, FleetNameBank> = {
     ],
   },
   megamart: {
-    // Time Is Money: hyper-efficient retail logistics.
-    title: "Delivery",
+    // Time Is Money: hyper-efficient retail logistics. "Convoy" mirrors ES2's
+    // Lumeris and fits a supply fleet.
+    title: "Convoy",
     adjectives: [
       "Doorstep", "Same-Day", "Express", "Bulk", "Discount",
       "Rush", "Wholesale", "On-Demand", "Overnight", "Clearance",
     ],
   },
   "news-inc": {
-    // Live News Feeds: 24/7 media war machine.
-    title: "Broadcast",
+    // Live News Feeds: 24/7 media war machine. "Dispatch" doubles as a news
+    // dispatch and a fleet sent out on assignment.
+    title: "Dispatch",
     adjectives: [
       "Breaking", "Live", "Primetime", "Headline", "Exclusive",
       "Trending", "Unfiltered", "Front-Page", "Viral", "Sensational",

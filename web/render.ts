@@ -2676,10 +2676,6 @@ function playView(state: AppState): string {
            <p class="play-arc-line"><span class="lf-arc lf-arc-aux">${icon("arc-aux", 15, "slot-arc")}AUX</span> full 180&deg; front arc</p>
          </div>`
       : "";
-  const debtNote = isShipyard
-    ? `<p class="play-debt-note">${ruleText("You start with 0 credits, and recover that expenditure by earning credits from the objectives.")}</p>`
-    : "";
-
   // This screen is used standing at a table mid-turn, so it has one job the rest
   // of the app doesn't: fit on the screen. Everything below is in service of
   // that, and the height came from three places.
@@ -2736,7 +2732,6 @@ function playView(state: AppState): string {
           ${counter(scoreLabel, play.vp, "play-vp", scoreStep, scoreFmt)}
           ${counter("Opponent " + scoreLabel.toLowerCase(), play.oppVp, "play-oppvp", scoreStep, scoreFmt)}
         </div>
-        ${debtNote}
         ${playShipyardTracker(list, faction, customs)}
       </div>
     </div>`

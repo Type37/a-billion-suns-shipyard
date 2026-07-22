@@ -90,7 +90,6 @@ export function soloListView(state: AppState): string {
   <main class="home-main solo-main">
     <header class="solo-head">
       <h1 class="page-title">Junkspace</h1>
-      <p class="solo-tagline">A solo campaign. Run Jobs against dice-driven Hostiles, and clear your outfit's ${ck(STARTING_DEBT_K)} debt within ${DEBT_CLEAR_GAMES} games to win. Every credit you repay raises the Alert Level.</p>
     </header>
     <section class="commission-panel">
       <div class="solo-panel-head">
@@ -99,15 +98,7 @@ export function soloListView(state: AppState): string {
       </div>
       ${
         outfits.length === 0
-          ? `<div class="solo-empty">
-              <p>No outfits yet. An outfit is your crew of up to ${OUTFIT_MAX_SHIPS} ships, bought with ${ck(OUTFIT_BUDGET_K)} and saddled with ${ck(STARTING_DEBT_K)} of debt.</p>
-              <ol class="solo-primer">
-                <li><strong>Build your outfit.</strong> Up to ${OUTFIT_MAX_SHIPS} ships within ${ck(OUTFIT_BUDGET_K)}, each with a pilot class.</li>
-                <li><strong>Set up the board.</strong> A 3' by 3' table, Entry and Exit Jump Points, 8 face-down Blips, and three Jobs from one suit.</li>
-                <li><strong>Play the round.</strong> Command, Jump, Tactical, End. You run both sides; the roller decides what the Hostiles do.</li>
-                <li><strong>Pay your debts.</strong> Earnings from Jobs reduce your debt; surviving pilots earn Perks.</li>
-              </ol>
-            </div>`
+          ? `<div class="solo-empty"></div>`
           : `<div class="outfit-cards">${cards}</div>`
       }
     </section>
@@ -208,7 +199,7 @@ function outfitTab(o: SavedOutfit): string {
           <div class="readout"><span class="readout-label">Left</span><span class="readout-value ${over ? "negative" : ""}">${over ? "−" : ""}${ck(Math.abs(remaining))}</span></div>
         </div>
         <h3 class="roster-section">Ships <span class="muted">${o.ships.length}/${OUTFIT_MAX_SHIPS}${full ? " &middot; outfit full" : ""}</span></h3>
-        ${shipRows || '<p class="muted roster-hint">Add up to five ships from the left. In Junkspace every unit is a single ship, and each needs a pilot class.</p>'}
+        ${shipRows || ""}
         ${over ? '<div class="inspection fail"><p class="issue-error">Over budget by ' + ck(-remaining) + ".</p></div>" : ""}
         <div class="roster-actions">
           <button class="bar-btn danger" data-action="delete-outfit" data-id="${o.id}">${icon("trash", 16)} Delete outfit</button>

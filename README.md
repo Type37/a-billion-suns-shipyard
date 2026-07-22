@@ -20,6 +20,58 @@ Pick an era, pick a faction, build a legal list (or fill a Shipyard), give it an
 - **Emblems** — a set of built-in vector marks per faction, plus colour and upload options.
 - **Learn to play** — the rulebook's tutorial fleets (Combat Simulator, Management Training) load as ready-made lists, with guided tours.
 - **Fleet notes**, a **printable roster**, **share links**, and a bundled **Quick Reference PDF**.
+- **Fleet-name generator** — flavourful default fleet names per faction (see below).
+
+## Fleet-name generator
+
+Inspired by the auto-naming in *Endless Space 2*, `src/fleet-names.ts` builds a
+default name for any fleet from three parts:
+
+```
+[ordinal] [adjective] [faction title-noun]
+   3rd      Crushing        Horde
+```
+
+The **ordinal** counts up per faction (1st, 2nd, 3rd Fleet…), the **title** is a
+fixed noun for what that faction calls its fleets, and the **adjective** is drawn
+from a bank themed to the faction's character.
+
+```ts
+import { fleetName, randomFleetName } from "./src/fleet-names.ts";
+
+fleetName("vyke", 1);              // "1st Crushing Horde"   (deterministic)
+fleetName("gen-omega", 7);         // "7th Pitiless Crusade"
+randomFleetName("megamart", 4);    // e.g. "4th Doorstep Convoy"
+randomFleetName("megamart", 4, 12345); // seeded → reproducible
+fleetName("my-homebrew", 1);       // "1st Wandering Fleet"  (default fallback)
+```
+
+`fleetName()` is deterministic (the Nth fleet of a faction always gets the same
+name); `randomFleetName()` picks any adjective, optionally seeded.
+
+Where an ABS faction maps cleanly onto an *Endless Space 2* faction, the title
+noun **and** adjective bank are lifted straight from ES2 (the **ES2 source**
+column below). The rest keep bespoke banks.
+
+| Faction (id) | Title | ES2 source | Sample adjectives |
+| --- | --- | --- | --- |
+| The Vyke (`vyke`) | **Horde** | Cravers (zerg swarm) | Crushing · Burning · Ravaging · Slaughtering · Devouring |
+| AEGIS (`aegis`) | **Wardens** | Riftborn (defence AI) | Void · Dark · Zero · Eternal · Logical |
+| Gen Ω (`gen-omega`) | **Crusade** | Vodyani (zealots) | Noble · Glorious · Vengeful · Remorseless · Merciless |
+| The Alliance (`alliance`) | **Coalition** | — | Fractious · Manifold · Sovereign · Discordant · Myriad |
+| Golem Mega-Systems (`golem-mega-systems`) | **Swarm** | — | Harvesting · Grinding · Tireless · Strip · Consuming |
+| The Discord (`the-discord`) | **Embers** | Unfallen (rebellion) | Glowing · Flaming · Blazing · Scorching · Ardent |
+| The Ordinate (`the-ordinate`) | **Communion** | — | Foreseen · Ordained · Calculated · Prophetic · Anointed |
+| The Unity (`the-unity`) | **Navy** | United Empire (the Empire) | Heroes · Patriots · Saviors · Defenders · Conquerors |
+| Galactic Credit (`galactic-credit`) | **Venture** | Lumeris (finance) | Liquidation · Acquisition · Takeover · Leverage · Seizure |
+| Heavy Industries (`heavy-industries`) | **Hammer** | Hissho (metals/alloys) | Iron · Steel · Lead · Cobalt · Gold |
+| Megamart (`megamart`) | **Convoy** | Lumeris (title only) | Doorstep · Same-Day · Express · Bulk · Rush |
+| News Inc. (`news-inc`) | **Dispatch** | — | Breaking · Live · Primetime · Headline · Viral |
+| *unknown / custom* | **Fleet** | — | Wandering · Roaming · Questing · Ranging · Errant |
+
+Each bank holds ten adjectives; the table shows five. To add or tweak a faction,
+edit `FLEET_NAME_BANKS` in `src/fleet-names.ts` (key it by the faction's `id`).
+Covered by `test/fleet-names.test.ts`.
 
 ## Running locally
 

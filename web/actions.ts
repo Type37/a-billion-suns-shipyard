@@ -3,6 +3,7 @@ import { maxUnitSize } from "../src/validation.ts";
 import { MODE_BUILDER_SHAPE } from "../src/types.ts";
 import { JUNKSPACE_SHIPS, OUTFIT_MAX_SHIPS } from "../src/data/junkspace.ts";
 import { w } from "../src/data/_helpers.ts";
+import { randomFleetName } from "../src/fleet-names.ts";
 import { announce } from "./announce.ts";
 import { findFaction, isCustom } from "./catalog.ts";
 import { resolveShip } from "./render.ts";
@@ -344,6 +345,21 @@ function handleClick(e: MouseEvent): void {
         return { ...s, lists, ui: { ...s.ui, modal: undefined } };
       });
       location.hash = routeHash({ view: "builder", listId: list.id });
+      break;
+    }
+    case "gen-fleet-name": {
+      const id = currentListId();
+      if (!id) return;
+      const source = state.lists.find((l) => l.id === id);
+      if (!source) return;
+      const factionId = source.fleet.factionId;
+      // Ordinal = this fleet's position among your fleets of the same faction,
+      // so the 3rd Vyke list you own reads "3rd ... Horde". Adjective is rolled
+      // fresh each click, so the button re-rolls a new name.
+      const sameFaction = state.lists.filter((l) => l.fleet.factionId === factionId);
+      const ordinal = Math.max(1, sameFaction.findIndex((l) => l.id === id) + 1);
+      const name = randomFleetName(factionId, ordinal);
+      store.setState((s) => updateFleet(s, id, (f) => ({ ...f, name })));
       break;
     }
     case "duplicate-list": {

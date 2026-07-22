@@ -10,6 +10,15 @@ export {
   type Catalog,
 } from "./data/index.ts";
 export {
+  fleetName,
+  randomFleetName,
+  toOrdinal,
+  fleetNameBank,
+  FLEET_NAME_BANKS,
+  DEFAULT_FLEET_NAME_BANK,
+  type FleetNameBank,
+} from "./fleet-names.ts";
+export {
   validateFleet,
   fleetCost,
   maxUnitSize,

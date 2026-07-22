@@ -2045,6 +2045,17 @@ button { font-family: inherit; }
 .mf-name:hover { border-bottom-color: var(--ink-3); }
 .mf-name:focus { outline: none; border-bottom-style: solid; border-bottom-color: var(--blue); }
 
+/* Dice button beside the fleet name: rolls a faction-flavoured default name
+   (see web/actions.ts "gen-fleet-name" and src/fleet-names.ts). */
+.mf-name-gen {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; padding: 0; border: none; border-radius: 7px;
+  background: none; color: var(--ink-3); cursor: pointer;
+}
+.mf-name-gen:hover { background: var(--hair-soft); color: var(--ink); }
+.mf-name-gen:active { transform: rotate(-18deg); }
+.mf-name-gen:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+
 /* Budget sits at the right end of the one-line header (margin-left:auto pushes
    it past the faction/era), with the Actions button after it. */
 .mf-budget { margin-left: auto; flex-shrink: 0; }

@@ -1076,6 +1076,7 @@ function shipyardView(state: AppState): string {
       <div class="sy-id">
         <span class="mf-emblem">${emblemPicker}</span>
         <input class="mf-name sy-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled fleet" data-action="fleet-name" />
+        <button class="mf-name-gen" data-action="gen-fleet-name" title="Roll a fleet name" aria-label="Roll a fleet name">${icon("die", 18)}</button>
         ${moreMenu}
       </div>
       <div class="sy-fac">
@@ -1473,6 +1474,7 @@ function builderView(state: AppState): string {
         <div class="mf-grp mf-grp-id">
           <span class="mf-emblem">${emblemPicker}</span>
           <input class="mf-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled fleet" data-action="fleet-name" />
+          <button class="mf-name-gen" data-action="gen-fleet-name" title="Roll a fleet name" aria-label="Roll a fleet name">${icon("die", 18)}</button>
           ${moreMenu}
         </div>
         <div class="mf-grp mf-grp-fac">

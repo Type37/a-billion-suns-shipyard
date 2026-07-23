@@ -13,8 +13,6 @@ import {
   commandRow,
   diceRow,
   emblemMark,
-  fleetsMark,
-  optionsMark,
   icon,
   statChips,
   tacticalDiagram,
@@ -426,11 +424,11 @@ function topbar(): string {
       <summary class="nav-fold-btn" aria-label="Menu">${icon("menu", 20)}<span class="nav-fold-label">Menu</span></summary>
       <nav class="topnav" aria-label="Main">
         <span class="nav-pill" aria-hidden="true"></span>
-        <a href="#/fleets">${fleetsMark(17)} Fleets</a>
+        <a href="#/fleets">${icon("fleets", 17)} Fleets</a>
         <a href="#/solo">${icon("solo", 17)} Solo</a>
         <a href="#/ships">${icon("compendium", 17)} Compendium</a>
         <a href="#/foundry">${icon("custom-rules", 17)} Custom Rules</a>
-        <button class="topnav-btn" data-action="open-options" title="Options">${optionsMark(17)} Options</button>
+        <button class="topnav-btn" data-action="open-options" title="Options">${icon("options", 17)} Options</button>
       </nav>
     </details>
   </header>`;
@@ -1076,12 +1074,12 @@ function shipyardView(state: AppState): string {
         <span class="mf-emblem">${emblemPicker}</span>
         <input class="mf-name sy-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled company" data-action="fleet-name" />
         <button class="mf-name-gen" data-action="reroll-corp-name" title="Roll a company name" aria-label="Roll a company name">${icon("d12", 18)}</button>
-        ${moreMenu}
       </div>
       <div class="sy-fac">
         <span class="mf-fac">${factionControl}</span>
         <span class="mf-era-badge" title="Era you are building for">Hypergrowth</span>
       </div>
+      ${moreMenu}
     </header>
 
     ${faction && !list.freePlay ? `<section class="sy-faction">${factionRuleBlock(faction, "full")}</section>` : ""}
@@ -3013,7 +3011,7 @@ function optionsModal(state: AppState): string {
       <div class="modal-body opt-body">
         <section class="opt-section">
           <h3 class="opt-h">Your data</h3>
-          <p class="opt-note">Everything you build is saved in this browser only. Back it up to a file, move it to another device, or start over.</p>
+          <p class="opt-note">Everything you build is saved in this browser only.</p>
           <div class="opt-actions">
             <button class="bar-btn" data-action="export-data">${icon("download", 15)} Export a backup</button>
             <label class="bar-btn file-btn">${icon("upload", 15)} Import a backup

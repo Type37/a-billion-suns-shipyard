@@ -4,6 +4,7 @@ import { morphInto } from "./morph.ts";
 import { wireActions } from "./actions.ts";
 import { decodeShare, decodeSharePayload, sharePayloadFromHash, type DecodedShare } from "./share.ts";
 import { persistCustomFactions, persistLists } from "./storage.ts";
+import { runDecode, DIGIT_POOL } from "./write-on.ts";
 import "./style.css";
 
 // The app is a hash-routed, single-store, full-re-render SPA. state.ts holds the
@@ -182,7 +183,10 @@ function paint(): void {
       ? document.getElementById(activeKey.slice(3))
       : [...root.querySelectorAll<HTMLElement>("[data-action]")].find((el) => focusKey(el) === activeKey);
     if (restored instanceof HTMLElement) {
-      restored.focus();
+      // preventScroll: restoring focus after a re-render must not scroll the
+      // control into view. Without it, clicking a button near a viewport edge
+      // (the d12 roll, a +/- stepper) nudged the page a few pixels every click.
+      restored.focus({ preventScroll: true });
       if (restored instanceof HTMLInputElement && caret !== null) {
         try {
           restored.setSelectionRange(caret, caret);
@@ -558,6 +562,12 @@ function animateCountChanges(): void {
     const before = seen.get(key);
     const after = current.get(key);
     if (before === undefined || after === undefined || before === after) continue;
+    // The digits write on with the Hypergrowth decode (mechanical, transactional)
+    // over the top of the pop, scrambling through numerals before settling on the
+    // new count.
+    runDecode(after, (partial) => {
+      countEl.textContent = partial;
+    }, { pool: DIGIT_POOL, base: 60, step: 22, isAlive: () => countEl.isConnected });
     // Going up pops big and blue; going down gives a smaller, quieter settle so
     // both the + and the - are acknowledged where the eye already is.
     const up = Number(after) > Number(before);

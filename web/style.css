@@ -2198,13 +2198,16 @@ button { font-family: inherit; }
 /* Masthead: what this fleet IS (emblem, name, the menu that acts on it) over
    what it is BUILT FROM (faction, era). Two stacked groups, each wrapping as a
    whole. Reuses the builder's .mf-name / .mf-fac / .mf-era-badge / .mf-menu. */
-.sy-head { padding: 12px 0 8px; }
-/* One row, never wrapping: the name shrinks so the ... menu keeps its place
-   beside it. Left to wrap, the menu dropped onto a line of its own on a phone
-   and ate a whole row for one button. */
-.sy-id { display: flex; align-items: center; gap: 8px 10px; flex-wrap: nowrap; }
+/* Everything the masthead needs on ONE line: emblem, name, the d12 roll, the
+   faction switch, the era badge, and the ... menu. The name column grows to
+   soak up the slack so the rest sits to the right; the whole row wraps only
+   when a viewport genuinely cannot hold it (narrow phones). */
+.sy-head { display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap; padding: 12px 0 8px; }
+/* The identity group (emblem + name + d12) grows and never wraps internally, so
+   the d12 stays welded to the name and the group as a whole takes the slack. */
+.sy-id { display: flex; align-items: center; gap: 8px 10px; flex-wrap: nowrap; flex: 1 1 260px; min-width: 0; }
 .sy-name { flex: 1 1 0; min-width: 0; }
-.sy-fac { display: flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; margin-top: 6px; }
+.sy-fac { display: flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; }
 
 /* Faction block: the faction rule verbatim with Initiative and CMD/round. */
 .sy-faction { padding: 10px 0; border-top: 1px solid var(--hair-soft); }

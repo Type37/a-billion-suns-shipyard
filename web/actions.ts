@@ -39,6 +39,7 @@ import type { AppState, LastRoll, PrintOpts, ShipFilter } from "./state.ts";
 import { RANDOM_BEHAVIOUR, GLITCH_BLIP, type RollRow } from "../src/data/junkspace-solo.ts";
 import { LIB_PAGE, libraryIcon, randomIconId } from "./emblems.ts";
 import { randomCorpName } from "../src/corp-names.ts";
+import { writeOnInput } from "./write-on.ts";
 import { shareUrl } from "./share.ts";
 import { fleetToMarkdown } from "./export-text.ts";
 
@@ -364,11 +365,21 @@ function handleClick(e: MouseEvent): void {
       break;
     }
     case "reroll-corp-name": {
-      // Hypergrowth shipyard's d12 button: roll a fresh corporation name.
+      // Hypergrowth shipyard's d12 button: roll a fresh corporation name and
+      // let it write on with the decode effect. The name flickers into the live
+      // input first (no re-render, so the field does not blur or jump); the
+      // rolled value is committed to state only once it has settled.
       const id = currentListId();
       if (!id) return;
       const name = randomCorpName();
-      store.setState((s) => updateFleet(s, id, (f) => ({ ...f, name })));
+      const input = document.querySelector<HTMLInputElement>(".sy-name");
+      if (input) {
+        writeOnInput(input, name, () => {
+          store.setState((s) => updateFleet(s, id, (f) => ({ ...f, name })));
+        });
+      } else {
+        store.setState((s) => updateFleet(s, id, (f) => ({ ...f, name })));
+      }
       break;
     }
     case "duplicate-list": {

@@ -31,12 +31,17 @@ export const MASS_MARK =
 const PATHS: Record<string, string> = {
   // wordmark companion: a planet disc with a single orbit line
   logo: '<circle cx="12" cy="12" r="5.5"/><ellipse cx="12" cy="12" rx="10" ry="3.4" transform="rotate(-18 12 12)"/>',
-  // Nav marks: an EVA figure for Solo, a bookmarked volume for the Compendium,
-  // and a block grid with a plus for Custom Rules.
+  // Nav marks: Material-style solid glyphs. A standings podium for Solo, a
+  // shelved-volumes mark for the Compendium, a document list for Fleets, and a
+  // sliders mark for Options. All 24-grid, filled, stroke-none.
   solo:
-    '<g fill="currentColor" stroke="none"><path d="M17.15 10.59c4.08 0 7.27 3.13 7.61 7.12c.03.38-.27.7-.65.69l-6.96.01a3.91 3.91 0 1 1 0-7.82M11.5 5a.5.5 0 1 0 0-1a.5.5 0 0 0 0 1"/><path d="M16.425 7h-.165q-.22 0-.442.015A4.718 4.718 0 0 0 11.28 1H8.19A4.19 4.19 0 0 0 4 5.19v1.15c0 1.066.676 1.887 1.544 2.21l-.397.416A7.702 7.702 0 0 0 10.71 22h4.79v1h-3.62c-.76 0-1.38.62-1.38 1.38v.37c0 .41.34.75.75.75s.75-.33.75-.76v-.24h8.28c.66 0 1.28-.37 1.56-.96a1.67 1.67 0 0 0-.038-1.54h4.038c1.803 0 3.283-1.534 3.123-3.397C28.445 12.147 22.945 7.083 16.425 7M17 23v-1h2.931l.539.69c.06.08.04.15.02.2s-.07.11-.17.11zm-4.73-12.29c.49-.54 1.216-1.01 2.017-1.319A5.6 5.6 0 0 1 16.26 9h.14c5.51.07 10.14 4.36 10.57 9.77c.06.67-.47 1.23-1.13 1.23H10.71a5.702 5.702 0 0 1-4.12-9.65L10.75 6H10V3h1.28c.848 0 1.607.39 2.106 1A2.7 2.7 0 0 1 14 5.72c0 .72-.29 1.42-.8 1.93l-4.98 4.98c-.29.29-.29.77 0 1.06s.77.29 1.06 0zM9 3v3H7.966c-.288 0-.577.09-.816.25l-.6.39a.36.36 0 0 1-.55-.3V5.19a2.2 2.2 0 0 1 .072-.558l.007-.029l.016-.052A2.19 2.19 0 0 1 8.19 3zm6.5 26.51V25.5H17v4.46c0 .58-.48 1.05-1.06 1.05h-1.19a.749.749 0 1 1 0-1.5z"/></g>',
+    '<path fill="currentColor" stroke="none" d="M7 2h10v2H7zm0 8h10v2H7zm8-6h2v6h-2zM7 4h2v6H7zM4 14h2v8H4zm14 0h2v8h-2zM6 14h12v2H6z"/>',
   compendium:
-    '<path fill="currentColor" stroke="none" d="M18 2h-6v7L9.5 7.5L7 9V2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4a2 2 0 0 0-2-2m-.32 16.41c-.11.09-1.21.84-1.63 1.09c-.42.29-2.05 1.22-1.79-.58c.63-3.64 1.85-5.8.39-4.86c-.38.23-.6.37-.74.44c-.13.11-.12.1-.23-.09s-.15-.18-.01-.28c0 0 2.23-1.79 3.05-1.85c.78-.07.59.89.52 1.33c-.46 1.85-1.3 4.54-1.17 4.93c.11.39.93-.23 1.37-.54c0 0 .06-.07.17.05c.11.17.22.25.07.36m-.71-7.35c-.57 0-1.03-.46-1.03-1.03S16.4 9 16.97 9S18 9.46 18 10.03s-.46 1.03-1.03 1.03"/>',
+    '<g fill="currentColor" stroke="none"><path d="M0 3h13v2H0zm0 16h11v2H0z"/><path d="M11 3h13v2H11zm2 16h11v2H13zM11 5h2v18h-2zM0 5h2v14H0zm22 0h2v14h-2zm-7 2h5v2h-5zm0 4h5v2h-5zm0 4h2v2h-2z"/></g>',
+  fleets:
+    '<path fill="currentColor" stroke="none" d="M10 5h12v2H10zm0 4h8v2h-8zm0 4h12v2H10zm0 4h8v2h-8zM4 7v2h2V7zm4 4H2V5h6zm-6 2h6v2H2zm0 4h6v2H2zm0 0v-2h2v2zm4 0v-2h2v2z"/>',
+  options:
+    '<g fill="currentColor" stroke="none"><path d="M4 14h2v6H4zm5 0h2v6H9zm-5-2h7v2H4zm0 8h7v2H4zm-2-4h2v2H2zm20-8h-4V6h4z"/><path d="M10 16h12v2H10zm5-8H2V6h13zm5-4v2h-2V4zm0 6V8h-2v2zm-7-8h7v2h-7zm0 10h7v-2h-7zm0-8h2v2h-2zm0 6h2V8h-2z"/></g>',
   "custom-rules":
     '<path fill="currentColor" stroke="none" fill-opacity=".16" d="M8.4 14H5.6A1.6 1.6 0 0 0 4 15.6v2.8A1.6 1.6 0 0 0 5.6 20h2.8a1.6 1.6 0 0 0 1.6-1.6v-2.8A1.6 1.6 0 0 0 8.4 14m10-10h-2.8A1.6 1.6 0 0 0 14 5.6v2.8a1.6 1.6 0 0 0 1.6 1.6h2.8A1.6 1.6 0 0 0 20 8.4V5.6A1.6 1.6 0 0 0 18.4 4"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.5" d="M14 17h6m-3 3v-6M5.6 4h2.8A1.6 1.6 0 0 1 10 5.6v2.8A1.6 1.6 0 0 1 8.4 10H5.6A1.6 1.6 0 0 1 4 8.4V5.6A1.6 1.6 0 0 1 5.6 4m0 10h2.8a1.6 1.6 0 0 1 1.6 1.6v2.8A1.6 1.6 0 0 1 8.4 20H5.6A1.6 1.6 0 0 1 4 18.4v-2.8A1.6 1.6 0 0 1 5.6 14m10-10h2.8A1.6 1.6 0 0 1 20 5.6v2.8a1.6 1.6 0 0 1-1.6 1.6h-2.8A1.6 1.6 0 0 1 14 8.4V5.6A1.6 1.6 0 0 1 15.6 4"/>',
   plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
@@ -126,9 +131,7 @@ export const EMBLEMS: Record<string, string> = {
 // one declare it rather than being redrawn. Paths that carry their own fill or
 // stroke override the wrapper's defaults, which is how the solid nav marks sit
 // alongside the stroke-only set.
-const ICON_VIEWBOX: Record<string, string> = {
-  solo: "0 0 32 32",
-};
+const ICON_VIEWBOX: Record<string, string> = {};
 
 export function icon(name: string, size = 18, cls = ""): string {
   const body = PATHS[name];
@@ -318,81 +321,4 @@ const CREDITS_VB = { w: 44.81, h: 41.45 };
 export function creditsGlyph(size = 12): string {
   const w = (size * CREDITS_VB.w) / CREDITS_VB.h;
   return `<svg class="credits-glyph" width="${w.toFixed(2)}" height="${size}" viewBox="0 0 ${CREDITS_VB.w} ${CREDITS_VB.h}" fill="currentColor" aria-hidden="true" focusable="false">${CREDITS_INNER}</svg>`;
-}
-
-
-/**
- * The Fleets mark. Unlike everything else in this file it carries its own fills
- * and gradients rather than inheriting currentColor, so it needs a dedicated
- * renderer - and unique gradient ids per call, because two copies on one page
- * sharing an id makes the second definition win for both.
- */
-let fleetsMarkSeq = 0;
-export function fleetsMark(size = 16, cls = ""): string {
-  const n = ++fleetsMarkSeq;
-  const a = `fleetsA${n}`;
-  const b = `fleetsB${n}`;
-  return `<svg class="icon icon-fleets ${cls}" width="${size}" height="${size}" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-    <g fill="none">
-      <path fill="url(#${a})" d="M15.5 7H7l-.5-2L7 3h8.5A1.5 1.5 0 0 1 17 4.5v1A1.5 1.5 0 0 1 15.5 7"/>
-      <path fill="url(#${a})" d="M7 12h8.5a1.5 1.5 0 0 0 1.5-1.5v-1A1.5 1.5 0 0 0 15.5 8H7l-.5 2z"/>
-      <path fill="url(#${a})" d="M7 17h8.5a1.5 1.5 0 0 0 1.5-1.5v-1a1.5 1.5 0 0 0-1.5-1.5H7l-.5 2z"/>
-      <path fill="url(#${b})" d="M7 7V3H4.5A1.5 1.5 0 0 0 3 4.5v1A1.5 1.5 0 0 0 4.5 7z"/>
-      <path fill="url(#${b})" d="M7 8v4H4.5A1.5 1.5 0 0 1 3 10.5v-1A1.5 1.5 0 0 1 4.5 8z"/>
-      <path fill="url(#${b})" d="M7 13v4H4.5A1.5 1.5 0 0 1 3 15.5v-1A1.5 1.5 0 0 1 4.5 13z"/>
-      <defs>
-        <linearGradient id="${a}" x1="4.925" x2="16.953" y1="1" y2="16.207" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#36dff1"/><stop offset="1" stop-color="#0094f0"/>
-        </linearGradient>
-        <linearGradient id="${b}" x1="3.951" x2="9.941" y1="4.861" y2="7.594" gradientUnits="userSpaceOnUse">
-          <stop offset=".125" stop-color="#9c6cfe"/><stop offset="1" stop-color="#7a41dc"/>
-        </linearGradient>
-      </defs>
-    </g>
-  </svg>`;
-}
-
-
-/**
- * The Options mark. Like fleetsMark it brings its own gradients, so it needs
- * per-call ids - two copies sharing one id would make the later definition win
- * for both.
- */
-let optionsMarkSeq = 0;
-export function optionsMark(size = 16, cls = ""): string {
-  const n = ++optionsMarkSeq;
-  const bar = `optBar${n}`;
-  const g1 = `optG1${n}`;
-  const g2 = `optG2${n}`;
-  const k1 = `optK1${n}`;
-  const k2 = `optK2${n}`;
-  const track = (y: number) =>
-    `<path fill="url(#${bar})" d="M14 ${y}.5a.5.5 0 0 0-.5-.5h-11l-.09.008A.5.5 0 0 0 2.5 ${y + 1}h11l.09-.008A.5.5 0 0 0 14 ${y}.5"/>`;
-  return `<svg class="icon icon-options ${cls}" width="${size}" height="${size}" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-    <g fill="none">
-      ${track(11)}
-      <path fill="url(#${g2})" d="M14 11.5a.5.5 0 0 0-.5-.5h-11l-.09.008A.5.5 0 0 0 2.5 12h11l.09-.008A.5.5 0 0 0 14 11.5"/>
-      ${track(4)}
-      <path fill="url(#${g1})" d="M14 4.5a.5.5 0 0 0-.5-.5h-11l-.09.008A.5.5 0 0 0 2.5 5h11l.09-.008A.5.5 0 0 0 14 4.5"/>
-      <circle cx="6" cy="11.5" r="2" fill="url(#${k2})"/>
-      <circle cx="10" cy="4.5" r="2" fill="url(#${k1})"/>
-      <defs>
-        <radialGradient id="${g1}" cx="0" cy="0" r="1" gradientTransform="matrix(3 0 0 2.3326 10 4.5)" gradientUnits="userSpaceOnUse">
-          <stop offset=".549" stop-color="#70777d"/><stop offset="1" stop-color="#70777d" stop-opacity="0"/>
-        </radialGradient>
-        <radialGradient id="${g2}" cx="0" cy="0" r="1" gradientTransform="matrix(3 0 0 2.3326 6 11.5)" gradientUnits="userSpaceOnUse">
-          <stop offset=".549" stop-color="#70777d"/><stop offset="1" stop-color="#70777d" stop-opacity="0"/>
-        </radialGradient>
-        <linearGradient id="${bar}" x1="14.75" x2="7.421" y1="12.8" y2="-1.064" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#8c959b"/><stop offset="1" stop-color="#a3acb5"/>
-        </linearGradient>
-        <linearGradient id="${k2}" x1="4.4" x2="7.6" y1="9.5" y2="13.5" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#29b4fb"/><stop offset="1" stop-color="#2764e7"/>
-        </linearGradient>
-        <linearGradient id="${k1}" x1="8.4" x2="11.6" y1="2.5" y2="6.5" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#29b4fb"/><stop offset="1" stop-color="#2764e7"/>
-        </linearGradient>
-      </defs>
-    </g>
-  </svg>`;
 }

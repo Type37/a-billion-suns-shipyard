@@ -124,6 +124,10 @@ function paint(): void {
   // is replaced (switching into the builder from another view). Nothing may
   // move on a click that isn't the point of the click.
   const manifestScroll = document.querySelector(".mf-manifest")?.scrollTop ?? 0;
+  // A modal panel scrolls internally (overflow:auto, max-height). Adding a unit
+  // from the picker re-renders the whole page; without this the modal jumps back
+  // to the top and you have to scroll down again to add another.
+  const modalScroll = document.querySelector(".modal-panel")?.scrollTop ?? 0;
 
   // A <details> the player opened is a decision, and re-rendering must not undo
   // it. Without this, adding a ship from the "Add ships" catalog collapses the
@@ -156,6 +160,8 @@ function paint(): void {
 
   const manifest = document.querySelector(".mf-manifest");
   if (manifest) manifest.scrollTop = manifestScroll;
+  const modalPanel = document.querySelector(".modal-panel");
+  if (modalPanel && modalScroll) modalPanel.scrollTop = modalScroll;
 
   measureStickyHeader();
   observeEmblemLibrary();

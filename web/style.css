@@ -2365,6 +2365,28 @@ button { font-family: inherit; }
 .shipref-table tbody tr:hover { background: var(--blue-wash); }
 .shipref-mass td { background: var(--blue-wash); font-family: var(--display); font-weight: 800; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--blue); padding: 4px 10px; }
 
+/* Compact add-unit card: the whole tile is the Add button, kept short so all
+   four Mass quadrants fit a desktop without scrolling. */
+.au-card { display: block; width: 100%; text-align: left; border: 1px solid var(--hair-soft); background: var(--paper); padding: 7px 11px 8px; cursor: pointer; position: relative; font-family: inherit; color: var(--ink); }
+.au-card:hover, .au-card:focus-visible { border-color: var(--blue); background: var(--blue-wash); outline: none; }
+.au-card:active { transform: translateY(1px); }
+.au-card-top { display: flex; align-items: baseline; gap: 8px; }
+.au-card-name { font-weight: 700; font-size: 14px; }
+.au-card-owned { font-family: var(--display); font-weight: 800; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.03em; color: #fff; background: var(--blue); padding: 1px 6px; border-radius: 9px; }
+.au-card-cost { margin-left: auto; font-family: var(--display); font-weight: 800; }
+.au-card-add { display: inline-flex; align-items: center; color: var(--blue); }
+.au-card-stats { display: flex; flex-wrap: wrap; gap: 4px 8px; margin: 5px 0 0; }
+.au-card-wep { display: block; font-size: 11.5px; line-height: 1.35; color: var(--ink-2); }
+.au-wl { font-family: var(--display); font-weight: 800; font-size: 9px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3); margin-right: 4px; }
+.au-wsep { margin: 0 5px; color: var(--hair-soft); }
+
+/* Armageddon carrier-assignment block, below the HVP choose list. */
+.hvp-assign { margin-top: 12px; border-top: 1px solid var(--hair-soft); padding-top: 10px; }
+.hvp-assign-head { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; font-size: 11px; color: var(--ink-3); margin: 0 0 8px; }
+.hvp-assign-row { display: flex; align-items: center; gap: 10px; padding: 5px 0; }
+.hvp-assign-name { font-weight: 700; font-size: 13px; flex: 1 1 auto; min-width: 0; }
+.hvp-assign-row .personnel-assign { flex: 0 0 auto; }
+
 /* body: two flush regions, one quiet vertical rule between; no cards. The
    masthead's border is the one heavy divider on this page - everything below
    it (column rule, section labels) stays light so it does not compete. */

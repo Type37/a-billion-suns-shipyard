@@ -847,40 +847,6 @@ export function weaponsTable(ship: ShipClass): string {
   return `<div class="weap-lines">${lines.join("")}</div>`;
 }
 
-function catalogShipRow(ship: ShipClass, ownerFaction: Faction, composite: boolean, owned = 0): string {
-  const addId = composite ? `${ownerFaction.id}/${ship.id}` : ship.id;
-  // The whole row is the click target (add a unit), with a standing ADD cue on
-  // the right so the affordance is never hover-only. Name and cost on their own
-  // line so a long name never gets cut; full stats and weapons always visible.
-  // The "owned" count is an absolutely-positioned badge on the glyph, so it
-  // appears when you add a unit without reflowing (and shifting) the catalog.
-  return `
-  <article class="ship-row is-option ${ship.image ? "has-art" : ""}" data-action="add-unit" data-ship="${addId}" role="button" tabindex="0" title="Add a unit of ${escapeHtml(ship.name)}">
-    <div class="ship-row-body">
-      <div class="ship-row-head">
-        <h4 class="ship-name">${escapeHtml(ship.name)}</h4>
-        <span class="ship-cost">${credits(ship.cost)}</span>
-      </div>
-      <div class="ship-row-details">
-        ${statChips(ship, true)}
-        <!--
-          The weapons table is ALWAYS here, whether or not the class is already
-          in your fleet. It was briefly swapped for a "weapons on your roster"
-          line once you owned one, to stop the same grid being drawn twice on
-          one screen. That was a bad trade twice over: it took the stats off the
-          thing you were deciding whether to buy more of, and because the
-          substitute line is shorter than the table, the row COLLAPSED by ~50px
-          the instant you clicked ADD - so the catalogue jumped under your
-          cursor at the exact moment you were using it. A row must be the same
-          height before and after you press its button.
-        -->
-        ${weaponsTable(ship)}
-      </div>
-    </div>
-    <span class="add-cue">${icon("plus", 15)}<span>Add</span></span>
-  </article>`;
-}
-
 // ---------------------------------------------------------------------------
 // Hypergrowth Shipyard  (spec: HYPERGROWTH-SHIPYARD.md)
 // ---------------------------------------------------------------------------
@@ -1165,38 +1131,44 @@ function builderView(state: AppState): string {
         return `<option value="${u.id}" ${assignedId === u.id ? "selected" : ""}>${escapeHtml(label)}</option>`;
       })
       .join("");
+  // A stable toggle row (the Shipyard's sy-hvp shape): the check button on the
+  // right flips chosen on/off and NEVER changes the row's size, so clicking one
+  // never reflows the list. Carrier assignment (Armageddon only) is a separate
+  // block below, so choosing an HVP here shifts nothing above it.
   const personnelCard = (h: Hvp, source: string) => {
     const selIndex = list.fleet.hvp.findIndex((sel) => sel.hvpId === h.id);
     const isChosen = selIndex !== -1;
     const isGeneric = source === "Generic";
-    const body = `<div class="personnel-body">
-        <span class="personnel-name ${isGeneric ? "is-generic" : ""}">${escapeHtml(h.name)}</span>
-        <span class="personnel-rule">${ruleText(h.rule)}</span>
-      </div>`;
-    if (isChosen) {
-      const sel = list.fleet.hvp[selIndex]!;
-      // The chosen row has a simple dropdown to assign a carrier.
-      return `
-      <article class="personnel-row chosen">
-        ${body}
-        <span class="personnel-actions">
-          <select class="personnel-assign" data-action="hvp-assign" data-index="${selIndex}" title="Assign a carrier">
-            <option value="">Not assigned</option>
-            ${carrierOptions(sel.assignedUnitId)}
-          </select>
-          <button class="ghost-btn danger" data-action="remove-hvp" data-index="${selIndex}" title="Remove ${escapeHtml(h.name)}">${icon("close", 16)}</button>
-        </span>
-      </article>`;
-    }
-    if (atHvpCap) {
-      return `<article class="personnel-row is-full">${body}<span class="add-cue is-off">Full</span></article>`;
-    }
+    const disabled = !isChosen && atHvpCap;
     return `
-    <article class="personnel-row is-option" data-action="add-hvp" data-hvp="${h.id}" role="button" tabindex="0" title="Add ${escapeHtml(h.name)}">
-      ${body}
-      <span class="add-cue">${icon("plus", 15)}<span>Add</span></span>
+    <article class="sy-hvp ${isChosen ? "is-chosen" : ""} ${isGeneric ? "is-generic" : ""}">
+      <div class="sy-hvp-body">
+        <span class="sy-hvp-name">${escapeHtml(h.name)}</span>
+        <span class="sy-hvp-rule">${ruleText(h.rule)}</span>
+      </div>
+      <button class="sy-hvp-check ${isChosen ? "is-on" : ""}" data-action="${isChosen ? "remove-hvp" : "add-hvp"}" ${isChosen ? `data-index="${selIndex}"` : `data-hvp="${h.id}"`} aria-pressed="${isChosen}" ${disabled ? 'aria-disabled="true"' : ""} title="${isChosen ? `Remove ${escapeHtml(h.name)}` : disabled ? "Personnel full" : `Add ${escapeHtml(h.name)}`}">${icon(isChosen ? "check" : "plus", 16)}</button>
     </article>`;
   };
+  // Armageddon assigns each chosen HVP to a carrier unit before play; Age of
+  // Unity defers that until the missions are known, so it only toggles on/off.
+  const hvpAssignBlock =
+    list.mode === "armageddon" && list.fleet.hvp.length
+      ? `<div class="hvp-assign">
+          <p class="hvp-assign-head">Assign carriers</p>
+          ${list.fleet.hvp
+            .map((sel, i) => {
+              const def = hvpById(sel.hvpId, faction);
+              return `<div class="hvp-assign-row">
+                <span class="hvp-assign-name">${escapeHtml(def?.name ?? sel.hvpId)}</span>
+                <select class="personnel-assign" data-action="hvp-assign" data-index="${i}" title="Assign a carrier for ${escapeHtml(def?.name ?? sel.hvpId)}">
+                  <option value="">Not assigned</option>
+                  ${carrierOptions(sel.assignedUnitId)}
+                </select>
+              </div>`;
+            })
+            .join("")}
+        </div>`
+      : "";
   // Combat Simulator issues a fixed crew rather than offering a choice: "All
   // three of your HVP are Seasoned Captains" (p.63). The picker below is one
   // card per HVP *type*, so it physically cannot show three of one person - it
@@ -1424,7 +1396,7 @@ function builderView(state: AppState): string {
           : `${list.fleet.hvp.length} of ${list.freePlay ? "any" : hvpMin === hvpMax ? hvpMax : `${hvpMin}–${hvpMax}`} chosen`
       }</span></p>
       ${list.mode === "age-of-unity" ? '<p class="sy-hvp-note">Optional now. In Age of Unity you assign HVP after the missions are generated.</p>' : ""}
-      <div class="mf-list personnel-grid">${personnelCatalog}</div>
+      ${isFixedCrew ? `<div class="mf-list personnel-grid">${personnelCatalog}</div>` : `<div class="sy-hvp-list">${personnelCatalog}</div>${hvpAssignBlock}`}
     </div>`
     }
 
@@ -1457,12 +1429,26 @@ function addUnitModal(state: AppState): string {
     : faction
       ? faction.ships.map((s) => ({ ship: s, owner: faction, composite: false }))
       : [];
+  // Compact card: the whole tile is the Add button. Name, cost and the four
+  // stats only - the weapon ranges live one tap away in the Reference - so all
+  // four Mass quadrants fit a desktop without scrolling.
+  const auCard = (ship: ShipClass, addId: string, owned: number) => `
+      <button class="au-card" data-action="add-unit" data-ship="${addId}" title="Add ${escapeHtml(ship.name)}">
+        <span class="au-card-top">
+          <span class="au-card-name">${escapeHtml(ship.name)}</span>
+          ${owned ? `<span class="au-card-owned">${owned} in fleet</span>` : ""}
+          <span class="au-card-cost">${credits(ship.cost)}</span>
+          <span class="au-card-add">${icon("plus", 14)}</span>
+        </span>
+        <span class="au-card-stats">${statChips(ship, true)}</span>
+      </button>`;
   const quad = (mass: number) => {
     const rows = pool.filter((p) => p.ship.mass === mass);
     const cards = rows
-      .map((p) =>
-        catalogShipRow(p.ship, p.owner, p.composite, ownedCount(p.composite ? `${p.owner.id}/${p.ship.id}` : p.ship.id)),
-      )
+      .map((p) => {
+        const addId = p.composite ? `${p.owner.id}/${p.ship.id}` : p.ship.id;
+        return auCard(p.ship, addId, ownedCount(addId));
+      })
       .join("");
     return `<div class="au-quad">
         <h4 class="au-quad-head"><span class="au-mass">${mass}</span> Mass ${mass} <span class="au-quad-count">${rows.length} class${rows.length === 1 ? "" : "es"}${mass === 3 ? " · single-ship units" : ""}</span></h4>

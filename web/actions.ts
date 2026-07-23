@@ -642,6 +642,14 @@ function handleClick(e: MouseEvent): void {
       store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined } }));
       break;
     }
+    case "open-add-unit": {
+      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "add-unit" } } }));
+      break;
+    }
+    case "open-ship-reference": {
+      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "ship-reference" } } }));
+      break;
+    }
     case "open-options": {
       store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "options" } } }));
       break;

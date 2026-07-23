@@ -2314,6 +2314,57 @@ button { font-family: inherit; }
 
 .sy-finish { margin-top: 28px; }
 
+/* ---------------------------------------------------------------------------
+   Fleet-List builder (Armageddon / Age of Unity): the Shipyard shell reused,
+   with per-unit rows, an Add-unit picker and a Ship Reference table.
+   --------------------------------------------------------------------------- */
+.sy-ref-btn { display: inline-flex; align-items: center; gap: 6px; font-family: var(--display); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.02em; padding: 5px 10px; border: 1px solid var(--hair-soft); background: var(--paper); color: var(--ink); cursor: pointer; }
+.sy-ref-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-wash); }
+
+.sy-list-head { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+.sy-h { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; font-size: 15px; margin: 0; display: flex; align-items: baseline; gap: 8px; }
+.sy-h-count { font-weight: 600; font-size: 12px; color: var(--ink-3); }
+.sy-add-unit { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; font-size: 13px; padding: 9px 15px; border: none; background: var(--blue); color: #fff; cursor: pointer; }
+.sy-add-unit:hover { background: var(--blue-deep); }
+
+.sy-unit .sy-ship-head { gap: 10px; }
+.sy-unit-id { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 8px; }
+.sy-unit-name { flex: 1 1 auto; min-width: 0; border: none; background: none; padding: 2px 0; font-family: var(--ios); font-weight: 700; font-size: 16px; color: var(--ink); border-bottom: 2px dotted var(--hair-soft); }
+.sy-unit-name::placeholder { color: var(--placeholder); font-weight: 400; }
+.sy-unit-name:hover { border-bottom-color: var(--ink-3); }
+.sy-unit-name:focus { outline: none; border-bottom-style: solid; border-bottom-color: var(--blue); }
+.sy-unit .sy-ship-cost { margin-left: auto; }
+.sy-unit-remove { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 1px solid var(--hair-soft); background: var(--paper); color: var(--ink-3); cursor: pointer; }
+.sy-unit-remove:hover { border-color: var(--red); color: var(--red); }
+.sy-unit-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 6px 0 2px; }
+
+.sy-empty { border: 2px dashed var(--hair-soft); padding: 34px 18px; text-align: center; display: flex; flex-direction: column; gap: 5px; color: var(--ink-3); }
+.sy-empty-big { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; font-size: 16px; color: var(--ink-2); }
+.sy-hvp-note { font-size: 12.5px; color: var(--ink-3); margin: 0 0 10px; }
+
+/* Add-unit picker: the faction's classes in a 2x2 grid by Mass. */
+.au-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.au-quad-head { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; font-size: 12px; color: var(--ink-2); }
+.au-mass { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 12px; }
+.au-quad-count { font-weight: 600; font-size: 11px; color: var(--ink-3); text-transform: none; letter-spacing: 0; }
+.au-quad-list { display: flex; flex-direction: column; gap: 8px; }
+.au-quad-list .ship-row { border: 1px solid var(--hair-soft); }
+@media (max-width: 720px) { .au-grid { grid-template-columns: 1fr; } }
+
+/* Ship Reference: one line per ship, PDF-style, grouped by Mass. */
+.shipref-modal { width: min(760px, 100%); }
+.shipref-cap { margin: 0 0 10px; font-size: 12.5px; color: var(--ink-3); }
+.shipref-scroll { overflow-x: auto; }
+.shipref-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.shipref-table th, .shipref-table td { padding: 7px 10px; border-bottom: 1px solid var(--hair-soft); text-align: left; white-space: nowrap; }
+.shipref-table thead th { font-family: var(--display); font-weight: 800; text-transform: uppercase; font-size: 10.5px; letter-spacing: 0.04em; color: var(--ink-2); border-bottom: 2px solid var(--ink); }
+.shipref-n { font-weight: 700; }
+.shipref-num { text-align: center; font-variant-numeric: tabular-nums; }
+.shipref-w { white-space: normal; font-size: 12px; color: var(--ink-2); }
+.shipref-cost { font-family: var(--display); font-weight: 800; text-align: right; }
+.shipref-table tbody tr:hover { background: var(--blue-wash); }
+.shipref-mass td { background: var(--blue-wash); font-family: var(--display); font-weight: 800; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--blue); padding: 4px 10px; }
+
 /* body: two flush regions, one quiet vertical rule between; no cards. The
    masthead's border is the one heavy divider on this page - everything below
    it (column rule, section labels) stays light so it does not compete. */

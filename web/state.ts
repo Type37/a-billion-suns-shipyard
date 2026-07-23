@@ -203,6 +203,8 @@ export interface AppState {
     /** An open modal dialog. */
     modal?:
       | { kind: "new-fleet"; era: Era; limit: number; factionId?: string; showAll: boolean; customOpen?: boolean; noLimit?: boolean }
+      | { kind: "add-unit" }
+      | { kind: "ship-reference" }
       | {
           kind: "emblem";
           target: "list" | "faction" | "outfit";

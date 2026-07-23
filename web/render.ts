@@ -881,48 +881,6 @@ function catalogShipRow(ship: ShipClass, ownerFaction: Faction, composite: boole
   </article>`;
 }
 
-// Stat comparison chart: every ship class in the faction as a horizontal bar,
-// ranked by a chosen stat, so a build decision ("which is the cheapest Mass 2
-// hull?") is a glance instead of scanning a dozen rows by eye.
-type ChartStatKey = "cost" | "mass" | "thrust" | "silhouette" | "shields";
-const CHART_STATS: Record<ChartStatKey, { label: string; icon: string; get: (s: ShipClass) => number; fmt: (n: number) => string }> = {
-  cost: { label: "Cost", icon: "", get: (s) => s.cost, fmt: (n) => credits(n) },
-  mass: { label: "Mass", icon: "stat-mass", get: (s) => s.mass, fmt: (n) => String(n) },
-  thrust: { label: "Thrust", icon: "stat-thrust", get: (s) => s.thrust, fmt: (n) => `${n}"` },
-  silhouette: { label: "Sil", icon: "stat-silhouette", get: (s) => s.silhouette, fmt: (n) => String(n) },
-  shields: { label: "Shields", icon: "stat-shields", get: (s) => s.shields, fmt: (n) => String(n) },
-};
-
-function catalogChartPicker(stat: ChartStatKey): string {
-  return `<div class="chart-picker" role="group" aria-label="Compare ship classes by">
-    ${(Object.keys(CHART_STATS) as ChartStatKey[])
-      .map((key) => {
-        const m = CHART_STATS[key];
-        return `<button class="chart-picker-btn ${stat === key ? "selected" : ""}" data-action="set-chart-stat" data-stat="${key}">${m.icon ? icon(m.icon, 13) : ""}${m.label}</button>`;
-      })
-      .join("")}
-  </div>`;
-}
-
-function catalogChart(faction: Faction, stat: ChartStatKey): string {
-  const meta = CHART_STATS[stat];
-  const rows = [...faction.ships].sort((a, b) => meta.get(b) - meta.get(a));
-  const max = Math.max(1, ...rows.map(meta.get));
-  return `<div class="chart">${rows
-    .map((s) => {
-      const v = meta.get(s);
-      const pct = Math.max(2, Math.round((v / max) * 100));
-      return `
-      <div class="chart-row">
-        <span class="chart-label">${escapeHtml(s.name)}</span>
-        <span class="chart-track"><span class="chart-bar" style="width:${pct}%"></span></span>
-        <span class="chart-val">${meta.fmt(v)}</span>
-      </div>`;
-    })
-    .join("")}</div>`;
-}
-
-
 // ---------------------------------------------------------------------------
 // Hypergrowth Shipyard  (spec: HYPERGROWTH-SHIPYARD.md)
 // ---------------------------------------------------------------------------
@@ -1135,8 +1093,6 @@ function builderView(state: AppState): string {
   // Declared here because the roster rows below read it.
   const isStocking = MODE_BUILDER_SHAPE[list.mode] === "shipyard";
   const era = MODE_ERA[list.mode];
-  const catalogView = state.ui.catalogView;
-  const chartStat = state.ui.catalogChartStat ?? "cost";
 
   // Validation: the full engine for rules play, none for Free Play. The
   // Hypergrowth shipyard has no unit-size limits at build time (rules p.122),
@@ -1192,28 +1148,8 @@ function builderView(state: AppState): string {
       ),
     ).join("") + factionSection("Custom", allFactions(customs).filter((f) => customIds.has(f.id)));
 
-  // How many units of a given class the fleet already holds, keyed by the id we
-  // add with. Shown on each option so the picker reads like a live tally.
-  const ownedCount = (addId: string) => list.fleet.units.filter((u) => u.shipClassId === addId).length;
-
   const unitNames = unitDisplayNames(list.fleet.units, faction, customs);
   const autoUnitName = (unitId: string) => unitNames.get(unitId) ?? "";
-
-  // Catalog: one faction in rules play; every faction grouped in Free Play.
-  let catalogHtml = "";
-  if (list.freePlay) {
-    catalogHtml = allFactions(customs)
-      .map(
-        (f, i) => `
-        <details class="catalog-group" data-persist="catalog-${f.id}" ${i === 0 ? "open" : ""}>
-          <summary>${escapeHtml(f.name)} <span class="muted">${f.era}</span></summary>
-          ${f.ships.map((s) => catalogShipRow(s, f, true, ownedCount(`${f.id}/${s.id}`))).join("")}
-        </details>`,
-      )
-      .join("");
-  } else if (faction) {
-    catalogHtml = faction.ships.map((s) => catalogShipRow(s, faction, false, ownedCount(s.id))).join("");
-  }
 
   // Personnel catalog. Turning one on is the whole interaction: the card you
   // just clicked becomes its own complete record, holding the carried-by
@@ -1295,8 +1231,9 @@ function builderView(state: AppState): string {
         GENERIC_HVP.map((h) => personnelCard(h, "Generic")).join("")
       : GENERIC_HVP.map((h) => personnelCard(h, "Generic")).join("");
 
-  // Roster units.
-  // Compact rows with inline controls (ship count stepper, HVP carrier assignment).
+  // Roster units, in the Shipyard's single-column row shape: name + cost +
+  // control on the head line, stat chips and weapons beneath. A unit is an
+  // instance with its own size (unit-count), unlike the Shipyard's class pool.
   const unitRows = list.fleet.units
     .map((u) => {
       const r = resolveShip(u.shipClassId, faction, customs);
@@ -1308,13 +1245,12 @@ function builderView(state: AppState): string {
           const def = hvpById(h.hvpId, faction);
           return { name: def?.name ?? h.hvpId, rule: def?.rule ?? "" };
         });
-      const maxCount = list.freePlay || list.mode === "hypergrowth" ? 99 : r?.ship.mass === 3 ? 1 : 3;
-      // What this unit is called out loud: the player's own name for it if they
-      // gave it one, otherwise the auto-generated one shown in the field.
+      const maxCount = list.freePlay ? 99 : r?.ship.mass === 3 ? 1 : 3;
       const unitLabel = u.name || unitName || r?.ship.name || "this unit";
       const showSpecies = faction?.requiresSpecies && !list.freePlay;
-      // Each carried person is a tap target: the title shows, a popover reveals
-      // the rule. Popover is position:absolute, so opening it shifts nothing.
+      // Mass 3 hulls are always a single ship (maxUnitSize), so they carry no
+      // size stepper at all - just a remove control in its place.
+      const noStepper = !list.freePlay && r?.ship.mass === 3;
       const carryMarkup = carried.length
         ? `<span class="ru-carry">${icon("personnel", 12)}${carried
             .map(
@@ -1322,56 +1258,28 @@ function builderView(state: AppState): string {
             )
             .join('<span class="ru-carry-sep">,</span> ')}</span>`
         : "";
-      const subline = carried.length || (r && list.freePlay);
+      const nameCell = isStocking
+        ? `<span class="ru-classname">${escapeHtml(r?.ship.name ?? unitName)}</span>`
+        : `<input class="unit-name-input sy-unit-name" type="text" value="${escapeHtml(u.name ?? "")}" placeholder="${escapeHtml(unitName)}" data-action="unit-name" data-unit="${u.id}" />`;
+      const control = !r
+        ? ""
+        : noStepper
+          ? `<button class="ru-remove sy-unit-remove" data-action="remove-unit" data-unit="${u.id}" title="Remove this unit" aria-label="Remove ${escapeHtml(unitLabel)}">${icon("trash", 14)}</button>`
+          : `<span class="stepper sy-qty">
+              <button class="${u.count <= 1 ? "will-remove" : ""}" data-action="unit-count" data-unit="${u.id}" data-delta="-1" aria-label="${u.count <= 1 ? `Remove ${escapeHtml(unitLabel)}` : `One fewer ship in ${escapeHtml(unitLabel)}`}" title="${u.count <= 1 ? "Remove this unit" : "One fewer ship"}">${icon("minus", 16)}</button>
+              <span class="stepper-count">${u.count}</span>
+              <button data-action="unit-count" data-unit="${u.id}" data-delta="1" ${u.count >= maxCount ? 'aria-disabled="true"' : ""} aria-label="${u.count >= maxCount ? `${escapeHtml(unitLabel)} is at its maximum of ${maxCount} ships` : `One more ship in ${escapeHtml(unitLabel)}`}" title="${u.count >= maxCount ? `Maximum ${maxCount} ships in a unit` : "One more ship"}">${icon("plus", 16)}</button>
+            </span>`;
       return `
-      <div class="roster-unit ${r ? "" : "unresolved"}" data-roster-key="${u.id}">
-        <span class="ru-id">
-          ${r ? "" : `<span class="roster-unit-glyph">${icon("warning", 20)}</span>`}
-          <span class="ru-main">
-            ${
-              isStocking
-                ? `<span class="ru-classname">${escapeHtml(r?.ship.name ?? unitName)}</span>`
-                : `<input class="unit-name-input" type="text" value="${escapeHtml(u.name ?? "")}" placeholder="${escapeHtml(unitName)}" data-action="unit-name" data-unit="${u.id}" />`
-            }
-            ${subline ? `<span class="ru-sub">${r && list.freePlay ? `<span class="muted">${escapeHtml(r.owner.name)}</span>` : ""}${carryMarkup}</span>` : ""}
-            ${showSpecies ? speciesSelect(u) : ""}
-          </span>
-        </span>
-        ${
-          r
-            ? `<div class="ru-details">
-                ${statChips(r.ship, true)}
-                ${weaponsTable(r.ship)}
-              </div>`
-            : ""
-        }
-        <div class="ru-controls">
-          ${
-            r
-              ? // Every stepper on the roster used to announce the identical
-                // "One fewer ship" / "One more ship", so with eight units a
-                // screen reader heard the same two strings sixteen times with
-                // no way to tell which unit it was on. The unit's name goes in
-                // the label. At the cap the (+) is aria-disabled rather than
-                // disabled: a disabled button cannot hold focus, so pressing it
-                // up to the limit threw focus to the top of the document.
-                `<span class="stepper ru-stepper">
-                  <button class="${u.count <= 1 ? "will-remove" : ""}" data-action="unit-count" data-unit="${u.id}" data-delta="-1" aria-label="${u.count <= 1 ? `Remove ${escapeHtml(unitLabel)}` : `One fewer ship in ${escapeHtml(unitLabel)}`}" title="${u.count <= 1 ? "Remove this unit" : "One fewer ship"}">${icon("minus", 14)}</button>
-                  <span class="stepper-count">${u.count}</span>
-                  <button data-action="unit-count" data-unit="${u.id}" data-delta="1" ${
-                    u.count >= maxCount ? 'aria-disabled="true"' : ""
-                  } aria-label="${
-                    u.count >= maxCount
-                      ? `${escapeHtml(unitLabel)} is at its maximum of ${maxCount} ships`
-                      : `One more ship in ${escapeHtml(unitLabel)}`
-                  }" title="${u.count >= maxCount ? `Maximum ${maxCount} ships in a unit` : "One more ship"}">${icon("plus", 14)}</button>
-                </span>`
-              : ""
-          }
-          <span class="roster-unit-cost">${credits(cost)}</span>
-          <button class="ru-remove" data-action="remove-unit" data-unit="${u.id}" title="Remove this unit">${icon("trash", 14)}</button>
+      <article class="sy-ship sy-unit ${r ? "" : "unresolved"}" data-roster-key="${u.id}">
+        <div class="sy-ship-head">
+          <span class="sy-unit-id">${r ? "" : `<span class="roster-unit-glyph">${icon("warning", 18)}</span>`}${nameCell}</span>
+          <span class="sy-ship-cost">${credits(cost)}</span>
+          ${control}
         </div>
-      </div>`;
+        ${carried.length || showSpecies ? `<div class="sy-unit-sub">${carryMarkup}${showSpecies ? speciesSelect(u) : ""}</div>` : ""}
+        ${r ? `<div class="sy-ship-data">${statChips(r.ship, true)}${weaponsTable(r.ship)}</div>` : ""}
+      </article>`;
     })
     .join("");
 
@@ -1444,118 +1352,186 @@ function builderView(state: AppState): string {
 
   const nUnits = list.fleet.units.length;
   const unitWord = isStocking ? (nUnits === 1 ? "ship class" : "ship classes") : nUnits === 1 ? "unit" : "units";
-  // A fixed crew is not a tally against a cap - there is nothing to fill.
-  const hvpCount = isFixedCrew
-    ? "Issued by the scenario"
-    : list.freePlay
-      ? `${list.fleet.hvp.length}`
-      : hvpMin === hvpMax
-        ? `${list.fleet.hvp.length}/${hvpMax}`
-        : `${list.fleet.hvp.length}/${hvpMin}–${hvpMax}`;
 
   return `
   ${topbar()}
   ${trainingGuide(list.mode, state.onboarding.visits <= 1)}
 
-  <main class="builder ${!unlimited && remaining < 0 ? "is-over" : ""}">
-    <header class="mf-head">
-      <!--
-        Three groups, each a unit that wraps as a whole: what this fleet IS
-        (emblem, name, and the menu that acts on it), what it is BUILT FROM
-        (faction and era), and what it COSTS (spent / limit / free). Everything
-        used to be one flat run of siblings, so on a phone the ... menu wrapped
-        onto a line of its own under the budget and read as an orphan - which is
-        what "nothing is logically grouped" meant.
-      -->
-      <div class="mf-topline">
-        <div class="mf-grp mf-grp-id">
-          <span class="mf-emblem">${emblemPicker}</span>
-          <input class="mf-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled fleet" data-action="fleet-name" />
-          <button class="mf-name-gen" data-action="gen-fleet-name" title="Roll a fleet name" aria-label="Roll a fleet name">${icon("die", 18)}</button>
-          ${moreMenu}
-        </div>
-        <div class="mf-grp mf-grp-fac">
-          <span class="mf-fac">${factionControl}</span>
-          ${era ? `<span class="mf-era-badge" title="Era you are building for">${escapeHtml(era)}</span>` : ""}
-        </div>
-        <div class="mf-grp mf-grp-budget">
-          <span class="mf-budget">
-            <span class="mf-tally">
-              <span class="mf-tally-now">${credits(total)}</span>${limitControl}
-              <span class="mf-tally-free">${unlimited ? "unlimited" : remaining < 0 ? `${credits(-remaining)} over` : `${credits(remaining)} free`}</span>
-            </span>
-          </span>
-        </div>
+  <main class="shipyard builder-fleet ${remaining < 0 ? "is-over" : ""}">
+    <header class="sy-head">
+      <div class="sy-id">
+        <span class="mf-emblem">${emblemPicker}</span>
+        <input class="mf-name sy-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled fleet" data-action="fleet-name" />
+        <button class="mf-name-gen" data-action="gen-fleet-name" title="Roll a fleet name" aria-label="Roll a fleet name">${icon("die", 18)}</button>
       </div>
-      <div class="mf-meter"><span class="mf-meter-fill" style="width:${unlimited ? 0 : list.fleet.creditsLimit > 0 ? Math.min(100, (total / list.fleet.creditsLimit) * 100) : 0}%"></span></div>
+      <div class="sy-fac">
+        <span class="mf-fac">${factionControl}</span>
+        ${era ? `<span class="mf-era-badge" title="Era you are building for">${escapeHtml(era)}</span>` : ""}
+        ${faction && !list.freePlay ? `<button class="sy-ref-btn" data-action="open-ship-reference" title="Faction ship reference">${icon("scroll", 15)} Reference</button>` : ""}
+      </div>
+      ${moreMenu}
     </header>
 
-    <div class="mf-body">
-      <section class="mf-manifest">
-        <h3 class="mf-h">${isStocking ? "Your shipyard" : "Your fleet"} <span class="mf-h-count">${nUnits} ${unitWord}</span></h3>
-        ${
-          // A legal fleet says nothing worth a standing line: silence is the
-          // confirmation, and the line is only spent when there is something to
-          // resolve. Free Play still announces itself, because "no rules check"
-          // is not the absence of a result, it is a different result.
-          list.freePlay
-            ? '<p class="yard-status is-muted">Free Play, no rules check</p>'
-            : issues.length > 0
-              ? `<details class="yard-status-pop">
-                  <summary class="yard-status is-fail">${icon("warning", 12)} ${issues.length} to resolve</summary>
-                  <ul class="yard-status-panel issue-list">${issues.map(issueLine).join("")}</ul>
-                </details>`
-              : `<p class="yard-status is-ok">${icon("check", 12)} Legal</p>`
-        }
-        <div class="mf-list">
-          ${unitRows}
-        </div>
+    ${faction && !list.freePlay ? `<section class="sy-faction">${factionRuleBlock(faction, "full")}</section>` : ""}
 
+    <div class="sy-budget ${remaining < 0 ? "is-over" : ""}">
+      <div class="sy-budget-row">
+        <span class="sy-budget-now">${credits(total)}</span>
+        <span class="sy-budget-cap">${limitControl}</span>
+        <span class="sy-budget-free">${remaining < 0 ? `${credits(-remaining)} over` : `${credits(remaining)} remaining`}</span>
+      </div>
+      <div class="sy-meter"><span class="sy-meter-fill" style="width:${list.fleet.creditsLimit > 0 ? Math.min(100, (total / list.fleet.creditsLimit) * 100) : 0}%"></span></div>
+    </div>
 
-        <div class="mf-finish">
-          <a class="mf-play-cta" href="#/play/${list.id}">${icon("flag", 18)} Enter Play Mode</a>
-          <a class="mf-print-cta" href="#/print/${list.id}">${icon("print", 18)} Print setup</a>
-        </div>
-      </section>
-
-      <section class="mf-yard">
-        ${
-          faction && !list.freePlay
-            ? `<div class="mf-rule">${factionRuleBlock(faction, "compact")}</div>`
+    <div class="sy-list-head">
+      <h3 class="sy-h">${isStocking ? "Your shipyard" : "Your fleet"} <span class="sy-h-count">${nUnits} ${unitWord}</span></h3>
+      ${
+        list.freePlay || faction
+          ? `<button class="sy-add-unit" data-action="open-add-unit">${icon("plus", 16)} Add ${isStocking ? "ship" : "unit"}</button>`
+          : ""
+      }
+    </div>
+    ${
+      // A legal fleet says nothing worth a standing line; the line is only spent
+      // when there is something to resolve. Free Play always announces itself.
+      list.freePlay
+        ? '<p class="yard-status is-muted">Free Play, no rules check</p>'
+        : issues.length > 0
+          ? `<details class="yard-status-pop">
+              <summary class="yard-status is-fail">${icon("warning", 12)} ${issues.length} to resolve</summary>
+              <ul class="yard-status-panel issue-list">${issues.map(issueLine).join("")}</ul>
+            </details>`
+          : nUnits > 0
+            ? `<p class="yard-status is-ok">${icon("check", 12)} Legal</p>`
             : ""
-        }
-        <h3 class="mf-h">Ship classes${
-          faction && !list.freePlay
-            ? switcher(
-                "Ship classes view",
-                "set-catalog-view",
-                "view",
-                [
-                  ["list", "List"],
-                  ["chart", "Compare"],
-                ],
-                catalogView ?? "list",
-              )
-            : ""
-        }</h3>
-        ${
-          catalogView === "chart" && faction && !list.freePlay
-            ? `${catalogChartPicker(chartStat)}${catalogChart(faction, chartStat)}`
-            : `<div class="mf-list">${catalogHtml || '<p class="mf-empty">Pick a faction to see its ships.</p>'}</div>`
-        }
-        ${
-          // Age of Unity defers HVP until the missions are known, so they are
-          // optional here and assigned later. Armageddon requires them pre-play.
-          // (Hypergrowth, the only mode with no HVP at build, has its own screen.)
-          `<h3 class="mf-h">High-Value Personnel <span class="mf-h-count">${hvpCount}</span></h3>
-        ${list.mode === "age-of-unity" ? '<p class="mf-hvp-note">Optional now. In Age of Unity you assign HVP after the missions are generated.</p>' : ""}
-        <div class="mf-list personnel-grid">${personnelCatalog}</div>`
-        }
-      </section>
+    }
+
+    <div class="sy-list">${
+      nUnits
+        ? unitRows
+        : `<div class="sy-empty"><span class="sy-empty-big">No ${isStocking ? "ships" : "units"} yet</span><span>Tap &ldquo;Add ${isStocking ? "ship" : "unit"}&rdquo; to begin.</span></div>`
+    }</div>
+
+    ${
+      // Management Training selects no HVP (p.65). Every other mode shows the
+      // personnel picker; Age of Unity notes it is optional until missions land.
+      list.mode === "management-training"
+        ? ""
+        : `<div class="sy-personnel">
+      <p class="sy-hvp-count">${isFixedCrew ? "Personnel" : "High-Value Personnel"} <span>${
+        isFixedCrew
+          ? "issued by the scenario"
+          : `${list.fleet.hvp.length} of ${list.freePlay ? "any" : hvpMin === hvpMax ? hvpMax : `${hvpMin}–${hvpMax}`} chosen`
+      }</span></p>
+      ${list.mode === "age-of-unity" ? '<p class="sy-hvp-note">Optional now. In Age of Unity you assign HVP after the missions are generated.</p>' : ""}
+      <div class="mf-list personnel-grid">${personnelCatalog}</div>
+    </div>`
+    }
+
+    <div class="sy-finish mf-finish">
+      <a class="mf-play-cta" href="#/play/${list.id}">${icon("flag", 18)} Enter Play Mode</a>
+      <a class="mf-print-cta" href="#/print/${list.id}">${icon("print", 18)} Print setup</a>
     </div>
   </main>
   ${toast(state)}
-  ${footer()}`;
+  ${footer()}
+  ${addUnitModal(state)}
+  ${shipReferenceModal(state)}`;
+}
+
+// The Add-unit picker: the faction's ship classes in a 2x2 grid by Mass (0-3),
+// each a full catalogue row you tap to add as a new unit. Free Play offers every
+// faction's ships in the same grid. The roster's own size control grows a unit
+// after it is added, so a class can be added as several separate units.
+function addUnitModal(state: AppState): string {
+  const m = state.ui.modal;
+  if (!m || m.kind !== "add-unit") return "";
+  const list = activeList(state);
+  if (!list) return "";
+  const customs = state.customFactions;
+  const faction = findFaction(list.fleet.factionId, customs);
+  const isStocking = MODE_BUILDER_SHAPE[list.mode] === "shipyard";
+  const ownedCount = (addId: string) => list.fleet.units.filter((u) => u.shipClassId === addId).length;
+  const pool: { ship: ShipClass; owner: Faction; composite: boolean }[] = list.freePlay
+    ? allFactions(customs).flatMap((f) => f.ships.map((s) => ({ ship: s, owner: f, composite: true })))
+    : faction
+      ? faction.ships.map((s) => ({ ship: s, owner: faction, composite: false }))
+      : [];
+  const quad = (mass: number) => {
+    const rows = pool.filter((p) => p.ship.mass === mass);
+    const cards = rows
+      .map((p) =>
+        catalogShipRow(p.ship, p.owner, p.composite, ownedCount(p.composite ? `${p.owner.id}/${p.ship.id}` : p.ship.id)),
+      )
+      .join("");
+    return `<div class="au-quad">
+        <h4 class="au-quad-head"><span class="au-mass">${mass}</span> Mass ${mass} <span class="au-quad-count">${rows.length} class${rows.length === 1 ? "" : "es"}${mass === 3 ? " · single-ship units" : ""}</span></h4>
+        <div class="au-quad-list">${cards || '<p class="mf-empty">None</p>'}</div>
+      </div>`;
+  };
+  const label = isStocking ? "ship" : "unit";
+  return `
+  <div class="modal-root">
+    <div class="modal-backdrop" data-action="close-modal"></div>
+    <div class="modal-panel modal-wide au-modal" role="dialog" aria-modal="true" aria-label="Add ${label}">
+      <header class="modal-header">
+        <h2 class="modal-title">Add ${label}${faction && !list.freePlay ? ` · ${escapeHtml(faction.name)}` : ""}</h2>
+        <button class="modal-close" data-action="close-modal" aria-label="Close">${icon("close", 18)}</button>
+      </header>
+      <div class="modal-body au-body">
+        <div class="au-grid">${[0, 1, 2, 3].map(quad).join("")}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// The faction ship reference: one line per ship, grouped by Mass, laid out like
+// the rulebook - stats plus both weapon slots at a glance. Opened from the
+// masthead in every fleet-list mode.
+function shipReferenceModal(state: AppState): string {
+  const m = state.ui.modal;
+  if (!m || m.kind !== "ship-reference") return "";
+  const list = activeList(state);
+  if (!list) return "";
+  const faction = findFaction(list.fleet.factionId, state.customFactions);
+  if (!faction) return "";
+  let rows = "";
+  for (const mass of [0, 1, 2, 3]) {
+    const ships = faction.ships.filter((s) => s.mass === mass).sort((a, b) => a.cost - b.cost);
+    if (!ships.length) continue;
+    rows += `<tr class="shipref-mass"><td colspan="8">Mass ${mass}</td></tr>`;
+    for (const s of ships) {
+      rows += `<tr>
+        <td class="shipref-n">${escapeHtml(s.name)}</td>
+        <td class="shipref-num">${s.mass}</td>
+        <td class="shipref-num">${s.thrust}"</td>
+        <td class="shipref-num">${s.silhouette}</td>
+        <td class="shipref-num">${s.shields}</td>
+        <td class="shipref-w">${primarySlotText(s)}</td>
+        <td class="shipref-w">${auxSlotText(s)}</td>
+        <td class="shipref-cost">${credits(s.cost)}</td>
+      </tr>`;
+    }
+  }
+  return `
+  <div class="modal-root">
+    <div class="modal-backdrop" data-action="close-modal"></div>
+    <div class="modal-panel shipref-modal" role="dialog" aria-modal="true" aria-label="${escapeHtml(faction.name)} ship reference">
+      <header class="modal-header">
+        <h2 class="modal-title">${escapeHtml(faction.name)} &mdash; Ship Reference</h2>
+        <button class="modal-close" data-action="close-modal" aria-label="Close">${icon("close", 18)}</button>
+      </header>
+      <div class="modal-body shipref-body">
+        <p class="shipref-cap">${escapeHtml(faction.rule.name)} · Initiative ${escapeHtml(faction.initiative)} · ${escapeHtml(faction.cmdTokens)} CMD/round</p>
+        <div class="shipref-scroll">
+          <table class="shipref-table">
+            <thead><tr><th>Ship</th><th>Mass</th><th>Thr</th><th>Sil</th><th>Shd</th><th>Primary</th><th>Auxiliary</th><th>Cost</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>`;
 }
 
 // ---------------------------------------------------------------------------

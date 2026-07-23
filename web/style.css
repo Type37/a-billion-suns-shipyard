@@ -2202,12 +2202,21 @@ button { font-family: inherit; }
    faction switch, the era badge, and the ... menu. The name column grows to
    soak up the slack so the rest sits to the right; the whole row wraps only
    when a viewport genuinely cannot hold it (narrow phones). */
-.sy-head { display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap; padding: 12px 0 8px; }
+.sy-head { display: flex; align-items: center; gap: 4px 8px; flex-wrap: wrap; padding: 6px 0 4px; }
 /* The identity group (emblem + name + d12) grows and never wraps internally, so
    the d12 stays welded to the name and the group as a whole takes the slack. */
-.sy-id { display: flex; align-items: center; gap: 8px 10px; flex-wrap: nowrap; flex: 1 1 260px; min-width: 0; }
+.sy-id { display: flex; align-items: center; gap: 2px 4px; flex-wrap: nowrap; flex: 1 1 260px; min-width: 0; }
 .sy-name { flex: 1 1 0; min-width: 0; }
-.sy-fac { display: flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; }
+.sy-fac { display: flex; align-items: center; gap: 4px 8px; flex-wrap: wrap; }
+/* Tightened masthead: the shipyard header is a dense control strip, so its
+   shared marks (d12, era badge, ... menu, emblem) shed the roomier padding the
+   Armageddon builder uses. Scoped to .sy-head so only this header shrinks. */
+.sy-head .mf-name { padding: 1px 0; font-size: clamp(16px, 1.9vw, 22px); }
+.sy-head .mf-name-gen { width: 24px; height: 24px; border-radius: 5px; }
+.sy-head .mf-era-badge { padding: 3px 7px; font-size: 11px; letter-spacing: 0.04em; }
+.sy-head .mf-menu > summary { height: 28px; padding: 0 8px; gap: 4px; }
+.sy-head .emblem-current-btn svg { width: 34px; height: 34px; }
+.sy-head .emblem-edit-cue { display: none; }
 
 /* Faction block: the faction rule verbatim with Initiative and CMD/round. */
 .sy-faction { padding: 10px 0; border-top: 1px solid var(--hair-soft); }

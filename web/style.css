@@ -3447,15 +3447,20 @@ a .icon,
    four links wide and pushed "Battle" to the far edge of the row. */
 .learn-progress { flex-direction: column; align-items: stretch; gap: 6px; }
 .learn-rail { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+/* Column gap matches .learn-rail so the ghost chips reserve exactly the width of
+   the real ones and the phase links land under their parent step. */
 .learn-dot-subs {
   display: flex; flex-direction: row; flex-wrap: wrap; align-items: center;
-  gap: 2px 4px; padding: 3px 0 3px 10px;
-  border-left: 2px solid var(--hair);
+  gap: 2px 6px; padding: 3px 0;
 }
+.learn-dot-ghost { visibility: hidden; pointer-events: none; }
 .learn-subs-tag {
   font-family: var(--display); font-weight: 800; font-size: 10.5px;
   letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3);
-  padding: 3px 6px 3px 0;
+  padding: 3px 6px 3px 10px; border-left: 2px solid var(--hair);
+}
+@media (max-width: 760px) {
+  .learn-dot-ghost { display: none; }
 }
 .learn-dot.is-sub { padding: 3px 4px; }
 .learn-dot.is-sub .learn-dot-n { display: none; }

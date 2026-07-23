@@ -3125,7 +3125,18 @@ function learnView(state: AppState): string {
     const on = phaseStep === step && anchor === slug;
     return `<a class="learn-dot is-sub ${on ? "on" : ""}" href="#/learn/${phaseStep}/${slug}"><span class="learn-dot-l">${escapeHtml(p2.name.replace(" Phase", ""))}</span></a>`;
   }).join("");
-  const progress = `<div class="learn-rail">${chips}</div><div class="learn-dot-subs"><span class="learn-subs-tag">Step ${phaseStep + 1}</span>${subs}</div>`;
+  // The phase row belongs to step 4, so it starts under step 4. Invisible copies
+  // of the chips before it reserve exactly their width (same markup, same font),
+  // which aligns the row to that chip's left edge without hard-coding a pixel
+  // offset that would drift with the labels. Dropped on narrow screens, where the
+  // rail wraps and there is no column to line up with.
+  const subGhosts = LEARN_STEPS.slice(0, phaseStep)
+    .map(
+      (s2, i) =>
+        `<span class="learn-dot learn-dot-ghost" aria-hidden="true"><span class="learn-dot-n">${i + 1}</span><span class="learn-dot-l">${escapeHtml(s2.label)}</span></span>`,
+    )
+    .join("");
+  const progress = `<div class="learn-rail">${chips}</div><div class="learn-dot-subs">${subGhosts}<span class="learn-subs-tag">Step ${phaseStep + 1}</span>${subs}</div>`;
 
   // Rules text on these pages comes from TRAINING_GUIDES (transcribed from the
   // Combat Simulator scenario) and ROUND_PHASES / ACTIVATION_STEPS (transcribed
@@ -3179,9 +3190,11 @@ function learnView(state: AppState): string {
   };
 
   const screens = [
-    // 0 - Mission brief
+    // 0 - Mission brief. The scenario's own introduction, verbatim, rather than a
+    // title on an empty page.
     `<div class="learn-screen">
       <h1 class="learn-title">Your first battle</h1>
+      <p class="learn-lede">${ruleText(cs?.intro ?? "")}</p>
     </div>`,
     // 1 - Your fleet
     `<div class="learn-screen">
@@ -3189,10 +3202,11 @@ function learnView(state: AppState): string {
       <p class="learn-lede">This is a sample fleet that can be used in the tutorials.</p>
       ${learnFleetTable()}
       <div class="learn-stat-defs">
-        <p><b>Mass</b> is a broad measure of the size and bulk of a ship. Throughout the rules, when you see the icon ${icon("stat-mass", 15, "stat-ico stat-ico-mass")}, replace that with the value of the Mass of the unit&rsquo;s ship class. If a rule refers to the Combined Mass of ships, sum the ${icon("stat-mass", 15, "stat-ico stat-ico-mass")} of all the related individual ships to form a total.</p>
+        <p><b>Mass</b> ${icon("stat-mass", 15, "stat-ico stat-ico-mass")} is a broad measure of the size and bulk of a ship. Throughout the rules, when you see the icon ${icon("stat-mass", 15, "stat-ico stat-ico-mass")}, replace that with the value of the Mass of the unit&rsquo;s ship class. If a rule refers to the Combined Mass of ships, sum the ${icon("stat-mass", 15, "stat-ico stat-ico-mass")} of all the related individual ships to form a total.</p>
         <p><b>Thrust</b> ${icon("stat-thrust", 15, "stat-ico stat-ico-thrust")} is the maximum number of inches this ship can travel in a single move.</p>
-        <p><b>Silhouette</b> ${icon("stat-silhouette", 15, "stat-ico stat-ico-silhouette")} is the highest die roll that hits this ship, and its starting HP.</p>
-        <p><b>Shields</b> ${icon("stat-shields", 15, "stat-ico stat-ico-shields")} is the damage this ship soaks from each hit.</p>
+        <p><b>Silhouette</b> ${icon("stat-silhouette", 15, "stat-ico stat-ico-silhouette")} represents both the physical size of the ship as well as the brightness of its energy signature. The larger and &lsquo;louder&rsquo; the ship, the easier it is for enemy vessels to track, target and hit it, but the more punishment it can withstand. A ship&rsquo;s Silhouette value is the highest roll on any attack die that will be considered a hit. Each ship enters play with Hull Points (HP) equal to its Silhouette. A ship&rsquo;s HP value is the number of damage tokens required to remove the ship from play.</p>
+        <p><b>Shields</b> ${icon("stat-shields", 15, "stat-ico stat-ico-shields")} &mdash; most larger ships are equipped with kinetic field generators, used to absorb and disperse the energy of incoming attacks. A ship&rsquo;s Shields value indicates the strength and sophistication of the defensive shields it possesses. A ship&rsquo;s Shields value determines the highest die roll that counts as a successful saving throw when defending against attacks.</p>
+        <p><b>Weapons</b> &mdash; the weapons this ship is carrying and in what quantity. Ships may have Primary and/or Auxiliary weapon systems. Weapon systems have a Range (Minimum and Maximum), a number and type of Attack Dice, and a damage value.</p>
       </div>
     </div>`,
     // 2 - The table
@@ -3250,7 +3264,6 @@ function learnView(state: AppState): string {
              <li>Gravity Well: a Jump Point must be more than 9" from a Planetoid, and no jumping happens inside that 9" either.</li>
              <li>Blockading an enemy Jump Point scores you points, but the Jump Point still belongs to its owner and still works for them.</li>
            </ul>
-           ${learnDiagram("gravity-well")}
 
            <h3 class="learn-sub">Leaving by jump</h3>
            <ul class="learn-rules">

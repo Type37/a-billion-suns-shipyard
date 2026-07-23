@@ -394,7 +394,7 @@ button { font-family: inherit; }
 }
 
 /* Uniform WarLore builder footer: one centered, dot-separated line. */
-.game-info-footer { margin-top: 64px; border-top: 1px solid var(--hair-soft); padding: 18px 16px 30px; }
+.game-info-footer { margin-top: 24px; border-top: 1px solid var(--hair-soft); padding: 16px 16px 22px; }
 .gif-inner { max-width: var(--shell); margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 24px; font-size: 12.5px; color: var(--ink-2); }
 .gif-inner > span, .gif-inner > a { padding: 0 2px; }
 /* The footer links that carry a glyph centre it against the words rather than

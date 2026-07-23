@@ -83,17 +83,16 @@ function syncDocumentTitle(): void {
 //
 // Recorded on pointerdown (before any state change) in the capture phase, so it
 // is captured even for controls that stop propagation.
-let pressAnchor: { key: string; top: number; route: string } | null = null;
+let pressAnchor: { scrollY: number; route: string } | null = null;
 
 document.addEventListener(
   "pointerdown",
   (e) => {
     const el = e.target instanceof Element ? e.target.closest("[data-action]") : null;
-    const key = el instanceof HTMLElement ? focusKey(el) : null;
-    pressAnchor =
-      el instanceof HTMLElement && key
-        ? { key, top: el.getBoundingClientRect().top, route: location.hash }
-        : null;
+    // Record only the page's scroll position at press time, not the pressed
+    // element's box. See holdAnchor: pinning absolute scroll is drift-proof,
+    // element-relative anchoring is not.
+    pressAnchor = el instanceof HTMLElement ? { scrollY: window.scrollY, route: location.hash } : null;
   },
   true,
 );
@@ -103,11 +102,12 @@ function holdAnchor(): void {
   pressAnchor = null;
   // Not across a navigation: a new view is supposed to start where it starts.
   if (!a || a.route !== location.hash) return;
-  const el = [...root.querySelectorAll<HTMLElement>("[data-action]")].find((n) => focusKey(n) === a.key);
-  if (!el) return;
-  const delta = el.getBoundingClientRect().top - a.top;
-  // Sub-pixel drift is not a jump; correcting it would fight the browser.
-  if (Math.abs(delta) > 1) window.scrollBy(0, delta);
+  // Pin the page exactly where it was when the control was pressed. The old
+  // version anchored to the pressed element's own top and scrollBy'd the
+  // difference - but with real fonts a single click reflows the content above
+  // the control by a pixel or two, so the "difference" was never zero and every
+  // click crept the view downward. An absolute scroll pin cannot drift.
+  if (window.scrollY !== a.scrollY) window.scrollTo(0, a.scrollY);
 }
 
 function paint(): void {

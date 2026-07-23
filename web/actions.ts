@@ -371,7 +371,8 @@ function handleClick(e: MouseEvent): void {
       // rolled value is committed to state only once it has settled.
       const id = currentListId();
       if (!id) return;
-      const name = randomCorpName();
+      const factionId = state.lists.find((l) => l.id === id)?.fleet.factionId;
+      const name = randomCorpName(factionId);
       const input = document.querySelector<HTMLInputElement>(".sy-name");
       if (input) {
         writeOnInput(input, name, () => {
@@ -1183,7 +1184,7 @@ function handleClick(e: MouseEvent): void {
         }
         // A Hypergrowth fleet is a corporation: if the player named nothing,
         // roll one from the corp-name generator so it never opens "Untitled".
-        if (!list.fleet.name) list.fleet.name = randomCorpName();
+        if (!list.fleet.name) list.fleet.name = randomCorpName(m.factionId);
       }
       store.setState((s) => {
         const lists = [...s.lists, list];

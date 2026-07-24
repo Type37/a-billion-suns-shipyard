@@ -1966,10 +1966,12 @@ function printView(state: AppState): string {
         isUnity
           ? `<div class="print-hvp-cols">${availableHvpBlocks}</div>`
           : hasHvpBlocks
-            ? `<div class="print-hvp-cols">
-                 <div class="print-hvp-own">${hvpBlocks.own}</div>
-                 <div class="print-hvp-shared">${hvpBlocks.shared}</div>
-               </div>`
+            ? // You choose three, so print three columns - one personnel each,
+              // side by side. A CSS multi-column flow was used here before; it
+              // packs by height rather than by item, so two blocks landed in the
+              // first row and the third started a second row with a column and a
+              // half of blank paper beside it.
+              `<div class="print-hvp-chosen">${hvpBlocks.own}${hvpBlocks.shared}</div>`
             : ""
       }
 

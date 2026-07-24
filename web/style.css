@@ -3424,6 +3424,15 @@ a .icon,
 .print-hvp-cols { display: grid; grid-template-columns: 2fr 1fr; gap: 0 16px; align-items: start; }
 .print-hvp-own { columns: 2; column-gap: 16px; }
 .print-hvp-cols .print-hvp { break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 7px; }
+/* The three personnel you actually chose: one per column, side by side.
+   align-items:start so a short entry does not get stretched to match a long
+   one, and a real grid rather than a CSS column flow, which balances by height
+   and would drop the third block onto its own row. */
+.print-hvp-chosen {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 14px; align-items: start;
+}
+.print-hvp-chosen .print-hvp { break-inside: avoid; margin-bottom: 4px; }
+@media (max-width: 620px) { .print-hvp-chosen { grid-template-columns: 1fr; } }
 @media (max-width: 700px) {
   .print-hvp-cols { grid-template-columns: 1fr; }
   .print-hvp-own { columns: 1; }

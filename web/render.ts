@@ -1429,9 +1429,14 @@ function addUnitModal(state: AppState): string {
     : faction
       ? faction.ships.map((s) => ({ ship: s, owner: faction, composite: false }))
       : [];
-  // Compact card: the whole tile is the Add button. Name, cost and the four
-  // stats only - the weapon ranges live one tap away in the Reference - so all
-  // four Mass quadrants fit a desktop without scrolling.
+  const weaponsLine = (s: ShipClass) => {
+    const p = shortWeaponText(s.primary, s.utilityBays && s.primary.length === 0);
+    const a = shortWeaponText(s.auxiliary, s.utilityBays && s.auxiliary.length === 0);
+    const parts: string[] = [];
+    if (p) parts.push(`<span class="au-wl">P</span>${p}`);
+    if (a) parts.push(`<span class="au-wl">A</span>${a}`);
+    return parts.join('<span class="au-wsep">·</span>');
+  };
   const auCard = (ship: ShipClass, addId: string, owned: number) => `
       <button class="au-card" data-action="add-unit" data-ship="${addId}" title="Add ${escapeHtml(ship.name)}">
         <span class="au-card-top">
@@ -1441,6 +1446,7 @@ function addUnitModal(state: AppState): string {
           <span class="au-card-add">${icon("plus", 14)}</span>
         </span>
         <span class="au-card-stats">${statChips(ship, true)}</span>
+        <span class="au-card-wep">${weaponsLine(ship)}</span>
       </button>`;
   const quad = (mass: number) => {
     const rows = pool.filter((p) => p.ship.mass === mass);
@@ -1471,6 +1477,18 @@ function addUnitModal(state: AppState): string {
   </div>`;
 }
 
+/**
+ * A weapon slot in short form: name, dice, range. The long form used elsewhere
+ * ("Blasters: 2D6, range 0-6\", damage 1") wraps to two lines on a phone, and
+ * damage is fixed by die type (D6=1, D8=2, D10=3, D12=5) so the die already
+ * carries it. Returns "" for a genuinely empty slot, which callers use to drop
+ * the line entirely rather than spend a row on a dash.
+ */
+function shortWeaponText(w: Weapon[], isUtility: boolean): string {
+  if (w.length) return w.map((x) => `${escapeHtml(x.name)} ${x.count}${x.die} ${x.rangeMin}&ndash;${x.rangeMax}"`).join(" · ");
+  return isUtility ? "Utility Bays" : "";
+}
+
 // The faction ship reference: one line per ship, grouped by Mass, laid out like
 // the rulebook - stats plus both weapon slots at a glance. Opened from the
 // masthead in every fleet-list mode.
@@ -1481,22 +1499,33 @@ function shipReferenceModal(state: AppState): string {
   if (!list) return "";
   const faction = findFaction(list.fleet.factionId, state.customFactions);
   if (!faction) return "";
+  // Not a <table>: a table cannot reflow, so on a phone it could only be read by
+  // scrolling sideways. This is a grid that reads as aligned columns on a wide
+  // screen and collapses to a compact stacked entry on a narrow one, so the whole
+  // sheet is visible at once either way. An empty slot is dropped on narrow
+  // screens rather than spending a line on a dash.
   let rows = "";
   for (const mass of [0, 1, 2, 3]) {
     const ships = faction.ships.filter((s) => s.mass === mass).sort((a, b) => a.cost - b.cost);
     if (!ships.length) continue;
-    rows += `<tr class="shipref-mass"><td colspan="8">Mass ${mass}</td></tr>`;
+    rows += `<div class="sr-mass">Mass ${mass}</div>`;
     for (const s of ships) {
-      rows += `<tr>
-        <td class="shipref-n">${escapeHtml(s.name)}</td>
-        <td class="shipref-num">${s.mass}</td>
-        <td class="shipref-num">${s.thrust}"</td>
-        <td class="shipref-num">${s.silhouette}</td>
-        <td class="shipref-num">${s.shields}</td>
-        <td class="shipref-w">${primarySlotText(s)}</td>
-        <td class="shipref-w">${auxSlotText(s)}</td>
-        <td class="shipref-cost">${credits(s.cost)}</td>
-      </tr>`;
+      const pri = shortWeaponText(s.primary, s.utilityBays && s.primary.length === 0);
+      const aux = shortWeaponText(s.auxiliary, s.utilityBays && s.auxiliary.length === 0);
+      rows += `<div class="sr-row">
+        <span class="sr-name">${escapeHtml(s.name)}</span>
+        <span class="sr-stats">
+          <span class="sr-num" data-l="&#9410;">${s.mass}</span>
+          <span class="sr-num" data-l="T">${s.thrust}"</span>
+          <span class="sr-num" data-l="S">${s.silhouette}</span>
+          <span class="sr-num" data-l="Sh">${s.shields}</span>
+        </span>
+        <span class="sr-weps">
+          <span class="sr-w ${pri ? "" : "is-empty"}" data-l="P">${pri || "&mdash;"}</span>
+          <span class="sr-w ${aux ? "" : "is-empty"}" data-l="A">${aux || "&mdash;"}</span>
+        </span>
+        <span class="sr-cost">${credits(s.cost)}</span>
+      </div>`;
     }
   }
   return `
@@ -1509,11 +1538,13 @@ function shipReferenceModal(state: AppState): string {
       </header>
       <div class="modal-body shipref-body">
         <p class="shipref-cap">${escapeHtml(faction.rule.name)} · Initiative ${escapeHtml(faction.initiative)} · ${escapeHtml(faction.cmdTokens)} CMD/round</p>
-        <div class="shipref-scroll">
-          <table class="shipref-table">
-            <thead><tr><th>Ship</th><th>Mass</th><th>Thr</th><th>Sil</th><th>Shd</th><th>Primary</th><th>Auxiliary</th><th>Cost</th></tr></thead>
-            <tbody>${rows}</tbody>
-          </table>
+        <div class="shipref">
+          <div class="sr-row sr-head" aria-hidden="true">
+            <span class="sr-name">Ship</span><span class="sr-num">Mass</span><span class="sr-num">Thr</span>
+            <span class="sr-num">Sil</span><span class="sr-num">Shd</span>
+            <span class="sr-w">Primary</span><span class="sr-w">Auxiliary</span><span class="sr-cost">Cost</span>
+          </div>
+          ${rows}
         </div>
       </div>
     </div>

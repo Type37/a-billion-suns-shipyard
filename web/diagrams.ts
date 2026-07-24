@@ -88,24 +88,142 @@ function jumpDiagram(): string {
  * Drag to Select: a lead unit, everything unactivated within 6" of it, and a
  * Combined Mass of 10 or less. The ship outside the bubble stays grey to show
  * the boundary is the rule, not a suggestion.
+ *
+ * Drawn as the RTS gesture it is named after, because "drag to select" is a verb
+ * players already own from a thousand strategy games and the picture may as well
+ * borrow it: a pointer clicks the lead, a click ripple goes out, marquee corners
+ * snap open around the bubble, and each ship the ripple reaches turns blue and
+ * gains its own selection brackets. The order is the rule - lead first, then
+ * whoever is inside 6" - so the timing carries the same information the text does.
+ *
+ * Every hull is labelled with its Mass, because the Combined Mass limit is half
+ * the rule and an unlabelled picture cannot show a sum. 4 + 3 + 2 + 1 = 10 puts
+ * the battlegroup exactly on the cap, which is more useful than a comfortable
+ * number: the M:2 ship outside the bubble is out on range, and the total tells
+ * you it could not have joined on Mass either.
+ *
+ * One 3600ms cycle drives everything and the per-ship stagger is baked into
+ * keyframe percentages rather than animation-delay - a delay on an infinite
+ * animation shifts that element's whole loop and the four ships drift out of
+ * step with the ripple within a few passes.
  */
 function dragSelectDiagram(): string {
+  const LEAD_X = 128, LEAD_Y = 100, R6 = 54;
+
+  // Selection brackets: four corner ticks, not a box, so they read as a UI
+  // affordance sitting on top of the table rather than another range shape.
+  const brackets = (x: number, y: number, cls: string, h = 13, arm = 5) => `
+    <g transform="translate(${x} ${y})"><g class="dgs-lock ${cls}">
+      <path d="M${-h} ${-h + arm} L${-h} ${-h} L${-h + arm} ${-h}
+               M${h - arm} ${-h} L${h} ${-h} L${h} ${-h + arm}
+               M${h} ${h - arm} L${h} ${h} L${h - arm} ${h}
+               M${-h + arm} ${h} L${-h} ${h} L${-h} ${h - arm}"/>
+    </g></g>`;
+
+  const mass = (x: number, y: number, m: number, cls = "dgs-mass") =>
+    `<text class="${cls}" x="${x}" y="${y}">M:${m}</text>`;
+
   return `
-  <svg class="learn-dg" viewBox="0 0 320 170" role="img"
-       aria-label="Drag to Select: a lead unit plus unactivated units within six inches of it, to a combined mass of ten or less.">
+  <svg class="learn-dg" viewBox="0 0 320 192" role="img"
+       aria-label="Drag to Select: click a lead unit of Mass 4, then drag a selection over the other unactivated units at least partially within six inches of it - Mass 3, Mass 2 and Mass 1 - for a Combined Mass of 10, which is the maximum. A Mass 2 unit further away is out of range and is not selected.">
+    <style>
+      .learn-dg .dgs-mass { font-family: var(--narrow); font-size: 9.5px; font-weight: 700; fill: var(--ink-2); text-anchor: middle; letter-spacing: 0.03em; }
+      .learn-dg .dgs-mass-out { fill: var(--ink-3); }
+      .learn-dg .dgs-total { font-family: var(--narrow); font-size: 10px; font-weight: 700; fill: var(--blue); text-anchor: middle; text-transform: uppercase; letter-spacing: 0.04em; }
+      .learn-dg .dgs-marq path { fill: none; stroke: var(--blue); stroke-width: 1.6; stroke-linecap: square; }
+      .learn-dg .dgs-lock path { fill: none; stroke: var(--blue); stroke-width: 1.4; stroke-linecap: square; }
+      .learn-dg .dgs-pulse { fill: none; stroke: var(--blue); stroke-width: 1.5; }
+      .learn-dg .dgs-cursor { fill: var(--ink); stroke: var(--paper); stroke-width: 1; stroke-linejoin: round; }
+
+      @keyframes dgs-pulse { 0% { r: 7; opacity: 0.75; } 6% { opacity: 0.7; } 40%, 100% { r: 62; opacity: 0; } }
+      @keyframes dgs-click { 0%, 3% { transform: scale(1); } 7% { transform: scale(0.82); } 13%, 100% { transform: scale(1); } }
+      @keyframes dgs-marq { 0%, 5% { transform: scale(0.06); opacity: 0; } 11% { opacity: 1; } 26%, 88% { transform: scale(1); opacity: 1; } 96%, 100% { transform: scale(1); opacity: 0; } }
+      @keyframes dgs-lock-0 { 0%, 12% { opacity: 0; transform: scale(1.5); } 18%, 90% { opacity: 1; transform: scale(1); } 96%, 100% { opacity: 0; transform: scale(1); } }
+      @keyframes dgs-lock-1 { 0%, 22% { opacity: 0; transform: scale(1.5); } 28%, 90% { opacity: 1; transform: scale(1); } 96%, 100% { opacity: 0; transform: scale(1); } }
+      @keyframes dgs-lock-2 { 0%, 28% { opacity: 0; transform: scale(1.5); } 34%, 90% { opacity: 1; transform: scale(1); } 96%, 100% { opacity: 0; transform: scale(1); } }
+      @keyframes dgs-lock-3 { 0%, 34% { opacity: 0; transform: scale(1.5); } 40%, 90% { opacity: 1; transform: scale(1); } 96%, 100% { opacity: 0; transform: scale(1); } }
+      @keyframes dgs-tint-1 { 0%, 22% { fill: var(--ink); } 28%, 90% { fill: var(--blue); } 96%, 100% { fill: var(--ink); } }
+      @keyframes dgs-tint-2 { 0%, 28% { fill: var(--ink); } 34%, 90% { fill: var(--blue); } 96%, 100% { fill: var(--ink); } }
+      @keyframes dgs-tint-3 { 0%, 34% { fill: var(--ink); } 40%, 90% { fill: var(--blue); } 96%, 100% { fill: var(--ink); } }
+      @keyframes dgs-total { 0%, 44% { opacity: 0; } 52%, 92% { opacity: 1; } 98%, 100% { opacity: 0; } }
+
+      .learn-dg .dgs-pulse { animation: dgs-pulse 3600ms ease-out infinite; }
+      .learn-dg .dgs-pulse-2 { animation-delay: 260ms; }
+      .learn-dg .dgs-cursor { animation: dgs-click 3600ms ease-out infinite; transform-box: fill-box; transform-origin: 10% 6%; }
+      .learn-dg .dgs-marq { animation: dgs-marq 3600ms cubic-bezier(0.2, 0.9, 0.3, 1) infinite; }
+      .learn-dg .dgs-lock { transform-box: fill-box; transform-origin: center; }
+      .learn-dg .dgs-lock-0 { animation: dgs-lock-0 3600ms ease-out infinite; }
+      .learn-dg .dgs-lock-1 { animation: dgs-lock-1 3600ms ease-out infinite; }
+      .learn-dg .dgs-lock-2 { animation: dgs-lock-2 3600ms ease-out infinite; }
+      .learn-dg .dgs-lock-3 { animation: dgs-lock-3 3600ms ease-out infinite; }
+      .learn-dg .dgs-catch-1 { animation: dgs-tint-1 3600ms step-end infinite; }
+      .learn-dg .dgs-catch-2 { animation: dgs-tint-2 3600ms step-end infinite; }
+      .learn-dg .dgs-catch-3 { animation: dgs-tint-3 3600ms step-end infinite; }
+      .learn-dg .dgs-total { animation: dgs-total 3600ms ease infinite; }
+
+      /* Motion off: settle on the informative frame - everything inside 6" is
+         selected and blue, the ripple is just a ring on the lead. */
+      @media (prefers-reduced-motion: reduce) {
+        .learn-dg .dg-ship.dgs-catch-1,
+        .learn-dg .dg-ship.dgs-catch-2,
+        .learn-dg .dg-ship.dgs-catch-3 { fill: var(--blue); }
+        .learn-dg .dgs-pulse-2 { display: none; }
+      }
+    </style>
+
     ${LABEL(160, 16, "Drag to Select a battlegroup", "dg-title")}
-    <circle class="dg-range dg-range-grow" cx="132" cy="96" r="54"/>
-    ${SHIP(132, 96, 0, "dg-ship dg-lead")}
-    ${LABEL(132, 118, "lead", "dg-mini")}
-    ${SHIP(96, 70, 15, "dg-ship dg-picked dg-picked-1")}
-    ${SHIP(170, 68, -10, "dg-ship dg-picked dg-picked-2")}
-    ${SHIP(150, 134, 0, "dg-ship dg-picked dg-picked-3")}
-    ${SHIP(268, 104, 0, "dg-ship dg-outside")}
-    ${LABEL(268, 126, "too far", "dg-mini dg-mini-out")}
-    <g class="dg-measure" transform="translate(132 96)">
-      <line x1="0" y1="0" x2="54" y2="0"/>
-      ${LABEL(27, -6, '6"', "dg-measure-text")}
+    <circle class="dg-range dg-range-grow" cx="${LEAD_X}" cy="${LEAD_Y}" r="${R6}"/>
+
+    <!-- The click, and the ripple it throws out. -->
+    <circle class="dgs-pulse dgs-pulse-1" cx="${LEAD_X}" cy="${LEAD_Y}" r="7"/>
+    <circle class="dgs-pulse dgs-pulse-2" cx="${LEAD_X}" cy="${LEAD_Y}" r="7"/>
+
+    <!-- Marquee corners, snapping open from the lead. -->
+    <g transform="translate(${LEAD_X} ${LEAD_Y})"><g class="dgs-marq">
+      <path d="M-52 -38 L-52 -50 L-40 -50
+               M40 -50 L52 -50 L52 -38
+               M52 38 L52 50 L40 50
+               M-40 50 L-52 50 L-52 38"/>
+    </g></g>
+
+    <!-- Every Mass sits 24 below its hull, which clears the selection brackets
+         (13 half-height) rather than landing on their bottom corners. "lead" goes
+         above its ship for the same reason: below, it ran into the top-left
+         bracket of the M:1 ship. -->
+    ${LABEL(LEAD_X, LEAD_Y - 22, "lead", "dg-mini")}
+    ${brackets(LEAD_X, LEAD_Y, "dgs-lock-0")}
+    ${SHIP(LEAD_X, LEAD_Y, 0, "dg-ship dg-lead")}
+    ${mass(LEAD_X, LEAD_Y + 24, 4)}
+
+    ${brackets(92, 68, "dgs-lock-1")}
+    ${SHIP(92, 68, 15, "dg-ship dgs-catch-1")}
+    ${mass(92, 92, 3)}
+
+    ${brackets(166, 66, "dgs-lock-2")}
+    ${SHIP(166, 66, -10, "dg-ship dgs-catch-2")}
+    ${mass(166, 90, 2)}
+
+    ${brackets(152, 138, "dgs-lock-3")}
+    ${SHIP(152, 138, 0, "dg-ship dgs-catch-3")}
+    ${mass(152, 162, 1)}
+
+    ${SHIP(266, 104, 0, "dg-ship dg-outside")}
+    ${mass(266, 128, 2, "dgs-mass dgs-mass-out")}
+    ${LABEL(266, 140, "too far", "dg-mini dg-mini-out")}
+
+    <!-- The pointer sits on the lead, tip on the hull. -->
+    <g transform="translate(133 92)">
+      <path class="dgs-cursor" d="M0 0 L0 15 L4 11.2 L6.4 16.6 L9.4 15.2 L7 10 L11.6 9.6 Z"/>
     </g>
+
+    <g class="dg-measure" transform="translate(${LEAD_X} ${LEAD_Y})">
+      <line x1="0" y1="0" x2="${R6}" y2="0"/>
+      <!-- Under the rule, not over it: above the line the figure landed on the
+           M:2 of the ship at the top right. -->
+      ${LABEL(R6 / 2, 12, '6"', "dg-measure-text")}
+    </g>
+
+    <text class="dgs-total" x="160" y="182">Combined Mass 4+3+2+1 = 10 (max 10)</text>
   </svg>`;
 }
 
@@ -183,71 +301,165 @@ function doubleMoveDiagram(): string {
  * one enemy cannot show that.
  */
 function passiveDiagram(): string {
+  // Friendly on the left, hostile on the right, and the movement therefore runs
+  // left to right. Every other drawing in this set reads that way round and this
+  // one did not, which made it the only diagram where you had to work out which
+  // ship was yours before you could read it.
+  const EX = 266, EY = 104; // the passive enemy, facing LEFT
+  const R = 72; // arc radius
+
+  // An exact half-disc. Both endpoints are (0, -R) and (0, +R) in the enemy's own
+  // frame, so the chord between them is the vertical diameter: dead straight, and
+  // passing through (0,0), the ship's centre, by construction rather than by eye.
+  // sweep-flag 0 bulges the curve towards -x (SVG's y axis points down, so
+  // sweep 1 is clockwise on screen and would put the bulge behind the ship); at
+  // exactly 180 degrees the large-arc-flag is degenerate and either value gives
+  // the same semicircle, so it stays 0. `Z` draws the diameter as a straight
+  // closing line - the flat side is a line segment, never a second arc.
+  const HALF_DISC = `M0 -${R} A${R} ${R} 0 0 0 0 ${R} Z`;
+
+  // Your unit's path: begins outside the arc, ends inside it. SHIP() points up at
+  // rotation 0, so the heading angle is atan2(dx, -dy). The run from (46,150) to
+  // (206,104) is dx +160, dy -46, which is +74deg; 76 splits the difference with
+  // the shallower final leg.
+  const END_X = 206, END_Y = 104;
+
   return `
   <svg class="learn-dg" viewBox="0 0 340 186" role="img"
-       aria-label="Passive Attacks Step: an unactivated enemy fires its auxiliary weapons at your unit when your unit moves through or ends inside that enemy's 180 degree auxiliary arc. An enemy facing away does not fire, even in range.">
+       aria-label="Passive Attacks Step: your unit moves from the left into the 180 degree auxiliary arc of an unactivated enemy on the right, and that enemy fires its auxiliary weapons at it. A second enemy is facing away: it is in range but your unit is behind it, so it does not fire.">
+    <style>
+      .learn-dg .dgp-arc-edge { fill: none; stroke: var(--red); stroke-width: 1; stroke-opacity: 0.55; }
+      .learn-dg .dgp-arc-dia { stroke: var(--red); stroke-width: 1.2; stroke-opacity: 0.8; }
+      @keyframes dgp-move {
+        0%, 10% { transform: translate(-160px, 46px); }
+        55%, 100% { transform: translate(0px, 0px); }
+      }
+      .learn-dg .dgp-mover { animation: dgp-move 3200ms ease-in-out infinite; }
+    </style>
+
     ${LABEL(170, 15, "Move into an enemy's AUX arc and it fires", "dg-title")}
 
-    <!-- Passive enemy, facing right: its auxiliary arc is the 180 degrees ahead. -->
-    <g transform="translate(74 104)">
-      <path class="dg-arc-fill dg-arc-aux" d="M0 -72 A72 72 0 0 1 0 72 Z"/>
-      ${SHIP(0, 0, 90, "dg-ship dg-enemy")}
+    <!-- Passive enemy, facing left: its auxiliary arc is the 180 degrees ahead of
+         it, drawn as an exact half-disc with its diameter on the hull's centre. -->
+    <g transform="translate(${EX} ${EY})">
+      <path class="dg-arc-fill dg-arc-aux" d="${HALF_DISC}"/>
+      <path class="dgp-arc-edge" d="${HALF_DISC}"/>
+      <line class="dgp-arc-dia" x1="0" y1="-${R}" x2="0" y2="${R}"/>
+      ${SHIP(0, 0, -90, "dg-ship dg-enemy")}
       ${LABEL(0, 30, "passive", "dg-mini")}
     </g>
-    ${LABEL(120, 52, 'AUX 180°', "dg-mini dg-mini-arc")}
+    ${LABEL(228, 58, 'AUX 180°', "dg-mini dg-mini-arc")}
 
-    <!-- Your unit's path: begins outside the arc, ends inside it.
-         The hull points along the direction of travel. It was at -110deg while
-         the path runs at about -76deg, so the ship was flying visibly sideways -
-         nose down-left, travelling up-left. SHIP() points up at rotation 0, so
-         the angle for a heading is atan2(dx, -dy): the run from (300,150) to
-         (134,104) is dx -166, dy -46, which is -74.5deg. -76 splits the
-         difference between that and the steeper final leg of the path. -->
-    <path class="dg-path" d="M300 150 L196 118 L134 104"/>
-    <g class="dg-passive-mover">${SHIP(0, 0, -76, "dg-ship")}</g>
-    ${LABEL(300, 168, "your unit moves", "dg-mini")}
+    <!-- In range, but facing away: no arc, no attack. Both enemies face the same
+         way; the only difference is which side of them you finish on, which is
+         exactly the rule. Your unit ends at ${END_X},${END_Y} - behind this one. -->
+    <g transform="translate(108 48)">
+      ${SHIP(0, 0, -90, "dg-ship dg-enemy dg-enemy-away")}
+      ${LABEL(0, 26, "facing away — no shot", "dg-mini dg-mini-out")}
+    </g>
+
+    <path class="dg-path" d="M46 150 L146 118 L${END_X} ${END_Y}"/>
+    <g transform="translate(${END_X} ${END_Y})">
+      <g class="dgp-mover">${SHIP(0, 0, 76, "dg-ship")}</g>
+    </g>
+    ${LABEL(54, 170, "your unit moves", "dg-mini")}
 
     <!-- Fire only once the mover is inside the arc. -->
     <g class="dg-passive-shots">
-      <line class="dg-shot dg-pshot-1" x1="88" y1="100" x2="128" y2="102"/>
-      <line class="dg-shot dg-pshot-2" x1="88" y1="108" x2="128" y2="108"/>
-    </g>
-
-    <!-- In range, but facing away: no arc, no attack.
-         This ship was rotated -90, which points it LEFT - straight at the action
-         at (134,104). Its front arc would have covered your unit completely, so
-         the drawing was illustrating the opposite of its own caption. Rotated 90
-         it faces right, the same way as the passive enemy, and your unit ends up
-         behind it. Both enemies now face the same way and the only difference is
-         which side of them you finish on, which is exactly the rule. -->
-    <g transform="translate(232 48)">
-      ${SHIP(0, 0, 90, "dg-ship dg-enemy dg-enemy-away")}
-      ${LABEL(0, 26, "facing away — no shot", "dg-mini dg-mini-out")}
+      <line class="dg-shot dg-pshot-1" x1="252" y1="100" x2="214" y2="102"/>
+      <line class="dg-shot dg-pshot-2" x1="252" y1="108" x2="214" y2="108"/>
     </g>
   </svg>`;
 }
 
-/** Action Step: one action, Open Fire shown as the common case. */
+/**
+ * Action Step: one action, Open Fire shown as the common case.
+ *
+ * The dice used to be four rounded squares with one 2.2px pip in the middle of
+ * each, which is a die face showing 1 - four times - and at the size this
+ * renders it read as four empty boxes. They now carry real pip layouts for the
+ * values they rolled, and the values are chosen against the target's Silhouette
+ * so the picture states the rule instead of gesturing at it: a ship's Silhouette
+ * is the highest roll on an attack die that counts as a hit, so against
+ * Silhouette 4 the 2 and the 4 hit and the 5 and the 6 miss. Both hulls are
+ * labelled with their own Silhouette, because "roll under Silhouette" is
+ * ambiguous until you can see there are two of them and only the target's
+ * matters.
+ */
 function actionDiagram(): string {
-  const die = (i: number, x: number) => `
-    <g transform="translate(${x} 112)">
-      <g class="dg-die dg-die-${i}">
-        <rect x="-11" y="-11" width="22" height="22" rx="3.5"/>
-        <circle class="dg-pip" cx="0" cy="0" r="2.2"/>
+  // Pip layout on the usual 3x3 grid. Values are drawn, not counted, so a face
+  // is always the arrangement a real die shows.
+  const PIPS: Record<number, Array<[number, number]>> = {
+    1: [[0, 0]],
+    2: [[-1, -1], [1, 1]],
+    3: [[-1, -1], [0, 0], [1, 1]],
+    4: [[-1, -1], [1, -1], [-1, 1], [1, 1]],
+    5: [[-1, -1], [1, -1], [0, 0], [-1, 1], [1, 1]],
+    6: [[-1, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [1, 1]],
+  };
+
+  const HALF = 14, GAP = 6.5, PIP = 2.9;
+  const die = (i: number, x: number, y: number, value: number, hit: boolean) => {
+    const pips = (PIPS[value] ?? [])
+      .map(([px, py]) => `<circle cx="${px * GAP}" cy="${py * GAP}" r="${PIP}"/>`)
+      .join("");
+    const cls = hit ? "dgof-die dgof-hit" : "dgof-die dgof-miss";
+    return `
+    <g transform="translate(${x} ${y})">
+      <g class="dg-die dg-die-${i} ${cls}">
+        <rect x="-${HALF}" y="-${HALF}" width="${HALF * 2}" height="${HALF * 2}" rx="4"/>
+        <g class="dgof-pips">${pips}</g>
       </g>
-    </g>`;
+    </g>
+    <text class="dgof-tag ${hit ? "dgof-tag-hit" : "dgof-tag-miss"}" x="${x}" y="${y + 28}">${hit ? "hit" : "miss"}</text>`;
+  };
+
+  const ATK_SIL = 3, DEF_SIL = 4;
+  const ROLLS: Array<[number, boolean]> = [
+    [2, 2 <= DEF_SIL],
+    [4, 4 <= DEF_SIL],
+    [5, 5 <= DEF_SIL],
+    [6, 6 <= DEF_SIL],
+  ];
+  const DICE_Y = 128;
+  const dice = ROLLS.map(([v, hit], i) => die(i + 1, 88 + i * 48, DICE_Y, v, hit)).join("");
+
   return `
-  <svg class="learn-dg" viewBox="0 0 320 150" role="img"
-       aria-label="Action Step: take one action. Open Fire attacks with all weapon systems, rolling equal to or under Silhouette to hit.">
-    ${LABEL(160, 16, "Take one Action — here, Open Fire", "dg-title")}
-    <g transform="translate(70 62)">
+  <svg class="learn-dg" viewBox="0 0 320 176" role="img"
+       aria-label="Action Step: take one action. Open Fire attacks with every weapon system. Your ship of Silhouette 3 fires at an enemy of Silhouette 4: a ship's Silhouette is the highest roll on an attack die that counts as a hit, so of the four dice rolled - 2, 4, 5 and 6 - the 2 and the 4 hit and the 5 and the 6 miss.">
+    <style>
+      .learn-dg .dgof-die rect { fill: var(--paper); stroke: var(--ink); stroke-width: 1.6; }
+      .learn-dg .dgof-die .dgof-pips circle { fill: var(--ink); }
+      .learn-dg .dgof-hit rect { stroke: var(--blue); stroke-width: 2; }
+      .learn-dg .dgof-hit .dgof-pips circle { fill: var(--blue); }
+      .learn-dg .dgof-miss rect { stroke: var(--ink-3); stroke-width: 1.4; }
+      .learn-dg .dgof-miss .dgof-pips circle { fill: var(--ink-3); }
+      .learn-dg .dgof-miss { opacity: 0.65; }
+      .learn-dg .dgof-tag { font-family: var(--narrow); font-size: 9.5px; font-weight: 700; text-anchor: middle; text-transform: uppercase; letter-spacing: 0.05em; }
+      .learn-dg .dgof-tag-hit { fill: var(--blue); }
+      .learn-dg .dgof-tag-miss { fill: var(--ink-3); }
+      .learn-dg .dgof-sil { font-family: var(--narrow); font-size: 9.5px; font-weight: 700; text-anchor: middle; letter-spacing: 0.03em; fill: var(--ink-2); }
+      .learn-dg .dgof-sil-t { fill: var(--red); }
+      /* The shared .dg-shot dash is cut for a 138px beam; this one is 154. */
+      .learn-dg .dgof-beam { stroke-dasharray: 160; }
+    </style>
+
+    ${LABEL(160, 15, "Take one Action — here, Open Fire", "dg-title")}
+
+    <g transform="translate(66 58)">
       <path class="dg-arc-fill dg-arc-pri" d="M0 0 L74 -31 L74 31 Z"/>
       ${SHIP(0, 0, 90, "dg-ship")}
     </g>
-    ${SHIP(232, 62, -90, "dg-ship dg-enemy")}
-    <line class="dg-shot dg-shot-1" x1="84" y1="62" x2="222" y2="62"/>
-    ${LABEL(160, 92, "roll under Silhouette to hit", "dg-mini")}
-    ${die(1, 122)}${die(2, 150)}${die(3, 178)}${die(4, 206)}
+    <text class="dgof-sil" x="66" y="82">SIL ${ATK_SIL}</text>
+    ${LABEL(66, 94, "attacker", "dg-mini")}
+
+    ${SHIP(244, 58, -90, "dg-ship dg-enemy")}
+    <text class="dgof-sil dgof-sil-t" x="244" y="82">SIL ${DEF_SIL}</text>
+    ${LABEL(244, 94, "target", "dg-mini")}
+
+    <line class="dg-shot dg-shot-1 dgof-beam" x1="80" y1="58" x2="234" y2="58"/>
+    ${LABEL(160, 108, "roll equal to or under the target's Silhouette", "dg-mini")}
+    ${dice}
   </svg>`;
 }
 

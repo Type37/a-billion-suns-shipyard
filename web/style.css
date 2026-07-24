@@ -1293,7 +1293,9 @@ button { font-family: inherit; }
 .sv-value { font-family: var(--display); font-weight: 800; font-size: 20px; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
 .sv-figure .dice-row { gap: 3px; }
 .is-inksaver .sv-item { background: none; }
-.sheet-section { font-family: var(--display); font-size: 12px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink); background: none; padding: 0 0 2px; margin: 10px 0 5px; border-bottom: 1px solid var(--ink); }
+.sheet-section { font-family: var(--display); font-size: 12px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--blue); background: none; padding: 0 0 2px; margin: 10px 0 5px; border-bottom: 1px solid var(--blue); }
+/* Ink Saver drops back to plain ink for anyone printing on a mono laser. */
+.is-inksaver .sheet-section { color: var(--ink); border-bottom-color: var(--ink); }
 .print-rule { margin-top: 7px; border-left: 1px solid var(--ink-3); padding: 1px 0 1px 9px; }
 .print-rule h3 { font-family: var(--display); font-size: 14px; margin-bottom: 3px; }
 .print-rule p { font-family: var(--serif); font-size: 12px; line-height: 1.32; }
@@ -2906,7 +2908,17 @@ button { font-family: inherit; }
   body { font-size: 11pt; }
   .print-page { max-width: none; padding: 0; }
   .sheet { border: none; padding: 0; }
-  .sheet-section { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* Print the sheet in colour. Browsers drop backgrounds and flatten colour on
+     paper unless every element opts in, so this is global rather than a list of
+     selectors that quietly missed things. Ink Saver is still there for anyone
+     who wants the frugal version. */
+  *, *::before, *::after { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* The accents carry meaning on paper too: blue for the fleet's own structure,
+     red for personnel. Flattening them to black was what made a printed sheet
+     look like a fax. */
+  .sheet-section { color: var(--blue); border-bottom-color: var(--blue); }
+  .sheet-subtitle { color: var(--blue); }
+  .sheet-emblem { color: var(--blue); }
   .print-unit, .print-hvp, .print-rule { break-inside: avoid; }
   /* An action/command must never be split from its own effect text across a
      page break, and a section heading must not be stranded at a page foot. */
@@ -2914,7 +2926,7 @@ button { font-family: inherit; }
   .print-ref-list dd { break-inside: avoid; }
   .print-ref-h { break-after: avoid; }
   .sheet-section { break-after: avoid; }
-  a { color: var(--ink); }
+  a { color: var(--blue); }
   /* The blue rule bar and the red HVP bar are how those blocks are told apart
      from body text on paper, and the tactical diagrams are meaningless in
      monochrome - all of them have to survive "Background graphics: off". */

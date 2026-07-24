@@ -2352,10 +2352,15 @@ const SCORING_NOTES: Partial<Record<GameMode, string[]>> = {
  * carried HVP can grant more or change the cost, so a standing note says so.
  */
 /**
- * The fleet, as a reference block for Play Mode. Every unit with its stats and
- * weapons and a hull tracker per ship, because "I cannot see my fleet" was the
- * single loudest complaint about Play Mode: it tracked the round for you while
- * hiding the ships the round is about.
+ * The fleet, as a reference block for Play Mode: every unit with its stats and
+ * weapons, because "I cannot see my fleet" was the single loudest complaint
+ * about Play Mode - it tracked the round for you while hiding the ships the
+ * round is about.
+ *
+ * No hull tracker. The boxes were never wired to anything: you could not tick
+ * one, and nothing read them, so they were a grid of dead squares that cost more
+ * vertical space than every stat on the card put together. Damage belongs on the
+ * printed sheet, where you can actually mark it.
  */
 function playFleetPanel(list: SavedList, faction: Faction | undefined, customs: Faction[]): string {
   const names = unitDisplayNames(list.fleet.units, faction, customs);
@@ -2375,10 +2380,6 @@ function playFleetPanel(list: SavedList, faction: Faction | undefined, customs: 
         </header>
         <div class="pf-data">${statChips(ship, true)}${weaponsTable(ship)}</div>
         ${carried.length ? `<p class="pf-carry">Carrying: ${escapeHtml(carried.join("; "))}</p>` : ""}
-        <div class="pf-track">${Array.from(
-          { length: u.count },
-          () => `<span class="pf-track-row">${Array.from({ length: ship.silhouette }, () => '<span class="pf-hp"></span>').join("")}</span>`,
-        ).join("")}</div>
       </article>`;
     })
     .join("");

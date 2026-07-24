@@ -3667,11 +3667,13 @@ a .icon,
    the checklist, the counters, Next phase and the command list at 290 / 554 /
    773 / 1095px - four things you touch every turn, none of them visible at the
    same time. Left is what you are doing, right is what you are spending. */
-.play-cols { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 12px 24px; align-items: start; margin-top: 10px; }
-.play-col { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.play-cols { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 8px 18px; align-items: start; margin-top: 6px; }
+.play-col { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
 /* Trimmed rather than restyled: every value in here is spacing, and on the one
    phase that carries the arc legend the screen was 28px short of fitting. */
-.play-cols .phase-checklist { margin-top: 0; max-width: none; padding: 12px 16px; min-height: 214px; }
+/* No min-height: it reserved 214px of empty box for a phase with two lines in
+   it, which pushed the fleet below the fold on every screen. */
+.play-cols .phase-checklist { margin-top: 0; max-width: none; padding: 8px 10px; }
 
 /* Phase steps fold. Mobile-first: a tap-to-open card so the play screen fits
    without scrolling past a wall of steps. On desktop (>=700px) the toggle is
@@ -3691,9 +3693,15 @@ a .icon,
      ::details-content for Chromium 128+ (which hides via the pseudo-element). */
   .phase-fold > .phase-fold-body { display: block; }
   .phase-fold::details-content { content-visibility: visible; }
-  .phase-fold .phase-checklist { min-height: 214px; border-left: 3px solid var(--blue); }
+  /* No min-height: it reserved 214px of empty box so the four phases were all
+     the same height, which cost more screen than the phases themselves and
+     pushed the fleet below the fold. The phase is as tall as its own steps. */
+  .phase-fold .phase-checklist { border-left: 3px solid var(--blue); }
 }
 
+/* Nothing decorative survives in Play Mode: the credits/links footer is a whole
+   band of screen you cannot use with a fleet on the table in front of you. */
+main.play-body ~ .game-info-footer { display: none; }
 .play-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .play-actions .cta-btn { flex: 1 1 auto; justify-content: center; }
 .play-cols .pc-cmds { margin-top: 0; }
@@ -3711,8 +3719,12 @@ a .icon,
 
 /* One header line instead of a 137px masthead: where you are, which round (read
    and adjusted in the same control), and the once-a-game Reset. */
-.play-body { padding-top: 10px; }
-.play-bar { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding-bottom: 9px; border-bottom: 2px solid var(--hair); }
+.play-body { padding-top: 6px; }
+.play-bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding-bottom: 5px; border-bottom: 2px solid var(--hair); }
+/* Section headings lose the indent and the accent square: mid-game that is 34px
+   of left margin and a decorative dot on a line that just says "Your fleet". */
+main.play-body .roster-section { padding: 5px 0 4px; font-size: 10.5px; border-bottom: none; }
+main.play-body .roster-section::before { content: none; }
 .play-bar-id { margin: 0; font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); }
 .play-bar-id a { color: var(--blue); text-decoration: none; }
 .play-bar-id a:hover { text-decoration: underline; }
@@ -3744,7 +3756,7 @@ a .icon,
 @media (max-width: 410px) { .play-cols .play-counters { grid-template-columns: minmax(0, 1fr); } }
 /* Sits at the bottom of the (usually shorter) left column, filling the space
    the taller command list leaves next to it instead of leaving it blank. */
-.play-notes { margin-top: 4px; padding-top: 10px; border-top: 1px solid var(--hair-soft); display: flex; flex-direction: column; gap: 10px; }
+.play-notes { margin-top: 2px; padding-top: 6px; border-top: 1px solid var(--hair-soft); display: flex; flex-direction: column; gap: 6px; }
 /* The masthead was 137px of mostly title; it only needs to say where you are. */
 .setup-band .page-title { font-size: clamp(20px, 2.6vw, 26px); }
 @media (max-width: 900px) {
@@ -3890,19 +3902,22 @@ a .icon,
 .play-fleet { margin-top: 0; }
 .play-cols .play-fleet .pf-list { grid-template-columns: 1fr; }
 .pf-hint { font-family: var(--sans); font-size: 11px; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--ink-3); margin-left: 8px; }
-.pf-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 10px; margin-top: 10px; }
-.pf-unit { border: 1px solid var(--hair); padding: 9px 11px; }
-.pf-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+/* Play Mode is read at arm's length across a table mid-game, so it is stripped
+   right back: no card boxes, a hairline between units instead, and the stats and
+   guns on one line. Every unit that fits on screen is a unit you are not
+   scrolling for. */
+.pf-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 0; margin-top: 4px; }
+.pf-unit { border: none; border-bottom: 1px solid var(--hair-soft); padding: 3px 0 4px; }
+.pf-unit:last-child { border-bottom: none; }
+.pf-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 1px; }
 .pf-glyph { color: var(--blue); display: inline-flex; }
-.pf-name { font-family: var(--display); font-weight: 800; font-size: 15px; }
+.pf-name { font-family: var(--display); font-weight: 800; font-size: 13.5px; }
 .pf-x { color: var(--blue); font-weight: 900; }
-.pf-data { display: flex; flex-wrap: nowrap; align-items: flex-start; gap: 6px 22px; margin-bottom: 6px; }
-.pf-data .stat-chips { flex: 0 0 auto; }
+.pf-data { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 14px; margin-bottom: 0; }
+.pf-data .stat-chips { flex: 0 0 auto; gap: 0 8px; }
+.pf-data .stat-chip, .pf-data .stat-chip-mini { border: none; background: none; padding: 0; }
 .pf-data .weap-lines { flex: 1 1 auto; margin-top: 0; min-width: 0; }
-.pf-carry { font-size: 11.5px; font-style: italic; color: var(--ink-2); margin-top: 5px; }
-.pf-track { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
-.pf-track-row { display: flex; flex-wrap: wrap; gap: 4px; }
-.pf-hp { width: 15px; height: 15px; border: 1.5px solid var(--ink-3); display: inline-block; }
+.pf-carry { font-size: 11px; font-style: italic; color: var(--ink-2); margin-top: 1px; }
 
 .learn-dg .dg-dbl-mover { animation: dg-double-run 3400ms ease-in-out infinite; }
 

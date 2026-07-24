@@ -74,7 +74,15 @@ export function ruleText(s: string): string {
   // U+24C2 (the capital) is accepted too: it is what the data used until the
   // codepoint was corrected, and custom factions people have already written
   // and saved in their own browsers still contain it.
-  return escapeHtml(s).replace(/[ⓜⓂ]/g, mass);
+  //
+  // *asterisks* become italics. The Quick Reference italicises the qualifier
+  // that scopes a rule - "*Utility Ships only*", "*Hypergrowth only*" - and the
+  // transcription has to carry that, since dropping it would change how the
+  // line reads. Applied AFTER escaping, so the markers are the only markup that
+  // can ever get through; user-authored faction text is still fully escaped.
+  return escapeHtml(s)
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>")
+    .replace(/[ⓜⓂ]/g, mass);
 }
 
 export function formatDate(iso: string): string {

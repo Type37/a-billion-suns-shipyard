@@ -4,7 +4,13 @@ import { validateFleet, type ValidationIssue } from "../src/validation.ts";
 import { GENERIC_HVP } from "../src/data/index.ts";
 import { JUNKSPACE_SHIPS } from "../src/data/junkspace.ts";
 import { TRAINING_FLEET } from "../src/data/training-fleet.ts";
-import { ACTIVATION_STEPS, CORE_ACTIONS, CORE_COMMANDS, ROUND_PHASES } from "../src/data/commands.ts";
+import {
+  ACTIVATION_STEPS,
+  CORE_ACTIONS,
+  CORE_COMMANDS,
+  ROUND_PHASES,
+  RULES_YOU_MIGHT_FORGET,
+} from "../src/data/commands.ts";
 import { deriveCommandEffects, effectiveCost } from "../src/command-effects.ts";
 import type { CommandCostChange, CommandEffects, RuleSource } from "../src/command-effects.ts";
 import { allFactions, factionsByEra, findFaction, makeCatalog, ERA_ORDER } from "./catalog.ts";
@@ -1885,6 +1891,12 @@ function printView(state: AppState): string {
           <dl class="print-ref-list">${coreEntries}${grantedEntries}</dl>
           ${grantedBlock}
         </div>
+      </div>
+      <div class="print-ref-forget">
+        <h4 class="print-ref-h">Rules you might forget</h4>
+        <dl class="print-ref-list">
+          ${RULES_YOU_MIGHT_FORGET.map((r) => `<dt>${escapeHtml(r.name)}</dt><dd>${ruleText(r.text)}</dd>`).join("")}
+        </dl>
       </div>`;
 
   // The project's single interpunct lives in this subtitle, and its single

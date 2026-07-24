@@ -505,7 +505,7 @@ function homeView(state: AppState): string {
     <div class="nameplate-inner">
       <h1 class="wordmark-hero">
         <span class="wm-edition">Second Edition</span>
-        <span class="wm-lockup"><svg class="wm-delta" viewBox="0 0 613 649" aria-hidden="true" fill="none"><mask id="abs-delta-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="613" height="649"><rect width="613" height="649" fill="#fff"/><path d="M 256.71 422.6 L 101.53 748.2 L -9.35 779.55 L 145.83 453.94 Z" fill="#000"/></mask><path d="M 319.61 14.03 L 604.97 614.56 C 607.84 620.58 607.41 627.65 603.85 633.28 C 600.29 638.92 594.09 642.33 587.42 642.33 L 25.39 642.33 C 18.73 642.33 12.52 638.92 8.96 633.28 C 5.4 627.65 4.98 620.58 7.84 614.56 L 293.21 14.03 C 295.63 8.94 300.77 5.69 306.41 5.69 C 312.05 5.69 317.18 8.94 319.61 14.03 Z" stroke="currentColor" stroke-width="111" stroke-linejoin="round" mask="url(#abs-delta-cut)"/></svg><span class="wm-billion">Billion</span><span class="wm-suns">Suns</span></span>
+        <span class="wm-lockup"><svg class="wm-delta" viewBox="-60 -60 733 769" aria-hidden="true" fill="none"><mask id="abs-delta-cut" maskUnits="userSpaceOnUse" x="-60" y="-60" width="733" height="769"><rect x="-60" y="-60" width="733" height="769" fill="#fff"/><path d="M 256.71 422.6 L 101.53 748.2 L -9.35 779.55 L 145.83 453.94 Z" fill="#000"/></mask><path d="M 319.61 14.03 L 604.97 614.56 C 607.84 620.58 607.41 627.65 603.85 633.28 C 600.29 638.92 594.09 642.33 587.42 642.33 L 25.39 642.33 C 18.73 642.33 12.52 638.92 8.96 633.28 C 5.4 627.65 4.98 620.58 7.84 614.56 L 293.21 14.03 C 295.63 8.94 300.77 5.69 306.41 5.69 C 312.05 5.69 317.18 8.94 319.61 14.03 Z" stroke="currentColor" stroke-width="111" stroke-linejoin="round" mask="url(#abs-delta-cut)"/></svg><span class="wm-billion">Billion</span><span class="wm-suns">Suns</span></span>
         <span class="wm-tag">Interstellar Fleet Battles</span>
       </h1>
     </div>
@@ -1359,6 +1359,8 @@ function builderView(state: AppState): string {
       <div class="sy-meter"><span class="sy-meter-fill" style="width:${list.fleet.creditsLimit > 0 ? Math.min(100, (total / list.fleet.creditsLimit) * 100) : 0}%"></span></div>
     </div>
 
+    <div class="sy-cols">
+    <div class="sy-col-fleet">
     <div class="sy-list-head">
       <h3 class="sy-h">${isStocking ? "Your shipyard" : "Your fleet"} <span class="sy-h-count">${nUnits} ${unitWord}</span></h3>
       ${
@@ -1387,6 +1389,7 @@ function builderView(state: AppState): string {
         ? unitRows
         : `<div class="sy-empty"><span class="sy-empty-big">No ${isStocking ? "ships" : "units"} yet</span><span>Tap &ldquo;Add ${isStocking ? "ship" : "unit"}&rdquo; to begin.</span></div>`
     }</div>
+    </div>
 
     ${
       // Management Training selects no HVP (p.65). Every other mode shows the
@@ -1403,6 +1406,7 @@ function builderView(state: AppState): string {
       ${isFixedCrew ? `<div class="mf-list personnel-grid">${personnelCatalog}</div>` : `<div class="sy-hvp-list">${personnelCatalog}</div>${hvpAssignBlock}`}
     </div>`
     }
+    </div>
 
     <div class="sy-finish mf-finish">
       <a class="mf-play-cta" href="#/play/${list.id}">${icon("flag", 18)} Enter Play Mode</a>

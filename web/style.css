@@ -2284,6 +2284,14 @@ button { font-family: inherit; }
    three-chosen cap the rest go inert. The square is the same box either way, so
    toggling it never reflows the row. */
 .sy-personnel { margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--ink); }
+/* Fleet and personnel stack on mobile; on desktop personnel becomes the
+   right-hand column (fleet ~1.55fr, personnel 1fr). */
+.sy-cols { display: grid; grid-template-columns: 1fr; align-items: start; }
+.sy-col-fleet { min-width: 0; }
+@media (min-width: 920px) {
+  .sy-cols { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 34px; }
+  .sy-personnel { margin-top: 0; padding-top: 0; padding-left: 30px; border-top: none; border-left: 1px solid var(--hair-soft); }
+}
 .sy-hvp-count { display: flex; align-items: baseline; gap: 8px; font-family: var(--display); font-weight: 800; font-size: 14px; margin: 0 0 6px; }
 .sy-hvp-count span { font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }
 .sy-hvp-list { display: flex; flex-direction: column; }

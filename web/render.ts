@@ -1,5 +1,5 @@
 import type { Era, Faction, FleetUnit, GameMode, Hvp, ShipClass, Weapon } from "../src/types.ts";
-import { ALLIANCE_SPECIES, DAMAGE_BY_DIE, MODE_BUILDER_SHAPE } from "../src/types.ts";
+import { ALLIANCE_SPECIES, MODE_BUILDER_SHAPE } from "../src/types.ts";
 import { validateFleet, type ValidationIssue } from "../src/validation.ts";
 import { GENERIC_HVP } from "../src/data/index.ts";
 import { JUNKSPACE_SHIPS } from "../src/data/junkspace.ts";
@@ -22,7 +22,6 @@ import {
   LIB_PAGE,
   categoryLabel,
   iconLibraryGrid,
-  libraryIcon,
   libraryUrl,
   matchCount,
 } from "./emblems.ts";
@@ -389,15 +388,11 @@ function renderSigil(e: EmblemFields, size: number, cls = ""): string {
   return emblemMark(e.emblem ?? "delta", e.emblemImage ?? libraryUrl(e.emblemLib), size, cls);
 }
 
-// Full emblem: the sigil, optionally on a coloured background tile (so an
-// all-white sigil is visible, and any mark can be given a colour ground).
+// Full emblem: the sigil, optionally on a coloured background tile (so any
+// mark can be given a colour ground). Only when the user actually chose one -
+// no tile is ever added automatically.
 export function emblemView(e: EmblemFields, size: number, cls = ""): string {
-  // A near-white mark gets a black tile whether or not anyone asked for one.
-  // Without it the sigil is white-on-white and there is simply nothing on the
-  // page - which is the actual problem tinting was invented to work around.
-  // An explicit choice still wins; this only fills in where none was made.
-  const autoDark = !e.emblemBg && !e.emblemImage && e.emblemLib && libraryIcon(e.emblemLib)?.light;
-  const bg = e.emblemBg ? EMBLEM_BG[e.emblemBg] : autoDark ? EMBLEM_BG["ink"] : undefined;
+  const bg = e.emblemBg ? EMBLEM_BG[e.emblemBg] : undefined;
   if (bg) {
     const inSize = Math.round(size * 0.72);
     return `<span class="emblem-bgbox ${cls}" style="width:${size}px;height:${size}px;background:${bg};">${renderSigil(e, inSize)}</span>`;
@@ -788,19 +783,16 @@ function switcher(
  * screen-width panel, and inside a card three to a page it wastes most of its
  * width on column gutters.
  */
+// One line per weapon, in the book's own notation - arc, name, then
+// [dice, range] in brackets (see weaponsTable() below, the same notation).
+// No separate DMG figure: it's a fixed lookup from the die, not a printed column.
 function cardWeapons(ship: ShipClass): string {
   const one = (w: Weapon, arc: "primary" | "aux") => `
-    <div class="pcw">
-      <div class="pcw-head">
-        <span class="pcw-arc">${arc === "primary" ? "PRI" : "AUX"}${icon(arc === "primary" ? "arc-primary" : "arc-aux", 13, "slot-arc")}</span>
-        <span class="pcw-name">${escapeHtml(w.name)}</span>
-      </div>
-      <div class="pcw-figures">
-        <span>${w.rangeMin}-${w.rangeMax}"</span>
-        <span>${w.count}${w.die}</span>
-        <span>DMG ${DAMAGE_BY_DIE[w.die]}</span>
-      </div>
-    </div>`;
+    <p class="pcw">
+      <span class="pcw-arc">${icon(arc === "primary" ? "arc-primary" : "arc-aux", 12, "slot-arc")}${arc === "primary" ? "Pri" : "Aux"}:</span>
+      <span class="pcw-name">${escapeHtml(w.name)}</span>
+      <span class="pcw-fig">[${w.count}${w.die}, ${w.rangeMin}-${w.rangeMax}"]</span>
+    </p>`;
   const rows = [
     ...ship.primary.map((w) => one(w, "primary")),
     ...ship.auxiliary.map((w) => one(w, "aux")),
@@ -809,12 +801,10 @@ function cardWeapons(ship: ShipClass): string {
   // card has to say so rather than leaving the auxiliary line blank.
   if (ship.auxiliary.length === 0 && (ship.auxiliaryFitting || ship.auxiliaryUtility)) {
     rows.push(`
-    <div class="pcw">
-      <div class="pcw-head">
-        <span class="pcw-arc">AUX${icon("arc-aux", 13, "slot-arc")}</span>
-        <span class="pcw-name">${escapeHtml(ship.auxiliaryFitting ?? "Utility Bays")}</span>
-      </div>
-    </div>`);
+    <p class="pcw">
+      <span class="pcw-arc">${icon("arc-aux", 12, "slot-arc")}Aux:</span>
+      <span class="pcw-name">${escapeHtml(ship.auxiliaryFitting ?? "Utility Bays")}</span>
+    </p>`);
   }
   return rows.length ? `<div class="pc-weapons">${rows.join("")}</div>` : "";
 }
@@ -1673,7 +1663,6 @@ function printView(state: AppState): string {
       return `
       <tr>
         <td class="pr-unit">
-          <button class="pr-drop" data-action="print-exclude-unit" data-unit="${u.id}" title="Leave this unit out of the printout" aria-label="Leave ${escapeHtml(title)} out of the printout">${icon("close", 12)}</button>
           <span class="pr-unit-name">${escapeHtml(title)}${countSuffix}</span>
           ${showClass ? `<span class="pr-unit-class">${escapeHtml(ship.name)}${list.freePlay ? `, ${escapeHtml(r.owner.name)}` : ""}</span>` : ""}
           ${named.length ? `<span class="pr-unit-ships">${escapeHtml(named.join(" / "))}</span>` : ""}
@@ -1699,7 +1688,7 @@ function printView(state: AppState): string {
       <thead>
         <tr>
           <th class="pr-unit">${isShipyard ? "Ship class" : "Unit"}</th><th class="pr-num">Mass</th><th class="pr-num">Thrust</th><th class="pr-num">Sil.</th><th class="pr-num">Shields</th>
-          <th class="pr-weap">Primary weapons</th><th class="pr-weap">Auxiliary weapons</th><th class="pr-cost">Cost</th>${isShipyard ? '<th class="pr-req">Requisitioned</th>' : ""}${opts.trackers ? '<th class="pr-track">Hull tracker</th>' : ""}${fieldsHvp ? '<th class="pr-hvp-slot">HVP carried</th>' : ""}
+          <th class="pr-weap">Primary weapons</th><th class="pr-weap">Auxiliary weapons</th><th class="pr-cost">Cost</th>${isShipyard ? '<th class="pr-req">Req’d</th>' : ""}${opts.trackers ? '<th class="pr-track">Hull tracker</th>' : ""}${fieldsHvp ? '<th class="pr-hvp-slot">HVP carried</th>' : ""}
         </tr>
       </thead>
       <tbody>${unitRows}</tbody>
@@ -1722,7 +1711,8 @@ function printView(state: AppState): string {
         });
       const named = (u.shipNames ?? []).slice(0, u.count).filter((n) => n && n.trim());
       // Card layout follows the sketch: name and count on one line with the
-      // cost, a 2x2 stat block, then each weapon as arc + name over its figures.
+      // cost, then a left column (stat block) beside a right column of weapons
+      // - not stacked, so the card uses its full width instead of running tall.
       const classLine = title === ship.name ? "" : escapeHtml(ship.name);
       const extras = [classLine, u.species ? escapeHtml(u.species) : ""].filter(Boolean).join(" · ");
       return `
@@ -1730,11 +1720,12 @@ function printView(state: AppState): string {
         <header class="pc-head">
           <span class="pc-name">${escapeHtml(title)}${u.count > 1 ? ` <span class="pc-x">&times;${u.count}</span>` : ""}</span>
           <span class="pc-cost">${credits(ship.cost * u.count)}</span>
-          <button class="pr-drop" data-action="print-exclude-unit" data-unit="${u.id}" title="Leave this unit out of the printout" aria-label="Leave ${escapeHtml(title)} out of the printout">${icon("close", 12)}</button>
         </header>
         ${extras ? `<p class="pc-sub">${extras}</p>` : ""}
-        <div class="pc-stats-chips">${statChips(ship)}</div>
-        ${cardWeapons(ship)}
+        <div class="pc-body">
+          <div class="pc-main"><div class="pc-stats-chips">${statChips(ship)}</div></div>
+          <div class="pc-weapons-col">${cardWeapons(ship)}</div>
+        </div>
         ${named.length ? `<p class="pc-ships">${escapeHtml(named.join(" / "))}</p>` : ""}
         ${carried.length ? `<p class="pc-carry">Carrying: ${escapeHtml(carried.join("; "))}</p>` : ""}
         ${
@@ -1866,13 +1857,13 @@ function printView(state: AppState): string {
   const commandsSection = `
       <div class="print-ref-cols">
         <div class="print-ref-col">
-          <h4 class="print-ref-h">Actions <span class="print-ref-sub">one per activation</span></h4>
+          <h4 class="print-ref-h">Actions</h4>
           <dl class="print-ref-list">
             ${CORE_ACTIONS.map((a) => `<dt>${escapeHtml(a.name)}</dt><dd>${ruleText(a.text)}</dd>`).join("")}
           </dl>
         </div>
         <div class="print-ref-col">
-          <h4 class="print-ref-h">Commands <span class="print-ref-sub">spend CMD tokens</span></h4>
+          <h4 class="print-ref-h">Commands</h4>
           ${globalBlock}
           <dl class="print-ref-list">${coreEntries}${grantedEntries}</dl>
           ${grantedBlock}
@@ -1901,7 +1892,7 @@ function printView(state: AppState): string {
         </span>
         <label class="print-toggle"><input type="checkbox" data-action="print-trackers" ${opts.trackers ? "checked" : ""} /> Trackers</label>
         <label class="print-toggle"><input type="checkbox" data-action="print-rules" ${opts.rules ? "checked" : ""} /> Rules</label>
-        <label class="print-toggle" title="No coloured fills, so it survives your browser's Background graphics setting and saves toner"><input type="checkbox" data-action="print-inksaver" ${opts.inkSaver ? "checked" : ""} /> Ink saver</label>
+        <label class="print-toggle" title="Drops the solid fills and heavy rules. Colour is kept: a coloured line costs no more ink than a black one"><input type="checkbox" data-action="print-inksaver" ${opts.inkSaver ? "checked" : ""} /> Ink saver</label>
       </div>
       <div class="print-go">
         <span class="print-pagecount" data-print-pagecount>&nbsp;</span>

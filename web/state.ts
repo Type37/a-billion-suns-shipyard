@@ -166,7 +166,7 @@ export const DEFAULT_PRINT: PrintOpts = {
   trackers: false,
   rules: true,
   paper: "letter",
-  inkSaver: true,
+  inkSaver: false,
   excluded: [],
 };
 

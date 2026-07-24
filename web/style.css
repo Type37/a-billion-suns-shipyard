@@ -465,7 +465,7 @@ button { font-family: inherit; }
      grows to 44 but the paint stays where it was. */
   .bar-btn, .ghost-btn, .cta-btn, .stepper-btn, .nf-opt, .card-act,
   .mf-menu-btn, .mf-tally-cap, .nf-custom-btn, .switcher-opt, .learn-btn,
-  .cg-build, .comp-groupcheck, .control-group, .add-cue, .pr-drop,
+  .cg-build, .comp-groupcheck, .control-group, .add-cue,
   .learn-dot, .tour-close, .tour-next, .play-bar-id a {
     min-height: 44px;
   }
@@ -1212,39 +1212,35 @@ button { font-family: inherit; }
 /* Print setup: options bar (screen only), per-unit cards, and trackers. */
 .print-opts { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .print-toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
-.print-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr)); gap: 8px; }
+.print-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr)); gap: 8px; }
 /* Cards are cut out and held at the table, so they are dense by design: the
-   layout is name + count with cost, a 2x2 stat block, then each weapon as its
-   arc and name over its figures. */
+   layout is name + count with cost, then the stat block and the weapons list
+   side by side - two columns, not stacked, so the card's width is used
+   instead of running the card tall with weapons underneath. */
 .print-card { border: 1px solid var(--hair); padding: 6px 8px; break-inside: avoid; page-break-inside: avoid; }
 .pc-head { display: flex; align-items: baseline; gap: 6px; border-bottom: 1px solid var(--hair); padding-bottom: 3px; margin-bottom: 4px; }
 .pc-name { font-family: var(--display); font-weight: 800; font-size: 14px; line-height: 1.15; flex: 1; }
 .pc-x { font-weight: 900; color: var(--blue); }
-.is-inksaver .pc-x { color: var(--ink); }
 .pc-cost { font-weight: 700; font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .pc-sub { font-size: 10px; color: var(--ink-2); margin-bottom: 3px; }
-.pc-stats-chips { margin: 0 0 4px; }
+.pc-body { display: flex; align-items: flex-start; gap: 10px; }
+.pc-main { flex: 0 1 auto; min-width: 0; }
+.pc-stats-chips { margin: 0; }
+.pc-weapons-col { flex: 1 1 auto; min-width: 0; border-left: 1px solid var(--hair-soft); padding-left: 8px; }
 .pc-ships { font-family: var(--serif); font-size: 10.5px; color: var(--ink); margin-top: 3px; }
 /* Small, always-there firing-arc glyph beside the Primary/Auxiliary label -
    a permanent reminder of the fixed 45/180 degree geometry, not a stat that
    varies per ship. */
 .slot-arc { vertical-align: -2px; margin-left: 3px; color: var(--blue); }
-.is-inksaver .slot-arc { color: var(--ink-2); }
-/* One weapon: arc + name, figures beneath. */
-.pc-weapons { display: flex; flex-direction: column; gap: 3px; }
-.pcw { border-top: 1px solid var(--hair-soft); padding-top: 3px; }
-.pcw:first-child { border-top: none; padding-top: 0; }
-.pcw-head { display: flex; align-items: center; gap: 6px; }
+/* One weapon per line, in the book's own notation: arc, name, [dice, range]. */
+.pc-weapons { display: flex; flex-direction: column; gap: 2px; }
+.pcw { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 5px; margin: 0; }
 .pcw-arc {
   display: inline-flex; align-items: center; flex: none;
   font-family: var(--narrow); font-size: 9px; font-weight: 700; letter-spacing: 0.04em; color: var(--ink-3);
 }
 .pcw-name { font-family: var(--serif); font-size: 11.5px; font-weight: 400; color: var(--ink); }
-.pcw-figures {
-  display: flex; gap: 9px; margin-top: 1px; padding-left: 2px;
-  font-size: 10.5px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink-2);
-}
-.pcw-figures span + span { border-left: 1px solid var(--hair); padding-left: 9px; }
+.pcw-fig { font-size: 10.5px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink-2); }
 .pc-carry { font-size: 10px; font-style: italic; color: var(--ink-2); margin-top: 3px; }
 .pc-track { margin-top: 6px; padding-top: 5px; border-top: 1px solid var(--hair-soft); display: flex; flex-direction: column; gap: 2px; }
 .pc-track-h { font-family: var(--display); font-weight: 800; font-size: 9px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-2); margin: 0 0 3px; }
@@ -1281,8 +1277,9 @@ button { font-family: inherit; }
 .sheet-title { font-family: var(--display); font-weight: 800; font-size: clamp(19px, 2.8vw, 26px); letter-spacing: -0.02em; text-transform: uppercase; line-height: 0.98; }
 .sheet-subtitle { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-top: 4px; }
 .sheet-totals { text-align: right; }
-.sheet-total-line { font-family: var(--display); font-weight: 800; font-size: 20px; font-variant-numeric: tabular-nums; }
-.sheet-count { font-size: 11px; font-weight: 600; color: var(--ink-2); margin-top: 3px; }
+.sheet-total-line { font-family: var(--display); font-weight: 700; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.sheet-total-line .credits-glyph { width: 11px; height: 11px; }
+.sheet-count { font-size: 10px; font-weight: 600; color: var(--ink-3); margin-top: 2px; }
 .sheet-legal { color: var(--go); font-weight: 800; }
 .sheet-illegal { color: var(--red-deep); font-weight: 800; }
 
@@ -1300,8 +1297,6 @@ button { font-family: inherit; }
 .sv-figure .dice-row { gap: 3px; }
 .is-inksaver .sv-item { background: none; }
 .sheet-section { font-family: var(--display); font-size: 12px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--blue); background: none; padding: 0 0 2px; margin: 10px 0 5px; border-bottom: 1px solid var(--blue); }
-/* Ink Saver drops back to plain ink for anyone printing on a mono laser. */
-.is-inksaver .sheet-section { color: var(--ink); border-bottom-color: var(--ink); }
 .print-rule { margin-top: 7px; border-left: 1px solid var(--ink-3); padding: 1px 0 1px 9px; }
 .print-rule h3 { font-family: var(--display); font-size: 14px; margin-bottom: 3px; }
 .print-rule p { font-family: var(--serif); font-size: 12px; line-height: 1.32; }
@@ -1310,7 +1305,6 @@ button { font-family: inherit; }
 .print-ref-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; }
 @media (max-width: 640px) { .print-ref-cols { grid-template-columns: 1fr; } }
 .print-ref-h { font-family: var(--display); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; margin: 0 0 6px; color: var(--ink); }
-.print-ref-sub { font-family: var(--sans); font-weight: 600; font-size: 9px; letter-spacing: 0.04em; color: var(--ink-3); }
 .print-ref-list { margin: 0; }
 .print-ref-list dt { font-family: var(--sans); font-weight: 800; font-size: 10.5px; color: var(--ink); margin-top: 3px; }
 .print-ref-list dt:first-child { margin-top: 0; }
@@ -1321,7 +1315,6 @@ button { font-family: inherit; }
    Set in red so it reads as an override of the printed core cost above it. */
 .print-ref-mod { display: block; font-size: 9.5px; color: var(--red); margin-top: 2px; }
 .print-ref-cost s { color: var(--ink-3); font-weight: 400; margin-right: 2px; }
-.is-inksaver .print-ref-mod { color: var(--ink-2); }
 
 /* Roster as one continuous unit-row table (Army Forge / Infinity Army style). */
 /* Fixed layout, because auto-layout spent the row on the wrong columns: a
@@ -1343,7 +1336,6 @@ button { font-family: inherit; }
 .print-roster tbody tr { break-inside: avoid; }
 .pr-unit-name { display: block; font-family: var(--display); font-weight: 800; font-size: 12.5px; line-height: 1.2; }
 .pr-unit-x { font-weight: 900; color: var(--blue); }
-.is-inksaver .pr-unit-x { color: var(--ink); }
 .pr-unit-class { display: block; font-size: 11px; font-weight: 600; color: var(--ink-2); }
 .pr-unit-ships { display: block; font-family: var(--serif); font-size: 11.5px; color: var(--ink); margin-top: 2px; }
 .pr-unit-notes { display: block; font-family: var(--serif); font-style: italic; font-size: 11.5px; color: var(--ink-2); margin-top: 2px; }
@@ -3247,21 +3239,14 @@ button { font-family: inherit; }
 }
 .print-excluded-note { font-size: 12.5px; color: var(--ink-2); margin: 0 0 12px; }
 .linklike { background: none; border: none; padding: 0; font: inherit; color: var(--blue); text-decoration: underline; cursor: pointer; }
-/* Leave-this-unit-out control. Never printed. */
-.pr-drop {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 18px; height: 18px; margin-right: 6px; vertical-align: 1px;
-  border: 1px solid var(--hair); background: var(--paper); color: var(--ink-3); cursor: pointer;
-}
-.pr-drop:hover { border-color: var(--red); color: var(--red); }
-.pc-head .pr-drop { margin-left: auto; margin-right: 0; }
-/* Ink saver: drop every coloured fill and bar so the sheet is identical whether
-   or not the browser prints background graphics, and uses far less toner. */
-.is-inksaver .print-rule { border-left-color: var(--ink); }
-.is-inksaver .print-hvp { border-left-color: var(--ink); }
-.is-inksaver .print-unit-head { background: none; border-bottom: 1px solid var(--ink); }
-.is-inksaver .pr-cost, .is-inksaver .print-ref-cost, .is-inksaver .sheet-subtitle { color: var(--ink-2); }
-.is-inksaver .sheet-emblem { color: var(--ink); }
+/* Ink saver never touches colour - a coloured line costs no more ink than a
+   black one. It strips the fills and thins the structural lines instead:
+   the actual ink cost of a page, not its palette. Colour print is the
+   default; this is the opt-in for someone printing on a mono laser. */
+.is-inksaver .print-unit-head { background: none; }
+.is-inksaver .print-card { border-color: var(--hair-soft); }
+.is-inksaver .pc-weapons-col { border-left-color: var(--hair-soft); }
+.is-inksaver .print-roster thead th { border-bottom-width: 1px; }
 @media (max-width: 820px) {
   .print-toolbar { flex-direction: column; align-items: stretch; }
   .print-go { justify-content: space-between; }
@@ -3272,7 +3257,7 @@ button { font-family: inherit; }
   .page-guide { display: none !important; }
   .sheet { width: auto; box-shadow: none; }
   .sheet-viewport { overflow: visible; display: block; max-width: none; }
-  .pr-drop, .print-excluded-note { display: none !important; }
+  .print-excluded-note { display: none !important; }
 }
 
 /* ---------------------------------------------------------------------------
@@ -3386,17 +3371,6 @@ a .icon,
 .print-hvp.is-generic h4,
 .print-hvp.is-generic p { color: var(--ink-3); }
 .print-hvp.is-generic { border-left-color: var(--hair); }
-
-/* Less ink overall. The sheet is a working document, not a poster: hairline
-   rules, no solid fills, and the blue accents dropped to ink where they were
-   only decoration. */
-.sheet .print-ref-cost { color: var(--ink-2); }
-.sheet .pr-cost { color: var(--ink-2); }
-.sheet .pc-x, .sheet .pr-unit-x { color: var(--ink-2); }
-.sheet .print-ref-mod { color: var(--ink-3); }
-.sheet .slot-arc { color: var(--ink-3); }
-.sheet .stat-ico { color: var(--ink-3); }
-.sheet .credits-glyph { color: var(--ink-2); }
 
 /* The firing-arcs reference, below the controls rather than among them. */
 .play-arcs { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--hair-soft); }
@@ -3930,7 +3904,7 @@ main.play-body .roster-section::before { content: none; }
 /* Touch targets. Testers found the builder fiddly on both phone and desktop:
    the steppers and row buttons were well under the 44px the platform guidelines
    ask for, and several sat within a few pixels of each other. */
-.stepper button, .ru-remove, .stepper-btn, .pr-drop {
+.stepper button, .ru-remove, .stepper-btn {
   min-width: 44px; min-height: 44px;
 }
 .ru-stepper .stepper-count { min-width: 44px; line-height: 44px; }

@@ -1,14 +1,15 @@
 import type { ShipClass, Weapon } from "../src/types.ts";
-import { DAMAGE_BY_DIE } from "../src/types.ts";
 import { creditsGlyph, MASS_MARK } from "./icons.ts";
 
 // Project style rules: no abbreviations in anything user-visible, no monospace,
 // and a hard budget of one em-dash and one interpunct across the whole project
 // (both are spent in the print document, nowhere else).
 
+// Bracket notation, matching the book's own ship-class table: name, then
+// [dice, range] in brackets. Damage isn't printed - it's a fixed lookup from
+// the die, not a separate figure the book gives a column to.
 export function formatWeapon(weapon: Weapon): string {
-  const dmg = DAMAGE_BY_DIE[weapon.die];
-  return `${weapon.name}: ${weapon.count}${weapon.die}, range ${weapon.rangeMin}-${weapon.rangeMax}", damage ${dmg}`;
+  return `${weapon.name} [${weapon.count}${weapon.die}, ${weapon.rangeMin}-${weapon.rangeMax}"]`;
 }
 
 /** Primary column content: full weapon lines, "Utility Bays", or "None". */

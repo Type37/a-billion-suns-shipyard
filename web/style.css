@@ -1336,9 +1336,9 @@ button { font-family: inherit; }
   white-space: normal; overflow-wrap: normal; word-break: normal; hyphens: none;
 }
 .print-roster thead th {
-  background: #fff; border-bottom: 1.5px solid var(--ink); text-align: left;
+  background: #fff; border-bottom: 1px solid var(--ink-3); text-align: left;
   font-size: 8px; font-weight: 600; text-transform: uppercase;
-  color: var(--ink-2); padding: 4px 4px;
+  color: var(--ink-2); padding: 3px 4px;
 }
 .print-roster tbody td { border-bottom: 1px solid var(--hair-soft); padding: 2px 5px; vertical-align: top; font-size: 11px; }
 .print-roster tbody tr { break-inside: avoid; }

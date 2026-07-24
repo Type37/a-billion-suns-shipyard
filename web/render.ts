@@ -2770,9 +2770,48 @@ interface CompRow {
   isCustom: boolean;
 }
 
+// Compendium "Compare" view: a horizontal bar chart of the currently filtered
+// ships by one stat. Restored to the Compendium (only) after the builder
+// refactor dropped it. Reads straight off the CompRow fields.
+type ChartStatKey = "cost" | "mass" | "thrust" | "silhouette" | "shields";
+const CHART_STATS: Record<ChartStatKey, { label: string; icon: string; get: (r: CompRow) => number; fmt: (r: CompRow) => string }> = {
+  cost: { label: "Cost", icon: "", get: (r) => r.cost, fmt: (r) => r.costLabel },
+  mass: { label: "Mass", icon: "stat-mass", get: (r) => r.mass, fmt: (r) => String(r.mass) },
+  thrust: { label: "Thrust", icon: "stat-thrust", get: (r) => r.thrust, fmt: (r) => `${r.thrust}"` },
+  silhouette: { label: "Sil", icon: "stat-silhouette", get: (r) => r.silhouette, fmt: (r) => String(r.silhouette) },
+  shields: { label: "Shields", icon: "stat-shields", get: (r) => r.shields, fmt: (r) => String(r.shields) },
+};
+
+function catalogChartPicker(stat: ChartStatKey): string {
+  return `<div class="chart-picker" role="group" aria-label="Compare ships by">
+    ${(Object.keys(CHART_STATS) as ChartStatKey[])
+      .map((key) => {
+        const m = CHART_STATS[key];
+        return `<button class="chart-picker-btn ${stat === key ? "selected" : ""}" data-action="set-chart-stat" data-stat="${key}">${m.icon ? icon(m.icon, 13) : ""}${m.label}</button>`;
+      })
+      .join("")}
+  </div>`;
+}
+
+function compendiumChart(rows: CompRow[], stat: ChartStatKey): string {
+  const meta = CHART_STATS[stat];
+  const sorted = [...rows].sort((a, b) => meta.get(b) - meta.get(a) || a.name.localeCompare(b.name));
+  const max = Math.max(1, ...sorted.map(meta.get));
+  if (!sorted.length) return '<p class="muted" style="padding:20px">No ships match these filters.</p>';
+  return `<div class="chart">${sorted
+    .map((r) => {
+      const v = meta.get(r);
+      const pct = Math.max(2, Math.round((v / max) * 100));
+      return `<div class="chart-row"><span class="chart-label">${escapeHtml(r.name)} <span class="chart-fac">${escapeHtml(r.factionName)}</span></span><span class="chart-track"><span class="chart-bar" style="width:${pct}%"></span></span><span class="chart-val">${meta.fmt(r)}</span></div>`;
+    })
+    .join("")}</div>`;
+}
+
 function shipsView(state: AppState): string {
   const customs = state.customFactions;
   const f = state.ui.shipFilter ?? { era: "", faction: "", mass: "", q: "", sort: "faction" };
+  const chartMode = state.ui.catalogView === "chart";
+  const chartStat: ChartStatKey = state.ui.catalogChartStat ?? "cost";
 
   const rows: CompRow[] = [];
   const pushFaction = (fac: Faction, isCustom: boolean): void => {
@@ -2954,13 +2993,23 @@ function shipsView(state: AppState): string {
       ${f.era || f.faction || f.mass || f.q ? '<button class="ghost-btn comp-clear" data-action="ship-filter-clear">Clear filters</button>' : ""}
     </div>
 
-    <p class="comp-count">${shown.length} of ${f.showCustom ? rows.length : rows.length - customCount} ships</p>
-    <div class="table-scroll comp-scroll">
+    <div class="comp-viewbar">
+      <div class="comp-view-toggle" role="group" aria-label="Compendium view">
+        <button class="comp-view-btn ${!chartMode ? "on" : ""}" data-action="set-catalog-view" data-view="list">${icon("grid", 13)} Table</button>
+        <button class="comp-view-btn ${chartMode ? "on" : ""}" data-action="set-catalog-view" data-view="chart">${icon("shuffle", 13)} Compare</button>
+      </div>
+      <p class="comp-count">${shown.length} of ${f.showCustom ? rows.length : rows.length - customCount} ships</p>
+    </div>
+    ${
+      chartMode
+        ? `${catalogChartPicker(chartStat)}<div class="comp-chart-wrap">${compendiumChart(shown, chartStat)}</div>`
+        : `<div class="table-scroll comp-scroll">
       <table class="comp-table ${grouped ? "grouped" : ""}">
         <thead>${headRow}</thead>
         <tbody>${bodyHtml || `<tr><td colspan="${colspan}" class="muted" style="padding:20px">No ships match these filters.</td></tr>`}</tbody>
       </table>
-    </div>
+    </div>`
+    }
   </main>
   ${toast(state)}
   ${footer()}`;

@@ -1326,13 +1326,6 @@ button { font-family: inherit; }
 .print-ref-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 16px; }
 @media (max-width: 640px) { .print-ref-cols { grid-template-columns: 1fr; } }
 .print-ref-h { font-family: var(--display); font-size: 10px; font-weight: 600; text-transform: uppercase; margin: 0 0 3px; color: var(--ink-2); }
-/* The easy-to-miss geometry and edge cases. Two columns like the block above,
-   flowed rather than gridded because these are many short entries. */
-.print-ref-forget { margin-top: 6px; }
-.print-ref-forget .print-ref-list { columns: 2; column-gap: 16px; }
-.print-ref-forget .print-ref-list dt { break-after: avoid; }
-.print-ref-forget .print-ref-list dd { break-before: avoid; break-inside: avoid; margin-bottom: 2px; }
-@media (max-width: 640px) { .print-ref-forget .print-ref-list { columns: 1; } }
 .print-ref-list { margin: 0; }
 .print-ref-list dt { font-family: var(--sans); font-weight: 600; font-size: 9px; color: var(--ink-2); margin-top: 2px; }
 .print-ref-list dt:first-child { margin-top: 0; }

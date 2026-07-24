@@ -6,3 +6,6 @@ dist/
 Documents/
 competitive-advantages/
 .claude/
+
+# Converted TTFs cached by scripts/make-quick-reference.py
+build/fonts/

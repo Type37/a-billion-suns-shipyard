@@ -103,23 +103,7 @@ export const ACTIVATION_STEPS: RoundPhase[] = [
   { name: "Action Step", text: "Take one Action. Page XX." },
 ];
 
-/**
- * "Rules You Might Forget", VERBATIM from the Quick Reference. The easy-to-miss
- * geometry and edge cases - arcs, explosion checks, coherence, gravity wells -
- * that a player looks up mid-game rather than memorises.
- */
-export const RULES_YOU_MIGHT_FORGET: RoundPhase[] = [
-  { name: "Unit Coherence", text: "Ships have to stay within 6\" of all other ships in their unit. Page XX." },
-  { name: "Drag To Select a Battlegroup", text: "Select an unactivated unit as lead. Select unactivated units within 6\" of the lead unit, with a combined Mass of 10 or less. Page XX." },
-  { name: "Squadron Capacity", text: "A unit can carry a number of Squadrons up to twice its Combined Mass. Page XX." },
-  { name: "Attack Dice Damage Values", text: "D6 is 1, D8 is 2, D10 is 3, and D12 is 5." },
-  { name: "Primary Arc", text: "45° arc of fire to front. Auxiliary Arc: 180° arc of fire to front. Page XX." },
-  { name: "Facilities", text: "360° arc of fire. Will Passive attack every unit in range." },
-  { name: "Explosion Check", text: "Roll a D6. If you roll equal to or under the ship's ⓜ, it Explodes and all units within 3\" suffers a ⓜD6 attack, causing 1 damage per hit. Page XX." },
-  { name: "Easy Target", text: "If a unit moved less than 3\" and didn't Jump, it is an 'Easy Target': enemy units may re-roll attack dice. Page XX." },
-  { name: "Inertial Strain", text: "If any single pivot is more than 90 degrees, ship cannot make Primary attacks. Page XX." },
-  { name: "Mother's Wing", text: "radius is 2ⓜ. Can protect Objectives. Page XX." },
-  { name: "Escort", text: "Most ships within 6\". Tie-break on greatest Combined Mass within 6\". Page XX." },
-  { name: "Blockade", text: "Greatest Combined Mass within 6\". Tie-break on most ships within 6\". Page XX." },
-  { name: "Gravity Well", text: "Jump Points cannot be placed within 9\" of a Planetoid. Units cannot jump within 9\" of a Planetoid." },
-];
+// "Rules You Might Forget" lives only on the Quick Reference sheet, so its text
+// lives in that sheet's generator (scripts/make-quick-reference.py) rather than
+// here. Keeping a second copy in the app data that nothing renders would be two
+// sources of truth for the same rules, and they would drift.

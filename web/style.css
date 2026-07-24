@@ -3454,6 +3454,17 @@ a .icon,
   gap: 2px 6px; padding: 3px 0;
 }
 .learn-dot-ghost { visibility: hidden; pointer-events: none; }
+/* Numbered rule lists, where the book itself numbers the steps (Drag to Select,
+   the End Phase sequence) and the order is part of the rule. */
+.learn-rules-num { list-style: decimal; padding-left: 22px; }
+.learn-rules-num > li::before { content: none; }
+/* Marks a rule as optional (a CMD-spend you may take, not a step you must). */
+.learn-optional {
+  display: inline-block; margin-left: 8px; vertical-align: middle;
+  font-family: var(--display); font-weight: 800; font-size: 9.5px;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  color: #fff; background: var(--ink-3); padding: 2px 7px;
+}
 .learn-subs-tag {
   font-family: var(--display); font-weight: 800; font-size: 10.5px;
   letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3);

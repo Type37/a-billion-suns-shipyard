@@ -3018,10 +3018,12 @@ interface LearnStep {
 // was a heading and a button that did the thing the page was named after, so
 // reaching the battle took two clicks where one would do. It is an action in the
 // progress rail now, and the last page's Next button launches directly.
+// "The table" (setup, blockading, scoring) folds into Mission: it IS the mission
+// briefing, and splitting it across two steps made the player page back and forth
+// between the objective and the board it is scored on.
 const LEARN_STEPS: LearnStep[] = [
   { label: "Mission" },
   { label: "Your fleet" },
-  { label: "The table" },
   { label: "The round", phases: true },
 ];
 
@@ -3190,11 +3192,20 @@ function learnView(state: AppState): string {
   };
 
   const screens = [
-    // 0 - Mission brief. The scenario's own introduction, verbatim, rather than a
-    // title on an empty page.
+    // 0 - Mission brief, and the table it is fought and scored on: the scenario's
+    // own introduction, setup, blockading and victory points, all verbatim.
     `<div class="learn-screen">
       <h1 class="learn-title">Your first battle</h1>
       <p class="learn-lede">${ruleText(cs?.intro ?? "")}</p>
+      <h2 class="learn-sub">Setup</h2>
+      <p class="learn-note">${ruleText(csStep("Setup")?.text ?? "")}</p>
+      ${learnDiagram("deployment")}
+      <h2 class="learn-sub">Blockading</h2>
+      <ul class="learn-rules">${bullets(csStep("Special rules"), /^Blockading/)}</ul>
+      <h2 class="learn-sub">Victory points</h2>
+      <p class="learn-note">In <b>this tutorial mission</b>, this is the scoring. Every mission and game type has its own scoring, though &mdash; always read the mission.</p>
+      <ul class="learn-rules">${bullets(csStep("Victory points"))}</ul>
+      <p class="learn-note">${ruleText(csStep("Game end and victory")?.text ?? "")}</p>
     </div>`,
     // 1 - Your fleet
     `<div class="learn-screen">
@@ -3209,18 +3220,7 @@ function learnView(state: AppState): string {
         <p><b>Weapons</b> &mdash; the weapons this ship is carrying and in what quantity. Ships may have Primary and/or Auxiliary weapon systems. Weapon systems have a Range (Minimum and Maximum), a number and type of Attack Dice, and a damage value.</p>
       </div>
     </div>`,
-    // 2 - The table
-    `<div class="learn-screen">
-      <h1 class="learn-title">Setup and winning</h1>
-      <p class="learn-lede">${ruleText(csStep("Setup")?.text ?? "")}</p>
-      ${learnDiagram("deployment")}
-      <h2 class="learn-sub">Blockading</h2>
-      <ul class="learn-rules">${bullets(csStep("Special rules"), /^Blockading/)}</ul>
-      <h2 class="learn-sub">Victory points</h2>
-      <ul class="learn-rules">${bullets(csStep("Victory points"))}</ul>
-      <p class="learn-note">${ruleText(csStep("Game end and victory")?.text ?? "")}</p>
-    </div>`,
-    // 3 - The round. Four accordions, one per phase, each stated exactly once.
+    // 2 - The round. Four accordions, one per phase, each stated exactly once.
     `<div class="learn-screen">
       <h1 class="learn-title">The round</h1>
       <p class="learn-lede">Four rounds, each running the same four phases in the same order.</p>
@@ -3228,42 +3228,37 @@ function learnView(state: AppState): string {
         ${phaseAccordion(
           0,
           `${learnDiagram("command")}
-           <ul class="learn-rules">
-             <li>Roll a number of D6 equal to your faction's Initiative value.</li>
-             <li>Each 2 or 3 is one success; each 1 is two successes.</li>
-             <li>Most successes wins and chooses who holds Initiative this round. Ties: lowest dice sum wins, then clockwise from the last holder.</li>
-             <li>Every player who did not win gains +1 CMD token.</li>
-             ${bullets(csStep("Special rules"), /^Initiative Checks/)}
-           </ul>`,
+           <h3 class="learn-sub">Gain CMD tokens</h3>
+           <p class="learn-note">You gain a number of CMD tokens determined by your faction (if you are using the Training Fleet, you gain 7 CMD tokens). Unspent CMD tokens are discarded at the end of the round.</p>
+           <h3 class="learn-sub">Seize Initiative</h3>
+           <p class="learn-note">All players make an Initiative Check. Roll a number of D6 equal to your faction&rsquo;s Initiative value. Each roll of a 2 or 3 counts as one success; each roll of a 1 counts as two successes. (This is equivalent to rolling to hit against a unit with Silhouette 3, if that helps you remember this mechanic.)</p>
+           <p class="learn-note">The player that rolls the most successes wins the Initiative Check and chooses which player has the Initiative for this round. If two or more players are tied, the tied players sum their dice values: the player with the lowest sum wins the Initiative Check. If still tied, the tied player clockwise from the last player to have Initiative wins the Initiative Check.</p>
+           <p class="learn-note">The player(s) that didn&rsquo;t win the Initiative Check receive 1 additional CMD token each.</p>
+           <ul class="learn-rules">${bullets(csStep("Special rules"), /^Initiative Checks/)}</ul>`,
         )}
         ${phaseAccordion(
           1,
           `${learnDiagram("jump")}
-           <h3 class="learn-sub">On your turn, do one thing</h3>
+           <p class="learn-note">The units in your Fleet start the game in Reserve and must be jumped into the combat zone via jump point during the Jump Phase.</p>
+           <p class="learn-note">In the Jump Phase, players take turns, clockwise from the player with Initiative. On your turn, you do one of the following:</p>
            <ul class="learn-rules">
-             <li>Open a Jump Point, Jump In a unit, or Pass.</li>
-             <li>Turn order follows Initiative: the Initiative holder chooses who goes first.</li>
-             <li>The phase ends once every player has passed in a row.</li>
+             <li><b>Open a Jump Point:</b> Take a jump point from the supply and place it into play, anywhere you like.</li>
+             <li><b>Jump In:</b> Deploy a unit from Reserve.</li>
+             <li><b>Pass:</b> You take no further turns during this Jump Phase.</li>
            </ul>
-           <p class="learn-fn">All three are free. Some faction rules and commands add a cost of their own.</p>
+           <p class="learn-note">Once all players have passed, the Jump Phase ends.</p>
+           <ul class="learn-rules">${bullets(csStep("Special rules"), /^Rapid Ingress/)}</ul>
 
-           <h3 class="learn-sub">Jumping a unit in</h3>
-           <ul class="learn-rules">
-             <li>The unit comes out of your Reserves and deploys wholly within 6" of a friendly Jump Point.</li>
-             <li>Unit coherence applies on arrival, exactly as it does after moving: every ship in the unit must end within 6" of every other ship in it.</li>
-             <li>Arriving is harmless to everything around it.</li>
-             <li>Jump Strain: each unit jumps once per round. Jump In, Jump Hop or Jump Out &mdash; pick one.</li>
-             ${bullets(csStep("Special rules"), /^Rapid Ingress/)}
-           </ul>
-           <p class="learn-fn">The 6" is a flat distance for every unit, whatever its Mass. Nothing takes damage from a ship arriving &mdash; the Jump Shock rule from first edition is not in these rules.</p>
-           ${learnDiagram("jump-strain")}
+           <h3 class="learn-sub">Jump Points</h3>
+           <p class="learn-note">A Jump Point is represented on the tabletop by a token approximately 1" in diameter. You could use a gaming gem, a coin or a token. All measurements to and from jump points are from its centrepoint, so the exact size isn&rsquo;t important.</p>
+           <p class="learn-note">The number of Jump Points you start the game with is determined by the era of play, and sometimes by the mission.</p>
 
-           <h3 class="learn-sub">Placing a Jump Point</h3>
-           <ul class="learn-rules">
-             <li>Jump Points sit on the table and belong to the player who opened them.</li>
-             <li>Gravity Well: a Jump Point must be more than 9" from a Planetoid, and no jumping happens inside that 9" either.</li>
-             <li>Blockading an enemy Jump Point scores you points, but the Jump Point still belongs to its owner and still works for them.</li>
-           </ul>
+           <h3 class="learn-sub">Jump Strain</h3>
+           <p class="learn-note">Due to gravitational strains, the complexities of &phi;-space calculations, and the time required to recharge the &phi;-fold drives: each unit can only &lsquo;jump&rsquo; once per round. This means that, for example, a unit that Jumped In this round cannot Jump Hop or Jump Out later in the same round.</p>
+
+           <h3 class="learn-sub">Opening a Jump Point</h3>
+           <p class="learn-note">During the Jump Phase, you can use your turn to open a new Jump Point, if you have any remaining in your supply. Take a Jump Point from your supply, and place it into play, anywhere outside of 9" from a planetoid.</p>
+           <p class="learn-note"><b>Gravity Well:</b> Jump Points cannot be placed within 9" of a planetoid. Units cannot Jump into a position within 9" of a planetoid. A unit cannot Jump Hop or Jump Out if a ship in that unit is within 9" of a planetoid.</p>
 
            <h3 class="learn-sub">Leaving by jump</h3>
            <ul class="learn-rules">
@@ -3274,44 +3269,50 @@ function learnView(state: AppState): string {
         )}
         ${phaseAccordion(
           2,
-          `<h3 class="learn-sub">Drag to Select</h3>
-           <p class="learn-note">A lead unit plus unactivated units within 6" of it; Combined Mass 10 or less.</p>
+          `<p class="learn-note">In the Tactical Phase, players take turns to activate battlegroups, clockwise from the player with Initiative.</p>
+           <p class="learn-note">On your turn, you Drag to Select a battlegroup and activate the units in that battlegroup.</p>
+           <h3 class="learn-sub">Drag to Select</h3>
+           <p class="learn-note">When you Drag to Select a battlegroup:</p>
+           <ol class="learn-rules learn-rules-num">
+             <li>Select a friendly unactivated unit to be the lead unit.</li>
+             <li>Select any number of other friendly unactivated units at least partially within 6" of the lead unit. The Combined Mass of selected units must be 10 or less.</li>
+             <li>Activate the units in that Battlegroup.</li>
+             <li>After a unit activates, give it an &lsquo;Activated&rsquo; token. Once you have finished activating all the units in that battlegroup, the battlegroup is deselected, and you pass play to the next player clockwise.</li>
+             <li>Once all in-play units have activated, the Tactical Phase ends.</li>
+           </ol>
            ${learnDiagram("drag-select")}
            <p class="learn-note">Then every unit in the battlegroup works through three steps, finishing each step before the next one starts.</p>
            ${activationStep(
              0,
              `${learnDiagram("movement")}
               <p class="learn-fn">A single pivot of more than 90&deg; costs this unit its Primary attacks for the activation (Inertial Strain). A unit that moved under 3" and did not jump becomes an Easy Target: enemies re-roll attack dice against it.</p>
-              <h4 class="learn-sub-min">Doubling your move</h4>
+              <h4 class="learn-sub-min">Doubling your move <span class="learn-optional">Optional</span></h4>
               <p class="learn-note">Spend 1 CMD on <b>Power to Engines</b> at the start of a unit&rsquo;s movement step and it takes the whole step twice &mdash; pivot and move, then pivot and move again. It is the only way a ship covers more than its Thrust in one activation.</p>
               ${learnDiagram("double-move")}`,
            )}
            ${activationStep(
              1,
              `${learnDiagram("passive")}
-              <ul class="learn-rules">
-                <li>It triggers when an active unit moves <b>through or ends in</b> the range and arc of a passive enemy's auxiliary weapons.</li>
-                <li>Passive means unactivated: an enemy that has already activated this round does not fire.</li>
-                <li>They fire <b>auxiliary weapons only</b> &mdash; the 180&deg; front arc, never the primary 45&deg; cone.</li>
-                <li>Each passive enemy unit fires <b>once per activation</b> of your battlegroup. It can fire again when your next battlegroup activates.</li>
-                <li>Only units that actually moved in this activation can be targeted.</li>
-                <li>Facilities have a 360&deg; arc and so always fire in this step at every active unit in range.</li>
-                <li>Easy Target: moving less than 3" lets enemies re-roll attack dice against you.</li>
-              </ul>`,
+              <p class="learn-note">After moving the units in the battlegroup, there is a Passive Attacks step. Every passive enemy unit that has one or more active units in range and arc of fire of their auxiliary weapons may attack once with their auxiliary weapons, targeting only active units.</p>
+              <p class="learn-note">A unit can only make passive attacks once during this battlegroup&rsquo;s activation. It can make further passive attacks in later activations.</p>
+              <p class="learn-note">If you have three or more players, the passive players make attacks in turns in a clockwise direction, beginning with the player to the left of the active player.</p>`,
            )}
            ${activationStep(2, learnDiagram("action"))}
            <p class="learn-note">Give each activated unit an Activated token. The phase ends when all units have activated.</p>`,
         )}
         ${phaseAccordion(
           3,
-          `<h3 class="learn-sub">Score</h3>
+          `<p class="learn-note">In the End Phase:</p>
+           <ol class="learn-rules learn-rules-num">
+             <li>Check the scoring conditions on contracts or missions.</li>
+             <li>Clear all &lsquo;Activated&rsquo; tokens.</li>
+             <li>Resolve any other &lsquo;End Phase&rsquo; game effects.</li>
+             <li>Discard all unused CMD tokens.</li>
+             <li>Begin a new Round.</li>
+           </ol>
+           <h3 class="learn-sub">Score</h3>
+           <p class="learn-note">In <b>this tutorial mission</b>, this is the scoring. Every mission and game type has its own scoring, though &mdash; always read the mission.</p>
            <ul class="learn-rules">${bullets(csStep("Victory points"))}</ul>
-           <h3 class="learn-sub">Then clear the table</h3>
-           <ul class="learn-rules">
-             <li>Remove every Activated token &mdash; all units can act again next round.</li>
-             <li>Discard any CMD tokens you did not spend. They do not carry over, so a token saved for later is a token wasted. (Some faction rules change this.)</li>
-             <li>Begin the next round. The game ends after Round 4.</li>
-           </ul>
            <p class="learn-note">${ruleText(csStep("Game end and victory")?.text ?? "")}</p>`,
         )}
       </div>

@@ -383,6 +383,15 @@ function handleClick(e: MouseEvent): void {
       }
       break;
     }
+    case "blank-fleet-name": {
+      // Eraser button beside the roll die: clear the name back to empty.
+      const id = currentListId();
+      if (!id) return;
+      const input = document.querySelector<HTMLInputElement>(".sy-name, .mf-name");
+      if (input) input.value = "";
+      store.setState((s) => updateFleet(s, id, (f) => ({ ...f, name: "" })));
+      break;
+    }
     case "duplicate-list": {
       const id = target.dataset["id"];
       const source = state.lists.find((l) => l.id === id);

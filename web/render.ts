@@ -505,7 +505,7 @@ function homeView(state: AppState): string {
     <div class="nameplate-inner">
       <h1 class="wordmark-hero">
         <span class="wm-edition">Second Edition</span>
-        <span class="wm-lockup"><svg class="wm-delta" viewBox="0 0 104 104" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="10" stroke-linejoin="round" stroke-linecap="round"><path d="M52 13 L96 93 L8 93 Z"/></svg><span class="wm-billion">Billion</span><span class="wm-suns">Suns</span></span>
+        <span class="wm-lockup"><svg class="wm-delta" viewBox="0 0 613 649" aria-hidden="true" fill="none"><mask id="abs-delta-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="613" height="649"><rect width="613" height="649" fill="#fff"/><path d="M 256.71 422.6 L 101.53 748.2 L -9.35 779.55 L 145.83 453.94 Z" fill="#000"/></mask><path d="M 319.61 14.03 L 604.97 614.56 C 607.84 620.58 607.41 627.65 603.85 633.28 C 600.29 638.92 594.09 642.33 587.42 642.33 L 25.39 642.33 C 18.73 642.33 12.52 638.92 8.96 633.28 C 5.4 627.65 4.98 620.58 7.84 614.56 L 293.21 14.03 C 295.63 8.94 300.77 5.69 306.41 5.69 C 312.05 5.69 317.18 8.94 319.61 14.03 Z" stroke="currentColor" stroke-width="111" stroke-linejoin="round" mask="url(#abs-delta-cut)"/></svg><span class="wm-billion">Billion</span><span class="wm-suns">Suns</span></span>
         <span class="wm-tag">Interstellar Fleet Battles</span>
       </h1>
     </div>
@@ -828,8 +828,10 @@ export function weaponsTable(ship: ShipClass): string {
   // an em dash; a utility slot names itself.
   const weaponLine = (w: Weapon, arc: "pri" | "aux") =>
     `<p class="weap-line"><span class="wl-arc">${icon(arc === "pri" ? "arc-primary" : "arc-aux", 13, "slot-arc")}${arc === "pri" ? "Pri" : "Aux"}:</span> <span class="wl-name">${escapeHtml(w.name)}</span> <span class="wl-fig">[${w.count}${w.die}, ${w.rangeMin}–${w.rangeMax}"]</span></p>`;
-  const slotLine = (arc: "pri" | "aux", text: string) =>
-    `<p class="weap-line"><span class="wl-arc">${icon(arc === "pri" ? "arc-primary" : "arc-aux", 13, "slot-arc")}${arc === "pri" ? "Pri" : "Aux"}:</span> <span class="wl-name">${text}</span></p>`;
+  const slotLine = (arc: "pri" | "aux", text: string) => {
+    const nm = text === "Utility Bays" ? `${icon("utility", 13, "util-ico")}${text}` : text;
+    return `<p class="weap-line"><span class="wl-arc">${icon(arc === "pri" ? "arc-primary" : "arc-aux", 13, "slot-arc")}${arc === "pri" ? "Pri" : "Aux"}:</span> <span class="wl-name">${nm}</span></p>`;
+  };
 
   const lines: string[] = [];
   // Primary
@@ -998,6 +1000,7 @@ function shipyardView(state: AppState): string {
         <span class="mf-emblem">${emblemPicker}</span>
         <input class="mf-name sy-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled company" data-action="fleet-name" />
         <button class="mf-name-gen" data-action="reroll-corp-name" title="Roll a company name" aria-label="Roll a company name">${icon("d12", 18)}</button>
+        <button class="mf-name-gen" data-action="blank-fleet-name" title="Clear the name" aria-label="Clear the name">${icon("eraser", 18)}</button>
       </div>
       <div class="sy-fac">
         <span class="mf-fac">${factionControl}</span>
@@ -1335,6 +1338,7 @@ function builderView(state: AppState): string {
         <span class="mf-emblem">${emblemPicker}</span>
         <input class="mf-name sy-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled fleet" data-action="fleet-name" />
         <button class="mf-name-gen" data-action="gen-fleet-name" title="Roll a fleet name" aria-label="Roll a fleet name">${icon("die", 18)}</button>
+        <button class="mf-name-gen" data-action="blank-fleet-name" title="Clear the name" aria-label="Clear the name">${icon("eraser", 18)}</button>
       </div>
       <div class="sy-fac">
         <span class="mf-fac">${factionControl}</span>
@@ -1359,7 +1363,7 @@ function builderView(state: AppState): string {
       <h3 class="sy-h">${isStocking ? "Your shipyard" : "Your fleet"} <span class="sy-h-count">${nUnits} ${unitWord}</span></h3>
       ${
         list.freePlay || faction
-          ? `<button class="sy-add-unit" data-action="open-add-unit">${icon("plus", 16)} Add ${isStocking ? "ship" : "unit"}</button>`
+          ? `<button class="sy-add-unit ${nUnits === 0 ? "is-pulsing" : ""}" data-action="open-add-unit">${icon("plus", 16)} Add ${isStocking ? "ship" : "unit"}</button>`
           : ""
       }
     </div>
@@ -1433,8 +1437,9 @@ function addUnitModal(state: AppState): string {
     const p = shortWeaponText(s.primary, s.utilityBays && s.primary.length === 0);
     const a = shortWeaponText(s.auxiliary, s.utilityBays && s.auxiliary.length === 0);
     const parts: string[] = [];
-    if (p) parts.push(`<span class="au-wl">P</span>${p}`);
-    if (a) parts.push(`<span class="au-wl">A</span>${a}`);
+    const util = (t: string) => (t === "Utility Bays" ? `${icon("utility", 11, "util-ico")}${t}` : t);
+    if (p) parts.push(`<span class="au-wl">P</span>${util(p)}`);
+    if (a) parts.push(`<span class="au-wl">A</span>${util(a)}`);
     return parts.join('<span class="au-wsep">·</span>');
   };
   const auCard = (ship: ShipClass, addId: string, owned: number) => `
@@ -1445,8 +1450,10 @@ function addUnitModal(state: AppState): string {
           <span class="au-card-cost">${credits(ship.cost)}</span>
           <span class="au-card-add">${icon("plus", 14)}</span>
         </span>
-        <span class="au-card-stats">${statChips(ship, true)}</span>
-        <span class="au-card-wep">${weaponsLine(ship)}</span>
+        <span class="au-card-body">
+          <span class="au-card-stats">${statChips(ship, true)}</span>
+          <span class="au-card-wep">${weaponsLine(ship)}</span>
+        </span>
       </button>`;
   const quad = (mass: number) => {
     const rows = pool.filter((p) => p.ship.mass === mass);

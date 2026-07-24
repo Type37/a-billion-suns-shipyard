@@ -119,7 +119,7 @@ export const FLEET_NAME_BANKS: Record<string, FleetNameBank> = {
   // --- Age of Unity era -------------------------------------------------
   "golem-mega-systems": {
     // Drone Swarms: strip-mining automata. No clean ES2 analog.
-    title: "Swarm",
+    title: "Fleet",
     adjectives: [
       "Harvesting", "Grinding", "Tireless", "Strip", "Rendering",
       "Consuming", "Fabricating", "Relentless", "Excavating", "Autonomous",

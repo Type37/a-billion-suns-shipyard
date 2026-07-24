@@ -1015,6 +1015,10 @@ button { font-family: inherit; }
 }
 .ship-row-details .stat-chips { flex: 0 0 auto; }
 .ship-row-details .weap-table { flex: 0 1 auto; margin-top: 0; }
+/* Weapons sit to the RIGHT of the four stat chips, not stacked under them. The
+   260px flex-basis lets the row wrap the weapons below only when the container
+   is genuinely too narrow (small phones), so desktop reads stats | guns. */
+.ship-row-details .weap-lines { flex: 1 1 260px; margin-top: 0; min-width: 0; }
 
 /* Weapons table: one row per weapon system, aligned columns for arc, dice,
    range and damage. Used in the catalog and the roster so weapons read the
@@ -1036,6 +1040,8 @@ button { font-family: inherit; }
 .wl-arc svg { vertical-align: -2px; margin-right: 3px; }
 .wl-name { font-weight: 600; }
 .wl-fig { color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* Utility-ship mark: the wrench-circle beside a "Utility Bays" slot. */
+.util-ico { color: var(--ink-3); vertical-align: -2px; margin-right: 3px; }
 
 .weap-table { width: fit-content; max-width: 100%; margin-top: 6px; font-variant-numeric: tabular-nums; }
 /* Every row - header, weapon, note - shares one template, so the columns line
@@ -2286,6 +2292,9 @@ button { font-family: inherit; }
   padding: 7px 0; border-top: 1px solid var(--hair-soft);
 }
 .sy-hvp:first-child { border-top: none; }
+/* A chosen HVP is unmistakable: a washed row with a solid blue spine down its
+   left edge, not just a ticked box. */
+.sy-hvp.is-chosen { background: var(--blue-wash); box-shadow: inset 3px 0 0 var(--blue); padding-left: 10px; padding-right: 8px; }
 .sy-hvp.is-chosen .sy-hvp-name { color: var(--blue); }
 .sy-hvp-check {
   width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;
@@ -2328,6 +2337,15 @@ button { font-family: inherit; }
 .sy-h-count { font-weight: 600; font-size: 12px; color: var(--ink-3); }
 .sy-add-unit { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; font-size: 13px; padding: 9px 15px; border: none; background: var(--blue); color: #fff; cursor: pointer; }
 .sy-add-unit:hover { background: var(--blue-deep); }
+/* A firm press: the button sinks a touch and shrinks, so the click has weight. */
+.sy-add-unit:active { transform: translateY(1px) scale(0.97); }
+/* When the fleet is empty, the one thing to do pulses a soft ring to draw the eye. */
+.sy-add-unit.is-pulsing { animation: add-unit-pulse 1.8s var(--ease) infinite; }
+@keyframes add-unit-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(11, 61, 145, 0.45); }
+  70% { box-shadow: 0 0 0 7px rgba(11, 61, 145, 0); }
+}
+@media (prefers-reduced-motion: reduce) { .sy-add-unit.is-pulsing { animation: none; } }
 
 .sy-unit .sy-ship-head { gap: 10px; }
 .sy-unit-id { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 8px; }
@@ -2428,10 +2446,12 @@ button { font-family: inherit; }
 .au-card-owned { font-family: var(--display); font-weight: 800; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.03em; color: #fff; background: var(--blue); padding: 0 5px; border-radius: 9px; }
 .au-card-cost { margin-left: auto; font-family: var(--display); font-weight: 800; font-size: 12.5px; }
 .au-card-add { display: inline-flex; align-items: center; color: var(--blue); }
-.au-card-stats { display: flex; flex-wrap: wrap; gap: 0 10px; margin: 1px 0 0; }
+/* Stats on the left, weapons to their right (wraps below only when cramped). */
+.au-card-body { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 18px; margin-top: 2px; }
+.au-card-stats { display: flex; flex-wrap: wrap; gap: 0 10px; margin: 0; flex: 0 0 auto; }
 .au-card .stat-chip, .au-card .stat-chip-mini { border: none; background: none; padding: 0; }
 .au-card .stat-chips { gap: 0 10px; }
-.au-card-wep { display: block; font-size: 11.5px; line-height: 1.35; color: var(--ink-2); }
+.au-card-wep { font-size: 11.5px; line-height: 1.35; color: var(--ink-2); flex: 1 1 200px; min-width: 0; }
 .au-wl { font-family: var(--display); font-weight: 800; font-size: 9px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3); margin-right: 4px; }
 .au-wsep { margin: 0 5px; color: var(--hair-soft); }
 

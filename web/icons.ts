@@ -52,6 +52,10 @@ const PATHS: Record<string, string> = {
     '<g fill="currentColor" stroke="none"><path d="M16 16h3a3 3 0 1 1-3 3.001zM5 16l3 .001v3a3 3 0 1 1-3-3"/><path fill-rule="evenodd" d="M19 8h-3V5a3 3 0 1 1 3 3M8 8V5a3 3 0 1 0-3 3z" clip-rule="evenodd"/><path d="M16 8H8v8h8z" opacity=".5"/></g>',
   // A twelve-sided die showing "12": the roll behind the corp-name generator.
   d12: '<path fill="currentColor" stroke="none" fill-rule="evenodd" d="M12 2L1.5 9.64L5.5 22h13l4-12.36zm5 18H7l-3.15-9.6L12 4.47l8.15 5.93zm0-4.25V17h-5.34v-1.09s3.57-3.46 3.57-4.51c0-1.28-1.05-1.15-1.05-1.15c-.68.05-1.18.62-1.18 1.3h-1.56c.06-1.46 1.28-2.61 2.83-2.55c2.47 0 2.5 1.85 2.5 2.3c0 1.77-3.19 4.47-3.19 4.47zM10.5 17H8.89v-6.11L7 11.47v-1.28L10.31 9h.19z"/>',
+  // Eraser (tabler): the "blank the name" button beside the roll die.
+  eraser: '<path d="M19 20H8.5l-4.21-4.3a1 1 0 0 1 0-1.41l10-10a1 1 0 0 1 1.41 0l5 5a1 1 0 0 1 0 1.41L11.5 20m6.5-6.7L11.7 7"/>',
+  // Utility ship (streamline-plump wrench-circle): a Mass 1+ ship with Utility Bays.
+  utility: '<path fill="currentColor" stroke="none" d="M1.5 24C1.5 11.574 11.574 1.5 24 1.5S46.5 11.574 46.5 24c0 10.493-7.182 19.308-16.899 21.797V39.69c0-1.59.974-2.987 2.287-3.884A13.98 13.98 0 0 0 38 24.24c0-5.09-2.717-9.547-6.78-11.997c-1.182-.712-2.553.242-2.553 1.622v8.223c0 .445-.147.878-.452 1.202c-.638.676-1.914 1.861-3.591 2.578c-.398.17-.849.17-1.247 0c-1.723-.736-3.022-1.967-3.64-2.632a1.7 1.7 0 0 1-.44-1.072c-.13-2.299-.172-5.234-.17-8.154c.002-1.401-1.397-2.367-2.582-1.62c-3.93 2.479-6.542 6.86-6.542 11.85c0 4.806 2.422 9.047 6.112 11.567c1.313.897 2.287 2.294 2.287 3.884v6.108C8.684 43.31 1.5 34.494 1.5 24"/>',
   close: '<line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/>',
   check: '<polyline points="5 13 10 18 19 7"/>',
   warning: '<path d="M12 3 22 20 2 20 Z"/><line x1="12" y1="9.5" x2="12" y2="14.5"/><line x1="12" y1="17" x2="12" y2="17.01"/>',
@@ -132,7 +136,7 @@ export const EMBLEMS: Record<string, string> = {
 // one declare it rather than being redrawn. Paths that carry their own fill or
 // stroke override the wrapper's defaults, which is how the solid nav marks sit
 // alongside the stroke-only set.
-const ICON_VIEWBOX: Record<string, string> = {};
+const ICON_VIEWBOX: Record<string, string> = { utility: "0 0 48 48" };
 
 export function icon(name: string, size = 18, cls = ""): string {
   const body = PATHS[name];

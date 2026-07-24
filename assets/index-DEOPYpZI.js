@@ -1419,7 +1419,6 @@ var e=Object.defineProperty,t=(t,n)=>{let r={};for(var i in t)e(r,i,{get:t[i],en
         </header>
         <div class="pf-data">${F(o,!0)}${Xm(o)}</div>
         ${c.length?`<p class="pf-carry">Carrying: ${L(c.join(`; `))}</p>`:``}
-        <div class="pf-track">${Array.from({length:i.count},()=>`<span class="pf-track-row">${Array.from({length:o.silhouette},()=>`<span class="pf-hp"></span>`).join(``)}</span>`).join(``)}</div>
       </article>`}).join(``);return i?`<section class="play-fleet">
     <h3 class="roster-section">Your fleet</h3>
     <div class="pf-list">${i}</div>

@@ -136,7 +136,25 @@ export const EMBLEMS: Record<string, string> = {
 // one declare it rather than being redrawn. Paths that carry their own fill or
 // stroke override the wrapper's defaults, which is how the solid nav marks sit
 // alongside the stroke-only set.
-const ICON_VIEWBOX: Record<string, string> = { utility: "0 0 48 48" };
+/**
+ * The four ship-stat glyphs come from different icon sets and draw wildly
+ * different amounts of ink inside the same 24 grid - measured bounding boxes are
+ * Mass 23 units tall, Shields 19.9, Silhouette 17, Thrust 14.1. Rendered at one
+ * pixel size they therefore looked like four different sizes, Mass reading 63%
+ * bigger than Thrust.
+ *
+ * Each stat glyph gets a square viewBox that tightly frames its own art (plus 4%
+ * air), centred on that art. The largest dimension of every glyph then fills its
+ * box, so one pixel size really is one apparent size. Recompute these if a glyph
+ * is ever redrawn: box side = max(bboxW, bboxH) * 1.04, centred on the bbox.
+ */
+const ICON_VIEWBOX: Record<string, string> = {
+  utility: "0 0 48 48",
+  "stat-mass": "0.04 0.04 23.92 23.92",
+  "stat-thrust": "3.62 3.59 16.83 16.83",
+  "stat-silhouette": "3.16 4.16 17.68 17.68",
+  "stat-shields": "1.66 1.67 20.69 20.69",
+};
 
 export function icon(name: string, size = 18, cls = ""): string {
   const body = PATHS[name];

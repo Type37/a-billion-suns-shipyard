@@ -1959,9 +1959,10 @@ function printView(state: AppState): string {
         opts.format === "guide"
           ? ""
           : `
-      ${opts.rules ? commandsSection : ""}
-
       ${
+        // Your own personnel sit directly under your ships: they are part of the
+        // fleet you brought. The Actions and Commands reference below is the
+        // same for everyone, so it comes after the things specific to you.
         isUnity
           ? `<div class="print-hvp-cols">${availableHvpBlocks}</div>`
           : hasHvpBlocks
@@ -1971,6 +1972,8 @@ function printView(state: AppState): string {
                </div>`
             : ""
       }
+
+      ${opts.rules ? commandsSection : ""}
 
       ${(() => {
         const maxRound = list.mode === "management-training" ? 3 : 4;

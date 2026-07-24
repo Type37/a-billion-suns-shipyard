@@ -1212,7 +1212,16 @@ button { font-family: inherit; }
 /* Print setup: options bar (screen only), per-unit cards, and trackers. */
 .print-opts { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .print-toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
-.print-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr)); gap: 5px; }
+/* Two across, and align-items:start.
+   Three across squeezed the weapons column so hard that every weapon wrapped to
+   three lines, and because grid rows stretch, a short card was padded out to the
+   height of the tallest card in its row - the empty space inside those boxes.
+   Two wider cards fit each weapon on one line AND come out shorter overall.
+   align-items:start means a card is only ever as tall as its own contents. */
+.print-cards {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(330px, 100%), 1fr));
+  gap: 4px; align-items: start;
+}
 /* Cards are cut out and held at the table, so they are dense by design: the
    layout is name + count with cost, then the stat block and the weapons list
    side by side - two columns, not stacked, so the card's width is used
@@ -1247,9 +1256,9 @@ button { font-family: inherit; }
   display: inline-flex; align-items: center; flex: none;
   font-family: var(--narrow); font-size: 9px; font-weight: 700; letter-spacing: 0.04em; color: var(--ink-3);
 }
-.pcw-name { font-family: var(--serif); font-size: 11.5px; font-weight: 400; color: var(--ink); }
-.pcw-fig { font-size: 10.5px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink-2); }
-.pc-carry { font-size: 10px; font-style: italic; color: var(--ink-2); margin-top: 3px; }
+.pcw-name { font-family: var(--serif); font-size: 10px; font-weight: 400; line-height: 1.15; color: var(--ink); }
+.pcw-fig { font-size: 9px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; color: var(--ink-2); white-space: nowrap; }
+.pc-carry { font-size: 9px; font-style: italic; color: var(--ink-2); margin-top: 2px; }
 .pc-track { margin-top: 6px; padding-top: 5px; border-top: 1px solid var(--hair-soft); display: flex; flex-direction: column; gap: 2px; }
 .pc-track-h { font-family: var(--display); font-weight: 800; font-size: 9px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-2); margin: 0 0 3px; }
 .pc-track-sub { font-family: var(--sans); font-weight: 600; font-size: 8.5px; letter-spacing: 0; text-transform: none; color: var(--ink-3); margin-left: 5px; }
@@ -1261,7 +1270,7 @@ button { font-family: inherit; }
 .pts-item { display: flex; align-items: center; gap: 10px; }
 .pts-label { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
 .pts-blank { display: inline-block; min-width: 120px; border-bottom: 1px solid var(--ink-2); height: 14px; }
-@media print { .print-cards { grid-template-columns: repeat(3, 1fr); } }
+@media print { .print-cards { grid-template-columns: repeat(2, 1fr); } }
 
 .print-notes { margin-top: 14px; }
 .print-notes p { font-family: var(--serif); font-size: 13px; line-height: 1.5; white-space: pre-wrap; color: var(--ink); }
@@ -1309,16 +1318,20 @@ button { font-family: inherit; }
 .print-rule h3 { font-family: var(--display); font-size: 14px; margin-bottom: 3px; }
 .print-rule p { font-family: var(--serif); font-size: 12px; line-height: 1.32; }
 
-/* Actions & commands reference: two dense columns, name + full effect text. */
-.print-ref-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; }
+/* Actions & commands reference: two dense columns, name + full effect text.
+   This is the same for every fleet in the game, so it is reference material
+   rather than YOUR fleet. Set smaller and lighter than the roster above it so
+   the page reads in the right order - your ships first, the rulebook extract
+   last. Still full text, never trimmed. */
+.print-ref-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 16px; }
 @media (max-width: 640px) { .print-ref-cols { grid-template-columns: 1fr; } }
-.print-ref-h { font-family: var(--display); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; margin: 0 0 6px; color: var(--ink); }
+.print-ref-h { font-family: var(--display); font-size: 10px; font-weight: 600; text-transform: uppercase; margin: 0 0 3px; color: var(--ink-2); }
 .print-ref-list { margin: 0; }
-.print-ref-list dt { font-family: var(--sans); font-weight: 800; font-size: 10.5px; color: var(--ink); margin-top: 3px; }
+.print-ref-list dt { font-family: var(--sans); font-weight: 600; font-size: 9px; color: var(--ink-2); margin-top: 2px; }
 .print-ref-list dt:first-child { margin-top: 0; }
-.print-ref-list dd { margin: 0; font-family: var(--serif); font-size: 10.5px; line-height: 1.26; color: var(--ink-2); }
-.print-ref-cost { font-family: var(--sans); font-weight: 700; font-size: 9.5px; color: var(--blue); letter-spacing: 0.02em; }
-.print-ref-note { font-size: 10.5px; font-style: italic; color: var(--ink-2); margin: 8px 0 0; }
+.print-ref-list dd { margin: 0; font-family: var(--serif); font-size: 9px; line-height: 1.18; color: var(--ink-3); }
+.print-ref-cost { font-family: var(--sans); font-weight: 600; font-size: 8.5px; color: var(--blue); }
+.print-ref-note { font-size: 9px; font-style: italic; color: var(--ink-3); margin: 5px 0 0; }
 /* What this fleet's own rules do to a command: a discount, or an alteration.
    Set in red so it reads as an override of the printed core cost above it. */
 .print-ref-mod { display: block; font-size: 9.5px; color: var(--red); margin-top: 2px; }
@@ -3251,6 +3264,11 @@ button { font-family: inherit; }
 .is-inksaver .print-card { border-color: var(--hair-soft); }
 .is-inksaver .pc-weapons-col { border-left-color: var(--hair-soft); }
 .is-inksaver .print-roster thead th { border-bottom-width: 1px; }
+/* On the sheet the credits mark is a unit symbol, not a highlight: it appears
+   beside every cost on the page, so at full size and in blue it read as the
+   loudest thing in the roster. Smaller, and in ink. */
+.sheet .credits-glyph { width: 9px; height: 9px; color: var(--ink-2); }
+.sheet .pc-cost, .sheet .pr-cost, .sheet .sy-ship-cost { color: var(--ink); }
 /* No tracked-out type anywhere on the printed sheet, ever. Wide letter-spacing
    is a poster effect: on a working document it stops a short label reading as a
    word and pushes headings past the column they have to fit in. Declared as one
@@ -3376,13 +3394,14 @@ a .icon,
    beside it. Here each chip is a simple flex row that stays inside its cell. */
 .print-card .stat-chips {
   display: grid; grid-template-columns: repeat(2, minmax(0, max-content));
-  gap: 1px 8px; align-content: start;
+  gap: 0 7px; align-content: start;
 }
 .print-card .stat-chips > .stat-chip {
-  display: flex; grid-column: auto; align-items: center; gap: 3px;
-  border: none; padding: 0; font-size: 10.5px; min-width: 0; white-space: nowrap;
+  display: flex; grid-column: auto; align-items: center; gap: 2px;
+  border: none; padding: 0; font-size: 9.5px; line-height: 1.3; min-width: 0; white-space: nowrap;
 }
-.print-card .stat-lbl { font-size: 8px; }
+.print-card .stat-lbl { font-size: 7.5px; }
+.print-card .stat-ico { width: 13px; height: 13px; }
 
 
 /* Generic personnel are the shared pool every fleet can draw on; the faction's

@@ -1226,10 +1226,15 @@ button { font-family: inherit; }
 .pc-x { font-weight: 900; color: var(--blue); }
 .pc-cost { font-weight: 700; font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .pc-sub { font-size: 9.5px; color: var(--ink-2); margin-bottom: 2px; }
-.pc-body { display: flex; align-items: flex-start; gap: 8px; }
-.pc-main { flex: 0 1 auto; min-width: 0; }
+/* The stat block takes exactly the width its four figures need and never less
+   (flex-shrink 0) - squeezing it was what pushed the second column of stats out
+   over the weapons text. The weapons take whatever is left. No divider rule
+   between them: the gap already separates them, and on a page of nine cards
+   that vertical line was nine more marks earning nothing. */
+.pc-body { display: flex; align-items: flex-start; gap: 10px; }
+.pc-main { flex: 0 0 auto; }
 .pc-stats-chips { margin: 0; }
-.pc-weapons-col { flex: 1 1 auto; min-width: 0; border-left: 1px solid var(--hair-soft); padding-left: 7px; }
+.pc-weapons-col { flex: 1 1 0; min-width: 0; }
 .pc-ships { font-family: var(--serif); font-size: 10px; color: var(--ink); margin-top: 2px; }
 /* Small, always-there firing-arc glyph beside the Primary/Auxiliary label -
    a permanent reminder of the fixed 45/180 degree geometry, not a stat that
@@ -3364,10 +3369,20 @@ a .icon,
 }
 
 
-/* Print-card stat block: the 2x2 grid, sized for a card rather than a panel. */
-.print-card .stat-chips { gap: 2px 10px; }
-.print-card .stat-chip { border: none; padding: 0; font-size: 11px; }
-.print-card .stat-lbl { font-size: 8.5px; }
+/* Print-card stat block: a plain 2x2, NOT the shared subgrid alignment used in
+   the builder. The subgrid version reserves a column pair sized to the widest
+   label across the whole set, which is wider than a print card's left column -
+   so the second pair overflowed its box and printed on top of the weapon names
+   beside it. Here each chip is a simple flex row that stays inside its cell. */
+.print-card .stat-chips {
+  display: grid; grid-template-columns: repeat(2, minmax(0, max-content));
+  gap: 1px 8px; align-content: start;
+}
+.print-card .stat-chips > .stat-chip {
+  display: flex; grid-column: auto; align-items: center; gap: 3px;
+  border: none; padding: 0; font-size: 10.5px; min-width: 0; white-space: nowrap;
+}
+.print-card .stat-lbl { font-size: 8px; }
 
 
 /* Generic personnel are the shared pool every fleet can draw on; the faction's

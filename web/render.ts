@@ -265,6 +265,25 @@ export function resolveShip(
   return ship && faction ? { ship, owner: faction } : undefined;
 }
 
+/**
+ * Fleet units in reading order: lightest Mass first, then cost, then name.
+ * Every view that lists units uses this, so the roster, the printed sheet and
+ * both Play Mode panels present the fleet in the same order - the order the
+ * book's own ship-class tables use. Unresolved units sort last rather than
+ * disappearing. Returns a new array; never sorts the stored fleet in place.
+ */
+function unitsByMass(units: FleetUnit[], faction: Faction | undefined, customs: Faction[]): FleetUnit[] {
+  const key = (u: FleetUnit) => {
+    const r = resolveShip(u.shipClassId, faction, customs);
+    return r ? { mass: r.ship.mass, cost: r.ship.cost, name: r.ship.name } : { mass: Infinity, cost: Infinity, name: "" };
+  };
+  return [...units].sort((a, b) => {
+    const x = key(a);
+    const y = key(b);
+    return x.mass - y.mass || x.cost - y.cost || x.name.localeCompare(y.name);
+  });
+}
+
 function hvpById(id: string, faction: Faction | undefined): Hvp | undefined {
   return faction?.hvp.find((h) => h.id === id) ?? GENERIC_HVP.find((h) => h.id === id);
 }
@@ -1199,7 +1218,8 @@ function builderView(state: AppState): string {
   // Roster units, in the Shipyard's single-column row shape: name + cost +
   // control on the head line, stat chips and weapons beneath. A unit is an
   // instance with its own size (unit-count), unlike the Shipyard's class pool.
-  const unitRows = list.fleet.units
+  // Lightest first, as everywhere else.
+  const unitRows = unitsByMass(list.fleet.units, faction, customs)
     .map((u) => {
       const r = resolveShip(u.shipClassId, faction, customs);
       const unitName = autoUnitName(u.id);
@@ -1596,7 +1616,8 @@ function printView(state: AppState): string {
 
   const unitNames = unitDisplayNames(list.fleet.units, faction, customs);
   // Units the player has dropped from this printout (still in the fleet).
-  const printUnits = list.fleet.units.filter((u) => !excluded.has(u.id));
+  // Lightest Mass first, matching the builder and the book's ship-class tables.
+  const printUnits = unitsByMass(list.fleet.units, faction, customs).filter((u) => !excluded.has(u.id));
 
   // HVP ride a unit, and they MOVE: the benefit applies only while an in-play
   // unit carries the token, the token drops as free-floating salvage when the
@@ -1761,21 +1782,17 @@ function printView(state: AppState): string {
       </section>`
     : "";
 
+  // No carrier line. The roster above has an HVP column per unit, which is where
+  // the assignment is actually written and amended; repeating it here (or, worse,
+  // printing a blank rule to write it on a second time) said the same thing twice.
   const selectedBlock = (sel: (typeof list.fleet.hvp)[number]) => {
     const def = hvpById(sel.hvpId, faction);
     if (!def) return "";
     const displayName = sel.customName ? `${sel.customName}, ${def.name}` : def.name;
-    // Name the starting carrier here as well as in the roster column: the
-    // column is where you amend it, this is where you read what it does.
-    const carrier = sel.assignedUnitId
-      ? (list.fleet.units.find((u) => u.id === sel.assignedUnitId)?.name ??
-         unitNames.get(sel.assignedUnitId) ??
-         "")
-      : "";
     const generic = GENERIC_HVP.some((g) => g.id === sel.hvpId);
     return `
       <section class="print-hvp ${generic ? "is-generic" : ""}">
-        <h4>${escapeHtml(displayName)} <span class="print-hvp-slot">${carrier ? `starts on ${escapeHtml(carrier)}` : "carrier: _______________"}</span></h4>
+        <h4>${escapeHtml(displayName)}</h4>
         <p>${ruleText(def.rule)}</p>
       </section>`;
   };
@@ -2366,7 +2383,7 @@ const SCORING_NOTES: Partial<Record<GameMode, string[]>> = {
  */
 function playFleetPanel(list: SavedList, faction: Faction | undefined, customs: Faction[]): string {
   const names = unitDisplayNames(list.fleet.units, faction, customs);
-  const rows = list.fleet.units
+  const rows = unitsByMass(list.fleet.units, faction, customs)
     .map((u) => {
       const r = resolveShip(u.shipClassId, faction, customs);
       if (!r) return "";
@@ -2405,10 +2422,14 @@ function playShipyardTracker(list: SavedList, faction: Faction | undefined, cust
   const unlimited = list.unlimitedShipyards === true;
   const byClass = new Map<string, number>();
   const order: string[] = [];
+  // Lightest Mass first either way, matching every other view.
   if (unlimited && faction) {
-    for (const s of faction.ships) { order.push(s.id); byClass.set(s.id, Infinity); }
+    for (const s of [...faction.ships].sort((a, b) => a.mass - b.mass || a.cost - b.cost)) {
+      order.push(s.id);
+      byClass.set(s.id, Infinity);
+    }
   } else {
-    for (const u of list.fleet.units) {
+    for (const u of unitsByMass(list.fleet.units, faction, customs)) {
       if (!byClass.has(u.shipClassId)) order.push(u.shipClassId);
       byClass.set(u.shipClassId, (byClass.get(u.shipClassId) ?? 0) + u.count);
     }

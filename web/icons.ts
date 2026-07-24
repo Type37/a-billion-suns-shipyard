@@ -233,10 +233,10 @@ export function statChips(
   // at the same 13px the hairline circle greyed out to a smudge. Same optical
   // weight, different measured size.
   const chip = (name: string, label: string, val: string) => {
-    // Silhouette runs 10% larger than Thrust/Shields: same drawing weight, but
-    // its shape reads smaller than a solid mark at an identical box size.
-    const size =
-      name === "stat-mass" ? (compact ? 16 : 18) : name === "stat-silhouette" ? (compact ? 14 : 17) : compact ? 13 : 15;
+    // All four at one size. Mass and Silhouette used to be drawn larger on the
+    // reasoning that a ring reads smaller than a solid mark, but in a row of
+    // four the mismatch just looks like a mistake.
+    const size = compact ? 14 : 16;
     return `<span class="stat-chip ${compact ? "stat-chip-mini" : ""}">${icon(name, size, `stat-ico stat-ico-${name.replace("stat-", "")}`)}<span class="stat-lbl">${label}</span><span class="stat-val">${val}</span></span>`;
   };
   return `<span class="stat-chips ${compact ? "stat-chips-mini" : ""}">${chip("stat-mass", "Mass", String(s.mass))}${chip("stat-thrust", "Thrust", `${s.thrust}"`)}${chip("stat-silhouette", "Sil", String(s.silhouette))}${chip("stat-shields", "Shields", String(s.shields))}</span>`;

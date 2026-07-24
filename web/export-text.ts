@@ -37,7 +37,13 @@ export function fleetToMarkdown(list: SavedList, customs: Faction[]): string {
   if (list.fleet.units.length === 0) {
     lines.push("_No units._");
   } else {
-    for (const u of list.fleet.units) {
+    // Lightest Mass first, the same order every on-screen and printed view uses.
+    const ordered = [...list.fleet.units].sort((a, b) => {
+      const x = resolveShip(a.shipClassId, faction, customs)?.ship;
+      const y = resolveShip(b.shipClassId, faction, customs)?.ship;
+      return (x?.mass ?? Infinity) - (y?.mass ?? Infinity) || (x?.cost ?? Infinity) - (y?.cost ?? Infinity);
+    });
+    for (const u of ordered) {
       const r = resolveShip(u.shipClassId, faction, customs);
       const ship = r?.ship;
       const name = u.name || `${ship?.name ?? u.shipClassId} unit`;

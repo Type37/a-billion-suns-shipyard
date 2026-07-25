@@ -2755,7 +2755,11 @@ button { font-family: inherit; }
 .opt-version { font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-3); margin: 0; font-variant-numeric: tabular-nums; }
 .opt-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
 .opt-links a { display: inline-flex; align-items: center; gap: 9px; padding: 8px 4px; color: var(--blue); font-weight: 600; font-size: 14px; }
-.modal-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; background: var(--color-action); color: #fff; }
+/* Sticky so the close control stays reachable when the body scrolls - it does on
+   a short landscape phone, where a static header (and its X) scrolled away and
+   left tap-the-backdrop or Esc as the only way out. z-index clears the modal's
+   own scrolling content. */
+.modal-header { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; background: var(--color-action); color: #fff; }
 .modal-title { font-family: var(--sans); font-weight: 600; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
 .modal-close { background: transparent; border: 1px solid #3a5aa0; color: #fff; cursor: pointer; display: inline-flex; padding: 6px; }
 .modal-close:hover { background: #fff; color: var(--color-action); }

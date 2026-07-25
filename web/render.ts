@@ -702,7 +702,7 @@ function newFleetModal(state: AppState, customs: Faction[]): string {
               ${
                 !customIsPreset || m.customOpen
                   ? `<label class="nf-custom on">Custom
-                <input type="number" min="1" step="10" value="${!customIsPreset ? m.limit : ""}" placeholder="¢bn" data-action="nf-size-custom" autofocus /></label>`
+                <input type="number" min="1" step="10" value="${!customIsPreset ? m.limit : ""}" placeholder="¢" data-action="nf-size-custom" autofocus /></label>`
                   : `<button type="button" class="nf-custom nf-custom-btn" data-action="nf-size-custom-open">Custom</button>`
               }`
               }
@@ -1307,7 +1307,7 @@ function builderView(state: AppState): string {
               ? ""
               : !limitIsPreset || limitCustomOpen
                 ? `<label class="nf-custom on">Custom
-              <input type="number" min="1" step="10" value="${!limitIsPreset ? list.fleet.creditsLimit : ""}" placeholder="¢bn" data-action="set-limit-free" autofocus /></label>`
+              <input type="number" min="1" step="10" value="${!limitIsPreset ? list.fleet.creditsLimit : ""}" placeholder="¢" data-action="set-limit-free" autofocus /></label>`
                 : `<button type="button" class="nf-custom nf-custom-btn" data-action="open-limit-custom">Custom</button>`
           }
         </div>

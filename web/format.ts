@@ -35,12 +35,12 @@ export function auxSlotText(ship: ShipClass): string {
  * Returns markup, so use creditsText() anywhere the result is not HTML.
  */
 export function credits(n: number): string {
-  return `${creditsGlyph(12)}${n}bn`;
+  return `${creditsGlyph(12)}${n}`;
 }
 
 /** The same figure as plain text, for exports, attributes and clipboard copy. */
 export function creditsText(n: number): string {
-  return `¢${n}bn`;
+  return `¢${n}`;
 }
 
 const ESCAPE_MAP: Record<string, string> = {

@@ -1,5 +1,6 @@
 import type { Faction, Fleet, GameMode, OutfitShip } from "../src/types.ts";
 import { SEED_FACTIONS } from "./seed-factions.ts";
+import { SEED_LISTS } from "./seed-lists.ts";
 
 // localStorage persistence. One key per concern, JSON payloads, versioned so a
 // future format change can migrate instead of clobber.
@@ -8,6 +9,7 @@ const LISTS_KEY = "abs2.lists.v1";
 const FACTIONS_KEY = "abs2.customFactions.v1";
 const OUTFITS_KEY = "abs2.outfits.v1";
 const SEEDS_APPLIED_KEY = "abs2.seedsApplied.v1";
+const LIST_SEEDS_APPLIED_KEY = "abs2.listSeedsApplied.v1";
 
 /** Live table-companion state for a fleet list, persisted with it. */
 export interface PlayState {
@@ -78,11 +80,26 @@ function write(key: string, value: unknown): void {
 }
 
 export function loadLists(): SavedList[] {
-  return read<SavedList[]>(LISTS_KEY, []);
+  return applyListSeeds(read<SavedList[]>(LISTS_KEY, []));
 }
 
 export function persistLists(lists: SavedList[]): void {
   write(LISTS_KEY, lists);
+}
+
+// Seed fleets ship as ready-made starter lists (see seed-lists.ts), one per
+// browser, same rule as applySeeds below: added at most once, tracked by id
+// so a deleted seed never reappears on the next visit.
+function applyListSeeds(stored: SavedList[]): SavedList[] {
+  const applied = new Set(read<string[]>(LIST_SEEDS_APPLIED_KEY, []));
+  const additions = SEED_LISTS.filter((seed) => !applied.has(seed.id) && !stored.some((l) => l.id === seed.id));
+  if (additions.length === 0) return stored;
+
+  const merged = [...stored, ...additions];
+  write(LISTS_KEY, merged);
+  for (const seed of SEED_LISTS) applied.add(seed.id);
+  write(LIST_SEEDS_APPLIED_KEY, [...applied]);
+  return merged;
 }
 
 export function loadCustomFactions(): Faction[] {

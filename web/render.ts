@@ -374,19 +374,20 @@ interface EmblemFields {
  * printed sheet and Play Mode - so the three facts that describe a faction are
  * always in the same arrangement rather than three different ones per screen.
  */
-function factionRuleBlock(f: Faction, size: "full" | "compact" = "full"): string {
+function factionRuleBlock(f: Faction, size: "full" | "compact" = "full", showInitiative = size === "full"): string {
   const glyph = size === "full" ? 18 : 13;
-  // The compact variant drops Initiative. Every place it is used sits next to a
-  // "Roll 3D6" button that already states the value and is the thing you press,
-  // so printing it again beside the button was the same number twice a few
-  // pixels apart. The full variant keeps it - there is no roll button there.
-  const initiative =
-    size === "full"
-      ? `<div class="frv">
+  // Compact normally drops Initiative: every ON-SCREEN place it is used (the
+  // picker, Play Mode) sits next to a "Roll 3D6" button that already states the
+  // value, so printing it again beside the button was the same number twice a
+  // few pixels apart. The printed sheet has no roll button - there is nothing
+  // else on paper that says the faction's Initiative value - so it passes
+  // showInitiative explicitly to keep this fact on the sheet at compact size.
+  const initiative = showInitiative
+    ? `<div class="frv">
         <span class="frv-label">Initiative</span>
         <span class="frv-figure"><span class="frv-value">${escapeHtml(f.initiative)}</span>${diceRow(f.initiative, glyph)}</span>
       </div>`
-      : "";
+    : "";
   return `
   <div class="frule frule-${size}">
     <div class="frule-main">
@@ -1939,7 +1940,10 @@ function printView(state: AppState): string {
 
       ${
         faction && opts.rules
-          ? `<section class="print-rule">${factionRuleBlock(faction, "compact")}</section>`
+          ? // showInitiative:true - the printed sheet has no "Roll 3D6" button
+            // standing in for this number, so it has to print here or it is
+            // nowhere on the page at all.
+            `<section class="print-rule">${factionRuleBlock(faction, "compact", true)}</section>`
           : ""
       }
 

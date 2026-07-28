@@ -938,11 +938,11 @@ button { font-family: inherit; }
 .control-group-emblem { flex: 0 0 auto; min-width: 0; }
 .fleet-name-input {
   font-family: var(--display); font-weight: 800; font-size: clamp(18px, 2.4vw, 24px);
-  letter-spacing: -0.01em; color: var(--ink); border: none; border-bottom: 2px solid transparent;
+  letter-spacing: -0.01em; color: var(--ink); border: none;
   padding: 1px 0; width: min(560px, 70vw); background: transparent;
 }
 .fleet-name-input::placeholder { color: var(--placeholder); }
-.fleet-name-input:focus { outline: none; border-bottom-color: var(--red); }
+
 
 .emblem-picker { display: flex; gap: 6px; flex-wrap: wrap; }
 .setup-controls .emblem-picker { margin-top: 0; }
@@ -1316,9 +1316,10 @@ button { font-family: inherit; }
 .roster-unit { padding: 13px 20px; border-bottom: 1px solid var(--hair-soft); }
 .roster-unit.unresolved { background: var(--red-wash); }
 .roster-unit-glyph { color: var(--blue); flex-shrink: 0; }
-.unit-name-input { flex: 1; min-width: 0; font-family: var(--display); font-weight: 700; font-size: 15px; border: none; border-bottom: 1px solid transparent; padding: 3px 0; background: transparent; color: var(--ink); }
+/* No border-bottom here: the shared rename affordance above owns it. Setting
+   one would win on source order and put this field back to invisible. */
+.unit-name-input { flex: 1; min-width: 0; font-family: var(--display); font-weight: 700; font-size: 15px; border: none; padding: 3px 0; background: transparent; color: var(--ink); }
 .unit-name-input::placeholder { color: var(--placeholder); font-weight: 600; }
-.unit-name-input:focus { outline: none; border-bottom-color: var(--red); }
 .roster-unit-cost { font-family: var(--display); font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums; color: var(--blue); white-space: nowrap;
   /* Reserve the width of a four-figure cost so the trash button beside it does
      not slide left every time the total gets shorter. */
@@ -2316,6 +2317,34 @@ button { font-family: inherit; }
   background: var(--blue); color: #fff; font-family: var(--display); font-weight: 800;
   font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; padding: 5px 11px; white-space: nowrap;
 }
+/* Era was a read-only badge; it is a control now. Same badge, plus a caret and
+   a popover - position:absolute, so opening it shifts nothing. */
+.era-switch { position: relative; flex-shrink: 0; align-self: center; }
+.era-switch > summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+.era-switch > summary::-webkit-details-marker { display: none; }
+.mf-era-badge.is-control:hover { background: var(--blue-deep); }
+.era-switch[open] > summary { background: var(--blue-deep); }
+.era-caret { transition: transform 0.14s var(--ease); }
+.era-switch[open] .era-caret { transform: rotate(180deg); }
+.era-switch-panel {
+  position: absolute; z-index: 60; top: calc(100% + 6px); left: 0;
+  width: min(300px, calc(100vw - 28px));
+  background: var(--paper); border: 2px solid var(--ink); padding: 10px;
+  display: flex; flex-direction: column; gap: 5px;
+  box-shadow: var(--shadow16);
+}
+.era-switch-head { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin: 2px 2px 4px; }
+.era-opt {
+  display: flex; flex-direction: column; gap: 1px; text-align: left; cursor: pointer;
+  padding: 8px 10px; min-height: var(--tap); justify-content: center;
+  border: 1px solid var(--hair-soft); border-left: 3px solid var(--hair); background: var(--paper);
+}
+.era-opt:hover { border-left-color: var(--blue); background: var(--blue-wash); }
+.era-opt.on { border-color: var(--blue); border-left-color: var(--red); background: var(--blue-wash); }
+.era-opt-name { font-family: var(--display); font-weight: 700; font-size: 13.5px; color: var(--ink); }
+.era-opt-hint { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); }
+.era-switch-note { font-size: 11.5px; line-height: 1.4; color: var(--ink-3); margin: 4px 2px 0; }
+
 .mf-emblem { flex-shrink: 0; }
 .mf-emblem .emblem-current-btn { border: none; padding: 0; background: none; }
 .mf-emblem .emblem-caret { display: none; }
@@ -2323,14 +2352,8 @@ button { font-family: inherit; }
   flex: 0 1 auto; min-width: 120px; max-width: 42ch; border: none; background: none; padding: 2px 0;
   font-family: var(--ios); font-weight: 700; font-size: clamp(18px, 2.2vw, 26px);
   letter-spacing: -0.01em; text-transform: none; line-height: 1.15; color: var(--ink);
-  border-bottom: 2px dotted var(--hair-soft);
 }
 .mf-name::placeholder { color: var(--placeholder); font-weight: 400; }
-/* Dotted underline at rest signals "editable text" the same way the credits
-   cap and faction switcher already do - without it this reads as a plain
-   heading, not a field, until you happen to click it. */
-.mf-name:hover { border-bottom-color: var(--ink-3); }
-.mf-name:focus { outline: none; border-bottom-style: solid; border-bottom-color: var(--blue); }
 
 /* Dice button beside the fleet name: rolls a faction-flavoured default name
    (see web/actions.ts "gen-fleet-name" and src/fleet-names.ts). */
@@ -2623,10 +2646,8 @@ button { font-family: inherit; }
 
 .sy-unit .sy-ship-head { gap: 10px; }
 .sy-unit-id { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 8px; }
-.sy-unit-name { flex: 1 1 auto; min-width: 0; border: none; background: none; padding: 2px 0; font-family: var(--ios); font-weight: 700; font-size: 16px; color: var(--ink); border-bottom: 2px dotted var(--hair-soft); }
+.sy-unit-name { flex: 1 1 auto; min-width: 0; border: none; background: none; padding: 2px 0; font-family: var(--ios); font-weight: 700; font-size: 16px; color: var(--ink); }
 .sy-unit-name::placeholder { color: var(--placeholder); font-weight: 400; }
-.sy-unit-name:hover { border-bottom-color: var(--ink-3); }
-.sy-unit-name:focus { outline: none; border-bottom-style: solid; border-bottom-color: var(--blue); }
 .sy-unit .sy-ship-cost { margin-left: auto; }
 .sy-unit-remove { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 1px solid var(--hair-soft); background: var(--paper); color: var(--ink-3); cursor: pointer; }
 .sy-unit-remove:hover { border-color: var(--red); color: var(--red); }
@@ -2983,6 +3004,18 @@ button { font-family: inherit; }
      one that blocks you until you deal with it. */
   box-shadow: var(--shadow64);
 }
+/* Destructive confirm. Red header and a red confirm button, so the weight of
+   the thing is visible before the words are read - but Cancel stays a normal
+   button rather than being made loud, because the quiet option should not have
+   to compete. */
+.cf-modal { width: min(440px, 100%); }
+.modal-header.is-danger { background: var(--red-deep); }
+.modal-header.is-danger .modal-close { border-color: rgb(255 255 255 / 0.35); }
+.modal-header.is-danger .modal-close:hover { background: #fff; color: var(--red-deep); }
+.cf-body { font-size: 14.5px; line-height: 1.5; color: var(--ink-2); }
+.cta-btn.cf-danger { background: var(--red-deep); border-color: var(--red-deep); box-shadow: none; }
+.cta-btn.cf-danger:hover { background: var(--red); border-color: var(--red); }
+
 .opt-modal { width: min(460px, 100%); }
 .no-modal { width: min(420px, 100%); }
 .opt-body { gap: 24px; }
@@ -4534,4 +4567,72 @@ main.play-body .roster-section::before { content: none; }
   .learn-progress { gap: 5px; margin-bottom: 18px; }
   .learn-dot { padding: 5px 7px; gap: 6px; }
   .learn-dot-l { font-size: 12px; }
+}
+
+
+/* ---------------------------------------------------- one rename affordance
+   Five things in this app can be renamed in place - the fleet, a unit, an
+   outfit, a ship in an outfit and its pilot - and they were drawn three
+   different ways. The builder's two showed a dotted rule at rest so they read
+   as fields; Junkspace's three had a transparent border and were invisible
+   until you happened to click one, which is exactly the "on a return visit you
+   cannot tell what is renameable" problem.
+
+   The dotted rule is the right answer and it already existed, so everything
+   adopts it rather than a third invention: dotted at rest means "you can type
+   here", darkening on hover, going solid blue on focus. Names that CANNOT be
+   renamed - a ship class in the catalogue, a faction's own name in the roster -
+   deliberately have no rule under them, so the absence means something.
+
+   The Foundry keeps its explicit labelled fields: those sit in a form where
+   every row is a field, and a dotted rule there would say nothing. */
+.mf-name,
+.sy-unit-name,
+.fleet-name-input,
+.unit-name-input,
+.ship-name-input {
+  border-bottom: 2px dotted var(--hair-soft);
+  transition: border-bottom-color 0.12s ease;
+}
+.mf-name:hover,
+.sy-unit-name:hover,
+.fleet-name-input:hover,
+.unit-name-input:hover,
+.ship-name-input:hover { border-bottom-color: var(--ink-3); }
+.mf-name:focus,
+.sy-unit-name:focus,
+.fleet-name-input:focus,
+.unit-name-input:focus,
+.ship-name-input:focus { outline: none; border-bottom-style: solid; border-bottom-color: var(--blue); }
+
+/* ------------------------------------------- Junkspace header on a phone
+   Measured on a 390x670 screen: 285px, 43% of the screen, went by before the
+   first ship. Topbar, a "Junkspace" breadcrumb, the outfit name, an "EMBLEM"
+   label, a bordered box holding a 40px swatch and a "Choose emblem" button,
+   the tab strip, and a section heading.
+
+   The emblem block was the worst of it at about 100px - a whole labelled
+   section for a decorative mark you set once. The fleet builder already
+   solved this: there, the emblem is a small tappable swatch welded to the left
+   of the name. Junkspace adopts the same shape, so the label and the button
+   text go and the swatch sits on the name line where it costs nothing. Nothing
+   is removed - it is the same control, in the builder's arrangement. */
+@media (max-width: 760px) {
+  .setup-band { padding: 8px clamp(12px, 2vw, 20px) 10px; }
+  /* flex-start, not the desktop space-between: with only two items on one line
+     space-between throws the name to the far right and it runs off the screen. */
+  .setup-head { align-items: center; justify-content: flex-start; gap: 10px; flex-wrap: nowrap; }
+  .setup-identity { order: 2; flex: 1 1 auto; min-width: 0; }
+  /* width:auto matters: the earlier mobile block sets width:100% on this group
+     for the stacked layout it used to have, and flex-basis:auto then resolves
+     to that 100%, so the swatch would eat the whole row and push the name off
+     the screen entirely. */
+  .control-group-emblem { order: 1; flex: 0 0 auto; width: auto; }
+  /* The label is redundant once the swatch sits beside the name it belongs to. */
+  .control-group-emblem > .control-label { display: none; }
+  .emblem-choose-btn { border: none; padding: 0; }
+  .emblem-choose-btn .emblem-choose-label { display: none; }
+  .emblem-choose-preview .emblem, .emblem-choose-preview .emblem-img { width: 34px; height: 34px; }
+  .band-eyebrow { margin-bottom: 2px; font-size: 10px; }
+  .fleet-name-input { font-size: 18px; width: 100%; }
 }

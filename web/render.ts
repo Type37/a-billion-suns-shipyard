@@ -961,6 +961,47 @@ function shipyardHvpRow(h: Hvp, chosen: boolean, atCap: boolean, generic = false
   </article>`;
 }
 
+/** The three eras a saved fleet can be built for, and the mode each maps to. */
+export const ERA_MODES: { era: Era; mode: GameMode; builds: string }[] = [
+  { era: "Hypergrowth", mode: "hypergrowth", builds: "Build a Shipyard" },
+  { era: "Age of Unity", mode: "age-of-unity", builds: "Build a Fleet List" },
+  { era: "Armageddon", mode: "armageddon", builds: "Build a Fleet List" },
+];
+
+/**
+ * The era, as a control rather than a badge.
+ *
+ * Era was fixed at creation, so trying a fleet in a different era meant
+ * rebuilding it ship by ship - which is absurd, because the thing that changes
+ * between eras is the SHAPE of the builder and the rules around the fleet, not
+ * the ships. Factions are explicitly playable in any era ("You are free to
+ * select a faction from any Era", Hypergrowth p.124) and ship classes belong to
+ * factions, so the fleet itself carries over intact. See "set-era" in
+ * actions.ts for what does and does not survive.
+ *
+ * Only offered on the two training modes' non-training siblings: Combat
+ * Simulator and Management Training are fixed scenarios, not eras, and moving
+ * one of those to Armageddon would quietly break the scenario it came from.
+ */
+function eraSwitch(list: SavedList): string {
+  const here = ERA_MODES.find((e) => e.mode === list.mode);
+  if (!here) return `<span class="mf-era-badge" title="Era you are building for">${escapeHtml(MODE_LABEL[list.mode] ?? list.mode)}</span>`;
+  return `
+    <details class="era-switch">
+      <summary class="mf-era-badge is-control" title="Era you are building for - click to change">${escapeHtml(here.era)}${icon("chevronDown", 12, "era-caret")}</summary>
+      <div class="era-switch-panel">
+        <p class="era-switch-head">Build this fleet for</p>
+        ${ERA_MODES.map(
+          (e) => `<button class="era-opt ${e.mode === list.mode ? "on" : ""}" data-action="set-era" data-mode="${e.mode}" aria-pressed="${e.mode === list.mode}">
+            <span class="era-opt-name">${escapeHtml(e.era)}</span>
+            <span class="era-opt-hint">${escapeHtml(e.builds)}</span>
+          </button>`,
+        ).join("")}
+        <p class="era-switch-note">Your ships and faction come with you. Personnel choices are cleared, because each era picks them at a different moment.</p>
+      </div>
+    </details>`;
+}
+
 function shipyardView(state: AppState): string {
   const list = activeList(state);
   if (!list)
@@ -1059,7 +1100,7 @@ function shipyardView(state: AppState): string {
       </div>
       <div class="sy-fac">
         <span class="mf-fac">${factionControl}</span>
-        <span class="mf-era-badge" title="Era you are building for">Hypergrowth</span>
+        ${eraSwitch(list)}
       </div>
       ${playBtn}
       ${moreMenu}
@@ -1408,7 +1449,7 @@ function builderView(state: AppState): string {
       </div>
       <div class="sy-fac">
         <span class="mf-fac">${factionControl}</span>
-        ${era ? `<span class="mf-era-badge" title="Era you are building for">${escapeHtml(era)}</span>` : ""}
+        ${eraSwitch(list)}
         ${faction && !list.freePlay ? `<button class="sy-ref-btn" data-action="open-ship-reference" title="Faction ship reference">${icon("scroll", 15)} Reference</button>` : ""}
       </div>
       ${playBtn}
@@ -3201,6 +3242,40 @@ function tourPopover(state: AppState): string {
 // App-wide Options dialog: back up / restore / wipe the browser-stored data,
 // plus the about-and-links that also live in the footer. Rendered from the root
 // so it is reachable on every view.
+/**
+ * The destructive-action dialog.
+ *
+ * Fluent's rule is that the confirm button is a specific response to the title:
+ * "Delete this file?" gets "Delete", never "OK". A native window.confirm cannot
+ * do that - its buttons are OK and Cancel and nothing can change them - so the
+ * app used to load the meaning into the sentence and hope. This says it on the
+ * button, where the finger is.
+ *
+ * Cancel comes first in the DOM and the destructive button is the one that has
+ * to be reached for, rather than being the default under a returning Enter.
+ */
+function confirmModal(state: AppState): string {
+  const m = state.ui.modal;
+  if (!m || m.kind !== "confirm") return "";
+  return `
+  <div class="modal-root">
+    <div class="modal-backdrop" data-action="confirm-cancel"></div>
+    <div class="modal-panel no-modal cf-modal" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title">
+      <header class="modal-header ${m.danger ? "is-danger" : ""}">
+        <h2 class="modal-title" id="confirm-title">${escapeHtml(m.title)}</h2>
+        <button class="modal-close" data-action="confirm-cancel" aria-label="Cancel">${icon("close", 18)}</button>
+      </header>
+      <div class="modal-body">
+        <p class="cf-body">${escapeHtml(m.body)}</p>
+      </div>
+      <footer class="modal-footer">
+        <button class="bar-btn" data-action="confirm-cancel">Cancel</button>
+        <button class="cta-btn ${m.danger ? "cf-danger" : ""}" data-action="confirm-go" autofocus>${icon(m.danger ? "ix-trash" : "check", 16)} ${escapeHtml(m.confirmLabel)}</button>
+      </footer>
+    </div>
+  </div>`;
+}
+
 function optionsModal(state: AppState): string {
   const m = state.ui.modal;
   if (!m || m.kind !== "options") return "";
@@ -3763,5 +3838,5 @@ export function render(state: AppState): string {
         return learnView(state);
     }
   })();
-  return `${body}${optionsModal(state)}${emblemModal(state)}${newOutfitModal(state)}${tourPopover(state)}`;
+  return `${body}${optionsModal(state)}${emblemModal(state)}${newOutfitModal(state)}${confirmModal(state)}${tourPopover(state)}`;
 }

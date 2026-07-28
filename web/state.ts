@@ -232,6 +232,19 @@ export interface AppState {
         }
       | { kind: "options" }
       /**
+       * A destructive action waiting on a yes. `intent` is the click that was
+       * intercepted - its action name and data-* payload - so confirming can
+       * replay it rather than duplicating what it does. See needsConfirm.
+       */
+      | {
+          kind: "confirm";
+          title: string;
+          body: string;
+          confirmLabel: string;
+          danger?: boolean;
+          intent: { action: string; data: Record<string, string> };
+        }
+      /**
        * The new-outfit dialog holds its answers until you press Start, so the
        * outfit is only written once. `fromId` is an existing outfit to copy the
        * ships, pilots and emblem from (a fresh campaign either way - debt,

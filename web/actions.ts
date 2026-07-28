@@ -6,7 +6,7 @@ import { w } from "../src/data/_helpers.ts";
 import { randomFleetName } from "../src/fleet-names.ts";
 import { announce } from "./announce.ts";
 import { findFaction, isCustom } from "./catalog.ts";
-import { resolveShip } from "./render.ts";
+import { ERA_MODES, resolveShip } from "./render.ts";
 import {
   clearAllData,
   exportAllData,
@@ -349,10 +349,58 @@ function finishTour(tourId: string): void {
 function handleClick(e: MouseEvent): void {
   const target = (e.target as HTMLElement).closest<HTMLElement>("[data-action]");
   if (!target) return;
+  dispatchAction(target);
+}
+
+/**
+ * Ask before doing something destructive, then come back and do it.
+ *
+ * Every confirm in the app was a native `window.confirm()`, whose buttons are
+ * always OK/Cancel and cannot be relabelled - so "name the action in the
+ * button" was unreachable and the sentence had to carry it. This puts the
+ * question in a real dialog, where the confirm button can say "Delete fleet".
+ *
+ * It works by replaying the click: the pending action's name and data-* payload
+ * are parked on the modal, and confirming rebuilds a detached element carrying
+ * them plus data-confirmed, then dispatches that. So a destructive case only
+ * needs one guard line at the top and its body is untouched - and because the
+ * replay is the same dispatch path, there is no second copy of the logic that
+ * could drift.
+ */
+function needsConfirm(
+  target: HTMLElement,
+  ask: { title: string; body: string; confirmLabel: string; danger?: boolean },
+): boolean {
+  if (target.dataset["confirmed"]) return false;
+  const data: Record<string, string> = {};
+  for (const [k, v] of Object.entries(target.dataset)) {
+    if (k !== "action" && typeof v === "string") data[k] = v;
+  }
+  const action = target.dataset["action"] ?? "";
+  store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "confirm", ...ask, intent: { action, data } } } }));
+  return true;
+}
+
+function dispatchAction(target: HTMLElement): void {
   const action = target.dataset["action"];
   const state = store.getState();
 
   switch (action) {
+    case "confirm-cancel": {
+      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined } }));
+      break;
+    }
+    case "confirm-go": {
+      const m = state.ui.modal;
+      if (m?.kind !== "confirm") return;
+      const el = document.createElement("button");
+      el.dataset["action"] = m.intent.action;
+      for (const [k, v] of Object.entries(m.intent.data)) el.dataset[k] = v;
+      el.dataset["confirmed"] = "1";
+      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined } }));
+      dispatchAction(el);
+      break;
+    }
     case "close-popover": {
       // Visible X inside a popover: close the nearest open <details> around it.
       target.closest<HTMLDetailsElement>("details[open]")?.removeAttribute("open");
@@ -442,7 +490,15 @@ function handleClick(e: MouseEvent): void {
       const id = target.dataset["id"];
       const doomed = state.lists.find((l) => l.id === id);
       if (!doomed) return;
-      if (!confirm(`Delete "${doomed.fleet.name || "Unnamed fleet"}"? This cannot be undone.`)) return;
+      if (
+        needsConfirm(target, {
+          title: "Delete this fleet?",
+          body: `"${doomed.fleet.name || "Unnamed fleet"}" and everything in it goes for good. This cannot be undone.`,
+          confirmLabel: "Delete fleet",
+          danger: true,
+        })
+      )
+        return;
       store.setState((s) => {
         const lists = s.lists.filter((l) => l.id !== id);
         persistLists(lists);
@@ -637,7 +693,15 @@ function handleClick(e: MouseEvent): void {
         // Names the action rather than asking "Continue?". A native confirm's
         // buttons are always OK/Cancel and cannot be relabelled, so the sentence
         // has to carry what OK is going to do.
-        if (!confirm("Changing faction clears every unit and all personnel in this list. Change faction anyway?")) return;
+        if (
+          needsConfirm(target, {
+            title: "Change faction?",
+            body: "Every unit and all personnel in this list are cleared. The fleet name, emblem and credit limit are kept.",
+            confirmLabel: "Change faction",
+            danger: true,
+          })
+        )
+          return;
       }
       store.setState((s) => updateFleet(s, id, (f) => ({ ...f, factionId, units: [], hvp: [] })));
       break;
@@ -682,6 +746,60 @@ function handleClick(e: MouseEvent): void {
       );
       break;
     }
+    /**
+     * Move a saved fleet to another era.
+     *
+     * What survives, and why: ship classes belong to FACTIONS, not eras, and a
+     * faction is playable in any era ("You are free to select a faction from
+     * any Era", Hypergrowth p.124). So the faction, every unit, the credit
+     * limit, the name and the emblem all carry over untouched. What changes is
+     * the shape of the builder and the rules wrapped around the fleet.
+     *
+     * What is cleared, and why:
+     *  - Personnel. Each era chooses HVPs at a different moment - Armageddon at
+     *    build time, Age of Unity after the missions are generated, Hypergrowth
+     *    at requisition - so an assignment made under one era's rules is not a
+     *    valid assignment under another's.
+     *  - Any game in progress, because the round structure and the requisition
+     *    model differ; a Hypergrowth Shipyard tracker means nothing to
+     *    Armageddon and vice versa.
+     *  - unlimitedShipyards, which only exists in Hypergrowth.
+     */
+    case "set-era": {
+      const id = currentListId();
+      const mode = target.dataset["mode"] as GameMode | undefined;
+      if (!id || !mode) return;
+      const list = state.lists.find((l) => l.id === id);
+      if (!list || list.mode === mode) return;
+      const toEra = ERA_MODES.find((e) => e.mode === mode);
+      const hadHvp = list.fleet.hvp.length > 0;
+      const hadPlay = !!list.play;
+      const losing = [hadHvp ? "your personnel choices" : "", hadPlay ? "the game in progress" : ""].filter(Boolean);
+      if (
+        losing.length &&
+        needsConfirm(target, {
+          title: `Move to ${toEra?.era ?? mode}?`,
+          body: `Your ships, faction and credit limit all come with you. This clears ${losing.join(" and ")}, because ${toEra?.era ?? "each era"} handles ${hadHvp ? "personnel" : "play"} differently.`,
+          confirmLabel: `Move to ${toEra?.era ?? "this era"}`,
+        })
+      )
+        return;
+      store.setState((s) =>
+        updateList(s, id, (l) => ({
+          ...l,
+          mode,
+          fleet: { ...l.fleet, hvp: [] },
+          play: undefined,
+          unlimitedShipyards: mode === "hypergrowth" ? l.unlimitedShipyards : undefined,
+        })),
+      );
+      const kept = list.fleet.units.reduce((n, u) => n + u.count, 0);
+      showToast(
+        `Now building for ${toEra?.era ?? mode}. ${kept} ship${kept === 1 ? "" : "s"} kept${losing.length ? `, ${losing.join(" and ")} cleared` : ""}.`,
+        { icon: "check", loud: true },
+      );
+      break;
+    }
     case "close-modal": {
       store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined } }));
       break;
@@ -713,7 +831,15 @@ function handleClick(e: MouseEvent): void {
       break;
     }
     case "clear-data": {
-      if (!window.confirm("Delete every saved fleet, outfit, and custom faction from this browser? This cannot be undone.")) return;
+      if (
+        needsConfirm(target, {
+          title: "Clear all data?",
+          body: "Every saved fleet, outfit and custom faction is deleted from this browser. Export a backup first if you want to keep any of it. This cannot be undone.",
+          confirmLabel: "Clear all data",
+          danger: true,
+        })
+      )
+        return;
       clearAllData();
       location.hash = "#/";
       location.reload();
@@ -1066,7 +1192,15 @@ function handleClick(e: MouseEvent): void {
       const id = target.dataset["id"];
       const doomed = state.outfits.find((o) => o.id === id);
       if (!doomed) return;
-      if (!confirm(`Delete "${doomed.name || "Unnamed outfit"}"? This cannot be undone.`)) return;
+      if (
+        needsConfirm(target, {
+          title: "Delete this outfit?",
+          body: `"${doomed.name || "Unnamed outfit"}", its ships and its whole campaign go for good. This cannot be undone.`,
+          confirmLabel: "Delete outfit",
+          danger: true,
+        })
+      )
+        return;
       store.setState((s) => {
         const outfits = s.outfits.filter((o) => o.id !== id);
         persistOutfits(outfits);
@@ -1364,6 +1498,16 @@ function handleClick(e: MouseEvent): void {
     case "play-reset": {
       const id = currentListId();
       if (!id) return;
+      if (
+        action === "play-reset" &&
+        needsConfirm(target, {
+          title: "Reset this game?",
+          body: "The round, the phase, your CMD tokens, both scores and where every unit is all go back to the start. Your fleet is untouched.",
+          confirmLabel: "Reset game",
+          danger: true,
+        })
+      )
+        return;
       const delta = Number(target.dataset["delta"] ?? 0);
       const phaseTo = Number(target.dataset["phase"] ?? -1);
       store.setState((s) =>
@@ -1429,9 +1573,8 @@ function handleClick(e: MouseEvent): void {
             case "play-oppvp":
               return { ...l, play: { ...p, oppVp: floorScore(l.mode, p.oppVp + delta) } };
             case "play-reset":
-              return confirm("Reset the round, phase, CMD, and scores for this game?")
-                ? { ...l, play: freshPlayState(faction) }
-                : l;
+              // The question was asked before we got here (see needsConfirm).
+              return { ...l, play: freshPlayState(faction) };
             default:
               return l;
           }
@@ -1585,7 +1728,15 @@ function handleClick(e: MouseEvent): void {
       const id = target.dataset["id"];
       const doomed = state.customFactions.find((f) => f.id === id);
       if (!doomed) return;
-      if (!confirm(`Delete the faction "${doomed.name}"? Lists that use it will stop resolving.`)) return;
+      if (
+        needsConfirm(target, {
+          title: "Delete this faction?",
+          body: `"${doomed.name}" is deleted. Any fleet built with it stops resolving its ships and rules.`,
+          confirmLabel: "Delete faction",
+          danger: true,
+        })
+      )
+        return;
       store.setState((s) => {
         const customFactions = s.customFactions.filter((f) => f.id !== id);
         persistCustomFactions(customFactions);

@@ -4636,3 +4636,53 @@ main.play-body .roster-section::before { content: none; }
   .band-eyebrow { margin-bottom: 2px; font-size: 10px; }
   .fleet-name-input { font-size: 18px; width: 100%; }
 }
+
+/* ------------------------------------------ builder chrome on a phone
+   Measured on a 390x670 screen with a real ¢300 fleet and 3 of 3 personnel
+   chosen: the first ship sat at y=560. That is 84% of the screen spent before
+   the thing you came to look at.
+
+   Where it went: a 147px masthead wrapping to three lines, then a 197px
+   faction-rule block (the rule printed in full, plus Initiative and CMD), then
+   an 82px credit tally.
+
+   The faction rule is not cut and not folded away - it is verbatim reference
+   text and stays verbatim and visible. It is MOVED. You read a faction rule
+   once and then spend the whole session in the roster, so on a phone the rule
+   sits after the fleet instead of on top of it. Nothing is hidden; the order
+   just matches what you are actually doing. The credit tally stays above the
+   fleet, because that number changes with every tap. */
+@media (max-width: 760px) {
+  .shipyard { display: flex; flex-direction: column; }
+  .shipyard > .sy-head { order: 1; }
+  .shipyard > .sy-budget { order: 2; }
+  .shipyard > .sy-cols { order: 3; }
+  .shipyard > .sy-faction { order: 4; border-top: 2px solid var(--hair); margin-top: 18px; }
+  .shipyard > .sy-finish { order: 5; }
+
+  /* The masthead ran to three lines: identity, then faction/era/Reference, then
+     Play and the menu orphaned onto a third because those two needed 110px and
+     the faction row had 61px left. Two lines instead, split by what the
+     controls are FOR - what this fleet is and what you do with it on the first,
+     what it is built from on the second. */
+  .sy-head { gap: 3px 6px; padding: 4px 0 2px; }
+  /* The name gets a row to itself. Sharing one with Play and the menu got the
+     header down to 97px but left the field 146px wide, and the shortest seed
+     name needs 164px - so the fleet name was being cut off, which is the one
+     thing that must never happen. Measured against the real names: a full row
+     is 282px, and the longest ("Golem Mega-Systems Starter Fleet") needs 308px
+     at 19px and 276px at 17px. So: full row, 17px, and it fits with room over.
+     Three short rows beat two rows and a truncated name. */
+  .sy-head > .sy-id { order: 1; flex: 1 1 100%; min-width: 0; }
+  .sy-head > .sy-fac { order: 2; flex: 1 1 auto; }
+  .sy-head > .mf-play-btn { order: 3; }
+  .sy-head > .mf-menu { order: 4; }
+  /* 16px, not 17: at 17 the longest seed name still needed 276px against 268
+     available and was clipped by 8. 16px needs 260. It is also the size below
+     which iOS Safari zooms the page on focus, so this is the floor anyway. */
+  .sy-head .mf-name { font-size: 16px; min-width: 60px; }
+  .sy-head .sy-id { gap: 2px; }
+  .sy-head .sy-ref-btn { padding: 0 8px; }
+  .sy-budget { padding: 6px 0 8px; }
+  .sy-budget-now { font-size: 26px; }
+}

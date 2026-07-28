@@ -356,7 +356,19 @@ const CREDITS_INNER = creditsRaw
 const CREDITS_VB = { w: 44.81, h: 41.45 };
 
 /** The credits mark, sized by height so it sits on the type baseline. */
+/**
+ * The credits mark. The glyph itself means "billions of credits" - the "bn"
+ * suffix was dropped from every figure because the mark already carries it -
+ * which is only obvious once somebody tells you. A <title> does that: hovering
+ * any figure on a desktop says it, so the mark stops being an unexplained
+ * squiggle.
+ *
+ * It stays aria-hidden. Exposing the title to assistive tech would read
+ * "billions of credits" before every single number, and this glyph appears
+ * beside a hundred-odd figures on the Compendium alone - the tooltip is the
+ * one-off explanation, not something to repeat on every row.
+ */
 export function creditsGlyph(size = 12): string {
   const w = (size * CREDITS_VB.w) / CREDITS_VB.h;
-  return `<svg class="credits-glyph" width="${w.toFixed(2)}" height="${size}" viewBox="0 0 ${CREDITS_VB.w} ${CREDITS_VB.h}" fill="currentColor" aria-hidden="true" focusable="false">${CREDITS_INNER}</svg>`;
+  return `<svg class="credits-glyph" width="${w.toFixed(2)}" height="${size}" viewBox="0 0 ${CREDITS_VB.w} ${CREDITS_VB.h}" fill="currentColor" aria-hidden="true" focusable="false"><title>billions of credits</title>${CREDITS_INNER}</svg>`;
 }

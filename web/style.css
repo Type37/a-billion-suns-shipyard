@@ -506,7 +506,55 @@ button { font-family: inherit; }
   position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%);
   background: var(--ink); color: #fff; padding: 13px 22px;
   font-size: 13px; font-weight: 600; letter-spacing: 0.02em;
-  border-left: 4px solid var(--red); z-index: 40;
+  border-left: 4px solid var(--red);
+  display: flex; align-items: center; gap: 10px;
+  animation: toast-in 200ms var(--ease) both;
+  /* Above .modal-root (60). The toast was on 40, which meant the one moment it
+     most needed to be seen - confirming an add while the Add Unit dialog is
+     still open over the roster - was the one moment the dialog's backdrop was
+     painted on top of it. It rendered, it measured correctly, and it was
+     invisible. A toast has to outrank everything it might report on. */
+  z-index: 90;
+}
+.toast-ico { flex: none; color: var(--red); }
+/* The loud variant. Confirming an add has to carry across a dialog that is
+   sitting over the roster, so it is bigger, holds longer (see showToast) and
+   arrives with a movement rather than appearing. Still bottom-centre and still
+   position:fixed, so it never displaces anything. */
+.toast.is-loud {
+  bottom: 34px; padding: 16px 26px 16px 22px; gap: 12px;
+  font-family: var(--display); font-weight: 800; font-size: 16px; letter-spacing: 0.01em;
+  border-left-width: 6px;
+  box-shadow: 0 6px 0 rgb(10 14 20 / 0.16);
+  animation: toast-in-loud 260ms var(--ease) both;
+}
+.toast.is-loud .toast-ico { color: #6ee7a8; }
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes toast-in-loud {
+  0% { opacity: 0; transform: translateX(-50%) translateY(16px) scale(0.96); }
+  70% { opacity: 1; transform: translateX(-50%) translateY(-2px) scale(1.01); }
+  100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toast, .toast.is-loud { animation: none; }
+}
+/* On a phone the toast spans the screen rather than sitting as a small pill in
+   the middle of it, and clears the home bar. */
+@media (max-width: 760px) {
+  .toast { left: 10px; right: 10px; transform: none; }
+  .toast.is-loud { font-size: 15px; padding: 14px 18px; }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes toast-in-loud {
+    0% { opacity: 0; transform: translateY(16px) scale(0.97); }
+    70% { opacity: 1; transform: translateY(-2px) scale(1.01); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
 }
 
 /* ---------------------------------------------------------------------- hero */
@@ -551,6 +599,10 @@ button { font-family: inherit; }
    floating toast. Retires itself after the second visit. */
 .onboard { display: flex; align-items: flex-start; gap: 16px; margin: 0 0 22px; padding: 18px 18px 18px 22px; border: 2px solid var(--color-line); border-left: 6px solid var(--color-accent); background: var(--paper); }
 .onboard-main { flex: 1; min-width: 0; }
+/* The Foundry nudge is the same card in blue, not red: it is an invitation on a
+   quiet visit, where the tutorial callout is a first-run instruction. */
+.onboard-foundry { border-left-color: var(--blue); }
+.onboard-foundry .onboard-opt { text-decoration: none; }
 .onboard-title { font-family: var(--display); font-weight: 800; font-size: 18px; }
 .onboard-note { font-size: 14px; color: var(--ink-2); margin-top: 4px; max-width: 62ch; }
 .onboard-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }

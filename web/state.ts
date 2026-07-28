@@ -188,6 +188,14 @@ export interface AppState {
   ui: {
     /** Toast message shown briefly after copy actions. */
     toast?: string;
+    /**
+     * Optional glyph for the current toast, and a flag for the loud variant.
+     * Confirmations you asked for ("added", "duplicated") get the loud one;
+     * incidental notices stay quiet. Both are the same element, so only one
+     * toast is ever on screen.
+     */
+    toastIcon?: string;
+    toastLoud?: boolean;
     /** Faction picker: show every era, not just the list's era. */
     showAllFactions: boolean;
     /** Active tab within a solo outfit workspace. */

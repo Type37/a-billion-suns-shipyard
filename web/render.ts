@@ -31,6 +31,7 @@ import { FACTION_LORE } from "./faction-lore.ts";
 import type { AppState } from "./state.ts";
 import { activeList, activeOutfit, DEFAULT_PRINT, PAPER } from "./state.ts";
 import type { SavedList, UnitPosition } from "./storage.ts";
+import { SEED_FACTIONS } from "./seed-factions.ts";
 import { soloListView, soloOutfitView, newOutfitModal } from "./solo.ts";
 import { activeTour } from "./tours.ts";
 
@@ -459,7 +460,7 @@ function footer(): string {
       <span class="gif-title">A Billion Suns</span>
       <span>by <a href="https://planetsmashergames.com/a-billion-suns/" target="_blank" rel="noopener">Mike Hutchinson</a>, Osprey Games</span>
       <a href="./ABS-2E-Quick-Reference.pdf" target="_blank" rel="noopener">${icon("scroll", 13)} Quick Reference</a>
-      <span class="gif-builder">Fleet builder by <a class="wl-sig" href="https://linktr.ee/warlore" target="_blank" rel="noopener">WarLore</a></span>
+      <span class="gif-builder">Shipyard by <a class="wl-sig" href="https://linktr.ee/warlore" target="_blank" rel="noopener">WarLore</a></span>
       <a href="mailto:warlore1@outlook.com">Send Feedback</a>
       <a href="https://github.com/Type37/a-billion-suns-shipyard" target="_blank" rel="noopener">Source on GitHub</a>
     </div>
@@ -467,7 +468,9 @@ function footer(): string {
 }
 
 function toast(state: AppState): string {
-  return state.ui.toast ? `<div class="toast" role="status">${escapeHtml(state.ui.toast)}</div>` : "";
+  if (!state.ui.toast) return "";
+  const glyph = state.ui.toastIcon ? icon(state.ui.toastIcon, 18, "toast-ico") : "";
+  return `<div class="toast ${state.ui.toastLoud ? "is-loud" : ""}" role="status">${glyph}<span>${escapeHtml(state.ui.toast)}</span></div>`;
 }
 
 
@@ -493,6 +496,43 @@ function tutorialCallout(state: AppState): string {
       </div>
     </div>
     <button class="onboard-close" data-action="dismiss-tutorials" aria-label="Dismiss">${icon("close", 16)}</button>
+  </aside>`;
+}
+
+/**
+ * The Foundry nudge, on the third and fourth visit.
+ *
+ * The tutorial callout owns the first two visits, so this waits until that has
+ * had its turn - two nudges stacked on the home page would be a wall of
+ * suggestions on the screen you land on. By visit three you have built
+ * something and the interesting question stops being "how do I play" and starts
+ * being "can I put MY ships in it", which is the one thing the Foundry answers
+ * and nothing else in the app hints at.
+ *
+ * Silent for anyone who has already built one: they have found it. Note that
+ * "has a custom faction" is not the test - every browser is seeded with the
+ * Covenant, so a plain length check is true for everybody and this would never
+ * have shown at all. The test is whether any faction is one the user made.
+ */
+function foundryNudge(state: AppState): string {
+  const o = state.onboarding;
+  if (o.foundryNudgeDismissed) return "";
+  if (o.visits < 3 || o.visits > 4) return "";
+  const seeded = new Set(SEED_FACTIONS.map((f) => f.id));
+  if (state.customFactions.some((f) => !seeded.has(f.id))) return "";
+  return `
+  <aside class="onboard onboard-foundry">
+    <div class="onboard-main">
+      <p class="onboard-title">Bring your own ships</p>
+      <p class="onboard-note">Custom Rules lets you build a faction from scratch: your ship classes, your stats, your personnel. It plays exactly like the ones in the book, and you can share it as a file.</p>
+      <div class="onboard-options">
+        <a class="onboard-opt" href="#/foundry">
+          <span class="oo-name">${icon("custom-rules", 15)} Open Custom Rules</span>
+          <span class="oo-desc">Forge a faction, or start by duplicating one that already exists and renaming it.</span>
+        </a>
+      </div>
+    </div>
+    <button class="onboard-close" data-action="dismiss-foundry-nudge" aria-label="Dismiss">${icon("close", 16)}</button>
   </aside>`;
 }
 
@@ -528,6 +568,7 @@ function homeView(state: AppState): string {
   <main class="index-wrap">
     <div class="index-col">
       ${tutorialCallout(state)}
+      ${foundryNudge(state)}
       <nav class="index">
         ${row("#/fleets", "Fleets", "Build, save, print, and share army lists for any faction and era.")}
         ${row("#/solo", "Solo Play", "Play the Junkspace in solo/campaign mode.")}

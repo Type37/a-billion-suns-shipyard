@@ -1,4 +1,5 @@
 import { parseRoute, store } from "./state.ts";
+import { MODE_BUILDER_SHAPE } from "../src/types.ts";
 import { render } from "./render.ts";
 import { morphInto } from "./morph.ts";
 import { wireActions } from "./actions.ts";
@@ -36,6 +37,8 @@ const SITE_NAME = "A Billion Suns 2e Shipyard";
 const VIEW_TITLE: Record<string, string> = {
   home: "Home",
   fleets: "Fleets",
+  // builder is set per game mode in syncDocumentTitle - Hypergrowth builds a
+  // Shipyard, the other eras build a fleet list.
   builder: "Fleet builder",
   print: "Print setup",
   foundry: "Custom Rules",
@@ -65,8 +68,19 @@ function syncLearnAnchor(): void {
 // route read as the same document. A screen reader gets no signal that the view
 // changed at all; the title is the primary one it has.
 function syncDocumentTitle(): void {
-  const view = store.getState().route.view;
-  const name = VIEW_TITLE[view];
+  const s = store.getState();
+  const view = s.route.view;
+  // "Shipyard" is two things in this app and both are correct: the product name
+  // and, in Hypergrowth, the actual game object - the stock of hulls you
+  // requisition from. So the builder titles itself by what you are building.
+  // Calling a Hypergrowth session a "Fleet builder" is wrong on the rules'
+  // own terms: you are not building a fleet, you are stocking a Shipyard and
+  // units are not formed until you requisition them mid-game.
+  let name = VIEW_TITLE[view];
+  if (view === "builder") {
+    const list = s.lists.find((l) => l.id === (s.route as { listId: string }).listId);
+    name = list && MODE_BUILDER_SHAPE[list.mode] === "shipyard" ? "Shipyard" : "Fleet builder";
+  }
   document.title = name ? `${name} - ${SITE_NAME}` : SITE_NAME;
 }
 

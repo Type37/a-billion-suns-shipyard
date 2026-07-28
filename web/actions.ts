@@ -40,6 +40,7 @@ import { RANDOM_BEHAVIOUR, GLITCH_BLIP, type RollRow } from "../src/data/junkspa
 import { LIB_PAGE, libraryIcon, randomIconId } from "./emblems.ts";
 import { EMBLEM_IDS } from "./icons.ts";
 import { randomCorpName } from "../src/corp-names.ts";
+import { creditsText } from "./format.ts";
 import { writeOnInput } from "./write-on.ts";
 import { shareUrl } from "./share.ts";
 import { fleetToMarkdown } from "./export-text.ts";
@@ -137,15 +138,22 @@ function liveOutfitName(): string {
 
 let toastTimer: ReturnType<typeof setTimeout> | undefined;
 
-function showToast(message: string): void {
+function showToast(message: string, opts: { icon?: string; loud?: boolean } = {}): void {
   if (toastTimer) clearTimeout(toastTimer);
   // The toast is rendered inside #app, which is replaced wholesale on every
   // state change, so it cannot announce itself. Speak it separately.
   announce(message);
-  store.setState((s) => ({ ...s, ui: { ...s.ui, toast: message } }));
-  toastTimer = setTimeout(() => {
-    store.setState((s) => ({ ...s, ui: { ...s.ui, toast: undefined } }));
-  }, 2200);
+  store.setState((s) => ({
+    ...s,
+    ui: { ...s.ui, toast: message, toastIcon: opts.icon, toastLoud: opts.loud },
+  }));
+  // A loud toast is a confirmation you are meant to read, so it holds longer.
+  toastTimer = setTimeout(
+    () => {
+      store.setState((s) => ({ ...s, ui: { ...s.ui, toast: undefined, toastIcon: undefined, toastLoud: undefined } }));
+    },
+    opts.loud ? 3000 : 2200,
+  );
 }
 
 /**
@@ -644,10 +652,20 @@ function handleClick(e: MouseEvent): void {
       const faction = findFaction(list.fleet.factionId, state.customFactions);
       const addedName = resolveShip(shipId, faction, state.customFactions)?.ship.name ?? "Unit";
       const held = stocking ? (list.fleet.units.find((u) => u.shipClassId === shipId)?.count ?? 0) + 1 : 1;
-      // No toast on a successful add. The new roster row animates in and the
-      // count steps up in place, both of them where you are already looking;
-      // a message in the far corner of the screen announcing what you just
-      // watched happen was noise. Toasts are for things you CANNOT see.
+      // This used to say nothing, on the reasoning that the roster row animates
+      // in where you are already looking. That reasoning does not survive
+      // contact with the Add Unit dialog: the dialog STAYS OPEN so you can add
+      // several ships in a row, and it is covering the roster the whole time.
+      // So the row you were supposed to watch land is behind the dialog, and
+      // the add had no feedback at all. Loud, because it is the confirmation
+      // for the single most repeated action in the app.
+      const cost = resolveShip(shipId, faction, state.customFactions)?.ship.cost;
+      showToast(
+        stocking
+          ? `${addedName} stocked${held > 1 ? ` (${held} held)` : ""}${cost === undefined ? "" : ` · ${creditsText(cost)}`}`
+          : `${addedName} added to the fleet${cost === undefined ? "" : ` · ${creditsText(cost)}`}`,
+        { icon: "check", loud: true },
+      );
       store.setState((s) =>
         updateFleet(s, id, (f) => {
           if (stocking) {
@@ -1282,6 +1300,14 @@ function handleClick(e: MouseEvent): void {
     case "dismiss-tutorials": {
       store.setState((s) => {
         const onboarding = { ...s.onboarding, tutorialsDismissed: true };
+        persistOnboarding(onboarding);
+        return { ...s, onboarding };
+      });
+      break;
+    }
+    case "dismiss-foundry-nudge": {
+      store.setState((s) => {
+        const onboarding = { ...s.onboarding, foundryNudgeDismissed: true };
         persistOnboarding(onboarding);
         return { ...s, onboarding };
       });

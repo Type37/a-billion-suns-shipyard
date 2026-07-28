@@ -940,7 +940,7 @@ function shipyardView(state: AppState): string {
   const playBtn = `<a class="mf-play-btn" href="#/play/${list.id}" title="Enter Play Mode">${icon("ix-play", 17)}<span class="mf-play-btn-t">Play</span></a>`;
   const moreMenu = `
     <details class="mf-menu">
-      <summary class="mf-menu-btn" title="Fleet options: share, duplicate, delete" aria-label="Fleet options">${icon("more", 18)}</summary>
+      <summary class="mf-menu-btn" title="Fleet options: share, print, duplicate, delete" aria-label="Fleet options">${icon("ix-context-menu", 18)}</summary>
       <div class="mf-menu-panel">
         <button data-action="share-list" data-id="${list.id}">${icon("ix-share", 16)} Share link</button>
         <button data-action="copy-list-text" data-id="${list.id}">${icon("scroll", 16)} Copy as text</button>
@@ -1340,7 +1340,7 @@ function builderView(state: AppState): string {
   const playBtn = `<a class="mf-play-btn" href="#/play/${list.id}" title="Enter Play Mode">${icon("ix-play", 17)}<span class="mf-play-btn-t">Play</span></a>`;
   const moreMenu = `
     <details class="mf-menu">
-      <summary class="mf-menu-btn" title="Fleet options: share, duplicate, delete" aria-label="Fleet options">${icon("more", 18)}</summary>
+      <summary class="mf-menu-btn" title="Fleet options: share, print, duplicate, delete" aria-label="Fleet options">${icon("ix-context-menu", 18)}</summary>
       <div class="mf-menu-panel">
         <button data-action="share-list" data-id="${list.id}">${icon("ix-share", 16)} Share link</button>
         <button data-action="copy-list-text" data-id="${list.id}">${icon("scroll", 16)} Copy as text</button>
@@ -2062,7 +2062,7 @@ function foundryListView(state: AppState): string {
     <p class="panel-note">It may be easiest to just take an existing faction and rename certain elements; for example, taking the Unity and renaming them to "The Empire."</p>
     <div class="foundry-actions">
       <details class="cf-new-picker">
-        <summary class="cta-btn">${icon("plus", 18)} Forge a new faction</summary>
+        <summary class="cta-btn">${icon("plus", 18)} Forge a faction</summary>
         <div class="cf-new-panel">
           <button class="faction-plaque faction-plaque-blank" data-action="new-faction">
             <span class="faction-plaque-name">${icon("plus", 15)} Start from a blank sheet</span>

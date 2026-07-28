@@ -52,12 +52,32 @@
      clears 4.5:1 on both grounds. */
   --ink-3: #5c6472;
 
-  /* Per-stat colours, Okabe-Ito colourblind-safe palette, darkened for contrast
-     on white. Deliberately NOT a red/green pair. */
-  --stat-mass: #0b3d91;
-  --stat-thrust: #c25100;
-  --stat-sil: #00795a;
-  --stat-shields: #7b4397;
+  /* Per-stat colours. Okabe-Ito hue angles (so this is deliberately NOT a
+     red/green pair), pulled back in chroma and held inside one contrast band.
+     Mean chroma is 37 against the old palette's 54: the previous set read as
+     four highlighter pens, with a 4.70:1 orange sitting next to a 10.04:1 navy,
+     so the row had no even weight and the orange shouted loudest.
+
+     Two rules this palette has to satisfy at once, and they pull against each
+     other. Lower chroma and matched lightness is what makes a row of chips look
+     calm - but colour-blind readers separate colours mostly BY lightness, so
+     flattening it destroys them. A luminance-matched version of this palette
+     was measured at dE 1.5 between Thrust and Shields under tritanopia, i.e.
+     the same colour. So the four keep distinct lightnesses inside a deliberately
+     narrow 5.3:1-8.3:1 band on white: even enough to look like a set, separated
+     enough to survive.
+
+     Measured, worst-pair dE across the four:
+       normal 33.5, deuteranopia 20.7, protanopia 25.3, tritanopia 19.7
+     against the old palette's 26.6 / 25.4 / 11.2 / 17.8. The number that counts
+     is the worst case over all vision types: 11.2 before, 19.7 now.
+
+     Contrast floor: every one clears 4.6:1 on --blue-wash, the hardest ground
+     these sit on. The old --stat-thrust was 4.11:1 there and failed AA. */
+  --stat-mass: #2d5da8;
+  --stat-thrust: #975f2a;
+  --stat-sil: #26634f;
+  --stat-shields: #6d3d6b;
   /* Motion: one curve, and it does not overshoot. Instruments settle onto a
      value, they do not bounce past it and come back - that bounce is the thing
      that reads as a consumer app rather than a control panel. */
@@ -2352,6 +2372,12 @@ button { font-family: inherit; }
 .sy-id { display: flex; align-items: center; gap: 2px 4px; flex-wrap: nowrap; flex: 1 1 260px; min-width: 0; }
 .sy-name { flex: 1 1 0; min-width: 0; }
 .sy-fac { display: flex; align-items: center; gap: 4px 8px; flex-wrap: wrap; }
+/* Play and the "..." are one cluster and must not be split across a wrap: with
+   the header set to wrap, the menu button was dropping onto a line of its own
+   under the fleet name, reading as a stray orphan control. They wrap together
+   or not at all, and they stay welded to the right-hand end of the row. */
+.sy-head .mf-play-btn { margin-left: auto; }
+.sy-head .mf-play-btn + .mf-menu { margin-left: 0; }
 /* Tightened masthead: the shipyard header is a dense control strip, so its
    shared marks (d12, era badge, ... menu, emblem) shed the roomier padding the
    Armageddon builder uses. Scoped to .sy-head so only this header shrinks. */
@@ -4213,6 +4239,12 @@ main.play-body .roster-section::before { content: none; }
 /* The Hypergrowth shipyard is a single reading column, so it is capped much
    narrower than the two-column builder. Needs the #app id to beat #app > *. */
 #app > .shipyard { max-width: 820px; margin-left: auto; margin-right: auto; }
+/* Both builders render as .shipyard; the fleet-list eras add .builder-fleet and
+   put a second column (High-Value Personnel) beside the roster, so 820px is a
+   Hypergrowth measurement being applied to a two-column screen. 902px is that
+   820 plus 10%: enough that the personnel rules stop breaking to three and four
+   words a line, without letting the roster run past a comfortable measure. */
+#app > .shipyard.builder-fleet { max-width: 902px; }
 
 /* Gravity well and jump strain. */
 .learn-dg .dg-well { fill: var(--red); fill-opacity: 0.07; stroke: var(--red); stroke-width: 1; stroke-dasharray: 4 4; }

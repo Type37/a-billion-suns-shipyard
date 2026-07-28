@@ -76,6 +76,11 @@ const PATHS: Record<string, string> = {
   // header where a stroked outline would go muddy.
   "ix-play":
     '<g fill="currentColor" stroke="none"><path d="M4 3.6A1.6 1.6 0 0 1 5.6 2h12.8A1.6 1.6 0 0 1 20 3.6v16.8a1.6 1.6 0 0 1-1.6 1.6H5.6A1.6 1.6 0 0 1 4 20.4Zm2 .4v16h12V4Z"/><path d="M9.6 7.2v9.6l7.2-4.8z"/></g>',
+  // Siemens ix:context-menu, verbatim. Vertical dots, not the horizontal ones
+  // (ix:more-menu): a horizontal triplet at 18px is read as a text ellipsis -
+  // "the name is truncated" - where a vertical triplet is read as a menu.
+  "ix-context-menu":
+    '<path fill="currentColor" stroke="none" fill-rule="evenodd" d="M256 117.333c17.673 0 32-14.327 32-32s-14.327-32-32-32s-32 14.327-32 32s14.327 32 32 32m0 341.333c17.673 0 32-14.327 32-32s-14.327-32-32-32s-32 14.327-32 32s14.327 32 32 32M256 288c17.673 0 32-14.327 32-32s-14.327-32-32-32s-32 14.327-32 32s14.327 32 32 32"/>',
   "ix-trash":
     '<g fill="currentColor" stroke="none"><path d="M9.5 2h5a1.5 1.5 0 0 1 1.5 1.5V5h5v2H3V5h5V3.5A1.5 1.5 0 0 1 9.5 2Zm.5 3h4v-1h-4z"/><path d="M5 8h14l-.8 12.1A2 2 0 0 1 16.2 22H7.8a2 2 0 0 1-2-1.9zm4 2v9h1.6v-9zm4.4 0v9H15v-9z"/></g>',
   trash: '<path d="M5 7 H19"/><path d="M9 7 V5 H15 V7"/><path d="M7 7 8 20 H16 L17 7"/>',
@@ -159,6 +164,8 @@ const ICON_VIEWBOX: Record<string, string> = {
   "stat-thrust": "3.62 3.59 16.83 16.83",
   "stat-silhouette": "3.16 4.16 17.68 17.68",
   "stat-shields": "1.66 1.67 20.69 20.69",
+  // Siemens ix icons ship on a 512 grid, not the 24 the rest of this set uses.
+  "ix-context-menu": "0 0 512 512",
 };
 
 export function icon(name: string, size = 18, cls = ""): string {

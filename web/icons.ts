@@ -71,6 +71,11 @@ const PATHS: Record<string, string> = {
     '<g fill="currentColor" stroke="none"><path d="M9 2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-1v-2h1V4H9v1H7V4a2 2 0 0 1 2-2Z"/><rect x="3" y="7" width="13" height="15" rx="2"/></g>',
   "ix-share":
     '<g fill="currentColor" stroke="none"><circle cx="18.5" cy="5" r="3.2"/><circle cx="18.5" cy="19" r="3.2"/><circle cx="5.5" cy="12" r="3.2"/><path d="m7.9 9.9 8.2-4.1.9 1.8-8.2 4.1zm0 4.2.9-1.8 8.2 4.1-.9 1.8z"/></g>',
+  // Same Siemens iX family as the card actions above: a solid right-pointing
+  // triangle inside a square plate, 2px corners. Reads at 18px on the builder
+  // header where a stroked outline would go muddy.
+  "ix-play":
+    '<g fill="currentColor" stroke="none"><path d="M4 3.6A1.6 1.6 0 0 1 5.6 2h12.8A1.6 1.6 0 0 1 20 3.6v16.8a1.6 1.6 0 0 1-1.6 1.6H5.6A1.6 1.6 0 0 1 4 20.4Zm2 .4v16h12V4Z"/><path d="M9.6 7.2v9.6l7.2-4.8z"/></g>',
   "ix-trash":
     '<g fill="currentColor" stroke="none"><path d="M9.5 2h5a1.5 1.5 0 0 1 1.5 1.5V5h5v2H3V5h5V3.5A1.5 1.5 0 0 1 9.5 2Zm.5 3h4v-1h-4z"/><path d="M5 8h14l-.8 12.1A2 2 0 0 1 16.2 22H7.8a2 2 0 0 1-2-1.9zm4 2v9h1.6v-9zm4.4 0v9H15v-9z"/></g>',
   trash: '<path d="M5 7 H19"/><path d="M9 7 V5 H15 V7"/><path d="M7 7 8 20 H16 L17 7"/>',

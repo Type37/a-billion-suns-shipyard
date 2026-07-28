@@ -275,7 +275,9 @@ export function freshPlayState(faction?: { cmdTokens: string }): import("./stora
   // Seed the CMD counter from the faction's per-round value where it is a
   // plain number ("7"); dice values ("D12") start at 0 and are set by hand.
   const cmd = faction ? Number(faction.cmdTokens) || 0 : 0;
-  return { round: 1, phase: 0, cmd, vp: 0, oppVp: 0 };
+  // No `pos`: every unit starts in Reserve, and an absent key already reads as
+  // Reserve, so a fresh game needs no seeding.
+  return { round: 1, phase: 0, cmd, cmdMax: cmd, vp: 0, oppVp: 0 };
 }
 
 /**

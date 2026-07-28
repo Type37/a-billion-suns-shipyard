@@ -1261,6 +1261,8 @@ function handleClick(e: MouseEvent): void {
     case "play-next":
     case "play-round":
     case "play-cmd":
+    case "play-cmd-set":
+    case "play-pos":
     case "play-vp":
     case "play-oppvp":
     case "play-reset": {
@@ -1279,18 +1281,48 @@ function handleClick(e: MouseEvent): void {
             case "play-phase":
               return { ...l, play: { ...p, phase: Math.max(0, Math.min(3, phaseTo)), checks: [] } };
             case "play-next": {
-              // Advancing past the End Phase rolls into the next round and
-              // refreshes the CMD counter from the faction value.
+              // Advancing past the End Phase rolls into the next round. Unspent
+              // CMD tokens are discarded at the end of the round and you gain
+              // your faction's value again, so the pool refills to the faction
+              // number rather than carrying over - including any +1 you took
+              // for losing the Initiative Check, which is re-rolled each round.
               if (p.phase >= 3) {
-                const cmd = faction ? Number(faction.cmdTokens) || p.cmd : p.cmd;
-                return { ...l, play: { ...p, phase: 0, round: Math.min(maxRound, p.round + 1), cmd, checks: [] } };
+                const base = faction ? Number(faction.cmdTokens) || (p.cmdMax ?? p.cmd) : (p.cmdMax ?? p.cmd);
+                return {
+                  ...l,
+                  play: { ...p, phase: 0, round: Math.min(maxRound, p.round + 1), cmd: base, cmdMax: base, checks: [] },
+                };
               }
               return { ...l, play: { ...p, phase: p.phase + 1, checks: [] } };
             }
             case "play-round":
               return { ...l, play: { ...p, round: Math.max(1, Math.min(maxRound, p.round + delta)) } };
-            case "play-cmd":
-              return { ...l, play: { ...p, cmd: Math.max(0, p.cmd + delta) } };
+            // The +/- beside the token row sizes the POOL, not what is left of
+            // it: losing the Initiative Check is +1 token, and several HVPs give
+            // and take tokens outright. Growing the pool hands you live tokens;
+            // shrinking it never leaves more unspent than the pool holds.
+            case "play-cmd": {
+              const max = Math.max(0, (p.cmdMax ?? p.cmd) + delta);
+              return { ...l, play: { ...p, cmdMax: max, cmd: Math.max(0, Math.min(p.cmd + delta, max)) } };
+            }
+            // Tapping token i: if it is live, it and everything to its right is
+            // spent (so spending one is a tap on the last live token); if it is
+            // already spent, it and everything to its left comes back. One tap
+            // for any number of tokens, and misclicks are undone the same way.
+            case "play-cmd-set": {
+              const i = Number(target.dataset["i"] ?? -1);
+              const max = p.cmdMax ?? p.cmd;
+              if (!Number.isFinite(i) || i < 0 || i >= max) return l;
+              return { ...l, play: { ...p, cmd: i < p.cmd ? i : i + 1 } };
+            }
+            // Reserve <-> jumped in, per unit. Units start in Reserve and jump
+            // in via a Jump Point; the Jump Out action puts one straight back.
+            case "play-pos": {
+              const unit = target.dataset["unit"];
+              const to = target.dataset["to"];
+              if (!unit || (to !== "reserve" && to !== "play")) return l;
+              return { ...l, play: { ...p, pos: { ...(p.pos ?? {}), [unit]: to } } };
+            }
             // Hypergrowth is played in credits, and you requisition ships out of
             // your Shipyard before you have earned anything: "You start with 0
             // credits, and recover that expenditure by earning credits from the

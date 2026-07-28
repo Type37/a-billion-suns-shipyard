@@ -30,7 +30,7 @@ import { learnDiagram } from "./diagrams.ts";
 import { FACTION_LORE } from "./faction-lore.ts";
 import type { AppState } from "./state.ts";
 import { activeList, activeOutfit, DEFAULT_PRINT, PAPER } from "./state.ts";
-import type { SavedList } from "./storage.ts";
+import type { SavedList, UnitPosition } from "./storage.ts";
 import { soloListView, soloOutfitView, newOutfitModal } from "./solo.ts";
 import { activeTour } from "./tours.ts";
 
@@ -935,12 +935,16 @@ function shipyardView(state: AppState): string {
 
   // Masthead chrome, the same pieces the Fleet-List builder uses.
   const emblemPicker = `<button class="emblem-current-btn" data-action="open-emblem-modal" data-target="list" title="Choose an emblem">${listEmblem(list, 46)}${icon("pencil", 12, "emblem-edit-cue")}</button>`;
+  // The one action you take at the table rather than at the desk, so it sits in
+  // the header at full size instead of behind the "..." with the admin actions.
+  const playBtn = `<a class="mf-play-btn" href="#/play/${list.id}" title="Enter Play Mode">${icon("ix-play", 17)}<span class="mf-play-btn-t">Play</span></a>`;
   const moreMenu = `
     <details class="mf-menu">
       <summary class="mf-menu-btn" title="Fleet options: share, duplicate, delete" aria-label="Fleet options">${icon("more", 18)}</summary>
       <div class="mf-menu-panel">
         <button data-action="share-list" data-id="${list.id}">${icon("ix-share", 16)} Share link</button>
         <button data-action="copy-list-text" data-id="${list.id}">${icon("scroll", 16)} Copy as text</button>
+        <a href="#/print/${list.id}">${icon("print", 16)} Print setup</a>
         <button data-action="duplicate-list" data-id="${list.id}">${icon("ix-duplicate", 16)} Duplicate</button>
         <button class="danger" data-action="delete-list" data-id="${list.id}">${icon("ix-trash", 16)} Delete fleet</button>
       </div>
@@ -1016,6 +1020,7 @@ function shipyardView(state: AppState): string {
         <span class="mf-fac">${factionControl}</span>
         <span class="mf-era-badge" title="Era you are building for">Hypergrowth</span>
       </div>
+      ${playBtn}
       ${moreMenu}
     </header>
 
@@ -1322,15 +1327,24 @@ function builderView(state: AppState): string {
       </details>`;
 
   // Overflow menu for the secondary fleet actions (share, duplicate, delete). A
-  // position:absolute popover so opening it shifts nothing. Play Mode and Print
-  // are deliberately NOT in here - they are the two "you're done building"
-  // output actions and get their own buttons at the foot of the manifest.
+  // position:absolute popover so opening it shifts nothing.
+  //
+  // Print setup lives in here now. Both output actions used to exist ONLY as
+  // buttons at the foot of the manifest, which is fine on a desktop where the
+  // foot is a scroll away, and useless on a phone where it is 3300px away - so
+  // reaching Print or Play meant scrolling the length of the fleet. Print is a
+  // menu item; Play gets its own button in the header (playBtn) because it is
+  // the one you press at the table, mid-game, repeatedly.
+  // The one action you take at the table rather than at the desk, so it sits in
+  // the header at full size instead of behind the "..." with the admin actions.
+  const playBtn = `<a class="mf-play-btn" href="#/play/${list.id}" title="Enter Play Mode">${icon("ix-play", 17)}<span class="mf-play-btn-t">Play</span></a>`;
   const moreMenu = `
     <details class="mf-menu">
       <summary class="mf-menu-btn" title="Fleet options: share, duplicate, delete" aria-label="Fleet options">${icon("more", 18)}</summary>
       <div class="mf-menu-panel">
         <button data-action="share-list" data-id="${list.id}">${icon("ix-share", 16)} Share link</button>
         <button data-action="copy-list-text" data-id="${list.id}">${icon("scroll", 16)} Copy as text</button>
+        <a href="#/print/${list.id}">${icon("print", 16)} Print setup</a>
         <button data-action="duplicate-list" data-id="${list.id}">${icon("ix-duplicate", 16)} Duplicate</button>
         <button class="danger" data-action="delete-list" data-id="${list.id}">${icon("ix-trash", 16)} Delete fleet</button>
       </div>
@@ -1356,6 +1370,7 @@ function builderView(state: AppState): string {
         ${era ? `<span class="mf-era-badge" title="Era you are building for">${escapeHtml(era)}</span>` : ""}
         ${faction && !list.freePlay ? `<button class="sy-ref-btn" data-action="open-ship-reference" title="Faction ship reference">${icon("scroll", 15)} Reference</button>` : ""}
       </div>
+      ${playBtn}
       ${moreMenu}
     </header>
 
@@ -2390,22 +2405,52 @@ const SCORING_NOTES: Partial<Record<GameMode, string[]>> = {
  * vertical space than every stat on the card put together. Damage belongs on the
  * printed sheet, where you can actually mark it.
  */
+/**
+ * The fleet in Play Mode, with a position control on every unit.
+ *
+ * This panel used to be a read-only roster, which left the single most
+ * bookkeeping-heavy thing in a game of A Billion Suns untracked. Units start in
+ * Reserve and are jumped in through a Jump Point during the Jump Phase; a unit
+ * that takes the Jump Out action goes straight back to Reserve. Two places, one
+ * toggle, and a tally at the top so you can see the shape of your fleet without
+ * reading every row.
+ *
+ * Hypergrowth is deliberately not routed here - see playShipyardTracker, where
+ * ships move Shipyard -> Reserves -> play and cost credits on the way out.
+ */
 function playFleetPanel(list: SavedList, faction: Faction | undefined, customs: Faction[]): string {
   const names = unitDisplayNames(list.fleet.units, faction, customs);
-  const rows = unitsByMass(list.fleet.units, faction, customs)
+  const pos = list.play?.pos ?? {};
+  const units = unitsByMass(list.fleet.units, faction, customs);
+  const posOf = (id: string): UnitPosition => pos[id] ?? "reserve";
+
+  const tally = { reserve: 0, play: 0 };
+  for (const u of units) tally[posOf(u.id)] += 1;
+
+  const PLACES: { key: UnitPosition; label: string }[] = [
+    { key: "reserve", label: "Reserve" },
+    { key: "play", label: "Jumped in" },
+  ];
+
+  const rows = units
     .map((u) => {
       const r = resolveShip(u.shipClassId, faction, customs);
       if (!r) return "";
       const ship = r.ship;
       const title = u.name || names.get(u.id) || ship.name;
+      const here = posOf(u.id);
       const carried = list.fleet.hvp
         .filter((h) => h.assignedUnitId === u.id)
         .map((h) => hvpById(h.hvpId, faction)?.name ?? h.hvpId);
+      const places = PLACES.map(
+        (pl) => `<button class="pf-pos-opt ${here === pl.key ? "on" : ""}" data-action="play-pos" data-unit="${u.id}" data-to="${pl.key}" aria-pressed="${here === pl.key}">${pl.label}</button>`,
+      ).join("");
       return `
-      <article class="pf-unit">
+      <article class="pf-unit is-${here}">
         <header class="pf-head">
           <span class="pf-name">${escapeHtml(title)}${u.count > 1 ? ` <span class="pf-x">&times;${u.count}</span>` : ""}</span>
         </header>
+        <div class="pf-pos" role="group" aria-label="Where ${escapeHtml(title)} is">${places}</div>
         <div class="pf-data">${statChips(ship, true)}${weaponsTable(ship)}</div>
         ${carried.length ? `<p class="pf-carry">Carrying: ${escapeHtml(carried.join("; "))}</p>` : ""}
       </article>`;
@@ -2413,7 +2458,14 @@ function playFleetPanel(list: SavedList, faction: Faction | undefined, customs: 
     .join("");
   if (!rows) return "";
   return `<section class="play-fleet">
-    <h3 class="roster-section">Your fleet</h3>
+    <div class="pf-panel-head">
+      <h3 class="roster-section">Your fleet</h3>
+      <p class="pf-tally">
+        <span class="pf-tally-n is-play">${tally.play}</span> jumped in
+        <span class="pf-tally-sep">·</span>
+        <span class="pf-tally-n is-reserve">${tally.reserve}</span> in reserve
+      </p>
+    </div>
     <div class="pf-list">${rows}</div>
   </section>`;
 }
@@ -2659,6 +2711,35 @@ function playView(state: AppState): string {
       </div>
     </div>`;
 
+  // CMD tokens as tokens. A bare number told you how many were left but not how
+  // many you started with, and a -/+ pair is the wrong shape for a resource you
+  // spend one at a time with a finger. This is the pile in front of you: every
+  // token the round gave you, drawn, and the spent ones greyed out where they
+  // were rather than vanishing - so "3 of 7 gone" is one glance, not arithmetic.
+  //
+  // The -/+ still sizes the pool, because the pool is not fixed: +1 for losing
+  // the Initiative Check, and HVPs like Customs Officer take tokens off you.
+  const cmdMax = play.cmdMax ?? play.cmd;
+  const cmdPips =
+    cmdMax > 0
+      ? Array.from({ length: cmdMax }, (_, i) => {
+          const spent = i >= play.cmd;
+          return `<button class="cmd-pip ${spent ? "is-spent" : ""}" data-action="play-cmd-set" data-i="${i}" aria-pressed="${spent}" title="${spent ? `Take token ${i + 1} back` : `Spend down to ${i} token${i === 1 ? "" : "s"}`}" aria-label="${spent ? `Token ${i + 1} of ${cmdMax}, spent` : `Token ${i + 1} of ${cmdMax}, unspent`}">${icon("cmd-delta", 20)}</button>`;
+        }).join("")
+      : `<span class="cmd-pips-none">No CMD tokens this round</span>`;
+  const cmdStrip = `
+    <div class="cmd-strip">
+      <div class="cmd-strip-head">
+        <span class="control-label">CMD tokens</span>
+        <span class="cmd-strip-count"><b>${play.cmd}</b> of ${cmdMax} left</span>
+        <span class="cmd-strip-adjust">
+          <button class="stepper-btn" data-action="play-cmd" data-delta="-1" aria-label="One fewer CMD token this round" title="One fewer CMD token this round">${icon("minus", 15)}</button>
+          <button class="stepper-btn" data-action="play-cmd" data-delta="1" aria-label="One more CMD token this round" title="One more CMD token this round">${icon("plus", 15)}</button>
+        </span>
+      </div>
+      <div class="cmd-pips" role="group" aria-label="CMD tokens">${cmdPips}</div>
+    </div>`;
+
   // Scoring reminders live in the End Phase only now (that is when you score),
   // not in a standing block that repeated on every phase.
   const scoringNotes = currentPhase?.scoring
@@ -2704,21 +2785,33 @@ function playView(state: AppState): string {
   return `
   ${topbar()}
   <main class="solo-body play-body">
-    <header class="play-bar">
-      <p class="play-bar-id"><a href="#/list/${list.id}">${escapeHtml(list.fleet.name || "Unnamed fleet")}</a> <span aria-hidden="true">/</span> Play mode</p>
-      <!--
-        A readout, not a control. The round only ever moves one way and it moves
-        by itself: Next phase past the End Phase rolls it over. A pair of steppers
-        beside it was two more things to look at that nobody needed to press.
-      -->
-      <p class="play-bar-round">
-        <span class="control-label">Round</span>
-        <span class="round-value">${play.round}</span>
-        <span class="play-bar-of">of ${maxRound}</span>
-      </p>
-      <button class="ghost-btn play-bar-reset" data-action="play-reset">Reset</button>
-    </header>
-    <div class="phase-track">${phaseBtns}</div>
+    <!--
+      Round, phase and the CMD pile are the three things you look at between
+      every action, and on a phone they were 2,600px above wherever you had
+      scrolled to. This wrapper pins them. On a desktop it is display:contents,
+      so the layout is exactly what it was.
+    -->
+    <div class="play-sticky">
+      <header class="play-bar">
+        <p class="play-bar-id"><a href="#/list/${list.id}">${escapeHtml(list.fleet.name || "Unnamed fleet")}</a> <span aria-hidden="true">/</span> Play mode</p>
+        <!--
+          A readout, not a control. The round only ever moves one way and it moves
+          by itself: Next phase past the End Phase rolls it over. A pair of steppers
+          beside it was two more things to look at that nobody needed to press.
+        -->
+        <p class="play-bar-round">
+          <span class="control-label">Round</span>
+          <span class="round-value">${play.round}</span>
+          <span class="play-bar-of">of ${maxRound}</span>
+        </p>
+        <button class="ghost-btn play-bar-reset" data-action="play-reset">Reset</button>
+      </header>
+      <div class="phase-track">${phaseBtns}</div>
+      ${cmdStrip}
+      <div class="play-sticky-next">
+        <button class="cta-btn" data-action="play-next">${icon("chevronRight", 16)} Next phase</button>
+      </div>
+    </div>
     ${
       isShipyard
         ? // Shipyard layout: left column is what you're doing PLUS the faction
@@ -2727,11 +2820,7 @@ function playView(state: AppState): string {
           `<div class="play-cols">
       <div class="play-col play-col-do">
         ${checklistBlock}
-        <div class="play-actions">
-          <button class="cta-btn" data-action="play-next">${icon("chevronRight", 16)} Next phase</button>
-        </div>
         <div class="play-counters">
-          ${counter("CMD tokens", play.cmd, "play-cmd", 1, (n) => String(n), icon("cmd-delta", 15, "cmd-delta-glyph"))}
           ${counter(scoreLabel, play.vp, "play-vp", scoreStep, scoreFmt)}
           ${counter("Opponent " + scoreLabel.toLowerCase(), play.oppVp, "play-oppvp", scoreStep, scoreFmt)}
         </div>
@@ -2748,11 +2837,7 @@ function playView(state: AppState): string {
           `<div class="play-cols">
       <div class="play-col play-col-do">
         ${checklistBlock}
-        <div class="play-actions">
-          <button class="cta-btn" data-action="play-next">${icon("chevronRight", 16)} Next phase</button>
-        </div>
         <div class="play-counters">
-          ${counter("CMD tokens", play.cmd, "play-cmd", 1, (n) => String(n), icon("cmd-delta", 15, "cmd-delta-glyph"))}
           ${counter(scoreLabel, play.vp, "play-vp", scoreStep, scoreFmt)}
           ${counter("Opponent " + scoreLabel.toLowerCase(), play.oppVp, "play-oppvp", scoreStep, scoreFmt)}
         </div>
@@ -2932,7 +3017,7 @@ function shipsView(state: AppState): string {
   const shipCells = (r: CompRow) => `
     <td class="comp-num" data-label="Mass">${r.mass}</td>
     <td class="comp-num" data-label="Thrust">${r.thrust}"</td>
-    <td class="comp-num" data-label="Silhouette">${r.silhouette}</td>
+    <td class="comp-num" data-label="Sil">${r.silhouette}</td>
     <td class="comp-num" data-label="Shields">${r.shields}</td>
     <td class="comp-weap" data-label="Primary">${r.primary || '<span class="muted">None</span>'}</td>
     <td class="comp-weap" data-label="Auxiliary">${r.auxiliary || '<span class="muted">None</span>'}</td>

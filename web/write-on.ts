@@ -59,12 +59,14 @@ export function runDecode(text: string, apply: (partial: string) => void, opts: 
   requestAnimationFrame(frame);
 }
 
-/** Desktop, pointer, not reduced-motion: the same gate the title decode uses. */
+/**
+ * Not reduced-motion. This used to also require `(hover: hover)` at 768px and
+ * up, which quietly meant "desktop only" - phones got the plain value and none
+ * of the decode. The animation is a string swap on one element, so there was no
+ * performance reason for the gate, and the phone is where the app is used most.
+ */
 export function canWriteOn(): boolean {
-  return (
-    window.matchMedia("(hover: hover) and (min-width: 768px)").matches &&
-    !window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
+  return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 /**

@@ -165,6 +165,7 @@ function paint(): void {
 
   measureStickyHeader();
   observeEmblemLibrary();
+  markJustPickedFaction();
   animateFactionTitle();
   animateNewRosterRows();
   animateCountChanges();
@@ -429,21 +430,34 @@ function decodeTitle(el: HTMLElement, text: string): void {
   requestAnimationFrame(frame);
 }
 
-// Age of Unity: the title comes in like the Star Wars logo - huge and distant,
-// then recedes into place, fading up only as it shrinks. Composed, inevitable.
-function recedeTitle(el: HTMLElement, text: string): void {
+// Age of Unity: a Star Wars scene wipe. A hard bright edge crosses the title
+// from left to right and the name is uncovered behind it. This replaced a
+// scale-and-fade recede: the fade was the softest thing on a screen that is
+// otherwise all hard edges, and a wipe is both more Star Wars and more Swiss.
+// Nothing fades - a letter is either behind the wipe or fully drawn.
+//
+// The clip-path does the uncovering and deliberately does NOT fill forwards: it
+// must revert to `none` so the red underline can overhang the box afterwards.
+// The travelling edge is a pseudo-element (see .nfd-title.is-wiping::before),
+// which WAAPI cannot reach, so it is driven by a class instead.
+function wipeTitle(el: HTMLElement, text: string): void {
   el.textContent = text;
   el.appendChild(titleRule());
-  el.style.transformOrigin = "50% 50%";
-  el.animate(
-    [
-      { opacity: 0, transform: "scale(2.1)" },
-      { opacity: 0.12, transform: "scale(1.45)", offset: 0.45 },
-      { opacity: 1, transform: "scale(1)" },
-    ],
-    { duration: 520, fill: "forwards", easing: "cubic-bezier(.2,.75,.2,1)" },
-  );
+  el.style.transformOrigin = "";
+  el.animate([{ clipPath: "inset(-20% 100% -20% 0)" }, { clipPath: "inset(-20% 0 -20% 0)" }], {
+    duration: WIPE_MS,
+    easing: "cubic-bezier(.3,0,.1,1)",
+  });
+  // Re-picking the same era re-runs this, and a class that is already present
+  // will not restart a CSS animation. Drop it, force a reflow, re-add.
+  el.classList.remove("is-wiping");
+  void el.offsetWidth;
+  el.classList.add("is-wiping");
+  window.setTimeout(() => el.classList.remove("is-wiping"), WIPE_MS + 60);
 }
+
+/** Shared by the clip-path reveal and the travelling edge, so they stay locked. */
+const WIPE_MS = 460;
 
 // Armageddon: the title lands big from above, overshoots small, then jolts once
 // on impact (a quick diagonal recoil) before settling. The red underline is held
@@ -726,6 +740,38 @@ function measureStickyHeader(): void {
   if (h > 0) document.documentElement.style.setProperty("--mf-head-h", `${h + 12}px`);
 }
 
+/**
+ * Flag the faction plaque that just became selected so its wipe plays once.
+ *
+ * The app re-renders by replacing HTML, so the plaque is a brand new element on
+ * every state change. A CSS `transition` therefore never fires (there is no old
+ * computed value to move from) and a keyframe animation fires on EVERY render,
+ * which would re-wipe the selected faction every time you added a ship. So the
+ * animation hangs off an extra `.just-picked` class added here, and only when
+ * the selection actually changed since the last render.
+ *
+ * Keyed by picker (`.nf-modal`, the builder switcher, the Foundry) so opening a
+ * modal that shows an already-selected faction does not count as a fresh pick.
+ * The settled look does not depend on any of this: `.selected::before` already
+ * rests at scaleX(1), so a missed frame just means no animation, never a plaque
+ * that is half-filled or missing its fill.
+ */
+const lastSelectedFaction = new Map<string, string>();
+function markJustPickedFaction(): void {
+  for (const group of document.querySelectorAll<HTMLElement>(".faction-plaques")) {
+    const scope = group.closest(".nf-modal, .faction-switch, .foundry-main, main")?.className ?? "loose";
+    const sel = group.querySelector<HTMLElement>(".faction-plaque.selected");
+    const id = sel?.dataset["faction"] ?? "";
+    const key = `${scope}|${group.className}`;
+    const before = lastSelectedFaction.get(key);
+    lastSelectedFaction.set(key, id);
+    // `undefined` is the first sight of this picker - seed it, do not animate,
+    // or every picker would wipe on open.
+    if (before === undefined || before === id || !sel) continue;
+    sel.classList.add("just-picked");
+  }
+}
+
 function animateFactionTitle(): void {
   const el = document.querySelector<HTMLElement>(".nfd-title[data-anim-title]");
   if (!el) {
@@ -738,16 +784,16 @@ function animateFactionTitle(): void {
   if (key === lastTitleKey) return; // unchanged - leave the resting state be
   lastTitleKey = key;
 
-  // Desktop only ("this order is just for desktop"), and never against the OS
-  // reduced-motion preference. In both cases the resting markup is already right.
-  const canMotion =
-    window.matchMedia("(hover: hover) and (min-width: 992px)").matches &&
-    !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (!canMotion) return;
+  // This was gated to desktop pointers at 992px and up. Phones got a plain
+  // title, which was the wrong call: picking a faction is the most-repeated
+  // moment in the app and the era animations are the best thing in it. The only
+  // gate left is the OS reduced-motion preference. All three are transform,
+  // opacity and clip-path on one element, so they stay cheap on a phone.
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
   if (era === "hyper") decodeTitle(el, title);
   else if (era === "arma") slamTitle(el, title);
-  else recedeTitle(el, title);
+  else wipeTitle(el, title);
   animateStatGlyphs();
 }
 
@@ -766,19 +812,40 @@ function positionTour(): void {
   pop.style.display = "flex";
   const p = pop.getBoundingClientRect();
 
-  let left = a.right + gap;
+  // Side placement needs the popover's full width clear of the anchor on one
+  // side or the other. On a phone neither side has it, and the old code fell
+  // through to a clamp that centred the popover ON its own target - the
+  // Compendium's coachmark sat squarely over the search box it was describing.
+  // When neither side fits, go below the anchor instead (or above it, if the
+  // anchor is low on the screen), which always leaves the target visible.
+  const fitsRight = a.right + gap + p.width <= window.innerWidth - 12;
+  const fitsLeft = a.left - gap - p.width >= 12;
+  let left: number;
+  let top: number;
   let arrowRight = false;
-  if (left + p.width > window.innerWidth - 12) {
-    left = a.left - p.width - gap;
-    arrowRight = true;
+  let arrowV = "";
+
+  if (fitsRight || fitsLeft) {
+    left = fitsRight ? a.right + gap : a.left - p.width - gap;
+    arrowRight = !fitsRight;
+    top = a.top + a.height / 2 - p.height / 2;
+  } else {
+    // Under the anchor by preference; flip above when there is no room under.
+    const below = a.bottom + gap;
+    const roomBelow = below + p.height <= window.innerHeight - 12;
+    top = roomBelow ? below : a.top - p.height - gap;
+    arrowV = roomBelow ? "arrow-top" : "arrow-bottom";
+    // Line the popover up with the anchor's left edge where it can.
+    left = a.left;
   }
   left = Math.max(12, Math.min(left, window.innerWidth - p.width - 12));
-  let top = a.top + a.height / 2 - p.height / 2;
   top = Math.max(12, Math.min(top, window.innerHeight - p.height - 12));
 
   pop.style.left = `${left}px`;
   pop.style.top = `${top}px`;
   pop.classList.toggle("arrow-right", arrowRight);
+  pop.classList.toggle("arrow-top", arrowV === "arrow-top");
+  pop.classList.toggle("arrow-bottom", arrowV === "arrow-bottom");
   pop.classList.add("placed");
 }
 

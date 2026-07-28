@@ -685,6 +685,12 @@ button { font-family: inherit; }
   max-width: var(--shell); margin: 0 auto;
   padding: clamp(28px, 4vw, 52px) clamp(16px, 4vw, 40px) 0;
   display: grid; grid-template-columns: 1.35fr 1fr; gap: clamp(28px, 4vw, 56px); align-items: start;
+  /* #app is a flex column at min-height 100vh and main has flex-grow:1, so this
+     grid is routinely taller than its rows. Without this, the default stretch
+     splits the leftover height BETWEEN the rows: Junkspace's 60px header and
+     62px panel were spaced out over 433px, reading as a broken page. Rows sit
+     at the top and the slack goes to the bottom, where it belongs. */
+  align-content: start;
 }
 @media (max-width: 940px) { .home-main { grid-template-columns: 1fr; } }
 
@@ -718,9 +724,59 @@ button { font-family: inherit; }
 }
 .faction-plaque:hover { border-color: var(--hair); border-left-color: var(--color-action); background: var(--blue-wash); }
 .faction-plaque:active { transform: translateY(1px); }
-.faction-plaque.selected { background: var(--blue); border-color: var(--blue); border-left-color: var(--red); }
+/* The blue of a selected plaque is painted by ::before, not by the element's
+   own background, so it can be wiped in from the left edge (see .just-picked).
+   ::before rests at scaleX(1), which means the settled state is correct with no
+   JavaScript at all: a re-render, a reduced-motion reader and a repaint all
+   draw a plain solid plaque, and only a fresh pick animates. */
+.faction-plaque { position: relative; isolation: isolate; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.faction-plaque::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: var(--blue); transform: scaleX(0); transform-origin: left center;
+}
+.faction-plaque.selected::before { transform: scaleX(1); }
+.faction-plaque.selected { background: var(--paper); border-color: var(--blue); border-left-color: var(--red); }
 .faction-plaque.selected .faction-plaque-name { color: #fff; }
 .faction-plaque.selected .faction-plaque-rule { color: #bcd0f2; }
+
+/* Picking a faction: the blue floods out of the red index bar to the far edge
+   in 260ms, the label flips to white as the edge passes under it, and a single
+   red rectangle pings out past the border and fades. Hard edges travelling in
+   one direction - the same move as the Age of Unity title wipe - rather than a
+   fade or a bounce. main.ts adds .just-picked to the newly selected plaque for
+   exactly one render (see markJustPickedFaction), so it fires on the pick and
+   not on every unrelated re-render.
+   Nothing here is in flow: ::before is inset-positioned and ::after is allowed
+   to overflow, so neighbouring plaques never move. */
+.faction-plaque.selected.just-picked::before { animation: plaque-wipe 260ms cubic-bezier(.16, .84, .36, 1) both; }
+.faction-plaque.selected.just-picked { animation: plaque-edge 300ms cubic-bezier(.16, .84, .36, 1) both; z-index: 5; }
+.faction-plaque.selected.just-picked .faction-plaque-name { animation: plaque-ink 260ms linear both; }
+.faction-plaque.selected.just-picked .faction-plaque-rule { animation: plaque-ink-sub 260ms linear both; }
+.faction-plaque.just-picked::after {
+  content: ""; position: absolute; inset: -1px; z-index: 3;
+  border: 2px solid var(--red); opacity: 0; pointer-events: none;
+  animation: plaque-ping 340ms cubic-bezier(.16, .84, .36, 1) both;
+}
+@keyframes plaque-wipe { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes plaque-edge { from { border-left-color: var(--blue); } 45%, 100% { border-left-color: var(--red); } }
+@keyframes plaque-ink { 0%, 35% { color: var(--ink); } 36%, 100% { color: #fff; } }
+@keyframes plaque-ink-sub { 0%, 35% { color: var(--ink-3); } 36%, 100% { color: #bcd0f2; } }
+@keyframes plaque-ping {
+  0% { transform: scale(1); opacity: 1; }
+  70% { opacity: 0.35; }
+  100% { transform: scale(1.055); opacity: 0; }
+}
+/* Reduced motion still gets the finished plaque, just with no travel: ::before
+   is already at scaleX(1) from the rule above, so cancelling the animations
+   leaves a correct, fully solid, fully legible button. */
+@media (prefers-reduced-motion: reduce) {
+  .faction-plaque.just-picked,
+  .faction-plaque.just-picked::before,
+  .faction-plaque.just-picked::after,
+  .faction-plaque.just-picked .faction-plaque-name,
+  .faction-plaque.just-picked .faction-plaque-rule { animation: none; }
+  .faction-plaque.just-picked::after { content: none; }
+}
 .faction-plaque-name { font-family: var(--display); font-weight: 700; font-size: 14px; line-height: 1.15; letter-spacing: -0.01em; color: var(--ink); }
 .faction-plaque-rule { font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
 
@@ -1973,7 +2029,32 @@ button { font-family: inherit; }
      off the LEFT edge - "Duplicate" sat at x=-40 and could not be tapped. */
   .dock-table .cell-actions { justify-content: flex-start; flex-wrap: wrap; gap: 8px; padding-top: 8px; margin-top: 6px; border-top: 1px solid var(--hair-soft); display: flex; }
   .comp-weap { min-width: 0; }
-  .comp-table tbody tr.comp-group td { position: static; }
+
+  /* The generic table-to-card rule above gives every cell its own labelled
+     line. For the fleets and foundry tables that is right - a handful of rows.
+     For the Compendium it is not: 115 ships x 7 stacked lines came to a 28,781px
+     page, 43 phone screens of scrolling with no way to navigate it.
+     Same cells, same labels, nothing hidden - just packed. Name and cost share
+     the first line, the four stats share the second, and the two weapon lines
+     run full width. About 100px a ship instead of 260. */
+  .comp-table tbody tr:not(.comp-group) {
+    display: flex; flex-wrap: wrap; align-items: baseline;
+    gap: 1px 10px; padding: 8px 11px; margin-bottom: 6px;
+  }
+  .comp-table .comp-name { flex: 1 1 auto; order: 0; padding-bottom: 0; font-size: 15px; }
+  .comp-table td.comp-cost { order: 1; margin-left: auto; font-weight: 800; color: var(--blue); }
+  .comp-table td.comp-cost::before { content: none; }
+  .comp-table td.comp-fac { order: 2; flex: 1 1 100%; }
+  .comp-table td.comp-num:not(.comp-cost) { order: 3; flex: 0 0 auto; gap: 5px; }
+  .comp-table td.comp-weap { order: 4; flex: 1 1 100%; }
+  /* The 84px label gutter is for a stacked list; inline it hangs the four stats
+     off the left edge of the screen. */
+  .comp-table td.comp-num:not(.comp-cost)::before,
+  .comp-table td.comp-weap::before { flex: 0 0 auto; }
+
+  /* Faction bars stick while you scroll their ships, so you always know whose
+     hull you are looking at and they double as landmarks in a long list. */
+  .comp-table tbody tr.comp-group td { position: sticky; top: 0; z-index: 2; }
 
   .hero-inner { padding-top: 40px; padding-bottom: 32px; }
   .band-readout { width: 100%; }
@@ -2003,6 +2084,7 @@ button { font-family: inherit; }
   .segment button { padding: 10px 14px; }
   .comp-filters .control-group { flex: 1 1 100%; }
 }
+
 
 /* Smallest phones still in the wild (iPhone SE, 320px): the labels wrap inside
    their buttons rather than clip, so this only needs to buy back a little room
@@ -2256,6 +2338,21 @@ button { font-family: inherit; }
 .sy-head .mf-menu > summary { height: 28px; padding: 0 8px; gap: 4px; }
 .sy-head .emblem-current-btn svg { width: 34px; height: 34px; }
 .sy-head .emblem-edit-cue { display: none; }
+
+/* Play, in the header. Filled blue because it is the only thing up here that
+   leaves the builder for the table, and it has to be findable at a glance in a
+   room with the lights down. Icon AND word - a lone triangle would be the one
+   unlabelled control on the screen. */
+.mf-play-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  flex-shrink: 0; height: 40px; padding: 0 12px;
+  border: 1px solid var(--blue); background: var(--blue); color: #fff;
+  font-family: var(--sans); font-size: 12px; font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase; text-decoration: none;
+}
+.mf-play-btn:hover { background: var(--blue-deep); border-color: var(--blue-deep); color: #fff; }
+.mf-play-btn:active { transform: translateY(1px); }
+.sy-head .mf-play-btn { height: 28px; padding: 0 9px; font-size: 11px; gap: 5px; }
 
 /* Faction block: the faction rule verbatim with Initiative and CMD/round. */
 .sy-faction { padding: 10px 0; border-top: 1px solid var(--hair-soft); }
@@ -2848,6 +2945,28 @@ button { font-family: inherit; }
    no transition; removing that class on landing lets the transition draw it in. */
 .nfd-title--arma .nfd-underline { transform: scaleX(1); }
 .nfd-title--arma.is-landing .nfd-underline { transform: scaleX(0); transition: none; }
+/* Age of Unity's Star Wars wipe: a hard red edge travels left to right while
+   wipeTitle() clip-paths the name in behind it. Absolutely positioned inside
+   the already-relative title and pointer-events:none, so it paints over the
+   letters without touching layout or swallowing a tap. The class is added and
+   removed in main.ts; `left` is the only animated property that matters and it
+   is on an out-of-flow element, so nothing else on the page reflows. */
+.nfd-title.is-wiping::before {
+  content: "";
+  position: absolute; top: -14%; bottom: -14%; left: 0; width: 3px;
+  background: var(--red);
+  box-shadow: 0 0 12px 2px rgb(238 53 36 / 0.5);
+  pointer-events: none;
+  animation: unity-wipe 460ms cubic-bezier(.3, 0, .1, 1) forwards;
+}
+@keyframes unity-wipe {
+  from { left: -2px; opacity: 1; }
+  85%  { opacity: 1; }
+  to   { left: 100%; opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nfd-title.is-wiping::before { animation: none; content: none; }
+}
 .nfd-era-tag { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-bottom: 12px; }
 /* The slogan sits in a fixed-height well so the "Signature ability" heading and
    the stat plates below hold the same position no matter which faction you
@@ -2896,14 +3015,51 @@ button { font-family: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .cmd-token path { animation: none; }
 }
+/* ---------------------------------------------------------- modals on a phone
+   A 20px moat on all four sides plus a 90vh cap costs about 110px of a 670px
+   screen before any content exists, and the New Fleet modal needs every one of
+   them. Near-fullscreen with a hairline of backdrop left showing, so it still
+   reads as a layer over the page rather than a new screen, and the internal
+   padding comes down hard. */
 @media (max-width: 720px) {
+  .modal-root { padding: 5px; }
+  .modal-panel { width: 100%; max-height: calc(100dvh - 10px); }
+  .modal-header { padding: 9px 12px; }
+  .modal-body { padding: 12px; gap: 13px; }
+  .modal-footer { padding: 9px 12px; }
+
   .nf-modal .nf-body { grid-template-columns: 1fr; }
-  .nf-detail-col { border-left: none; padding-left: 0; border-top: 1px solid var(--hair-soft); padding-top: 16px; }
-  /* Single-column, a flat 320px list pushes the modal body past its own 90vh
-     and you get two nested scrollers - on iOS the inner one swallows the drag
-     and the footer becomes unreachable. Still a FIXED height (one value per
-     viewport, not content-driven), so switching era still shifts nothing. */
-  .nf-faction-scroll { height: clamp(180px, 38vh, 320px); }
+  .nf-detail-col { border-left: none; padding-left: 0; border-top: 1px solid var(--hair-soft); padding-top: 14px; }
+  /* This was a fixed clamp(180px, 38vh, 320px) box, meant to avoid a second
+     scroller. It produced exactly the thing it was avoiding: a 258px porthole
+     showing under two factions at a time, nested inside the modal panel, which
+     scrolled as well. There are only four factions in an era, so at this width
+     the list runs at its natural height and the panel is the sole scroller. */
+  .nf-faction-scroll { height: auto; overflow: visible; padding-right: 0; }
+  /* Tighter plaques so all four factions of an era are on screen together. */
+  .modal-body .faction-plaques { gap: 5px; }
+  .modal-body .faction-plaque { height: auto; padding: 8px 10px; gap: 1px; }
+  .modal-body .faction-plaque-name { font-size: 13.5px; }
+  .modal-body .faction-plaque-rule { font-size: 9.5px; }
+  .nf-era-btn { padding: 8px 10px; }
+  /* Nothing is selected yet, so this is a 250px box whose entire content is an
+     instruction to select something. The faction list right above it is the
+     instruction. Comes back the moment a faction is picked. */
+  .nf-detail-empty { display: none; }
+  .nf-detail-col:has(.nf-detail-empty) { border-top: none; padding-top: 0; }
+  /* One unbroken control: the four caps butt up against each other and share a
+     single hairline, rather than four separate chips with CUSTOM orphaned onto
+     a second row. -1px margins collapse the doubled borders; the selected chip
+     lifts so its blue edge is not overlapped by its neighbour's grey one. */
+  .nf-opts { gap: 0; flex-wrap: nowrap; }
+  .nf-opts > * { flex: 1 1 0; min-width: 0; margin-left: -1px; position: relative; z-index: 0; justify-content: center; padding-left: 4px; padding-right: 4px; }
+  .nf-opts > :first-child { margin-left: 0; }
+  .nf-opts > .on { z-index: 1; }
+  /* The custom cap opens into a text field, which cannot share a quarter of the
+     row, so that one state is allowed to wrap. */
+  .nf-opts:has(.nf-custom.on) { flex-wrap: wrap; gap: 6px; }
+  .nf-opts:has(.nf-custom.on) > * { flex: 0 0 auto; margin-left: 0; }
+  .cta-go { white-space: nowrap; }
 }
 
 .modal-body .faction-plaques.nf-all {
@@ -2945,6 +3101,27 @@ button { font-family: inherit; }
   border-bottom: none;
   border-right: 2px solid var(--color-line);
   border-top: 2px solid var(--color-line);
+}
+/* Narrow screens place the popover under (or over) its target rather than
+   beside it, so the arrow moves to the horizontal edge. See positionTour. */
+.tour-pop.arrow-top .tour-pop-arrow {
+  top: -9px;
+  left: 22px;
+  transform: rotate(45deg);
+  border-left: 2px solid var(--color-line);
+  border-top: 2px solid var(--color-line);
+  border-bottom: none;
+  border-right: none;
+}
+.tour-pop.arrow-bottom .tour-pop-arrow {
+  top: auto;
+  bottom: -9px;
+  left: 22px;
+  transform: rotate(45deg);
+  border-left: none;
+  border-top: none;
+  border-bottom: 2px solid var(--color-line);
+  border-right: 2px solid var(--color-line);
 }
 .tour-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px 0; }
 .tour-title { font-family: var(--display); font-weight: 800; font-size: 15px; letter-spacing: -0.01em; color: var(--color-ink); }
@@ -3203,6 +3380,42 @@ button { font-family: inherit; }
 .emblem-bgbox { display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
 .em-foot { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 12px 18px; border-top: 1px solid var(--hair); }
 .em-foot .em-done { margin-left: auto; }
+
+/* ------------------------------------------------ emblem picker on a phone
+   Measured on a 390x670 screen: the scrolling body was 305px of a 650px modal,
+   and the folder chips wrapped to five rows that ate 250px of THAT - so the
+   grid you came for got about 55px, under one row of a 262-sigil library.
+   Everything below buys height back for the grid.
+
+   The chips become one horizontal lane instead of five stacked rows. This is
+   the one place a sideways scroll is right: they are a filter over the grid,
+   "All" leads and is the default, and every chip stays full width with its
+   count - nothing is truncated, it is the same list on one line instead of
+   five. Scroll-snap and a fading right edge say there is more to the right. */
+@media (max-width: 720px) {
+  .em-modal { height: calc(100dvh - 10px); }
+  .em-head { gap: 9px; }
+  .em-preview { width: 34px; height: 34px; }
+  .em-preview .emblem, .em-preview .emblem-img { width: 26px; height: 26px; }
+  .em-tab { padding: 9px 8px; }
+  .em-body { padding: 10px 12px; }
+  .em-search { padding: 8px 10px; margin-bottom: 8px; }
+  .em-folders {
+    flex-wrap: nowrap; overflow-x: auto; margin-bottom: 9px; padding-bottom: 3px;
+    scroll-snap-type: x proximity; overscroll-behavior-x: contain;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
+            mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
+  }
+  .em-folder { flex: 0 0 auto; scroll-snap-align: start; padding: 5px 9px; }
+  .em-foot { padding: 8px 12px; }
+  /* The background picker is one line: label and swatches share a row instead
+     of stacking, and the swatches shrink to a still-comfortable 30px. */
+  .em-colour { padding: 8px 12px; gap: 6px; }
+  .em-colour-row { gap: 10px; }
+  .em-colour-label { min-width: 0; font-size: 11px; }
+  .em-swatches { gap: 6px; flex-wrap: nowrap; overflow-x: auto; }
+  .bg-swatch { width: 30px; height: 30px; flex: 0 0 auto; }
+}
 
 /* Play Mode: the commands legal in the current phase, with cost and full text. */
 .pc-cmds { margin-top: 20px; border: 1px solid var(--hair); background: var(--paper); padding: 11px 13px; }
@@ -3808,6 +4021,40 @@ main.play-body ~ .game-info-footer { display: none; }
    and adjusted in the same control), and the once-a-game Reset. */
 .play-body { padding-top: 6px; }
 .play-bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding-bottom: 5px; border-bottom: 2px solid var(--hair); }
+/* display:contents on a wide screen, where nothing scrolls far enough to lose
+   the header - the round bar, phase track and CMD strip lay out exactly as if
+   this wrapper were not here. It only becomes a real pinned block on a phone. */
+.play-sticky { display: contents; }
+/* Next phase used to live in each column's .play-actions, which meant it was
+   written twice and sat below the checklist. There is one now, next to the
+   phase track it drives. On a wide screen it is a normal block in the flow; on
+   a phone it joins the pinned header. */
+.play-sticky-next { margin: 6px 0 2px; }
+.play-sticky-next .cta-btn { justify-content: center; }
+
+/* --------------------------------------------------------- the CMD pile
+   One button per token the round gave you. Live tokens are blue; spent ones
+   grey out in place rather than disappearing, so the size of the pile is a
+   constant and "what have I got left" is a glance, not a subtraction. */
+.cmd-strip { padding: 6px 0 4px; border-bottom: 1px solid var(--hair-soft); }
+.cmd-strip-head { display: flex; align-items: baseline; gap: 10px; }
+.cmd-strip-count { font-family: var(--sans); font-size: 11.5px; font-weight: 600; color: var(--ink-3); }
+.cmd-strip-count b { font-family: var(--display); font-weight: 900; font-size: 15px; color: var(--ink); }
+.cmd-strip-adjust { display: inline-flex; gap: 4px; margin-left: auto; }
+.cmd-strip-adjust .stepper-btn { width: 30px; height: 30px; min-height: 30px; flex: none; }
+.cmd-pips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.cmd-pip {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; padding: 0; cursor: pointer;
+  border: 1px solid var(--blue); background: var(--blue-wash); color: var(--blue);
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease, opacity 0.12s ease;
+}
+.cmd-pip:hover { background: var(--blue); color: #fff; }
+/* Spent: drained of colour but still drawn and still tappable, because taking a
+   token back has to be as easy as spending it - a mis-tap mid-turn is common. */
+.cmd-pip.is-spent { border-color: var(--hair); background: var(--paper); color: var(--ink-3); opacity: 0.5; }
+.cmd-pip.is-spent:hover { opacity: 0.85; border-color: var(--ink-3); background: var(--paper); color: var(--ink-2); }
+.cmd-pips-none { font-family: var(--sans); font-size: 12px; font-style: italic; color: var(--ink-3); }
 /* Section headings lose the indent and the accent square: mid-game that is 34px
    of left margin and a decorative dot on a line that just says "Your fleet". */
 main.play-body .roster-section { padding: 5px 0 4px; font-size: 10.5px; border-bottom: none; }
@@ -3826,17 +4073,17 @@ main.play-body .roster-section::before { content: none; }
 .play-debt-note { font-family: var(--serif); font-size: 12.5px; line-height: 1.45; color: var(--ink-2); margin: 8px 0 0; }
 .play-bar-of { font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }
 .play-bar-reset { flex: none; }
-/* Three counters, always one row. The fourth used to wrap and cost ~80px of
-   height for a single number; Round now lives in the header instead. */
-.play-cols .play-counters { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-/* Three counters share one row, and in the credit modes the value reads "¢90bn"
+/* Two counters, always one row: your score and your opponent's. Round moved to
+   the header, and CMD is now the token pile in the header block, so a third
+   track here would just be an empty cell. */
+.play-cols .play-counters { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+/* The counters share one row, and in the credit modes the value reads "¢90bn"
    rather than "7". At a fixed 40px with a 50px floor the middle one pushed a
    stepper past the right edge of the page, so inside these counters the figure
    scales and the row is allowed to shrink to its track. */
 .play-counters .play-counter { min-width: 0; }
 .play-counters .round-control { min-width: 0; justify-content: space-between; }
 .play-counters .round-value { min-width: 0; font-size: clamp(20px, 2.6vw, 32px); }
-@media (max-width: 620px) { .play-cols .play-counters { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 /* Below ~410px a signed credit value ("-70bn", and worse "-250bn") no longer
    fits between the two steppers in a half-width counter and gets clipped. One
    full-width column per counter gives every figure room. */
@@ -4005,6 +4252,82 @@ main.play-body .roster-section::before { content: none; }
 .pf-data .stat-chip, .pf-data .stat-chip-mini { border: none; background: none; padding: 0; }
 .pf-data .weap-lines { flex: 1 1 auto; margin-top: 0; min-width: 0; }
 .pf-carry { font-size: 11px; font-style: italic; color: var(--ink-2); margin-top: 1px; }
+
+/* ------------------------------------------------------- where a unit is
+   Reserve or Jumped in, one two-segment control per unit. Both segments are
+   always drawn at a fixed width, so the row's height never changes with the
+   answer and the fleet does not reflow as the game runs. The unit also carries
+   a state class (.is-reserve / .is-play) which tints its left edge, so you can
+   read the shape of your fleet by scanning the margin. */
+.pf-panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.pf-tally { margin: 0; font-family: var(--sans); font-size: 11.5px; font-weight: 600; color: var(--ink-3); }
+.pf-tally-n { font-family: var(--display); font-weight: 900; font-size: 14px; }
+.pf-tally-n.is-play { color: var(--blue); }
+.pf-tally-n.is-reserve { color: var(--ink-2); }
+.pf-tally-sep { color: var(--hair); margin: 0 3px; }
+
+.pf-unit { border-left: 3px solid transparent; padding-left: 8px; }
+.pf-unit.is-play { border-left-color: var(--blue); }
+.pf-unit.is-reserve { border-left-color: var(--hair); }
+
+.pf-pos { display: grid; grid-template-columns: repeat(2, 1fr); margin: 3px 0 4px; max-width: 230px; }
+.pf-pos-opt {
+  min-height: 34px; padding: 0 6px; cursor: pointer;
+  border: 1px solid var(--hair); margin-left: -1px; background: var(--paper); color: var(--ink-3);
+  font-family: var(--sans); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.pf-pos-opt:first-child { margin-left: 0; }
+.pf-pos-opt:hover { border-color: var(--ink-3); color: var(--ink); }
+.pf-pos-opt.on { background: var(--blue); border-color: var(--blue); color: #fff; position: relative; z-index: 1; }
+
+/* ------------------------------------------------- Play Mode on a phone
+   Play Mode is used standing at a table with the phone in one hand, and the
+   page runs to about 2,600px. Nothing was pinned, so advancing a phase or
+   checking how many CMD tokens were left meant scrolling the whole roster back
+   to the top and then finding your place again.
+
+   The round, the phase track, the CMD pile and Next phase pin to the top as one
+   block. It is deliberately the whole block and not just a strip: those four
+   things are what you touch between every action, and splitting them would put
+   half of them back at the top of a long scroll. Everything else - the fleet,
+   the commands, the checklist - scrolls under it. */
+@media (max-width: 760px) {
+  .play-sticky {
+    display: block; position: sticky; top: 0; z-index: 30;
+    background: var(--paper); padding-bottom: 5px; margin-bottom: 6px;
+    border-bottom: 2px solid var(--ink);
+    /* The topbar is not sticky, so this can own the top of the screen. */
+    box-shadow: 0 6px 12px -6px rgb(10 14 20 / 0.22);
+  }
+  /* The pinned block is only worth pinning if it leaves room for the fleet, so
+     every row in it is squeezed onto one line. Measured 274px before this,
+     41% of a 670px screen; the breadcrumb was wrapping and the round readout
+     was set at 28px. Nothing is dropped - it is the same four rows, tighter. */
+  .play-sticky .play-bar { padding-bottom: 3px; border-bottom: none; gap: 4px 10px; flex-wrap: nowrap; }
+  .play-sticky .play-bar-id { flex: 1 1 auto; min-width: 0; font-size: 10.5px; line-height: 1.25; }
+  .play-sticky .play-bar-round { flex: none; gap: 5px; }
+  .play-sticky .play-bar-round .round-value { font-size: 19px; }
+  .play-sticky .play-bar-of { font-size: 10.5px; }
+  .play-sticky .play-bar-reset { padding: 0 9px; min-height: 34px; font-size: 11px; }
+  .play-sticky .phase-track { margin: 0; }
+  .play-sticky .cmd-strip { padding: 4px 0 2px; border-bottom: none; }
+  .play-sticky .cmd-strip-adjust .stepper-btn { width: 26px; height: 26px; min-height: 26px; }
+  /* Next phase joins the pinned block, so the button you press four times a
+     round is always under your thumb. */
+  .play-sticky-next { margin: 5px 0 0; }
+  .play-sticky-next .cta-btn { width: 100%; }
+  /* The pile is the one thing that must never wrap out of sight, and a big
+     faction can hand out eight or more, so the tokens shrink rather than
+     spilling onto a third row. */
+  .cmd-pip { width: 30px; height: 30px; }
+  .cmd-pips { gap: 3px; }
+  /* Anything the sticky block scrolls over has to clear it, or a tapped
+     accordion opens underneath the header. */
+  .play-body .phase-fold[open] > summary { scroll-margin-top: 210px; }
+  .pf-pos { max-width: none; }
+}
 
 .learn-dg .dg-dbl-mover { animation: dg-double-run 3400ms ease-in-out infinite; }
 

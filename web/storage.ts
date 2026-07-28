@@ -16,7 +16,16 @@ export interface PlayState {
   round: number;
   /** 0 Command, 1 Jump, 2 Tactical, 3 End. */
   phase: number;
+  /** CMD tokens still unspent this round. */
   cmd: number;
+  /**
+   * How many the round started with, so the token row knows how many pips to
+   * draw and which of them are spent. Adjustable, because the pool is not just
+   * the faction value: losing the Initiative Check is +1 (core rules, Command
+   * Phase), and HVPs hand tokens back and forth. Optional so play states saved
+   * before the token row existed still load - read it as `cmdMax ?? cmd`.
+   */
+  cmdMax?: number;
   vp: number;
   oppVp: number;
   /** Which of the current phase's checklist steps are ticked. Reset every
@@ -36,7 +45,23 @@ export interface PlayState {
    * you moved in, out and to Reserves, with the Credit cost of each requisition.
    */
   log?: { kind: "deploy" | "jumpout" | "jumpin"; ship: string; cost: number }[];
+  /**
+   * Fleet-list modes (Armageddon, Age of Unity): where each unit is, keyed by
+   * unit id. "The units in your Fleet start the game in Reserve and must be
+   * jumped into the combat zone via jump point during the Jump Phase" (core
+   * rules, Jump Phase), and a unit can take the Jump Out action to go straight
+   * back to Reserves. Those are the only two places a unit can be, and an
+   * absent key means Reserve - which is also the correct starting state.
+   *
+   * Hypergrowth does not use this: its ships move Shipyard -> Reserves -> play
+   * by Requisition and are tracked per ship class in `req` above, because a
+   * Hypergrowth unit is not formed until the moment you requisition it.
+   */
+  pos?: Record<string, UnitPosition>;
 }
+
+/** Where a unit is. Absent from `pos` means "reserve". */
+export type UnitPosition = "reserve" | "play";
 
 export interface SavedList {
   id: string;

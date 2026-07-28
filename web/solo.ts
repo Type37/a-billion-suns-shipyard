@@ -123,7 +123,18 @@ export function soloListView(state: AppState): string {
       </div>
       ${
         outfits.length === 0
-          ? `<div class="solo-empty"></div>`
+          ? // An empty <div class="solo-empty"> shipped here for a while, so a
+            // first-time visitor got a page with a heading, a button and a
+            // couple of hundred pixels of nothing. Say what an outfit is and
+            // what the campaign asks of you.
+            `<div class="solo-empty">
+              <p class="solo-tagline">You are in hock to the wrong people for ${ck(STARTING_DEBT_K)}, flying salvage runs through the Junkspace to pay it off.</p>
+              <ul class="solo-primer">
+                <li><strong>Build an outfit.</strong> Up to ${OUTFIT_MAX_SHIPS} ships for ${ck(OUTFIT_BUDGET_K)}, and a pilot whose class sets your starting perk.</li>
+                <li><strong>Fly the games.</strong> The Roller runs the Hostiles for you, so you play alone.</li>
+                <li><strong>Clear the debt.</strong> You have ${DEBT_CLEAR_GAMES} games to pay back ${ck(STARTING_DEBT_K)}. What you earn pays down what you owe, and buys perks for the pilots who came home.</li>
+              </ul>
+            </div>`
           : `<div class="outfit-cards">${cards}</div>`
       }
     </section>

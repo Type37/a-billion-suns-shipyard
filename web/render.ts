@@ -1094,7 +1094,7 @@ function shipyardView(state: AppState): string {
     <header class="sy-head">
       <div class="sy-id">
         <span class="mf-emblem">${emblemPicker}</span>
-        <input class="mf-name sy-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled company" data-action="fleet-name" />
+        <input class="mf-name sy-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled company" aria-label="Company name" data-action="fleet-name" />
         <button class="mf-name-gen" data-action="reroll-corp-name" title="Roll a company name" aria-label="Roll a company name">${icon("d12", 18)}</button>
         <button class="mf-name-gen" data-action="blank-fleet-name" title="Clear the name" aria-label="Clear the name">${icon("eraser", 18)}</button>
       </div>
@@ -1333,7 +1333,12 @@ function builderView(state: AppState): string {
         : "";
       const nameCell = isStocking
         ? `<span class="ru-classname">${escapeHtml(r?.ship.name ?? unitName)}</span>`
-        : `<input class="unit-name-input sy-unit-name" type="text" value="${escapeHtml(u.name ?? "")}" placeholder="${escapeHtml(unitName)}" data-action="unit-name" data-unit="${u.id}" />`;
+        : // The accessible name has to name the FIELD, and it cannot come from
+          // the placeholder: a placeholder stops counting the moment the field
+          // has a value, so renaming a unit left it with no name at all.
+          // Naming the ship class here means each row is told apart in a list
+          // of rows that would otherwise all announce "Unit name".
+          `<input class="unit-name-input sy-unit-name" type="text" value="${escapeHtml(u.name ?? "")}" placeholder="${escapeHtml(unitName)}" aria-label="Name for this ${escapeHtml(r?.ship.name ?? "unit")} unit" data-action="unit-name" data-unit="${u.id}" />`;
       const control = !r
         ? ""
         : noStepper
@@ -1443,7 +1448,7 @@ function builderView(state: AppState): string {
     <header class="sy-head">
       <div class="sy-id">
         <span class="mf-emblem">${emblemPicker}</span>
-        <input class="mf-name sy-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled fleet" data-action="fleet-name" />
+        <input class="mf-name sy-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled fleet" aria-label="Fleet name" data-action="fleet-name" />
         <button class="mf-name-gen" data-action="gen-fleet-name" title="Roll a fleet name" aria-label="Roll a fleet name">${icon("die", 18)}</button>
         <button class="mf-name-gen" data-action="blank-fleet-name" title="Clear the name" aria-label="Clear the name">${icon("eraser", 18)}</button>
       </div>

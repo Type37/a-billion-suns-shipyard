@@ -4739,3 +4739,35 @@ main.play-body .roster-section::before { content: none; }
   .sy-budget { padding: 6px 0 8px; }
   .sy-budget-now { font-size: 26px; }
 }
+
+/* ------------------------------------------------ 24px target floor
+   WCAG 2.5.8 Target Size (Minimum), AA, is 24x24 CSS px, and it applies at
+   every viewport - not just phones, so the existing 44px mobile block does not
+   cover it. Measured at 375px and found: the Compendium's three filter selects
+   at 19px tall, the Reference button at 17, the era badge at 23, the carried-
+   personnel disclosures at 23, and the Foundry's checkboxes at 13x13.
+
+   Placed at the end of the file deliberately: several of these components set
+   their own padding or height later in the stylesheet, and an earlier rule
+   would silently lose on source order.
+
+   The footer's inline credits ("by Mike Hutchinson") are left alone - those are
+   links inside a sentence, which is exactly what the criterion's Inline
+   exception is written for. */
+.comp-filters select,
+.comp-search,
+.sy-ref-btn,
+.mf-era-badge,
+.mf-era-badge.is-control,
+.ru-carry .hvp-pop > summary,
+.sy-hvp-name > summary {
+  min-height: 24px;
+  box-sizing: border-box;
+}
+.comp-filters select { padding-block: 3px; }
+/* A 13px checkbox is under half the floor. Scaling keeps the native control
+   (and its focus ring and platform look) rather than replacing it with a div. */
+.foundry-main input[type="checkbox"],
+.print-opts input[type="checkbox"] {
+  width: 18px; height: 18px; margin: 3px;
+}

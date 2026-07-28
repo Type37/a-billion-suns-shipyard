@@ -155,6 +155,11 @@
      overlay, 64 is modal. */
   --shadow-ambient: rgb(0 0 0 / 0.12);
   --shadow-key: rgb(0 0 0 / 0.14);
+  /* The edge of an editable field. #818997 is 3.52:1 on --paper and 3.20:1 on
+     --ground, so it clears WCAG 1.4.11's 3:1 on both grounds a field sits on.
+     It has to: the field's boundary is the ONLY thing identifying the control,
+     which is exactly the case the criterion is written for. */
+  --field-edge: #818997;
   --shadow2: 0 0 2px var(--shadow-ambient), 0 1px 2px var(--shadow-key);
   --shadow4: 0 0 2px var(--shadow-ambient), 0 2px 4px var(--shadow-key);
   --shadow8: 0 0 2px var(--shadow-ambient), 0 4px 8px var(--shadow-key);
@@ -2426,14 +2431,26 @@ button { font-family: inherit; }
 .mf-print-cta:hover { background: transparent; border-color: var(--blue); color: var(--blue); }
 .mf-print-cta .icon { width: 16px; height: 16px; }
 
-/* faction reads as an inline editable field, the same dotted-underline
-   convention as the fleet name and credits cap - not a filled button. */
+/* The faction control OPENS A PICKER; it is not an editable field. It used to
+   carry the same dotted underline as the fleet name and the credits cap - the
+   old comment here said so approvingly - which meant one signifier stood for
+   two different behaviours, "type here" and "click to open a menu". A user who
+   learned one was wrong half the time. Now that the rename fields are boxes,
+   this keeps the underline and gains a caret, so it reads as a disclosure. */
 .mf-fac .faction-switch > summary,
 .mf-fac .freeplay-badge {
   border: none; background: none; padding: 0; list-style: none;
   font-family: var(--display); font-weight: 700; font-size: 15px; text-transform: none; letter-spacing: 0;
-  color: var(--ink); cursor: pointer; border-bottom: 2px dotted var(--ink-3);
+  color: var(--ink); cursor: pointer; border-bottom: 2px solid var(--field-edge);
 }
+.mf-fac .faction-switch > summary::after,
+.limit-switch > summary::after {
+  content: ""; display: inline-block; vertical-align: middle;
+  margin-left: 5px; margin-bottom: 2px;
+  border: 4px solid transparent; border-top-color: currentColor; border-bottom: 0;
+}
+.mf-fac .faction-switch[open] > summary::after,
+.limit-switch[open] > summary::after { transform: rotate(180deg); }
 .mf-fac .faction-switch > summary::-webkit-details-marker { display: none; }
 .mf-fac .faction-switch:hover > summary,
 .mf-fac .faction-switch[open] > summary { color: var(--blue); border-bottom-color: var(--blue); border-bottom-style: solid; }
@@ -2443,7 +2460,7 @@ button { font-family: inherit; }
 .limit-switch { position: relative; display: inline-block; }
 .limit-switch > summary {
   list-style: none; cursor: pointer; font-size: 22px; font-weight: 800; color: var(--ink);
-  border-bottom: 2px dotted var(--ink-3);
+  border-bottom: 2px solid var(--field-edge);
 }
 .limit-switch > summary::-webkit-details-marker { display: none; }
 .limit-switch:hover > summary, .limit-switch[open] > summary { color: var(--blue); border-bottom-color: var(--blue); }
@@ -4578,32 +4595,68 @@ main.play-body .roster-section::before { content: none; }
    until you happened to click one, which is exactly the "on a return visit you
    cannot tell what is renameable" problem.
 
-   The dotted rule is the right answer and it already existed, so everything
-   adopts it rather than a third invention: dotted at rest means "you can type
-   here", darkening on hover, going solid blue on focus. Names that CANNOT be
-   renamed - a ship class in the catalogue, a faction's own name in the roster -
-   deliberately have no rule under them, so the absence means something.
+   The first attempt unified them onto a dotted rule, on the reasoning that the
+   builder already used one. Research says that was wrong twice over, so it is
+   a box now.
+
+   1. THE REST STATE FAILED WCAG. The rule was --hair-soft on --paper, which is
+      1.43:1 against the 3:1 that SC 1.4.11 requires. The "visible content" get-
+      out does not apply: the boundary is the only thing identifying the
+      control, which is the precise case the criterion is written for. Worse,
+      the two states that DID pass (hover 5.96:1, focus 10:1) are the two you
+      only reach after you have already worked out the field is there. On
+      arrival - the moment that matters - it was invisible.
+   2. A LINE IS THE WRONG SHAPE FOR A DENSE LIST. Google ran two studies on
+      this (158 and 400 participants) and found a bare underline "was confused
+      with a divider" and that "the label and input were confused with body
+      text, especially in dense compositions". A roster row is a dense
+      composition full of real dividers. Their conclusion: enclosed fields with
+      a rectangular box beat a line. Material carries it as principle -
+      "containers improve the discoverability of text fields".
+
+   So: a quiet filled box at rest, with a hairline that clears 3:1 on both the
+   grounds a field sits on. The fill alone could never do it (1.10:1 against
+   paper) - it reads as a field, but the edge is what satisfies the criterion.
+   Hover and focus stay as reinforcement, because dynamic hinting is good and
+   just cannot be the only hinting: a phone has no hover at all, and hover
+   cannot tell somebody on arrival what is renameable.
+
+   Names that CANNOT be renamed - a ship class in the catalogue, a faction's own
+   name in a roster row - have no box, so the absence carries meaning.
 
    The Foundry keeps its explicit labelled fields: those sit in a form where
-   every row is a field, and a dotted rule there would say nothing. */
+   every row is a field and already have visible labels. */
 .mf-name,
 .sy-unit-name,
 .fleet-name-input,
 .unit-name-input,
 .ship-name-input {
-  border-bottom: 2px dotted var(--hair-soft);
-  transition: border-bottom-color 0.12s ease;
+  border: 1px solid var(--field-edge);
+  background: var(--ground);
+  border-radius: 2px;
+  padding-inline: 7px;
+  box-sizing: border-box;
+  /* WCAG 2.5.8 Target Size (Minimum), AA, is 24x24. The fleet name measured
+     22px. The "Inline" exception is written for links reflowing inside prose,
+     not inputs in a layout, so it does not cover these. */
+  min-height: 24px;
+  transition: border-color 0.12s ease, background 0.12s ease;
 }
 .mf-name:hover,
 .sy-unit-name:hover,
 .fleet-name-input:hover,
 .unit-name-input:hover,
-.ship-name-input:hover { border-bottom-color: var(--ink-3); }
+.ship-name-input:hover { border-color: var(--ink-3); background: var(--paper); }
 .mf-name:focus,
 .sy-unit-name:focus,
 .fleet-name-input:focus,
 .unit-name-input:focus,
-.ship-name-input:focus { outline: none; border-bottom-style: solid; border-bottom-color: var(--blue); }
+.ship-name-input:focus {
+  outline: 2px solid var(--blue);
+  outline-offset: -2px;
+  border-color: var(--blue);
+  background: var(--paper);
+}
 
 /* ------------------------------------------- Junkspace header on a phone
    Measured on a 390x670 screen: 285px, 43% of the screen, went by before the

@@ -243,7 +243,7 @@ function outfitTab(o: SavedOutfit): string {
       <article class="roster-unit" data-roster-key="${s.id}">
         <div class="roster-unit-head">
           ${def ? "" : `<span class="roster-unit-glyph">${icon("warning", 20)}</span>`}
-          <input class="unit-name-input" type="text" value="${escapeHtml(s.shipName ?? "")}" placeholder="${escapeHtml(def?.name ?? "Ship")}" aria-label="Name for this ${escapeHtml(def?.name ?? "ship")}" data-action="outfit-ship-name" data-ship="${s.id}" />
+          <input class="unit-name-input" type="text" value="${escapeHtml(s.shipName ?? "")}" placeholder="${escapeHtml(def?.name ?? "Ship")}" aria-label="${escapeHtml(def?.name ?? "Ship")}" data-action="outfit-ship-name" data-ship="${s.id}" />
           <span class="roster-unit-cost">${ck(def?.cost ?? 0)}</span>
         </div>
         ${

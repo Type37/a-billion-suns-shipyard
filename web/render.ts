@@ -1066,6 +1066,43 @@ function hvpAssignPanel(list: SavedList, faction: Faction | undefined, customs: 
   </div>`;
 }
 
+/**
+ * Hypergrowth's personnel, with no carrier picker, because there is nothing
+ * honest to pick.
+ *
+ * Hypergrowth lists "Choose and assign HVPs" as step 4 (p.123) exactly like the
+ * other eras, but it is the one era where the units do not exist yet: "You are
+ * buying ships; you don't have to organise them into units until you requisition
+ * them during the game" (p.122). A unit is formed by the Requisition command,
+ * one at a time, mid-game. So there is no list of units to assign to at setup,
+ * and a picker over ship CLASSES would be inventing a rule and misrepresenting
+ * what a row is.
+ *
+ * This shows who you picked, says when they actually board, and points at the
+ * printed roster - whose "HVP carried" column already has a write-in rule per
+ * row, which is the right place to record it as each unit forms.
+ */
+function hvpRequisitionNote(list: SavedList, faction: Faction | undefined): string {
+  if (!list.fleet.hvp.length) return "";
+  const rows = list.fleet.hvp
+    .map((sel) => {
+      const def = hvpById(sel.hvpId, faction);
+      const who = sel.customName ? `${sel.customName}, ${def?.name ?? sel.hvpId}` : (def?.name ?? sel.hvpId);
+      return `<li class="hvp-req-row">${escapeHtml(who)}</li>`;
+    })
+    .join("");
+  return `
+  <section class="hvp-req">
+    <div class="hvp-assign-head">
+      <h3 class="roster-section">Your personnel</h3>
+      <p class="hvp-assign-note">${list.fleet.hvp.length} chosen</p>
+    </div>
+    <ul class="hvp-req-list">${rows}</ul>
+    <p class="hvp-req-why">A Shipyard has no units until you requisition one, so there is nobody to assign them to yet. Each rides the unit you form when you requisition it &mdash; write it in the roster's <strong>HVP carried</strong> column as you go.</p>
+    <a class="bar-btn" href="#/print/${list.id}">${icon("print", 15)} Print the roster</a>
+  </section>`;
+}
+
 /** The three eras a saved fleet can be built for, and the mode each maps to. */
 export const ERA_MODES: { era: Era; mode: GameMode; builds: string }[] = [
   { era: "Hypergrowth", mode: "hypergrowth", builds: "Build a Shipyard" },
@@ -2930,12 +2967,27 @@ function playView(state: AppState): string {
   // right under the ability), and the right column is the live Shipyard where
   // you Deploy ships, always visible, rather than a damage tracker.
   const isShipyard = MODE_BUILDER_SHAPE[list.mode] === "shipyard";
-  // Age of Unity (p.92 step 5) and Hypergrowth (p.123 step 4) both choose and
-  // assign HVPs only once the missions are rolled, which is at the table - so
-  // for those two the carrier picker belongs here rather than in the builder.
-  // Armageddon assigns at build time (p.79 step 4) and already has it there.
+  // Age of Unity builds its Fleet List into UNITS up front (p.92 step 3) and
+  // only assigns HVPs once the missions are rolled (step 5), so the carrier
+  // picker belongs here, at the table, with real units to choose from.
+  // Armageddon assigns at build time (p.79 step 4) and has it in the builder.
+  //
+  // Hypergrowth gets NO picker, and that is the rules' problem rather than an
+  // omission. Its step 4 says "choose and assign HVPs" like the others, but a
+  // Hypergrowth Shipyard has no units to assign to: "You are buying ships; you
+  // don't have to organise them into units until you requisition them during
+  // the game" (p.122), and Requisition is what "form[s] a new unit using ships
+  // in your Shipyard". So the units your personnel would board do not exist
+  // until mid-game, one at a time. Offering a picker over ship CLASSES would be
+  // inventing a rule and quietly lying about what a row is. Instead the chosen
+  // three are listed with the truth, and the printed roster's "HVP carried"
+  // column is where you write it down as each unit forms.
   const playHvpAssign =
-    list.mode === "age-of-unity" || list.mode === "hypergrowth" ? hvpAssignPanel(list, faction, customs) : "";
+    list.mode === "age-of-unity"
+      ? hvpAssignPanel(list, faction, customs)
+      : list.mode === "hypergrowth"
+        ? hvpRequisitionNote(list, faction)
+        : "";
   const factionBlock = faction ? factionRuleBlock(faction, "compact") : "";
   const commandsPanel = playCommandsPanel(list, play.cmd, faction);
   // This screen is used standing at a table mid-turn, so it has one job the rest

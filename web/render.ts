@@ -2173,7 +2173,7 @@ function weaponEditor(shipIndex: number, slot: "primary" | "auxiliary", weapons:
     ? `<div class="weapon-edit-head"><span>Weapon</span><span>Attack</span><span>Range (inches)</span><span></span></div>`
     : "";
   return `${head}${rows}
-    <button class="ghost-btn" data-action="cf-weapon-add" data-ship="${shipIndex}" data-slot="${slot}">${icon("plus", 14)} Add a ${slot} weapon</button>`;
+    <button class="ghost-btn" data-action="cf-weapon-add" data-ship="${shipIndex}" data-slot="${slot}">${icon("plus", 14)} Add ${slot === "auxiliary" ? "an" : "a"} ${slot} weapon</button>`;
 }
 
 function foundryEditView(state: AppState, factionId: string): string {
@@ -2220,7 +2220,7 @@ function foundryEditView(state: AppState, factionId: string): string {
           ${s.auxiliaryUtility ? "" : weaponEditor(si, "auxiliary", s.auxiliary)}
         </div>
       </div>
-      <button class="ghost-btn danger" data-action="cf-ship-remove" data-ship="${si}">${icon("trash", 14)} Remove this ship class</button>
+      <button class="ghost-btn danger" data-action="cf-ship-remove" data-ship="${si}">${icon("trash", 14)} Remove ship class</button>
     </article>`,
     )
     .join("");
@@ -2845,7 +2845,9 @@ function playView(state: AppState): string {
           <span class="round-value">${play.round}</span>
           <span class="play-bar-of">of ${maxRound}</span>
         </p>
-        <button class="ghost-btn play-bar-reset" data-action="play-reset">Reset</button>
+        <!-- "Reset" alone does not say what it resets, and it is sitting next
+             to a round counter and a phase track it would wipe. -->
+        <button class="ghost-btn play-bar-reset" data-action="play-reset">${icon("shuffle", 14)} Reset game</button>
       </header>
       <div class="phase-track">${phaseBtns}</div>
       ${cmdStrip}
@@ -3189,7 +3191,9 @@ function tourPopover(state: AppState): string {
     <p class="tour-body">${escapeHtml(s.body)}</p>
     <div class="tour-foot">
       <span class="tour-dots">${dots}</span>
-      <button class="tour-next" data-action="tour-next" data-tour="${tour.id}" data-step="${step}" data-len="${tour.steps.length}">${icon(isLast ? "check" : "chevronRight", 15)} ${isLast ? "Done" : "Next"}</button>
+      <!-- "Got it" rather than "Done" on the last step: this is a teaching
+           popover, not a task you completed. -->
+      <button class="tour-next" data-action="tour-next" data-tour="${tour.id}" data-step="${step}" data-len="${tour.steps.length}">${icon(isLast ? "check" : "chevronRight", 15)} ${isLast ? "Got it" : "Next"}</button>
     </div>
   </div>`;
 }

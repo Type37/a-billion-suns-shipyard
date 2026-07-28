@@ -134,6 +134,33 @@
      on a normal monitor instead of stopping at the site's article width. */
   --shell-wide: 1760px;
   --tap: 44px;
+
+  /* ------------------------------------------------------------- elevation
+     Fluent 2's ramp, verbatim geometry. Every level is TWO shadows composited:
+     an ambient one at zero offset (a soft halo on all sides - this is what makes
+     a thing read as floating rather than stuck to the page) and a key one offset
+     downward (a sharper, directional edge, as if lit from above). The number is
+     the key shadow's blur in px and its offset is always half the blur, so the
+     level maps directly to how far off the page something sits.
+
+     Used sparingly here, and that is deliberate rather than lazy. This is a
+     hard-edged design and Fluent's own position is that a surface is defined
+     either by a shadow OR by a stroke, not usually by both - its Card `outline`
+     appearance sets box-shadow:none and paints a hairline instead, and its
+     Elevation page notes Windows swaps the key shadow for a stroke outright. So
+     things that sit ON the page keep their 1px keyline and no shadow, and the
+     ramp is reserved for things that genuinely float above it.
+
+     4 is rest, 8 is hover or a bar content passes under, 16 is a transient
+     overlay, 64 is modal. */
+  --shadow-ambient: rgb(0 0 0 / 0.12);
+  --shadow-key: rgb(0 0 0 / 0.14);
+  --shadow2: 0 0 2px var(--shadow-ambient), 0 1px 2px var(--shadow-key);
+  --shadow4: 0 0 2px var(--shadow-ambient), 0 2px 4px var(--shadow-key);
+  --shadow8: 0 0 2px var(--shadow-ambient), 0 4px 8px var(--shadow-key);
+  --shadow16: 0 0 2px var(--shadow-ambient), 0 8px 16px var(--shadow-key);
+  --shadow28: 0 0 8px var(--shadow-ambient), 0 14px 28px var(--shadow-key);
+  --shadow64: 0 0 8px var(--shadow-ambient), 0 32px 64px var(--shadow-key);
 }
 
 /* Tabular figures, so numbers line up in columns. One typeface throughout: the
@@ -525,7 +552,9 @@ button { font-family: inherit; }
   bottom: 34px; padding: 16px 26px 16px 22px; gap: 12px;
   font-family: var(--display); font-weight: 800; font-size: 16px; letter-spacing: 0.01em;
   border-left-width: 6px;
-  box-shadow: 0 6px 0 rgb(10 14 20 / 0.16);
+  /* It has to float clear of a dialog it may be reporting on, so it sits at the
+     transient-overlay tier rather than Fluent's usual shadow8 for a toast. */
+  box-shadow: var(--shadow16);
   animation: toast-in-loud 260ms var(--ease) both;
 }
 .toast.is-loud .toast-ico { color: #6ee7a8; }
@@ -704,9 +733,14 @@ button { font-family: inherit; }
   animation: fleet-card-in 0.34s var(--ease) both;
   animation-delay: calc(var(--i, 0) * 45ms);
 }
+/* Cards sit ON the page, so at rest they are defined by their keyline and cast
+   nothing - Fluent's own `outline` card appearance does exactly this. Hovering
+   lifts them one step onto the ramp, which is the canonical rest-to-hover jump
+   (4 to 8; here none to 8, since rest is a stroke). The flat blue offset block
+   this replaced was a different lighting model to everything else on screen. */
 .fleet-card:hover {
   border-color: var(--hair); border-top-color: var(--red);
-  transform: translateY(-3px); box-shadow: -6px 8px 0 rgba(11, 61, 145, 0.12);
+  transform: translateY(-3px); box-shadow: var(--shadow8);
 }
 @keyframes fleet-card-in {
   from { opacity: 0; transform: translateY(12px); }
@@ -921,7 +955,7 @@ button { font-family: inherit; }
   position: absolute; top: calc(100% + 4px); left: 0; z-index: 40;
   width: 320px; max-height: 360px; overflow-y: auto;
   background: var(--paper); border: 1px solid var(--ink); padding: 12px;
-  box-shadow: 0 12px 32px rgba(11, 22, 51, 0.18);
+  box-shadow: var(--shadow16);
 }
 .emblem-menu-tools { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 .emblem-menu-panel .lib-cat:first-of-type { margin-top: 0; }
@@ -2230,7 +2264,7 @@ button { font-family: inherit; }
   position: absolute; z-index: 40; top: calc(100% + 5px); left: 0; width: min(280px, 80vw);
   background: var(--paper); border: 1px solid var(--ink); padding: 10px 12px;
   display: flex; flex-direction: column; gap: 4px;
-  box-shadow: 0 10px 28px rgba(11, 22, 51, 0.18);
+  box-shadow: var(--shadow16);
   font-weight: 400; text-transform: none; letter-spacing: normal;
 }
 .hvp-pop-name { font-family: var(--display); font-weight: 800; font-size: 13px; color: var(--ink); text-transform: none; }
@@ -2335,7 +2369,7 @@ button { font-family: inherit; }
   position: absolute; z-index: 40; top: calc(100% + 6px); right: 0; width: 210px;
   background: var(--paper); border: 1px solid var(--ink); padding: 6px;
   display: flex; flex-direction: column; gap: 2px;
-  box-shadow: 0 12px 32px rgba(11, 22, 51, 0.18);
+  box-shadow: var(--shadow16);
 }
 .mf-menu-panel a, .mf-menu-panel button {
   display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
@@ -2853,7 +2887,7 @@ button { font-family: inherit; }
 .yard-status-panel {
   position: absolute; z-index: 30; top: calc(100% + 6px); left: 0; width: min(300px, 80vw);
   background: var(--paper); border: 1px solid var(--ink); padding: 10px 12px;
-  box-shadow: 0 10px 28px rgba(11, 22, 51, 0.18);
+  box-shadow: var(--shadow16);
 }
 .yard-status-panel.issue-list { gap: 8px; }
 .builder .issue-list li { font-size: 12.5px; font-weight: 600; }
@@ -2945,6 +2979,9 @@ button { font-family: inherit; }
 .modal-panel {
   position: relative; z-index: 1; width: min(560px, 100%); max-height: 90vh; overflow-y: auto;
   background: var(--paper); border: 2px solid var(--color-line);
+  /* Top of the ramp: a dialog is the furthest thing from the page and the only
+     one that blocks you until you deal with it. */
+  box-shadow: var(--shadow64);
 }
 .opt-modal { width: min(460px, 100%); }
 .no-modal { width: min(420px, 100%); }
@@ -3184,7 +3221,9 @@ button { font-family: inherit; }
   width: min(300px, calc(100vw - 24px));
   background: var(--paper);
   border: 2px solid var(--color-line);
-  box-shadow: 0 6px 0 rgba(10, 14, 20, 0.12);
+  /* A coachmark is a transient overlay pinned to a live element, same tier as
+     a menu or a callout. */
+  box-shadow: var(--shadow16);
 }
 .tour-pop.placed { visibility: visible; }
 .tour-pop-arrow {
@@ -3562,7 +3601,8 @@ button { font-family: inherit; }
   position: relative;
   width: var(--page-w, 710px);
   flex: 0 0 auto;
-  box-shadow: 0 2px 14px rgba(11, 22, 51, 0.12);
+  /* A sheet of paper lying on the desk: raised, but not floating over the UI. */
+  box-shadow: var(--shadow8);
 }
 /* A dashed rule where the page will actually break, labelled with the page it
    starts. Absolutely positioned: drawing it never shifts the content. */
@@ -4266,7 +4306,7 @@ main.play-body .roster-section::before { content: none; }
 .sy-ledger-btn::-webkit-details-marker { display: none; }
 .sy-ledger[open] .sy-ledger-btn { border-color: var(--blue); color: var(--blue); }
 .sy-ledger-total { font-family: var(--display); font-weight: 800; color: var(--blue); font-variant-numeric: tabular-nums; }
-.sy-ledger-panel { position: absolute; z-index: 25; top: calc(100% + 6px); right: 0; width: max-content; min-width: 240px; max-width: min(340px, 88vw); max-height: 60vh; overflow-y: auto; background: var(--paper); border: 2px solid var(--hair); padding: 12px 14px; box-shadow: 0 12px 32px rgba(11, 22, 51, 0.18); }
+.sy-ledger-panel { position: absolute; z-index: 25; top: calc(100% + 6px); right: 0; width: max-content; min-width: 240px; max-width: min(340px, 88vw); max-height: 60vh; overflow-y: auto; background: var(--paper); border: 2px solid var(--hair); padding: 12px 14px; box-shadow: var(--shadow16); }
 .sy-ledger-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
 .sy-log { display: flex; align-items: baseline; gap: 7px; font-family: var(--sans); font-size: 12.5px; color: var(--ink); padding-left: 10px; border-left: 2px solid var(--hair-soft); }
 .sy-log-deploy { border-left-color: var(--blue); }
@@ -4421,8 +4461,10 @@ main.play-body .roster-section::before { content: none; }
     display: block; position: sticky; top: 0; z-index: 30;
     background: var(--paper); padding-bottom: 5px; margin-bottom: 6px;
     border-bottom: 2px solid var(--ink);
-    /* The topbar is not sticky, so this can own the top of the screen. */
-    box-shadow: 0 6px 12px -6px rgb(10 14 20 / 0.22);
+    /* A raised command bar with the roster passing underneath it: Fluent puts
+       command bars and raised app bars on 8, and the shadow is what tells you
+       the fleet is scrolling UNDER this rather than being cut off by it. */
+    box-shadow: var(--shadow8);
   }
   /* The pinned block is only worth pinning if it leaves room for the fleet, so
      every row in it is squeezed onto one line. Measured 274px before this,

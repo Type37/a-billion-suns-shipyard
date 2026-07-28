@@ -634,7 +634,10 @@ function handleClick(e: MouseEvent): void {
       // inspector would flag every one. A faction change starts the list clean.
       const list = store.getState().lists.find((l) => l.id === id);
       if (list && (list.fleet.units.length > 0 || list.fleet.hvp.length > 0)) {
-        if (!confirm("Changing faction clears the units and personnel in this list. Continue?")) return;
+        // Names the action rather than asking "Continue?". A native confirm's
+        // buttons are always OK/Cancel and cannot be relabelled, so the sentence
+        // has to carry what OK is going to do.
+        if (!confirm("Changing faction clears every unit and all personnel in this list. Change faction anyway?")) return;
       }
       store.setState((s) => updateFleet(s, id, (f) => ({ ...f, factionId, units: [], hvp: [] })));
       break;

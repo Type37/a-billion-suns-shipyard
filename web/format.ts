@@ -35,7 +35,9 @@ export function auxSlotText(ship: ShipClass): string {
  * Returns markup, so use creditsText() anywhere the result is not HTML.
  */
 export function credits(n: number): string {
-  return `${creditsGlyph(12)}${n}`;
+  // 12 -> 13.5: the credits mark sits beside every price in the app and was the
+  // smallest glyph on screen.
+  return `${creditsGlyph(13.5)}${n}`;
 }
 
 /** The same figure as plain text, for exports, attributes and clipboard copy. */

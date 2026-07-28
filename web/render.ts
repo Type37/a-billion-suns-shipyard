@@ -850,7 +850,7 @@ function switcher(
 function cardWeapons(ship: ShipClass): string {
   const one = (w: Weapon, arc: "primary" | "aux") => `
     <p class="pcw">
-      <span class="pcw-arc">${icon(arc === "primary" ? "arc-primary" : "arc-aux", 12, "slot-arc")}${arc === "primary" ? "Pri" : "Aux"}:</span>
+      <span class="pcw-arc">${icon(arc === "primary" ? "arc-primary" : "arc-aux", 14, "slot-arc")}${arc === "primary" ? "Pri" : "Aux"}:</span>
       <span class="pcw-name">${escapeHtml(w.name)}</span>
       <span class="pcw-fig">[${w.count}${w.die}, ${w.rangeMin}-${w.rangeMax}"]</span>
     </p>`;
@@ -863,7 +863,7 @@ function cardWeapons(ship: ShipClass): string {
   if (ship.auxiliary.length === 0 && (ship.auxiliaryFitting || ship.auxiliaryUtility)) {
     rows.push(`
     <p class="pcw">
-      <span class="pcw-arc">${icon("arc-aux", 12, "slot-arc")}Aux:</span>
+      <span class="pcw-arc">${icon("arc-aux", 14, "slot-arc")}Aux:</span>
       <span class="pcw-name">${escapeHtml(ship.auxiliaryFitting ?? "Utility Bays")}</span>
     </p>`);
   }
@@ -878,10 +878,10 @@ export function weaponsTable(ship: ShipClass): string {
   // (damage is a fixed lookup from the die, never shown here). An empty slot is
   // an em dash; a utility slot names itself.
   const weaponLine = (w: Weapon, arc: "pri" | "aux") =>
-    `<p class="weap-line"><span class="wl-arc">${icon(arc === "pri" ? "arc-primary" : "arc-aux", 13, "slot-arc")}${arc === "pri" ? "Pri" : "Aux"}:</span> <span class="wl-name">${escapeHtml(w.name)}</span> <span class="wl-fig">[${w.count}${w.die}, ${w.rangeMin}–${w.rangeMax}"]</span></p>`;
+    `<p class="weap-line"><span class="wl-arc">${icon(arc === "pri" ? "arc-primary" : "arc-aux", 15, "slot-arc")}${arc === "pri" ? "Pri" : "Aux"}:</span> <span class="wl-name">${escapeHtml(w.name)}</span> <span class="wl-fig">[${w.count}${w.die}, ${w.rangeMin}–${w.rangeMax}"]</span></p>`;
   const slotLine = (arc: "pri" | "aux", text: string) => {
     const nm = text === "Utility Bays" ? `${icon("utility", 13, "util-ico")}${text}` : text;
-    return `<p class="weap-line"><span class="wl-arc">${icon(arc === "pri" ? "arc-primary" : "arc-aux", 13, "slot-arc")}${arc === "pri" ? "Pri" : "Aux"}:</span> <span class="wl-name">${nm}</span></p>`;
+    return `<p class="weap-line"><span class="wl-arc">${icon(arc === "pri" ? "arc-primary" : "arc-aux", 15, "slot-arc")}${arc === "pri" ? "Pri" : "Aux"}:</span> <span class="wl-name">${nm}</span></p>`;
   };
 
   const lines: string[] = [];

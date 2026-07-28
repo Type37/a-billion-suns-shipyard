@@ -1232,7 +1232,7 @@ button { font-family: inherit; }
 .stat-chips-mini { gap: 3px 6px; }
 .stat-chip { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--hair-soft); padding: 3px 8px 3px 6px; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; column-gap: 5px; }
 .stat-chip-mini { gap: 4px; padding: 2px 6px 2px 5px; font-size: 12px; }
-.stat-chip-mini .stat-lbl { font-size: 9.5px; letter-spacing: 0.03em; }
+.stat-chip-mini .stat-lbl { font-size: 10.5px; letter-spacing: 0.03em; }
 /* One colour per stat, so a glance at a row tells you which figure is which
    before you have read the label. Drawn from the Okabe-Ito colourblind-safe
    palette and darkened for contrast on white: they stay distinguishable under
@@ -2158,8 +2158,11 @@ button { font-family: inherit; }
   .setup-controls { gap: 14px; }
   .control-group-emblem { min-width: 0; width: 100%; }
 
-  .solo-tabs { overflow-x: auto; flex-wrap: nowrap; }
-  .solo-tab { white-space: nowrap; flex: 0 0 auto; }
+  /* Three tabs overflowed a 390px screen by 9px, so Campaign was fractionally
+     clipped and the strip scrolled sideways for the sake of those 9px. They
+     share the width instead: shrinkable, with the padding coming off. */
+  .solo-tabs { overflow-x: auto; flex-wrap: nowrap; padding: 0 10px; }
+  .solo-tab { white-space: nowrap; flex: 1 1 auto; min-width: 0; padding-left: 6px; padding-right: 6px; }
 
   .comp-filters { gap: 10px 12px; }
   .comp-filters .control-group { flex: 1 1 45%; }
@@ -4297,6 +4300,13 @@ main.play-body .roster-section::before { content: none; }
    820 plus 10%: enough that the personnel rules stop breaking to three and four
    words a line, without letting the roster run past a comfortable measure. */
 #app > .shipyard.builder-fleet { max-width: 902px; }
+/* Junkspace was the one view missing from this list, so it kept .workspace's
+   --shell-wide (1760px) while everything around it sat between 900 and 1320.
+   On a wide monitor an outfit of five ships was spread across the full width of
+   the screen with the roster and the catalogue drifting apart. Two dense
+   columns, so it is wider than the fleet builder and narrower than the
+   Compendium's table. */
+#app > .workspace { max-width: 1180px; margin-left: auto; margin-right: auto; }
 
 /* Gravity well and jump strain. */
 .learn-dg .dg-well { fill: var(--red); fill-opacity: 0.07; stroke: var(--red); stroke-width: 1; stroke-dasharray: 4 4; }

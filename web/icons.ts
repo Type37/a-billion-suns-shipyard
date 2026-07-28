@@ -168,11 +168,29 @@ const ICON_VIEWBOX: Record<string, string> = {
   "ix-context-menu": "0 0 512 512",
 };
 
+/**
+ * Stroke width, in viewBox units, that keeps a drawn line the same THICKNESS ON
+ * SCREEN whatever size the icon is asked for.
+ *
+ * stroke-width is measured in viewBox units, so a flat 1.8 on a 24-unit grid is
+ * 1.8 device px at 24px and 0.98 at 13px - the small icons were drawn at little
+ * over half the weight of the big ones and went spindly and grey, which is most
+ * of why the symbols were hard to see. 18px is the reference size, so anything
+ * at or above it is untouched and only the small ones are thickened, to a
+ * ceiling that stops a 12px glyph filling in solid.
+ */
+function strokeFor(size: number, vb: string): number {
+  const units = Number(vb.split(/\s+/)[2]) || 24;
+  const scale = units / 24; // non-24 grids (the 512 ix icons) scale with it
+  return Math.min(2.6 * scale, 1.8 * scale * Math.max(1, 18 / size));
+}
+
 export function icon(name: string, size = 18, cls = ""): string {
   const body = PATHS[name];
   if (!body) return "";
   const vb = ICON_VIEWBOX[name] ?? "0 0 24 24";
-  return `<svg class="icon ${cls}" width="${size}" height="${size}" viewBox="${vb}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true">${body}</svg>`;
+  const sw = strokeFor(size, vb).toFixed(2);
+  return `<svg class="icon ${cls}" width="${size}" height="${size}" viewBox="${vb}" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true">${body}</svg>`;
 }
 
 export function emblem(name: string, size = 28, cls = ""): string {
@@ -266,7 +284,12 @@ export function statChips(
     // All four at one size. Mass and Silhouette used to be drawn larger on the
     // reasoning that a ring reads smaller than a solid mark, but in a row of
     // four the mismatch just looks like a mistake.
-    const size = compact ? 14 : 16;
+    //
+    // 16/14 -> 18/16. These four are the most-read glyphs in the app and they
+    // are SOLID marks, so the stroke-width fix above does nothing for them -
+    // size is the only lever. The Silhouette target in particular carries
+    // interior detail that closed up into a blob at 14px.
+    const size = compact ? 16 : 18;
     return `<span class="stat-chip ${compact ? "stat-chip-mini" : ""}">${icon(name, size, `stat-ico stat-ico-${name.replace("stat-", "")}`)}<span class="stat-lbl">${label}</span><span class="stat-val">${val}</span></span>`;
   };
   return `<span class="stat-chips ${compact ? "stat-chips-mini" : ""}">${chip("stat-mass", "Mass", String(s.mass))}${chip("stat-thrust", "Thrust", `${s.thrust}"`)}${chip("stat-silhouette", "Sil", String(s.silhouette))}${chip("stat-shields", "Shields", String(s.shields))}</span>`;

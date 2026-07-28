@@ -18,7 +18,7 @@ const BASE_PERK: Record<string, { perkName: string; text: string }> = Object.fro
 );
 import { SOLO_PHASES, SOLO_ALERT_RULES, PERKS_BY_CLASS } from "../src/data/junkspace-solo.ts";
 import { escapeHtml, formatDate, ruleText } from "./format.ts";
-import { icon, statChips } from "./icons.ts";
+import { EMBLEM_IDS, emblem, icon, statChips } from "./icons.ts";
 import { emblemView, weaponsTable } from "./render.ts";
 import { libraryUrl } from "./emblems.ts";
 import gunnerIcon from "./pilots/gunner.png";
@@ -54,9 +54,59 @@ function gameTicks(played: number, total: number): string {
 // The Start-a-new-outfit dialog. Rendered globally (see render.ts) so it floats
 // over the solo list; a blank name is fine - the card falls back to "Unnamed
 // outfit". Outfits are salvage crews, not corporations, so no name is rolled.
+//
+// Three things, in the order you decide them: what it is called, what it flies,
+// and what it flies under. "Start from" is the useful one - a campaign runs
+// eight games and you will want to re-run a crew you liked without rebuilding
+// it ship by ship, so an existing outfit can be used as the starting hull. It
+// copies the ships, pilots and emblem and nothing else: the debt resets, the
+// games played reset, the perks reset. It is a new campaign, not a save-scum.
 export function newOutfitModal(state: AppState): string {
   const m = state.ui.modal;
   if (!m || m.kind !== "new-outfit") return "";
+
+  const from = m.fromId;
+  const source = from ? state.outfits.find((o) => o.id === from) : undefined;
+  // Only worth showing once there is something to copy.
+  const startFrom = state.outfits.length
+    ? `<div class="modal-field">
+         <span class="control-label">Start from</span>
+         <div class="no-from">
+           <button class="no-from-opt ${!from ? "on" : ""}" data-action="solo-new-outfit-from" data-id="" aria-pressed="${!from}">
+             <span class="no-from-name">Empty outfit</span>
+             <span class="no-from-sub">Nothing bought yet</span>
+           </button>
+           ${state.outfits
+             .map((o) => {
+               const on = from === o.id;
+               const n = o.ships.length;
+               return `<button class="no-from-opt ${on ? "on" : ""}" data-action="solo-new-outfit-from" data-id="${o.id}" aria-pressed="${on}">
+                 <span class="no-from-name">${escapeHtml(o.name || "Unnamed outfit")}</span>
+                 <span class="no-from-sub">${n} ship${n === 1 ? "" : "s"} · ${ck(outfitCost(o))}</span>
+               </button>`;
+             })
+             .join("")}
+         </div>
+       </div>`
+    : "";
+
+  // The marks are inline rather than behind the full 262-sigil library, because
+  // opening that picker replaces ui.modal and would throw away the half-filled
+  // dialog. This is the quick pick: ten marks and a randomiser, enough to leave
+  // with a crew that looks like yours. The whole library is one tap away in the
+  // outfit itself, which is also where you would go to upload your own.
+  const chosen = m.emblem ?? "delta";
+  const marks = EMBLEM_IDS.map(
+    (id) =>
+      `<button class="no-emblem-opt ${id === chosen ? "on" : ""}" data-action="solo-new-outfit-emblem" data-emblem="${id}" aria-pressed="${id === chosen}" title="${id}" aria-label="Emblem: ${id}">${emblem(id, 22)}</button>`,
+  ).join("");
+  const emblemField = `
+    <div class="modal-field">
+      <span class="control-label">Emblem</span>
+      <div class="no-emblem" role="group" aria-label="Emblem">${marks}</div>
+      <button class="bar-btn no-emblem-rnd" data-action="solo-new-outfit-emblem-random">${icon("shuffle", 15)} Surprise me</button>
+    </div>`;
+
   return `
   <div class="modal-root">
     <div class="modal-backdrop" data-action="close-modal"></div>
@@ -68,8 +118,10 @@ export function newOutfitModal(state: AppState): string {
       <div class="modal-body no-modal-body">
         <label class="modal-field">
           <span class="control-label">Outfit name</span>
-          <input class="new-outfit-name" type="text" placeholder="Unnamed outfit" autocomplete="off" data-action="solo-new-outfit-name" autofocus />
+          <input class="new-outfit-name" type="text" placeholder="${escapeHtml(source ? `${source.name || "Unnamed outfit"} II` : "Unnamed outfit")}" value="${escapeHtml(m.name ?? "")}" autocomplete="off" data-action="solo-new-outfit-name" autofocus />
         </label>
+        ${startFrom}
+        ${emblemField}
       </div>
       <footer class="modal-footer">
         <button class="bar-btn" data-action="close-modal">Cancel</button>

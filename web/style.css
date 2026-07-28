@@ -1758,6 +1758,29 @@ button { font-family: inherit; }
 .solo-primer strong { color: var(--ink); }
 .solo-tagline { font-family: var(--serif); font-size: 16px; line-height: 1.55; color: var(--ink-2); max-width: 70ch; margin: 6px 0 0; }
 .solo-panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+/* New-outfit dialog: start-from list and the quick emblem strip. */
+.no-from { display: grid; gap: 5px; }
+.no-from-opt {
+  display: flex; flex-direction: column; gap: 1px; text-align: left; cursor: pointer;
+  padding: 7px 10px; min-height: 44px; justify-content: center;
+  border: 1px solid var(--hair-soft); border-left: 3px solid var(--hair); background: var(--paper);
+  text-transform: none; letter-spacing: normal;
+}
+.no-from-opt:hover { border-left-color: var(--blue); background: var(--blue-wash); }
+.no-from-opt.on { border-color: var(--blue); border-left-color: var(--red); background: var(--blue-wash); }
+.no-from-name { font-family: var(--display); font-weight: 700; font-size: 13.5px; color: var(--ink); }
+.no-from-sub { font-family: var(--sans); font-size: 11px; font-weight: 600; color: var(--ink-3); }
+.no-emblem { display: flex; flex-wrap: wrap; gap: 5px; }
+.no-emblem-opt {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; padding: 0; cursor: pointer;
+  border: 1px solid var(--hair); background: var(--paper); color: var(--ink-2);
+  transition: border-color 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+.no-emblem-opt:hover { border-color: var(--ink-3); color: var(--ink); }
+.no-emblem-opt.on { border-color: var(--blue); background: var(--blue); color: #fff; }
+.no-emblem-rnd { align-self: flex-start; margin-top: 6px; }
+
 .new-outfit-form { display: flex; flex-direction: column; gap: 8px; }
 .new-outfit-name { width: 220px; max-width: 100%; }
 .new-outfit-acts { display: flex; gap: 8px; align-items: center; }
@@ -4280,7 +4303,13 @@ main.play-body .roster-section::before { content: none; }
 }
 .pf-pos-opt:first-child { margin-left: 0; }
 .pf-pos-opt:hover { border-color: var(--ink-3); color: var(--ink); }
-.pf-pos-opt.on { background: var(--blue); border-color: var(--blue); color: #fff; position: relative; z-index: 1; }
+/* Only "Jumped in" gets the loud fill. Every unit starts in Reserve, so if both
+   states shouted the roster would open as a wall of solid blue bars and the one
+   fact worth seeing - which units are actually on the table - would be the
+   hardest to pick out. Reserve reads as the quiet default it is. */
+.pf-pos-opt.on { position: relative; z-index: 1; }
+.pf-pos-opt.on[data-to="reserve"] { background: var(--ground); border-color: var(--ink-3); color: var(--ink); }
+.pf-pos-opt.on[data-to="play"] { background: var(--blue); border-color: var(--blue); color: #fff; }
 
 /* ------------------------------------------------- Play Mode on a phone
    Play Mode is used standing at a table with the phone in one hand, and the
@@ -4326,7 +4355,10 @@ main.play-body .roster-section::before { content: none; }
   /* Anything the sticky block scrolls over has to clear it, or a tapped
      accordion opens underneath the header. */
   .play-body .phase-fold[open] > summary { scroll-margin-top: 210px; }
-  .pf-pos { max-width: none; }
+  /* Left-aligned and capped rather than stretched full width: a two-state
+     toggle 340px wide on every one of nine units turns the roster into a
+     ladder of bars and buries the ship stats under it. */
+  .pf-pos { max-width: 220px; }
 }
 
 .learn-dg .dg-dbl-mover { animation: dg-double-run 3400ms ease-in-out infinite; }

@@ -223,7 +223,23 @@ export interface AppState {
           libShown?: number;
         }
       | { kind: "options" }
-      | { kind: "new-outfit" };
+      /**
+       * The new-outfit dialog holds its answers until you press Start, so the
+       * outfit is only written once. `fromId` is an existing outfit to copy the
+       * ships, pilots and emblem from (a fresh campaign either way - debt,
+       * games and perks always reset), and the emblem fields mirror
+       * SavedOutfit's so the shared emblem picker can write straight into them.
+       */
+      | {
+          kind: "new-outfit";
+          name?: string;
+          fromId?: string;
+          emblem?: string;
+          emblemImage?: string;
+          emblemLib?: string;
+          emblemColor?: "ink" | "blue" | "red";
+          emblemBg?: "ink" | "blue" | "red" | "steel" | "sand";
+        };
     /** In-progress first-visit coachmark tour, once the user has advanced past step 0. */
     tour?: { tourId: string; step: number };
     /** Print-setup options. Persisted (abs2.print.v1) so reprinting after an

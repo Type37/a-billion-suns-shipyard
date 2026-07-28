@@ -38,6 +38,7 @@ import {
 import type { AppState, LastRoll, PrintOpts, ShipFilter } from "./state.ts";
 import { RANDOM_BEHAVIOUR, GLITCH_BLIP, type RollRow } from "../src/data/junkspace-solo.ts";
 import { LIB_PAGE, libraryIcon, randomIconId } from "./emblems.ts";
+import { EMBLEM_IDS } from "./icons.ts";
 import { randomCorpName } from "../src/corp-names.ts";
 import { writeOnInput } from "./write-on.ts";
 import { shareUrl } from "./share.ts";
@@ -116,6 +117,19 @@ function editOutfit(fn: (o: SavedOutfit) => SavedOutfit): void {
   const id = currentOutfitId();
   if (!id) return;
   store.setState((s) => updateOutfit(s, id, fn));
+}
+
+/**
+ * What is typed in the new-outfit dialog right now.
+ *
+ * The name field is uncontrolled while the dialog is open - it is not written
+ * to state on every keystroke, because that would re-render the input and move
+ * the caret. So anything that DOES re-render the dialog (picking a source
+ * outfit, picking an emblem) has to carry the typed name across by hand, and
+ * Start has to read it from the DOM rather than from state.
+ */
+function liveOutfitName(): string {
+  return (document.querySelector<HTMLInputElement>(".new-outfit-name")?.value ?? "").trim();
 }
 
 // All interaction goes through delegated listeners on #app. Elements declare
@@ -945,10 +959,63 @@ function handleClick(e: MouseEvent): void {
     case "solo-new-outfit-cancel":
       store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined } }));
       break;
+    // The dialog's three answers are held on the modal until Start, so each of
+    // these just edits that draft. The name is read from the live input rather
+    // than the draft so typing never re-renders the field out from under you.
+    case "solo-new-outfit-from": {
+      const id = target.dataset["id"] || undefined;
+      store.setState((s) =>
+        s.ui.modal?.kind === "new-outfit"
+          ? { ...s, ui: { ...s.ui, modal: { ...s.ui.modal, fromId: id, name: liveOutfitName() } } }
+          : s,
+      );
+      break;
+    }
+    case "solo-new-outfit-emblem": {
+      const em = target.dataset["emblem"];
+      if (!em) return;
+      store.setState((s) =>
+        s.ui.modal?.kind === "new-outfit"
+          ? { ...s, ui: { ...s.ui, modal: { ...s.ui.modal, emblem: em, name: liveOutfitName() } } }
+          : s,
+      );
+      break;
+    }
+    case "solo-new-outfit-emblem-random": {
+      store.setState((s) => {
+        const draft = s.ui.modal;
+        if (draft?.kind !== "new-outfit") return s;
+        // Never hand back the mark already showing, or "Surprise me" looks broken.
+        const pool = EMBLEM_IDS.filter((e) => e !== draft.emblem);
+        const pick = pool[Math.floor(Math.random() * pool.length)] ?? EMBLEM_IDS[0]!;
+        return { ...s, ui: { ...s.ui, modal: { ...draft, emblem: pick, name: liveOutfitName() } } };
+      });
+      break;
+    }
     case "solo-new-outfit-create": {
-      const nameInput = document.querySelector<HTMLInputElement>(".new-outfit-name");
-      const name = (nameInput?.value ?? "").trim();
-      const outfit = { ...createOutfit(), name };
+      const name = liveOutfitName();
+      const draft = state.ui.modal?.kind === "new-outfit" ? state.ui.modal : undefined;
+      const source = draft?.fromId ? state.outfits.find((o) => o.id === draft.fromId) : undefined;
+      // Copying takes the crew and the colours, never the campaign: a copied
+      // outfit starts at the full debt with no games flown and no perks taken,
+      // because it is a new run with the same ships, not a restore point.
+      const base = createOutfit();
+      const outfit: SavedOutfit = {
+        ...base,
+        name: name || (source ? `${source.name || "Unnamed outfit"} II` : ""),
+        emblem: draft?.emblem ?? source?.emblem ?? base.emblem,
+        ...(source
+          ? {
+              ships: structuredClone(source.ships),
+              emblemImage: source.emblemImage,
+              emblemLib: source.emblemLib,
+              emblemColor: source.emblemColor,
+              emblemBg: source.emblemBg,
+            }
+          : {}),
+        // An explicit pick in the dialog beats whatever the source was flying.
+        ...(draft?.emblem ? { emblem: draft.emblem, emblemImage: undefined, emblemLib: undefined } : {}),
+      };
       store.setState((s) => {
         const outfits = [...s.outfits, outfit];
         persistOutfits(outfits);

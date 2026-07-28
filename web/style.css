@@ -2768,11 +2768,53 @@ button { font-family: inherit; }
 .au-wsep { margin: 0 5px; color: var(--hair-soft); }
 
 /* Armageddon carrier-assignment block, below the HVP choose list. */
+/* Carrier assignment. Mobile-first: the HVP's name on its own line and a
+   full-width control under it, rather than a name and a cramped dropdown
+   fighting over one row. The picker is a <details> popover, absolutely
+   positioned, so opening it never moves the rows below. */
 .hvp-assign { margin-top: 12px; border-top: 1px solid var(--hair-soft); padding-top: 10px; }
-.hvp-assign-head { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; font-size: 11px; color: var(--ink-3); margin: 0 0 8px; }
-.hvp-assign-row { display: flex; align-items: center; gap: 10px; padding: 5px 0; }
-.hvp-assign-name { font-weight: 700; font-size: 13px; flex: 1 1 auto; min-width: 0; }
-.hvp-assign-row .personnel-assign { flex: 0 0 auto; }
+.hvp-assign-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.hvp-assign-note { font-family: var(--sans); font-size: 11.5px; font-weight: 600; color: var(--ink-3); margin: 0; }
+.hvp-assign-row { display: flex; flex-direction: column; gap: 3px; padding: 6px 0; border-bottom: 1px solid var(--hair-soft); }
+.hvp-assign-row:last-child { border-bottom: none; }
+.hvp-assign-name { font-family: var(--display); font-weight: 700; font-size: 13.5px; }
+
+.hvp-pick { position: relative; }
+.hvp-pick > summary {
+  list-style: none; cursor: pointer;
+  display: flex; align-items: center; gap: 7px;
+  min-height: var(--tap); padding: 0 10px;
+  border: 1px solid var(--field-edge); background: var(--ground); color: var(--ink-3);
+  font-family: var(--sans); font-size: 13px; font-weight: 700;
+}
+.hvp-pick > summary::-webkit-details-marker { display: none; }
+.hvp-pick > summary:hover { border-color: var(--ink-3); background: var(--paper); }
+.hvp-pick-btn.is-set { color: var(--ink); border-color: var(--blue); background: var(--blue-wash); }
+.hvp-pick-current { flex: 1 1 auto; min-width: 0; text-align: left; }
+.hvp-pick-caret { flex: none; transition: transform 0.14s var(--ease); }
+.hvp-pick[open] .hvp-pick-caret { transform: rotate(180deg); }
+.hvp-pick-panel {
+  position: absolute; z-index: 45; top: calc(100% + 4px); left: 0; right: 0;
+  max-height: min(52vh, 380px); overflow-y: auto;
+  background: var(--paper); border: 2px solid var(--ink); padding: 5px;
+  display: flex; flex-direction: column; gap: 3px;
+  box-shadow: var(--shadow16);
+}
+.hvp-pick-opt {
+  display: flex; flex-direction: column; gap: 1px; align-items: flex-start; text-align: left;
+  min-height: var(--tap); justify-content: center; padding: 6px 9px; width: 100%;
+  border: 1px solid var(--hair-soft); border-left: 3px solid var(--hair);
+  background: var(--paper); cursor: pointer;
+}
+.hvp-pick-opt:hover { border-left-color: var(--blue); background: var(--blue-wash); }
+.hvp-pick-opt.on { border-color: var(--blue); border-left-color: var(--red); background: var(--blue-wash); }
+.hvp-pick-name { font-family: var(--display); font-weight: 700; font-size: 13.5px; color: var(--ink); }
+.hvp-pick-why { font-family: var(--sans); font-size: 10.5px; font-weight: 600; color: var(--ink-3); }
+/* Too light to carry: shown, never hidden, so you can see the unit is there and
+   why it is not an option. Not a button, so it cannot be tapped or tabbed to. */
+.hvp-pick-opt.is-blocked { cursor: default; opacity: 0.55; border-left-color: var(--hair-soft); }
+.hvp-pick-opt.is-blocked .hvp-pick-why { color: var(--red-deep); }
+.hvp-pick-opt.is-clear { border-left-color: var(--hair-soft); margin-top: 3px; }
 
 /* body: two flush regions, one quiet vertical rule between; no cards. The
    masthead's border is the one heavy divider on this page - everything below

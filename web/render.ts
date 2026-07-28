@@ -961,6 +961,111 @@ function shipyardHvpRow(h: Hvp, chosen: boolean, atCap: boolean, generic = false
   </article>`;
 }
 
+/**
+ * Assign each chosen HVP to the unit carrying it.
+ *
+ * The rule is the same in all three eras and it has a hard constraint the app
+ * was ignoring: "Assign them to friendly units of Mass 1 or higher" (Armageddon
+ * p.80, Age of Unity p.95, Hypergrowth p.125). The old control was a native
+ * <select> listing EVERY unit, so it happily assigned personnel to a Mass 0
+ * fighter wing, which is illegal. Mass 0 units are still listed here - hiding
+ * them would leave you wondering where a unit went - but they are disabled and
+ * say why, so the control teaches the rule instead of just enforcing it.
+ *
+ * Except for The Discord, whose "Aces and Heroes" says outright "Your HVP
+ * tokens can be carried by your Mass 0 units" (p.156). They are the only
+ * faction in the book that overrides it, and it matters: four of their nine
+ * ship classes are Mass 0, so a blanket rule would have locked personnel out of
+ * most of the fleet. See Faction.hvpMass0Carriers.
+ *
+ * WHEN this appears differs by era, and that follows the play sequences:
+ *   Armageddon    step 4, before the mission is chosen -> in the builder
+ *   Age of Unity  step 5, after missions are rolled    -> in Play Mode
+ *   Hypergrowth   step 4, after missions are rolled    -> in Play Mode
+ *
+ * Mobile-first: a row per HVP, a full-width carrier button, and a popover of
+ * 44px unit rows. It is absolutely positioned, so opening it shifts nothing.
+ * Names are whatever they have been renamed to - both the HVP's (custom
+ * factions rename them, and the rules invite you to: "not just 'Chief
+ * Engineer', but 'Lt. Commander Sadie Hyatt, Chief Engineer'") and the unit's.
+ */
+function hvpAssignPanel(list: SavedList, faction: Faction | undefined, customs: Faction[]): string {
+  if (!list.fleet.hvp.length) return "";
+  const names = unitDisplayNames(list.fleet.units, faction, customs);
+  const minMass = faction?.hvpMass0Carriers ? 0 : 1;
+  const carried = new Map<string, number>();
+  for (const h of list.fleet.hvp) {
+    if (h.assignedUnitId) carried.set(h.assignedUnitId, (carried.get(h.assignedUnitId) ?? 0) + 1);
+  }
+
+  const rows = list.fleet.hvp
+    .map((sel, i) => {
+      const def = hvpById(sel.hvpId, faction);
+      const who = def?.name ?? sel.hvpId;
+      const assigned = sel.assignedUnitId ? list.fleet.units.find((u) => u.id === sel.assignedUnitId) : undefined;
+      const assignedName = assigned ? assigned.name || names.get(assigned.id) || "Unit" : "";
+
+      const options = list.fleet.units
+        .map((u) => {
+          const r = resolveShip(u.shipClassId, faction, customs);
+          const mass = r?.ship.mass ?? 0;
+          const label = u.name || names.get(u.id) || r?.ship.name || "Unit";
+          const already = carried.get(u.id) ?? 0;
+          // Too light to carry. Shown, not hidden, with the reason.
+          if (mass < minMass) {
+            return `<span class="hvp-pick-opt is-blocked" aria-disabled="true">
+              <span class="hvp-pick-name">${escapeHtml(label)}</span>
+              <span class="hvp-pick-why">Mass 0 &middot; cannot carry personnel</span>
+            </span>`;
+          }
+          const on = sel.assignedUnitId === u.id;
+          return `<button class="hvp-pick-opt ${on ? "on" : ""}" data-action="hvp-assign-to" data-index="${i}" data-unit="${u.id}" aria-pressed="${on}">
+            <span class="hvp-pick-name">${escapeHtml(label)}</span>
+            <span class="hvp-pick-why">Mass ${mass}${already ? ` &middot; already carrying ${already}` : ""}</span>
+          </button>`;
+        })
+        .join("");
+
+      return `
+      <div class="hvp-assign-row">
+        <span class="hvp-assign-name">${escapeHtml(who)}</span>
+        <details class="hvp-pick">
+          <summary class="hvp-pick-btn ${assigned ? "is-set" : ""}">
+            ${icon("personnel", 15)}
+            <span class="hvp-pick-current">${assigned ? escapeHtml(assignedName) : "Choose a carrier"}</span>
+            ${icon("chevronDown", 13, "hvp-pick-caret")}
+          </summary>
+          <div class="hvp-pick-panel">
+            ${options}
+            <button class="hvp-pick-opt is-clear" data-action="hvp-assign-to" data-index="${i}" data-unit="">
+              <span class="hvp-pick-name">Not assigned</span>
+              <span class="hvp-pick-why">Leave this one off the table for now</span>
+            </button>
+          </div>
+        </details>
+      </div>`;
+    })
+    .join("");
+
+  const unassigned = list.fleet.hvp.filter((h) => !h.assignedUnitId).length;
+  return `
+  <div class="hvp-assign">
+    <div class="hvp-assign-head">
+      <h3 class="roster-section">Assign carriers</h3>
+      <p class="hvp-assign-note">${
+        unassigned === 0
+          ? `All ${list.fleet.hvp.length} are aboard.`
+          : `${unassigned} still to place. ${
+              minMass === 0
+                ? "Aces and Heroes: yours can ride any unit, squadrons included."
+                : "Personnel ride units of Mass 1 or higher."
+            }`
+      }</p>
+    </div>
+    ${rows}
+  </div>`;
+}
+
 /** The three eras a saved fleet can be built for, and the mode each maps to. */
 export const ERA_MODES: { era: Era; mode: GameMode; builds: string }[] = [
   { era: "Hypergrowth", mode: "hypergrowth", builds: "Build a Shipyard" },
@@ -1224,13 +1329,6 @@ function builderView(state: AppState): string {
   const hvpMax = list.freePlay ? 99 : (faction?.hvpMax ?? 3);
   const hvpMin = faction?.hvpMin ?? 3;
   const atHvpCap = list.fleet.hvp.length >= hvpMax;
-  const carrierOptions = (assignedId?: string) =>
-    list.fleet.units
-      .map((u) => {
-        const label = u.name || autoUnitName(u.id);
-        return `<option value="${u.id}" ${assignedId === u.id ? "selected" : ""}>${escapeHtml(label)}</option>`;
-      })
-      .join("");
   // A stable toggle row (the Shipyard's sy-hvp shape): the check button on the
   // right flips chosen on/off and NEVER changes the row's size, so clicking one
   // never reflows the list. Carrier assignment (Armageddon only) is a separate
@@ -1251,24 +1349,11 @@ function builderView(state: AppState): string {
   };
   // Armageddon assigns each chosen HVP to a carrier unit before play; Age of
   // Unity defers that until the missions are known, so it only toggles on/off.
+  // Armageddon selects AND assigns before the mission is chosen (p.79 step 4),
+  // so its assignment lives here in the builder. Age of Unity and Hypergrowth
+  // both assign only once the missions are known, so theirs is in Play Mode.
   const hvpAssignBlock =
-    list.mode === "armageddon" && list.fleet.hvp.length
-      ? `<div class="hvp-assign">
-          <p class="hvp-assign-head">Assign carriers</p>
-          ${list.fleet.hvp
-            .map((sel, i) => {
-              const def = hvpById(sel.hvpId, faction);
-              return `<div class="hvp-assign-row">
-                <span class="hvp-assign-name">${escapeHtml(def?.name ?? sel.hvpId)}</span>
-                <select class="personnel-assign" data-action="hvp-assign" data-index="${i}" title="Assign a carrier for ${escapeHtml(def?.name ?? sel.hvpId)}">
-                  <option value="">Not assigned</option>
-                  ${carrierOptions(sel.assignedUnitId)}
-                </select>
-              </div>`;
-            })
-            .join("")}
-        </div>`
-      : "";
+    list.mode === "armageddon" || list.mode === "combat-simulator" ? hvpAssignPanel(list, faction, customs) : "";
   // Combat Simulator issues a fixed crew rather than offering a choice: "All
   // three of your HVP are Seasoned Captains" (p.63). The picker below is one
   // card per HVP *type*, so it physically cannot show three of one person - it
@@ -1286,12 +1371,6 @@ function builderView(state: AppState): string {
           <span class="personnel-name">${escapeHtml(def.name)}</span>
           <span class="personnel-rule">${ruleText(def.rule)}</span>
         </div>
-        <span class="personnel-actions">
-          <select class="personnel-assign" data-action="hvp-assign" data-index="${i}" title="Assign a carrier for ${escapeHtml(def.name)}">
-            <option value="">Not assigned</option>
-            ${carrierOptions(sel.assignedUnitId)}
-          </select>
-        </span>
       </article>`;
     })
     .join("");
@@ -2851,6 +2930,12 @@ function playView(state: AppState): string {
   // right under the ability), and the right column is the live Shipyard where
   // you Deploy ships, always visible, rather than a damage tracker.
   const isShipyard = MODE_BUILDER_SHAPE[list.mode] === "shipyard";
+  // Age of Unity (p.92 step 5) and Hypergrowth (p.123 step 4) both choose and
+  // assign HVPs only once the missions are rolled, which is at the table - so
+  // for those two the carrier picker belongs here rather than in the builder.
+  // Armageddon assigns at build time (p.79 step 4) and already has it there.
+  const playHvpAssign =
+    list.mode === "age-of-unity" || list.mode === "hypergrowth" ? hvpAssignPanel(list, faction, customs) : "";
   const factionBlock = faction ? factionRuleBlock(faction, "compact") : "";
   const commandsPanel = playCommandsPanel(list, play.cmd, faction);
   // This screen is used standing at a table mid-turn, so it has one job the rest
@@ -2917,6 +3002,7 @@ function playView(state: AppState): string {
       </div>
 
       <div class="play-col play-col-spend">
+        ${playHvpAssign}
         ${playShipyardTracker(list, faction, customs)}
       </div>
     </div>`
@@ -2933,6 +3019,7 @@ function playView(state: AppState): string {
       </div>
 
       <div class="play-col play-col-spend">
+        ${playHvpAssign}
         ${playFleetPanel(list, faction, customs)}
         ${commandsPanel}
       </div>

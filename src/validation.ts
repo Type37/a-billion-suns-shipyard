@@ -256,7 +256,13 @@ export function validateFleet(fleet: Fleet, catalog: Catalog = defaultCatalog): 
         });
       } else {
         const mass = unitMass.get(sel.assignedUnitId);
-        const canMass0 = def?.canEmbarkMass0 === true;
+        // Two separate exemptions, and both have to be honoured. One is per
+        // PERSON - Gen Omega's "The Nameless Punk" rides anything. The other is
+        // per FACTION - The Discord's "Aces and Heroes" says "Your HVP tokens
+        // can be carried by your Mass 0 units" (p.156), which covers every one
+        // of theirs, so checking only the per-HVP flag would flag a legal
+        // Discord fleet as broken.
+        const canMass0 = def?.canEmbarkMass0 === true || faction?.hvpMass0Carriers === true;
         if (mass === 0 && !canMass0) {
           add({
             code: "HVP_ASSIGN_MASS0",

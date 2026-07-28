@@ -878,6 +878,44 @@ function dispatchAction(target: HTMLElement): void {
       );
       break;
     }
+    /**
+     * Put an HVP aboard a unit (or take it off, with an empty data-unit).
+     *
+     * Distinct from "toggle-carry", which flips the same pair on and off from
+     * the unit's side. This one comes from the carrier picker, where you choose
+     * a destination outright, so re-picking the unit it is already on is a
+     * no-op rather than a removal - tapping the highlighted row to confirm your
+     * own choice should not silently undo it.
+     *
+     * Mass 1 or higher is the rule (Armageddon p.80, Age of Unity p.95,
+     * Hypergrowth p.125), unless the faction says otherwise - The Discord's
+     * "Aces and Heroes" lets their tokens ride Mass 0 units (p.156). Re-checked
+     * here so a stale DOM cannot smuggle an illegal carrier in.
+     */
+    case "hvp-assign-to": {
+      const id = currentListId();
+      const index = Number(target.dataset["index"]);
+      const unitId = target.dataset["unit"] || undefined;
+      if (!id || !Number.isInteger(index)) return;
+      const list = state.lists.find((l) => l.id === id);
+      if (!list) return;
+      if (unitId) {
+        const unit = list.fleet.units.find((u) => u.id === unitId);
+        const faction = findFaction(list.fleet.factionId, state.customFactions);
+        const mass = unit ? (resolveShip(unit.shipClassId, faction, state.customFactions)?.ship.mass ?? 0) : 0;
+        if (!unit || mass < (faction?.hvpMass0Carriers ? 0 : 1)) return;
+      }
+      store.setState((s) =>
+        updateFleet(s, id, (f) => ({
+          ...f,
+          hvp: f.hvp.map((h, i) => (i === index ? { ...h, assignedUnitId: unitId } : h)),
+        })),
+      );
+      // Close the picker: it is a <details>, and the re-render would otherwise
+      // leave it hanging open over the row you just chose.
+      target.closest<HTMLDetailsElement>("details.hvp-pick")?.removeAttribute("open");
+      break;
+    }
     case "remove-unit": {
       const id = currentListId();
       const unitId = target.dataset["unit"];

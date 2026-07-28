@@ -127,6 +127,17 @@ export interface Faction {
    */
   hvpMin?: number;
   hvpMax?: number;
+  /**
+   * Whether this faction's HVP tokens may ride Mass 0 units.
+   *
+   * The core rule is "Assign them to friendly units of Mass 1 or higher"
+   * (Armageddon p.80, Age of Unity p.95, Hypergrowth p.125). The Discord's
+   * "Aces and Heroes" overrides it outright: "Your HVP tokens can be carried by
+   * your Mass 0 units" (p.156). It is the only faction in the book that does,
+   * and without this flag the carrier picker would refuse every squadron they
+   * own - which for a faction built around strong squadrons is most of them.
+   */
+  hvpMass0Carriers?: boolean;
   /** One-line strengths/playstyle note from the faction page, for the picker UI. */
   playstyle?: string;
   /** Freeform backstory / notes the player writes about this faction. */

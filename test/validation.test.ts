@@ -351,6 +351,24 @@ test("The Nameless Punk may ride a Mass 0 unit", () => {
   assert.ok(!mass0Errors.some((i) => i.hvpId === "the-nameless-punk"));
 });
 
+// "Aces and Heroes: ... Your HVP tokens can be carried by your Mass 0 units"
+// (p.156). This is a FACTION-wide exemption, unlike The Nameless Punk's, which
+// is per person - so every one of The Discord's HVPs may ride a squadron, and
+// none of them should raise HVP_ASSIGN_MASS0.
+test("The Discord's HVPs may all ride Mass 0 units", () => {
+  const f = fleet({
+    factionId: "the-discord",
+    units: [u("a", "viper-interceptor-wing", 1)], // Mass 0
+    hvp: [h("chief-engineer", "a"), h("executive-officer", "a"), h("seasoned-captain", "a")],
+  });
+  const r = validateFleet(f);
+  assert.equal(
+    r.issues.filter((i) => i.code === "HVP_ASSIGN_MASS0").length,
+    0,
+    "Aces and Heroes should exempt every Discord HVP from the Mass 1+ rule",
+  );
+});
+
 test("no Mass 1+ carrier produces a warning for un-carryable HVP", () => {
   const f = fleet({
     factionId: "vyke",

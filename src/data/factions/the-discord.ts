@@ -18,6 +18,10 @@ export const THE_DISCORD: Faction = {
   // Aces and Heroes: "You select 3, 4 or 5 HVP for your fleet."
   hvpMin: 3,
   hvpMax: 5,
+  // ...and "Your HVP tokens can be carried by your Mass 0 units", which is the
+  // whole point of the faction - their squadrons are their strength, and the
+  // core Mass 1+ rule would bar personnel from four of their nine ship classes.
+  hvpMass0Carriers: true,
   ships: [
     { id: "viper-interceptor-wing", name: "Viper Interceptor Wing", mass: 0, thrust: 10, silhouette: 2, shields: 1,
       primary: [], auxiliary: [w("Blasters", 2, "D6", 0, 6)], utilityBays: false, cost: 8 },

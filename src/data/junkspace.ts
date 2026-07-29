@@ -89,3 +89,90 @@ export const LOW_DEBT_THRESHOLD_K = 25;
 
 /** "If you have cleared your Debt completely, the Alert Level starts at 3." (p.195). */
 export const ALERT_START_DEBT_CLEARED = 3;
+
+/**
+ * The Alert Level a game starts at, given how much Debt is left.
+ *
+ * "As you progress through the campaign, the starting Alert Level increases,
+ * making the game more difficult. If you have less than ¢25k Debt remaining,
+ * the Alert Level starts the game at 2. If you have cleared your Debt
+ * completely, the Alert Level starts at 3." (p.195)
+ *
+ * The three constants above existed but nothing called them, so every game
+ * started at 1 and the campaign never got harder - which is the whole shape of
+ * the Junkspace campaign. Note the threshold is strict: exactly ¢25k remaining
+ * is NOT "less than ¢25k", so it still starts at 1.
+ */
+export function startingAlertLevel(debtK: number): number {
+  if (debtK <= 0) return ALERT_START_DEBT_CLEARED;
+  if (debtK < LOW_DEBT_THRESHOLD_K) return ALERT_START_LOW_DEBT;
+  return ALERT_START;
+}
+
+/**
+ * Translate a main-game fleet into a Junkspace outfit.
+ *
+ * These are two different economies and there is no shared ship list: the main
+ * game is factions of bespoke classes costed in billions, Junkspace is seven
+ * stock hulls costed in thousands with a five-ship cap. So an "import" cannot
+ * be a copy, and pretending otherwise would produce an outfit that is illegal
+ * on arrival. It is a RECAST: each unit becomes the stock hull closest to it in
+ * Mass, biggest first, and it stops at whichever limit bites first - five ships
+ * or the budget.
+ *
+ * Take the heaviest five and then DOWNGRADE until it fits, rather than filling
+ * greedily from the top. Greedy fill is what you reach for first and it is
+ * useless here, because the budget is tiny against the biggest hull: the
+ * heaviest unit maps to a Frigate at 25 of the 30 available, every other unit
+ * then fails to fit, and a 33-ship fleet recasts to a single ship. Measured
+ * exactly that before fixing it.
+ *
+ * Downgrading keeps the crew at five and keeps the fleet's shape: the most
+ * expensive hull steps down one class at a time until the whole outfit is
+ * affordable, so a capital-heavy list still arrives with its biggest ship
+ * biggest, just smaller in absolute terms.
+ *
+ * Returns what it fitted and what it left behind, so the UI can say so rather
+ * than silently dropping half a fleet.
+ */
+export function recastAsOutfit(unitMasses: number[]): { shipClassIds: string[]; spentK: number; dropped: number } {
+  const cheapestFirst = [...JUNKSPACE_SHIPS].sort((a, b) => a.cost - b.cost);
+  const nearest = (mass: number) =>
+    cheapestFirst.reduce(
+      (best, s) => (Math.abs(s.mass - mass) < Math.abs(best.mass - mass) ? s : best),
+      cheapestFirst[0]!,
+    );
+
+  const wanted = [...unitMasses].sort((a, b) => b - a);
+  const taken = wanted.slice(0, OUTFIT_MAX_SHIPS);
+  const dropped = wanted.length - taken.length;
+  let picks = taken.map((m) => ({ mass: m, ship: nearest(m) }));
+
+  const total = () => picks.reduce((n, p) => n + p.ship.cost, 0);
+  // Step the priciest hull down one class at a time, breaking ties in favour of
+  // the LIGHTEST original unit. Without that tie-break the loop keeps hitting
+  // index 0 - the heaviest ship in the fleet - and the result comes out
+  // inverted, with the flagship reduced to a fighter while a squadron ends up
+  // in the biggest hull. Terminates: each pass strictly lowers the total, or
+  // there is nothing cheaper left and it stops.
+  while (total() > OUTFIT_BUDGET_K) {
+    let at = -1;
+    for (let i = 0; i < picks.length; i += 1) {
+      if (at === -1) {
+        at = i;
+        continue;
+      }
+      const a = picks[i]!;
+      const b = picks[at]!;
+      if (a.ship.cost > b.ship.cost || (a.ship.cost === b.ship.cost && a.mass < b.mass)) at = i;
+    }
+    const current = picks[at]!.ship;
+    const cheaper = [...cheapestFirst].reverse().find((s) => s.cost < current.cost);
+    if (!cheaper) break; // everything is already the cheapest hull
+    picks = picks.map((p, i) => (i === at ? { ...p, ship: cheaper } : p));
+  }
+  // If even five of the cheapest will not fit, shed ships until it does.
+  while (picks.length && total() > OUTFIT_BUDGET_K) picks = picks.slice(0, -1);
+
+  return { shipClassIds: picks.map((p) => p.ship.id), spentK: total(), dropped };
+}

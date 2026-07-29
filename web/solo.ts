@@ -10,6 +10,9 @@ import {
   STARTING_DEBT_K,
   DEBT_CLEAR_GAMES,
   PILOT_PERKS,
+  ALERT_START,
+  LOW_DEBT_THRESHOLD_K,
+  startingAlertLevel,
 } from "../src/data/junkspace.ts";
 
 // Each pilot class's starting ability (Gunner "Hot Shot", etc.).
@@ -17,6 +20,9 @@ const BASE_PERK: Record<string, { perkName: string; text: string }> = Object.fro
   PILOT_PERKS.map((p) => [p.class, { perkName: p.perkName, text: p.text }]),
 );
 import { SOLO_PHASES, SOLO_ALERT_RULES, PERKS_BY_CLASS } from "../src/data/junkspace-solo.ts";
+import { recastAsOutfit } from "../src/data/junkspace.ts";
+import { findFaction } from "./catalog.ts";
+import { resolveShip } from "./render.ts";
 import { escapeHtml, formatDate, ruleText } from "./format.ts";
 import { EMBLEM_IDS, emblem, icon, statChips } from "./icons.ts";
 import { emblemView, weaponsTable } from "./render.ts";
@@ -67,6 +73,28 @@ export function newOutfitModal(state: AppState): string {
 
   const from = m.fromId;
   const source = from ? state.outfits.find((o) => o.id === from) : undefined;
+
+  // Import from the main game. A fleet cannot be copied across - the two sides
+  // share no ship list and no currency - so each offer says up front what it
+  // would actually become: N stock hulls for so many credits, recast by Mass.
+  // See recastAsOutfit. Fleets that recast to nothing are not offered.
+  const fleetImports = state.lists
+    .map((l) => {
+      const masses = l.fleet.units.flatMap((u) => {
+        const r = resolveShip(u.shipClassId, findFaction(l.fleet.factionId, state.customFactions), state.customFactions);
+        return r ? Array.from({ length: u.count }, () => r.ship.mass) : [];
+      });
+      if (!masses.length) return "";
+      const cast = recastAsOutfit(masses);
+      if (!cast.shipClassIds.length) return "";
+      const on = from === `list:${l.id}`;
+      return `<button class="no-from-opt is-import ${on ? "on" : ""}" data-action="solo-new-outfit-from" data-id="list:${l.id}" aria-pressed="${on}">
+        <span class="no-from-name">${icon("fleets", 13)} ${escapeHtml(l.fleet.name || "Unnamed fleet")}</span>
+        <span class="no-from-sub">Recast as ${cast.shipClassIds.length} ship${cast.shipClassIds.length === 1 ? "" : "s"} · ${ck(cast.spentK)}${cast.dropped ? ` · ${cast.dropped} left behind` : ""}</span>
+      </button>`;
+    })
+    .join("");
+
   // Only worth showing once there is something to copy.
   const startFrom = state.outfits.length
     ? `<div class="modal-field">
@@ -86,9 +114,21 @@ export function newOutfitModal(state: AppState): string {
                </button>`;
              })
              .join("")}
+           ${fleetImports}
          </div>
        </div>`
-    : "";
+    : fleetImports
+      ? `<div class="modal-field">
+           <span class="control-label">Start from</span>
+           <div class="no-from">
+             <button class="no-from-opt ${!from ? "on" : ""}" data-action="solo-new-outfit-from" data-id="" aria-pressed="${!from}">
+               <span class="no-from-name">Empty outfit</span>
+               <span class="no-from-sub">Nothing bought yet</span>
+             </button>
+             ${fleetImports}
+           </div>
+         </div>`
+      : "";
 
   // The marks are inline rather than behind the full 262-sigil library, because
   // opening that picker replaces ui.modal and would throw away the half-filled
@@ -332,6 +372,18 @@ function rollerPanel(state: AppState): string {
 function playTab(state: AppState, o: SavedOutfit): string {
   const alert = o.alertLevel;
   const pct = Math.min(100, (alert / 10) * 100);
+  // Why this game is harder than the last one. The starting Alert Level climbs
+  // as the debt comes down (p.195), and without saying so the player just sees
+  // a number that used to be 1 and now isn't.
+  const startsAt = startingAlertLevel(o.debtK);
+  const startNote =
+    startsAt > ALERT_START
+      ? `<p class="alert-start-note">${
+          o.debtK <= 0
+            ? "Debt cleared, so the Junkspace is watching you: this game starts at 3."
+            : `Under ${ck(LOW_DEBT_THRESHOLD_K)} of Debt left, so this game starts at ${startsAt}.`
+        }</p>`
+      : "";
   const phases = SOLO_PHASES.map((p) => `<li><strong>${escapeHtml(p.name)}.</strong> ${ruleText(p.text)}</li>`).join("");
   return `
   <div class="solo-grid">
@@ -347,6 +399,7 @@ function playTab(state: AppState, o: SavedOutfit): string {
         <button class="bar-btn" data-action="alert-adjust" data-delta="-2">-2 destroy Mass 2-3</button>
         <button class="ghost-btn" data-action="alert-adjust" data-delta="-1">-1</button>
       </div>
+      ${startNote}
       <ul class="rule-list small">${SOLO_ALERT_RULES.map((r) => `<li>${ruleText(r)}</li>`).join("")}</ul>
     </section>
     <section class="solo-card">

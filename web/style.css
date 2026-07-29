@@ -4824,3 +4824,9 @@ main.play-body .roster-section::before { content: none; }
 }
 .hvp-req-why { font-size: 12.5px; line-height: 1.45; color: var(--ink-2); margin: 0 0 10px; }
 .hvp-req-why strong { color: var(--ink); }
+
+/* A main-game fleet offered as a Junkspace import. Marked apart from the
+   outfit-to-outfit copies above it, because this one is a recast rather than a
+   copy and the subtitle says what it will actually become. */
+.no-from-opt.is-import { border-left-color: var(--red); }
+.no-from-opt.is-import .no-from-name { display: inline-flex; align-items: center; gap: 6px; }

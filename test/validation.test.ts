@@ -5,6 +5,7 @@ import type { Fleet, FleetUnit, FleetHvp, AllianceSpecies } from "../src/types.t
 import { validateFleet, fleetCost, maxUnitSize, type IssueCode } from "../src/validation.ts";
 import { GENERIC_HVP, type Catalog } from "../src/data/index.ts";
 import { THE_DISCORD } from "../src/data/factions/the-discord.ts";
+import { recastAsOutfit, JUNKSPACE_SHIPS, OUTFIT_BUDGET_K, OUTFIT_MAX_SHIPS } from "../src/data/junkspace.ts";
 
 // --- test helpers ----------------------------------------------------------
 
@@ -392,4 +393,42 @@ test("fleetCost matches the validator's totalCost", () => {
   // 75 + (4*3) + (45*2) = 75 + 12 + 90 = 177
   assert.equal(fleetCost(f), 177);
   assert.equal(validateFleet(f).totalCost, 177);
+});
+
+// ---------------------------------------------------------------------------
+// Junkspace: recasting a main-game fleet as an outfit
+// ---------------------------------------------------------------------------
+
+test("recastAsOutfit always fits the outfit budget and ship cap", () => {
+  const shapes = [
+    [3, 3, 2, 2, 1, 0, 0, 0, 0, 0, 0, 0],
+    Array.from({ length: 33 }, (_, i) => i % 4),
+    [3, 1],
+    Array(9).fill(0),
+    [],
+  ];
+  for (const masses of shapes) {
+    const r = recastAsOutfit(masses);
+    assert.ok(r.shipClassIds.length <= OUTFIT_MAX_SHIPS, `too many ships for ${JSON.stringify(masses)}`);
+    assert.ok(r.spentK <= OUTFIT_BUDGET_K, `over budget (${r.spentK}k) for ${JSON.stringify(masses)}`);
+    assert.equal(r.shipClassIds.length + r.dropped, masses.length, "every unit is either recast or counted as dropped");
+  }
+});
+
+// A single Frigate costs 25 of the 30 available, so a greedy heaviest-first
+// fill spent the whole budget on one hull and dropped the rest of the fleet.
+test("a heavy fleet recasts to a full crew, not one expensive hull", () => {
+  const r = recastAsOutfit([3, 3, 2, 2, 1]);
+  assert.equal(r.shipClassIds.length, 5, "should still field five ships");
+  assert.equal(r.dropped, 0);
+});
+
+// The downgrade loop used to keep hitting index 0 and shrink the flagship
+// first, leaving a squadron in the biggest hull.
+test("recast keeps the biggest unit in the biggest hull", () => {
+  const byId = new Map(JUNKSPACE_SHIPS.map((s) => [s.id, s]));
+  const masses = recastAsOutfit([3, 2, 1, 0, 0]).shipClassIds.map((id) => byId.get(id)!.mass);
+  for (let i = 1; i < masses.length; i += 1) {
+    assert.ok(masses[i - 1]! >= masses[i]!, `hull ${i} is heavier than the one before it: ${masses.join(",")}`);
+  }
 });

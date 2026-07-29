@@ -1,7 +1,7 @@
 import type { Faction, GameMode, Mass, PilotClass, Weapon } from "../src/types.ts";
 import { maxUnitSize } from "../src/validation.ts";
 import { MODE_BUILDER_SHAPE } from "../src/types.ts";
-import { JUNKSPACE_SHIPS, OUTFIT_MAX_SHIPS } from "../src/data/junkspace.ts";
+import { JUNKSPACE_SHIPS, OUTFIT_MAX_SHIPS, recastAsOutfit, startingAlertLevel } from "../src/data/junkspace.ts";
 import { w } from "../src/data/_helpers.ts";
 import { randomFleetName } from "../src/fleet-names.ts";
 import { announce } from "./announce.ts";
@@ -1181,14 +1181,46 @@ function dispatchAction(target: HTMLElement): void {
       const name = liveOutfitName();
       const draft = state.ui.modal?.kind === "new-outfit" ? state.ui.modal : undefined;
       const source = draft?.fromId ? state.outfits.find((o) => o.id === draft.fromId) : undefined;
+
+      // A "list:" source is a main-game fleet being brought across. The two
+      // sides share no ship list and no currency, so this is a recast rather
+      // than a copy: each unit becomes the nearest stock hull by Mass, heaviest
+      // first, stopping at the five-ship cap or the budget. Name and emblem
+      // come over intact, which is what makes it feel like the same outfit.
+      const fromListId = draft?.fromId?.startsWith("list:") ? draft.fromId.slice(5) : undefined;
+      const srcList = fromListId ? state.lists.find((l) => l.id === fromListId) : undefined;
+      let recast: SavedOutfit["ships"] | undefined;
+      if (srcList) {
+        const fac = findFaction(srcList.fleet.factionId, state.customFactions);
+        const masses = srcList.fleet.units.flatMap((u) => {
+          const r = resolveShip(u.shipClassId, fac, state.customFactions);
+          return r ? Array.from({ length: u.count }, () => r.ship.mass) : [];
+        });
+        const cast = recastAsOutfit(masses);
+        recast = cast.shipClassIds.map((shipClassId, i) => ({
+          id: `s${i + 1}`,
+          shipClassId,
+          pilotClass: "Junker" as const,
+        }));
+      }
+
       // Copying takes the crew and the colours, never the campaign: a copied
       // outfit starts at the full debt with no games flown and no perks taken,
       // because it is a new run with the same ships, not a restore point.
       const base = createOutfit();
       const outfit: SavedOutfit = {
         ...base,
-        name: name || (source ? `${source.name || "Unnamed outfit"} II` : ""),
-        emblem: draft?.emblem ?? source?.emblem ?? base.emblem,
+        name: name || (source ? `${source.name || "Unnamed outfit"} II` : (srcList?.fleet.name ?? "")),
+        emblem: draft?.emblem ?? source?.emblem ?? srcList?.emblem ?? base.emblem,
+        ...(recast
+          ? {
+              ships: recast,
+              emblemImage: srcList?.emblemImage,
+              emblemLib: srcList?.emblemLib,
+              emblemColor: srcList?.emblemColor,
+              emblemBg: srcList?.emblemBg,
+            }
+          : {}),
         ...(source
           ? {
               ships: structuredClone(source.ships),
@@ -1318,14 +1350,20 @@ function dispatchAction(target: HTMLElement): void {
       const raw = prompt("Credits earned this game (in thousands, ¢k):", "0");
       if (raw === null) return;
       const earnedK = Math.max(0, Math.round(Number(raw) || 0));
-      editOutfit((o) => ({
-        ...o,
-        debtK: Math.max(0, o.debtK - earnedK),
-        gamesPlayed: o.gamesPlayed + 1,
-        gameLog: [...o.gameLog, { game: o.gamesPlayed + 1, earnedK }],
-        alertLevel: 1,
-        round: 1,
-      }));
+      editOutfit((o) => {
+        const debtK = Math.max(0, o.debtK - earnedK);
+        return {
+          ...o,
+          debtK,
+          gamesPlayed: o.gamesPlayed + 1,
+          gameLog: [...o.gameLog, { game: o.gamesPlayed + 1, earnedK }],
+          // The next game starts at whatever the NEW debt says, not at 1. The
+          // campaign is supposed to get harder as you pay it off (p.195), and
+          // this was hardcoded to 1, so it never did.
+          alertLevel: startingAlertLevel(debtK),
+          round: 1,
+        };
+      });
       break;
     }
     case "remove-perk": {

@@ -850,7 +850,7 @@ function switcher(
 function cardWeapons(ship: ShipClass): string {
   const one = (w: Weapon, arc: "primary" | "aux") => `
     <p class="pcw">
-      <span class="pcw-arc">${icon(arc === "primary" ? "arc-primary" : "arc-aux", 14, "slot-arc")}${arc === "primary" ? "Pri" : "Aux"}:</span>
+      <span class="pcw-arc">${icon(arc === "primary" ? "arc-primary" : "arc-aux", 14, "slot-arc")}${arc === "primary" ? "Primary" : "Auxiliary"}:</span>
       <span class="pcw-name">${escapeHtml(w.name)}</span>
       <span class="pcw-fig">[${w.count}${w.die}, ${w.rangeMin}-${w.rangeMax}"]</span>
     </p>`;
@@ -863,7 +863,7 @@ function cardWeapons(ship: ShipClass): string {
   if (ship.auxiliary.length === 0 && (ship.auxiliaryFitting || ship.auxiliaryUtility)) {
     rows.push(`
     <p class="pcw">
-      <span class="pcw-arc">${icon("arc-aux", 14, "slot-arc")}Aux:</span>
+      <span class="pcw-arc">${icon("arc-aux", 14, "slot-arc")}Auxiliary:</span>
       <span class="pcw-name">${escapeHtml(ship.auxiliaryFitting ?? "Utility Bays")}</span>
     </p>`);
   }
@@ -878,10 +878,10 @@ export function weaponsTable(ship: ShipClass): string {
   // (damage is a fixed lookup from the die, never shown here). An empty slot is
   // an em dash; a utility slot names itself.
   const weaponLine = (w: Weapon, arc: "pri" | "aux") =>
-    `<p class="weap-line"><span class="wl-arc">${icon(arc === "pri" ? "arc-primary" : "arc-aux", 15, "slot-arc")}${arc === "pri" ? "Pri" : "Aux"}:</span> <span class="wl-name">${escapeHtml(w.name)}</span> <span class="wl-fig">[${w.count}${w.die}, ${w.rangeMin}–${w.rangeMax}"]</span></p>`;
+    `<p class="weap-line"><span class="wl-arc">${icon(arc === "pri" ? "arc-primary" : "arc-aux", 15, "slot-arc")}${arc === "pri" ? "Primary" : "Auxiliary"}:</span> <span class="wl-name">${escapeHtml(w.name)}</span> <span class="wl-fig">[${w.count}${w.die}, ${w.rangeMin}–${w.rangeMax}"]</span></p>`;
   const slotLine = (arc: "pri" | "aux", text: string) => {
     const nm = text === "Utility Bays" ? `${icon("utility", 13, "util-ico")}${text}` : text;
-    return `<p class="weap-line"><span class="wl-arc">${icon(arc === "pri" ? "arc-primary" : "arc-aux", 15, "slot-arc")}${arc === "pri" ? "Pri" : "Aux"}:</span> <span class="wl-name">${nm}</span></p>`;
+    return `<p class="weap-line"><span class="wl-arc">${icon(arc === "pri" ? "arc-primary" : "arc-aux", 15, "slot-arc")}${arc === "pri" ? "Primary" : "Auxiliary"}:</span> <span class="wl-name">${nm}</span></p>`;
   };
 
   const lines: string[] = [];
@@ -1139,7 +1139,6 @@ function eraSwitch(list: SavedList): string {
             <span class="era-opt-hint">${escapeHtml(e.builds)}</span>
           </button>`,
         ).join("")}
-        <p class="era-switch-note">Your ships and faction come with you. Personnel choices are cleared, because each era picks them at a different moment.</p>
       </div>
     </details>`;
 }
@@ -3111,7 +3110,7 @@ const CHART_STATS: Record<ChartStatKey, { label: string; icon: string; get: (r: 
   cost: { label: "Cost", icon: "", get: (r) => r.cost, fmt: (r) => r.costLabel },
   mass: { label: "Mass", icon: "stat-mass", get: (r) => r.mass, fmt: (r) => String(r.mass) },
   thrust: { label: "Thrust", icon: "stat-thrust", get: (r) => r.thrust, fmt: (r) => `${r.thrust}"` },
-  silhouette: { label: "Sil", icon: "stat-silhouette", get: (r) => r.silhouette, fmt: (r) => String(r.silhouette) },
+  silhouette: { label: "Silhouette", icon: "stat-silhouette", get: (r) => r.silhouette, fmt: (r) => String(r.silhouette) },
   shields: { label: "Shields", icon: "stat-shields", get: (r) => r.shields, fmt: (r) => String(r.shields) },
 };
 
@@ -3236,7 +3235,7 @@ function shipsView(state: AppState): string {
     `<th class="comp-stat comp-sortable ${f.sort === key ? "sorted" : ""}" data-action="ship-sort" data-sort="${key}" title="Sort by ${label}">${icon(ico, 13, "stat-ico")}<span class="comp-hlabel">${label}</span></th>`;
   const textH = (key: string, label: string) =>
     `<th class="comp-sortable ${f.sort === key ? "sorted" : ""}" data-action="ship-sort" data-sort="${key}">${label}</th>`;
-  const statHeaders = `${sortH("mass", "stat-mass", "Mass")}${sortH("thrust", "stat-thrust", "Thr")}${sortH("silhouette", "stat-silhouette", "Sil")}${sortH("shields", "stat-shields", "Shd")}`;
+  const statHeaders = `${sortH("mass", "stat-mass", "Mass")}${sortH("thrust", "stat-thrust", "Thrust")}${sortH("silhouette", "stat-silhouette", "Silhouette")}${sortH("shields", "stat-shields", "Shields")}`;
 
   // A ship's data cells (stats + weapons + cost), shared by both layouts.
   // data-label carries each column's heading down into the cell, so the mobile
@@ -3244,7 +3243,7 @@ function shipsView(state: AppState): string {
   const shipCells = (r: CompRow) => `
     <td class="comp-num" data-label="Mass">${r.mass}</td>
     <td class="comp-num" data-label="Thrust">${r.thrust}"</td>
-    <td class="comp-num" data-label="Sil">${r.silhouette}</td>
+    <td class="comp-num" data-label="Silhouette">${r.silhouette}</td>
     <td class="comp-num" data-label="Shields">${r.shields}</td>
     <td class="comp-weap" data-label="Primary">${r.primary || '<span class="muted">None</span>'}</td>
     <td class="comp-weap" data-label="Auxiliary">${r.auxiliary || '<span class="muted">None</span>'}</td>
@@ -3512,11 +3511,11 @@ function learnFleetTable(): string {
     .map((id) => {
       const s = byId.get(id);
       if (!s) return "";
-      const weap = (arc: "PRI" | "AUX", ws: Weapon[]) =>
+      const weap = (arc: "Primary" | "Auxiliary", ws: Weapon[]) =>
         ws.map((w) => `<span class="lf-arc lf-arc-${arc.toLowerCase()}">${arc}</span> ${escapeHtml(w.name)} ${w.count}${w.die}`).join("<br>");
       const cells = [
-        [...s.primary.length ? [weap("PRI", s.primary)] : []],
-        [...s.auxiliary.length ? [weap("AUX", s.auxiliary)] : []],
+        [...s.primary.length ? [weap("Primary", s.primary)] : []],
+        [...s.auxiliary.length ? [weap("Auxiliary", s.auxiliary)] : []],
       ]
         .flat()
         .join("<br>");
@@ -3534,7 +3533,7 @@ function learnFleetTable(): string {
         [
           ["stat-mass", "Mass"],
           ["stat-thrust", "Thrust"],
-          ["stat-silhouette", "Sil"],
+          ["stat-silhouette", "Silhouette"],
           ["stat-shields", "Shields"],
         ] as const
       )

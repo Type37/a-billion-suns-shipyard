@@ -2348,7 +2348,6 @@ button { font-family: inherit; }
 .era-opt.on { border-color: var(--blue); border-left-color: var(--red); background: var(--blue-wash); }
 .era-opt-name { font-family: var(--display); font-weight: 700; font-size: 13.5px; color: var(--ink); }
 .era-opt-hint { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); }
-.era-switch-note { font-size: 11.5px; line-height: 1.4; color: var(--ink-3); margin: 4px 2px 0; }
 
 .mf-emblem { flex-shrink: 0; }
 .mf-emblem .emblem-current-btn { border: none; padding: 0; background: none; }
@@ -3476,8 +3475,8 @@ button { font-family: inherit; }
 .lf-ship { font-weight: 700; color: var(--ink); }
 .lf-weap { font-family: var(--serif); font-size: 12.5px; color: var(--ink-2); }
 .lf-arc { font-family: var(--sans); font-weight: 800; font-size: 10px; letter-spacing: 0.03em; }
-.lf-arc-pri { color: var(--blue); }
-.lf-arc-aux { color: var(--ink-3); }
+.lf-arc-primary { color: var(--blue); }
+.lf-arc-auxiliary { color: var(--ink-3); }
 .learn-legend {
   list-style: disc; margin: 16px 0 0; padding-left: 20px;
   display: grid; gap: 5px; font-size: 14px; line-height: 1.5; color: var(--ink-2); max-width: 56ch;

@@ -1570,10 +1570,10 @@ function builderView(state: AppState): string {
       <div class="sy-fac">
         <span class="mf-fac">${factionControl}</span>
         ${eraSwitch(list)}
-        ${faction && !list.freePlay ? `<button class="sy-ref-btn" data-action="open-ship-reference" title="Faction ship reference">${icon("scroll", 15)} Reference</button>` : ""}
+        ${faction && !list.freePlay ? `<button class="sy-ref-btn" data-action="open-ship-reference" title="Faction ship reference">${icon("scroll", 15)}<span class="sy-ref-label"> Reference</span></button>` : ""}
+        ${playBtn}
+        ${moreMenu}
       </div>
-      ${playBtn}
-      ${moreMenu}
     </header>
 
     ${faction && !list.freePlay ? `<section class="sy-faction">${factionRuleBlock(faction, "full")}</section>` : ""}

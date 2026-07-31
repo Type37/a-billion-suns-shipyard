@@ -937,12 +937,16 @@ function hvpDisplayName(sel: FleetHvp, faction: Faction | undefined): string {
  * a field. Somebody you have NOT chosen gets no box, because the absence is
  * meaningful too: there is nobody yet to name.
  *
- * THE FIELD OPENS HOLDING THE JOB, AND THE CARET LANDS IN FRONT OF IT. The row
- * reads "Flight Controller"; you click it, the caret goes to the far left, and
- * you type until it reads "Kyle Hawkins, Flight Controller". Nothing is
- * selected, so nothing is destroyed by the first keystroke: you are writing in
- * front of the job, which is the book's own order (p.57, "Lt. Commander Sadie
- * Hyatt, Chief Engineer"). Nothing to clear first and nothing to open.
+ * THE FIELD OPENS HOLDING THE JOB, AND THE CARET LANDS AT THE END OF IT. The
+ * row reads "Commissar"; you click it and type, and it reads "Commissar Sadie
+ * Hyatt". Nothing is selected, so nothing is destroyed by the first keystroke,
+ * and there is no positioning to do first: click, type, done.
+ *
+ * The seeded value carries a TRAILING SPACE for that reason. Without it the
+ * first thing you type welds itself to the job - "CommissarSadie" - and "all
+ * you have to do is type" stops being true. It costs nothing: it is invisible
+ * at the end of a line, and the handler trims before it compares, so a field
+ * you opened and left alone still counts as untouched.
  *
  * The caret is placed in actions.ts, on focusin only, so a second click inside
  * the field still positions the caret where you actually clicked.
@@ -964,7 +968,7 @@ function hvpNameLine(def: Hvp, selIndex: number, customName?: string, cls = "sy-
   // The job title IS the field's name, and the same string is its starting
   // value, so the row says the identical words whether or not you have touched
   // it. aria-label states it too: a value is not an accessible name.
-  return `<span class="${cls} is-nameable"><input class="hvp-name-input" type="text" value="${escapeHtml(customName ?? def.name)}" data-default="${escapeHtml(def.name)}" aria-label="${escapeHtml(def.name)}" data-action="hvp-name" data-index="${selIndex}" /></span>`;
+  return `<span class="${cls} is-nameable"><input class="hvp-name-input" type="text" value="${escapeHtml(customName ?? `${def.name} `)}" data-default="${escapeHtml(def.name)}" aria-label="${escapeHtml(def.name)}" data-action="hvp-name" data-index="${selIndex}" /></span>`;
 }
 
 // One person: their name line and its verbatim rule, then a single square

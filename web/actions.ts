@@ -2354,13 +2354,13 @@ export function wireActions(root: HTMLElement): void {
   root.addEventListener("click", handleClick);
   root.addEventListener("change", handleChange);
   /**
-   * Naming a person puts the caret in FRONT of their job.
+   * Naming a person puts the caret at the END of their job, ready to type.
    *
-   * The personnel field opens holding "Flight Controller", and the useful thing
-   * to do with it is write a name before that, not after: "Kyle Hawkins, Flight
-   * Controller". A click would otherwise drop the caret wherever the pointer
-   * landed, and a keyboard tab would land at the end, so the first keystroke
-   * would append to the job instead of introducing the person.
+   * The field opens holding "Commissar " and the whole point is that clicking
+   * it is the only thing you have to do before typing "Sadie Hyatt". Left to
+   * itself a click drops the caret wherever the pointer landed, mid-word as
+   * often as not, and tabbing in selects the lot so the first keystroke wipes
+   * the job. Both are fixed by putting it at the end and selecting nothing.
    *
    * focusin, not click, for two reasons. It fires for the keyboard as well as
    * the pointer, and it fires only on ENTERING the field - so once you are
@@ -2377,9 +2377,10 @@ export function wireActions(root: HTMLElement): void {
   root.addEventListener("focusin", (e) => {
     const t = e.target;
     if (!(t instanceof HTMLInputElement) || t.dataset["action"] !== "hvp-name") return;
-    t.setSelectionRange(0, 0);
+    const end = t.value.length;
+    t.setSelectionRange(end, end);
     requestAnimationFrame(() => {
-      if (document.activeElement === t) t.setSelectionRange(0, 0);
+      if (document.activeElement === t) t.setSelectionRange(t.value.length, t.value.length);
     });
   });
   // Keyboard activation for the custom role="button" controls (the ship-row and

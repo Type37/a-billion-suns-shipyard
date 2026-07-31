@@ -2907,7 +2907,18 @@ button { font-family: inherit; }
 .sy-col-fleet { min-width: 0; }
 @media (min-width: 920px) {
   .sy-cols { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 34px; }
-  .sy-personnel { margin-top: 0; padding-top: 0; padding-left: 30px; border-top: none; border-left: 1px solid var(--hair-soft); }
+  /* The rows sit flush against the column rule, not 30px off it. That gutter
+     was pure loss: an HVP name is the longest string in this column and the
+     narrowest place it has to fit, and 30px of white between a hairline and a
+     row buys nothing a hairline is not already doing. A chosen row's blue spine
+     now lands right against the rule, which reads as the row claiming the edge.
+     Everything that is NOT a row keeps the rows' own 10px text inset, so the
+     heading still lines up with the names below it. */
+  .sy-personnel { margin-top: 0; padding-top: 0; border-top: none; border-left: 1px solid var(--hair-soft); }
+  .sy-personnel > .sy-hvp-count,
+  .sy-personnel > .sy-hvp-note,
+  .sy-personnel > .hvp-assign,
+  .sy-personnel > .hvp-req { padding-left: 10px; }
 }
 .sy-hvp-count { display: flex; align-items: baseline; gap: 8px; font-family: var(--display); font-weight: 800; font-size: 14px; margin: 0 0 6px; }
 .sy-hvp-count span { font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }

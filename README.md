@@ -125,10 +125,8 @@ web/                    The browser app (Vite root)
   index.html main.ts    Entry point
   render.ts state.ts    View + app state
   catalog.ts            Build-time faction discovery + era ordering
-  emblems/ *.ts         Emblems, seed factions, sharing, tours, changelog
+  emblems/ *.ts         Emblems, seed factions, sharing, tours
 ```
-
-The in-app changelog (`web/changelog.ts`, shown at `#/changelog`) tracks what's changed release to release.
 
 ## Deploying
 

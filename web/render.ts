@@ -33,7 +33,6 @@ import { activeList, activeOutfit, DEFAULT_PRINT, PAPER } from "./state.ts";
 import type { SavedList, UnitPosition } from "./storage.ts";
 import { SEED_FACTIONS } from "./seed-factions.ts";
 import { soloListView, soloOutfitView, newOutfitModal } from "./solo.ts";
-import { activeTour } from "./tours.ts";
 
 // The whole app renders from state into #app. Interactive elements carry
 // data-action attributes; actions.ts owns all event handling.
@@ -200,13 +199,7 @@ function trainingGuide(mode: GameMode, firstSession: boolean): string {
       <div class="guide-inner">
         <p class="guide-intro">${escapeHtml(g.intro)}</p>
         ${steps}
-        ${
-          notes
-            ? `<h4 class="guide-notes-title">Good to know</h4>
-               <p class="guide-notes-sub">Rules that apply throughout the game, not a step you take once.</p>
-               ${notes}`
-            : ""
-        }
+        ${notes}
       </div>
     </details>
   </section>`;
@@ -239,9 +232,7 @@ function trainingPrintBlocks(mode: GameMode): string {
     </div>
     ${
       noteItems
-        ? `<h3 class="sheet-section">Good to know</h3>
-           <p class="print-note" style="padding:0 0 8px">Rules that apply throughout the game, not a step you take once.</p>
-           <div class="ref-block"><ul class="ref-list">${noteItems}</ul></div>`
+        ? `<div class="ref-block"><ul class="ref-list">${noteItems}</ul></div>`
         : ""
     }`;
 }
@@ -487,11 +478,9 @@ function tutorialCallout(state: AppState): string {
       <div class="onboard-options">
         <button class="onboard-opt" data-action="new-training" data-mode="combat-simulator">
           <span class="oo-name">${icon("book", 15)} Combat Simulator</span>
-          <span class="oo-desc">Learn the core game. A quick skirmish with a ready-made fleet: move, shoot, and activate your battlegroups.</span>
         </button>
         <button class="onboard-opt" data-action="new-training" data-mode="management-training">
           <span class="oo-name">${icon("book", 15)} Management Training</span>
-          <span class="oo-desc">Learn the economy. Buy a Shipyard, then requisition and jump ships into play as the game unfolds.</span>
         </button>
       </div>
     </div>
@@ -524,11 +513,9 @@ function foundryNudge(state: AppState): string {
   <aside class="onboard onboard-foundry">
     <div class="onboard-main">
       <p class="onboard-title">Bring your own ships</p>
-      <p class="onboard-note">Custom Rules lets you build a faction from scratch: your ship classes, your stats, your personnel. It plays exactly like the ones in the book, and you can share it as a file.</p>
       <div class="onboard-options">
         <a class="onboard-opt" href="#/foundry">
           <span class="oo-name">${icon("custom-rules", 15)} Open Custom Rules</span>
-          <span class="oo-desc">Forge a faction, or start by duplicating one that already exists and renaming it.</span>
         </a>
       </div>
     </div>
@@ -1039,7 +1026,6 @@ function hvpAssignPanel(list: SavedList, faction: Faction | undefined, customs: 
             ${options}
             <button class="hvp-pick-opt is-clear" data-action="hvp-assign-to" data-index="${i}" data-unit="">
               <span class="hvp-pick-name">Not assigned</span>
-              <span class="hvp-pick-why">Leave this one off the table for now</span>
             </button>
           </div>
         </details>
@@ -1053,13 +1039,7 @@ function hvpAssignPanel(list: SavedList, faction: Faction | undefined, customs: 
     <div class="hvp-assign-head">
       <h3 class="roster-section">Assign carriers</h3>
       <p class="hvp-assign-note">${
-        unassigned === 0
-          ? `All ${list.fleet.hvp.length} are aboard.`
-          : `${unassigned} still to place. ${
-              minMass === 0
-                ? "Aces and Heroes: yours can ride any unit, squadrons included."
-                : "Personnel ride units of Mass 1 or higher."
-            }`
+        unassigned === 0 ? `All ${list.fleet.hvp.length} aboard` : `${unassigned} still to place`
       }</p>
     </div>
     ${rows}
@@ -1098,7 +1078,6 @@ function hvpRequisitionNote(list: SavedList, faction: Faction | undefined): stri
       <p class="hvp-assign-note">${list.fleet.hvp.length} chosen</p>
     </div>
     <ul class="hvp-req-list">${rows}</ul>
-    <p class="hvp-req-why">A Shipyard has no units until you requisition one, so there is nobody to assign them to yet. Each rides the unit you form when you requisition it &mdash; write it in the roster's <strong>HVP carried</strong> column as you go.</p>
     <a class="bar-btn" href="#/print/${list.id}">${icon("print", 15)} Print the roster</a>
   </section>`;
 }
@@ -1139,7 +1118,6 @@ function eraSwitch(list: SavedList): string {
             <span class="era-opt-hint">${escapeHtml(e.builds)}</span>
           </button>`,
         ).join("")}
-        <p class="era-switch-note">Your ships and faction come with you. Personnel choices are cleared, because each era picks them at a different moment.</p>
       </div>
     </details>`;
 }
@@ -1772,7 +1750,7 @@ function shipReferenceModal(state: AppState): string {
     <div class="modal-backdrop" data-action="close-modal"></div>
     <div class="modal-panel shipref-modal" role="dialog" aria-modal="true" aria-label="${escapeHtml(faction.name)} ship reference">
       <header class="modal-header">
-        <h2 class="modal-title">${escapeHtml(faction.name)} &mdash; Ship Reference</h2>
+        <h2 class="modal-title">${escapeHtml(faction.name)} - Ship Reference</h2>
         <button class="modal-close" data-action="close-modal" aria-label="Close">${icon("close", 18)}</button>
       </header>
       <div class="modal-body shipref-body">
@@ -2127,7 +2105,7 @@ function printView(state: AppState): string {
         </span>
         <label class="print-toggle"><input type="checkbox" data-action="print-trackers" ${opts.trackers ? "checked" : ""} /> Trackers</label>
         <label class="print-toggle"><input type="checkbox" data-action="print-rules" ${opts.rules ? "checked" : ""} /> Rules</label>
-        <label class="print-toggle" title="Drops the solid fills and heavy rules. Colour is kept: a coloured line costs no more ink than a black one"><input type="checkbox" data-action="print-inksaver" ${opts.inkSaver ? "checked" : ""} /> Ink saver</label>
+        <label class="print-toggle"><input type="checkbox" data-action="print-inksaver" ${opts.inkSaver ? "checked" : ""} /> Ink saver</label>
       </div>
       <div class="print-go">
         <span class="print-pagecount" data-print-pagecount>&nbsp;</span>
@@ -2261,7 +2239,6 @@ function foundryListView(state: AppState): string {
   ${topbar()}
   <main class="foundry-main">
     <h1 class="page-title">Custom Rules</h1>
-    <p class="panel-note">It may be easiest to just take an existing faction and rename certain elements; for example, taking the Unity and renaming them to "The Empire."</p>
     <div class="foundry-actions">
       <details class="cf-new-picker">
         <summary class="cta-btn">${icon("plus", 18)} Forge a faction</summary>
@@ -2464,130 +2441,16 @@ function foundryEditView(state: AppState, factionId: string): string {
 // Play mode: a table companion for the fleet game
 // ---------------------------------------------------------------------------
 
-// Each phase as a real checklist rather than a paragraph to read and
-// interpret yourself - the player ticks steps off as they do them at the
-// table. The Initiative step (index 1 of Command Phase) auto-ticks when the
-// player uses the Roll button below, since that's an unambiguous 1:1 link;
-// everything else is self-reported, because this is a physical miniatures
-// game and the app cannot see the table.
-/** A checklist step: the line to tick, plus an optional italic aside. */
-interface PhaseStep {
-  text: string;
-  note?: string;
-}
-/** A reference bullet (no checkbox), with optional nested sub-bullets. */
-interface PhaseRef {
-  text: string;
-  sub?: string[];
-}
-interface PhaseGuide {
-  name: string;
-  /** Tickable checklist steps. */
-  steps?: PhaseStep[];
-  /** A no-checkbox reference block: a lead line and bullets you read, not tick. */
-  intro?: string;
-  reference?: PhaseRef[];
-  /** True on the End Phase, where the mode's scoring reminders belong. */
-  scoring?: boolean;
-}
-
-// Command Phase, verbatim (A and B). The +1-CMD-for-losers line is not in the
-// player's transcription, so it is not invented back in here.
-const COMMAND_PHASE: PhaseGuide = {
-  name: "Command Phase",
-  steps: [
-    {
-      text: "You gain a number of CMD tokens determined by your faction (if you are using the Training Fleet, you gain 7 CMD tokens).",
-      note: "Unspent CMD tokens are discarded at the end of the round.",
-    },
-    {
-      text: "All players make an Initiative Check. Roll a number of D6 equal to your faction's Initiative value. Each roll of a 2 or 3 counts as one success; each roll of a 1 counts as two successes. The player that rolls the most successes wins the Initiative Check and chooses which player has the Initiative for this round.",
-    },
-  ],
-};
-
-// Jump Phase for the Shipyard modes: reference text, not a checklist, because
-// requisitioning happens repeatedly on your turns, not once. Verbatim.
-const JUMP_PHASE_SHIPYARD: PhaseGuide = {
-  name: "Jump Phase",
-  intro:
-    "In the Jump Phase, players take turns, clockwise from the player with Initiative. On your turn, you do one of the following:",
-  reference: [
-    {
-      text: 'Open a Jump Point: Take a jump point from the supply and place it into play, anywhere you like at least 9" outside of any planetoids. (Some missions have other restrictions.) You have access to 3 jump points +1 if there are 3 sectors.',
-    },
-    {
-      text: "Requisition (1 CMD): When it is your turn, spend 1 CMD token to form a new unit using ships in your Shipyard, paying their cost in credits. Move the appropriate miniatures into your Reserves area and then jump them into play. Once you have requisitioned a particular ship, strike it off your Shipyard Roster – you cannot requisition it again.",
-      sub: [
-        "When you requisition a unit, you can additionally requisition Squadron units, without spending additional CMD tokens, if they can all be carried by the first unit.",
-      ],
-    },
-    {
-      text: "Jump In a Unit - If you have any units in your Reserves (IE If units Jumped Out) you may have the Jump In without paying a command token or their cost in credits.",
-    },
-  ],
-};
-
-// Jump Phase for the Fleet-List modes: a short checklist (no requisition).
-const JUMP_PHASE_DEFAULT: PhaseGuide = {
-  name: "Jump Phase",
-  steps: [
-    { text: "Starting with whoever has Initiative, take turns clockwise." },
-    { text: "On your turn: open a Jump Point, Jump In a unit from Reserve, or pass." },
-    { text: "Once everyone has passed in a row, the phase ends." },
-  ],
-};
-
-const TACTICAL_PHASE: PhaseGuide = {
-  name: "Tactical Phase",
-  steps: [
-    { text: "Starting with whoever has Initiative, take turns clockwise." },
-    { text: 'Drag to Select a battlegroup: a lead unit, plus any unactivated friendly units within 6" of it (Combined Mass 10 or less).' },
-    { text: "Activate every unit in that battlegroup, then pass to the next player." },
-    { text: "The phase ends once every unit in play has activated." },
-  ],
-};
-
-const END_PHASE: PhaseGuide = {
-  name: "End Phase",
-  scoring: true,
-  steps: [
-    { text: "Check your mission(s) for anything you scored this round." },
-    { text: "Clear every Activated token." },
-    { text: "Resolve any other End Phase effects your mission or faction calls for." },
-    { text: "Discard any unused CMD tokens." },
-    { text: "Start the next round." },
-  ],
-};
-
-function phasesFor(mode: GameMode): PhaseGuide[] {
-  const shipyard = MODE_BUILDER_SHAPE[mode] === "shipyard";
-  return [COMMAND_PHASE, shipyard ? JUMP_PHASE_SHIPYARD : JUMP_PHASE_DEFAULT, TACTICAL_PHASE, END_PHASE];
-}
-
-/** End Phase scoring reminders by mode, from the relevant rules pages. */
-const SCORING_NOTES: Partial<Record<GameMode, string[]>> = {
-  "combat-simulator": [
-    "Each End Phase: 2VP per enemy flank Jump Point you are blockading; 5VP for the enemy's central Jump Point; 3VP for the central objective.",
-    "Game end (end of Round 4): 2VP per enemy HVP token you are carrying.",
-  ],
-  armageddon: [
-    "Each End Phase (core mission): 2VP per enemy flank Jump Point you are blockading; 5VP for the enemy's central Jump Point; 3VP for the central objective.",
-    "Game end (end of Round 4): 2VP per enemy HVP token you are carrying. Check your chosen mission for exact scoring.",
-  ],
-  "management-training": [
-    "Each End Phase: ¢20bn per Sector you control (most ships there; ties by Combined Mass) and ¢20bn per ComSat you are Blockading.",
-    "The game ends after Round 3; most credits wins.",
-  ],
-  hypergrowth: [
-    "Each End Phase: collect the Revenue your two rolled missions award for their objectives.",
-    "Game end (end of Round 4): highest Credits wins; ties go to the player carrying the most HVP tokens.",
-  ],
-  "age-of-unity": [
-    "Each End Phase: score the VP listed on the two rolled missions (Attacker and Defender briefings differ).",
-    "Game end (end of Round 4): most VP wins; check each mission's end-of-game scoring.",
-  ],
-};
+// The four phases of a round, as names only.
+//
+// This used to carry a per-phase checklist and a block of scoring reminders.
+// Both were removed: they were summaries of rules the app already holds
+// verbatim (Learn to Play renders the same phases word for word), and the
+// summaries had quietly lost clauses - the 6" Jump In constraint, the rule
+// that every unit finishes an activation step before the next one starts, and
+// the +1 CMD token for losing the Initiative Check. A tracker should track.
+// The rules it shows must be transcribed or absent.
+const PHASE_NAMES = ["Command Phase", "Jump Phase", "Tactical Phase", "End Phase"];
 
 /**
  * The commands you can actually spend CMD on *right now*: the core list filtered
@@ -2840,55 +2703,19 @@ function playView(state: AppState): string {
   const maxRound = list.mode === "management-training" ? 3 : 4;
   const isCredits = list.mode === "hypergrowth" || list.mode === "management-training";
   const scoreLabel = isCredits ? "Credits" : "Victory points";
-  const PHASES = phasesFor(list.mode);
-  const currentPhase = PHASES[play.phase];
-  const checks = play.checks ?? [];
-  const stepCount = currentPhase?.steps?.length ?? 0;
-  const doneCount = checks.filter(Boolean).length;
-  // A reference phase (e.g. the Shipyard Jump Phase) has nothing to tick, so it
-  // is never "done" via the checklist and shows no count or checkmark.
-  const phaseDone = stepCount > 0 && doneCount === stepCount;
-
-  // A bespoke instance of the switcher pattern (one bordered track, a
-  // sliding highlight) rather than the plain switcher() helper, since this
-  // one needs a per-option checkmark once that phase's checklist is clear -
-  // the four-separate-boxes version this replaced was the single biggest
-  // contributor to "too many lines" on this page.
-  const phaseBtns = `<div class="switcher" role="group" aria-label="Round phase" style="--switcher-count:${PHASES.length};--switcher-selected:${play.phase}">
+  // A bespoke instance of the switcher pattern (one bordered track, a sliding
+  // highlight) rather than the plain switcher() helper. It used to carry a
+  // per-phase checkmark once that phase's checklist was clear; the checklists
+  // are gone, so the number stands on its own.
+  const phaseBtns = `<div class="switcher" role="group" aria-label="Round phase" style="--switcher-count:${PHASE_NAMES.length};--switcher-selected:${play.phase}">
     <span class="switcher-thumb" aria-hidden="true"></span>
-    ${PHASES.map(
-      (p, i) => `
+    ${PHASE_NAMES.map(
+      (name, i) => `
       <button class="switcher-opt ${play.phase === i ? "selected" : ""}" data-action="play-phase" data-phase="${i}">
-        <span class="phase-n">${play.phase === i && phaseDone ? icon("check", 13) : i + 1}</span>${p.name.replace(" Phase", "")}
+        <span class="phase-n">${i + 1}</span>${name.replace(" Phase", "")}
       </button>`,
     ).join("")}
   </div>`;
-
-  // Each phase renders either as a tickable checklist (steps, with an optional
-  // italic aside) or as a read-only reference block (a lead line and bullets you
-  // do not tick, because the action repeats on every turn).
-  const checklistHtml = currentPhase?.reference
-    ? `<div class="phase-ref">
-        ${currentPhase.intro ? `<p class="phase-ref-lead">${ruleText(currentPhase.intro)}</p>` : ""}
-        <ul class="phase-ref-list">
-          ${currentPhase.reference
-            .map(
-              (r) => `<li>${ruleText(r.text)}${
-                r.sub ? `<ul class="phase-ref-sub">${r.sub.map((s) => `<li>${ruleText(s)}</li>`).join("")}</ul>` : ""
-              }</li>`,
-            )
-            .join("")}
-        </ul>
-      </div>`
-    : (currentPhase?.steps ?? [])
-        .map(
-          (step, i) => `
-    <label class="phase-check ${checks[i] ? "done" : ""}">
-      <input type="checkbox" data-action="play-check-step" data-index="${i}" ${checks[i] ? "checked" : ""} />
-      <span>${ruleText(step.text)}${step.note ? `<em class="phase-check-note">${ruleText(step.note)}</em>` : ""}</span>
-    </label>`,
-        )
-        .join("");
 
   // Management Training scores in ¢20bn awards ("¢20bn per Sector"), so it steps
   // by ten. Hypergrowth credits are the granular cost of requisitioning ships
@@ -2941,26 +2768,6 @@ function playView(state: AppState): string {
       </div>
       <div class="cmd-pips" role="group" aria-label="CMD tokens">${cmdPips}</div>
     </div>`;
-
-  // Scoring reminders live in the End Phase only now (that is when you score),
-  // not in a standing block that repeated on every phase.
-  const scoringNotes = currentPhase?.scoring
-    ? (SCORING_NOTES[list.mode] ?? []).map((n) => `<li>${ruleText(n)}</li>`).join("")
-    : "";
-
-  // On a phone the phase steps fold behind a tap so the play screen fits; on
-  // desktop the toggle disappears and they are always shown (see .phase-fold).
-  const checklistBlock = `<details class="phase-fold" data-persist="phase-fold">
-      <summary class="phase-fold-summary">
-        ${icon("chevronDown", 15, "phase-fold-caret")}
-        <span class="phase-fold-label">${currentPhase?.reference ? "This phase" : "Steps"}</span>
-        ${stepCount > 0 ? `<span class="phase-checklist-count">${doneCount} of ${stepCount} done</span>` : ""}
-      </summary>
-      <div class="phase-checklist phase-fold-body">
-        ${checklistHtml}
-        ${scoringNotes ? `<div class="phase-scoring"><ul class="rule-list">${scoringNotes}</ul></div>` : ""}
-      </div>
-    </details>`;
 
   // Hypergrowth is played from a Shipyard, so its Play Mode is laid out
   // differently: the faction ability and the Commands sit together (commands
@@ -3044,7 +2851,6 @@ function playView(state: AppState): string {
           // live Shipyard, always in view, and the counters above it.
           `<div class="play-cols">
       <div class="play-col play-col-do">
-        ${checklistBlock}
         <div class="play-counters">
           ${counter(scoreLabel, play.vp, "play-vp", scoreStep, scoreFmt)}
           ${counter("Opponent " + scoreLabel.toLowerCase(), play.oppVp, "play-oppvp", scoreStep, scoreFmt)}
@@ -3062,7 +2868,6 @@ function playView(state: AppState): string {
           // right is the counters, the fleet with its damage tracker, then commands.
           `<div class="play-cols">
       <div class="play-col play-col-do">
-        ${checklistBlock}
         <div class="play-counters">
           ${counter(scoreLabel, play.vp, "play-vp", scoreStep, scoreFmt)}
           ${counter("Opponent " + scoreLabel.toLowerCase(), play.oppVp, "play-oppvp", scoreStep, scoreFmt)}
@@ -3352,36 +3157,6 @@ function shipsView(state: AppState): string {
 // Root
 // ---------------------------------------------------------------------------
 
-// A first-visit coachmark: a small white popover anchored to a live element
-// (positioned in main.ts, since this app re-renders as a plain HTML string).
-// Hidden until positioning finds its target, so it never flashes at 0,0.
-function tourPopover(state: AppState): string {
-  const active = activeTour(state);
-  if (!active) return "";
-  const { tour, step } = active;
-  const s = tour.steps[step];
-  if (!s) return "";
-  const dots = tour.steps
-    .map((_, i) => `<span class="tour-dot ${i === step ? "on" : ""}"></span>`)
-    .join("");
-  const isLast = step >= tour.steps.length - 1;
-  return `
-  <div class="tour-pop" data-target="${escapeHtml(s.selector)}">
-    <div class="tour-pop-arrow"></div>
-    <div class="tour-head">
-      <h4 class="tour-title">${escapeHtml(s.title)}</h4>
-      <button class="tour-close" data-action="tour-dismiss" data-tour="${tour.id}">${icon("close", 15)} Skip</button>
-    </div>
-    <p class="tour-body">${escapeHtml(s.body)}</p>
-    <div class="tour-foot">
-      <span class="tour-dots">${dots}</span>
-      <!-- "Got it" rather than "Done" on the last step: this is a teaching
-           popover, not a task you completed. -->
-      <button class="tour-next" data-action="tour-next" data-tour="${tour.id}" data-step="${step}" data-len="${tour.steps.length}">${icon(isLast ? "check" : "chevronRight", 15)} ${isLast ? "Got it" : "Next"}</button>
-    </div>
-  </div>`;
-}
-
 // App-wide Options dialog: back up / restore / wipe the browser-stored data,
 // plus the about-and-links that also live in the footer. Rendered from the root
 // so it is reachable on every view.
@@ -3434,7 +3209,6 @@ function optionsModal(state: AppState): string {
       <div class="modal-body opt-body">
         <section class="opt-section">
           <h3 class="opt-h">Your data</h3>
-          <p class="opt-note">Everything you build is saved in this browser only.</p>
           <div class="opt-actions">
             <button class="bar-btn" data-action="export-data">${icon("download", 15)} Export a backup</button>
             <label class="bar-btn file-btn">${icon("upload", 15)} Import a backup
@@ -3664,27 +3438,24 @@ function learnView(state: AppState): string {
       <h2 class="learn-sub">Blockading</h2>
       <ul class="learn-rules">${bullets(csStep("Special rules"), /^Blockading/)}</ul>
       <h2 class="learn-sub">Victory points</h2>
-      <p class="learn-note">In <b>this tutorial mission</b>, this is the scoring. Every mission and game type has its own scoring, though &mdash; always read the mission.</p>
       <ul class="learn-rules">${bullets(csStep("Victory points"))}</ul>
       <p class="learn-note">${ruleText(csStep("Game end and victory")?.text ?? "")}</p>
     </div>`,
     // 1 - Your fleet
     `<div class="learn-screen">
       <h1 class="learn-title">The Training Fleet</h1>
-      <p class="learn-lede">This is a sample fleet that can be used in the tutorials.</p>
       ${learnFleetTable()}
       <div class="learn-stat-defs">
         <p><b>Mass</b> ${icon("stat-mass", 15, "stat-ico stat-ico-mass")} is a broad measure of the size and bulk of a ship. Throughout the rules, when you see the icon ${icon("stat-mass", 15, "stat-ico stat-ico-mass")}, replace that with the value of the Mass of the unit&rsquo;s ship class. If a rule refers to the Combined Mass of ships, sum the ${icon("stat-mass", 15, "stat-ico stat-ico-mass")} of all the related individual ships to form a total.</p>
         <p><b>Thrust</b> ${icon("stat-thrust", 15, "stat-ico stat-ico-thrust")} is the maximum number of inches this ship can travel in a single move.</p>
         <p><b>Silhouette</b> ${icon("stat-silhouette", 15, "stat-ico stat-ico-silhouette")} represents both the physical size of the ship as well as the brightness of its energy signature. The larger and &lsquo;louder&rsquo; the ship, the easier it is for enemy vessels to track, target and hit it, but the more punishment it can withstand. A ship&rsquo;s Silhouette value is the highest roll on any attack die that will be considered a hit. Each ship enters play with Hull Points (HP) equal to its Silhouette. A ship&rsquo;s HP value is the number of damage tokens required to remove the ship from play.</p>
-        <p><b>Shields</b> ${icon("stat-shields", 15, "stat-ico stat-ico-shields")} &mdash; most larger ships are equipped with kinetic field generators, used to absorb and disperse the energy of incoming attacks. A ship&rsquo;s Shields value indicates the strength and sophistication of the defensive shields it possesses. A ship&rsquo;s Shields value determines the highest die roll that counts as a successful saving throw when defending against attacks.</p>
-        <p><b>Weapons</b> &mdash; the weapons this ship is carrying and in what quantity. Ships may have Primary and/or Auxiliary weapon systems. Weapon systems have a Range (Minimum and Maximum), a number and type of Attack Dice, and a damage value.</p>
+        <p><b>Shields</b> ${icon("stat-shields", 15, "stat-ico stat-ico-shields")} - most larger ships are equipped with kinetic field generators, used to absorb and disperse the energy of incoming attacks. A ship&rsquo;s Shields value indicates the strength and sophistication of the defensive shields it possesses. A ship&rsquo;s Shields value determines the highest die roll that counts as a successful saving throw when defending against attacks.</p>
+        <p><b>Weapons</b> - the weapons this ship is carrying and in what quantity. Ships may have Primary and/or Auxiliary weapon systems. Weapon systems have a Range (Minimum and Maximum), a number and type of Attack Dice, and a damage value.</p>
       </div>
     </div>`,
     // 2 - The round. Four accordions, one per phase, each stated exactly once.
     `<div class="learn-screen">
       <h1 class="learn-title">The round</h1>
-      <p class="learn-lede">Four rounds, each running the same four phases in the same order.</p>
       <div class="learn-accs">
         ${phaseAccordion(
           0,
@@ -3748,7 +3519,7 @@ function learnView(state: AppState): string {
              `${learnDiagram("movement")}
               <p class="learn-fn">A single pivot of more than 90&deg; costs this unit its Primary attacks for the activation (Inertial Strain). A unit that moved under 3" and did not jump becomes an Easy Target: enemies re-roll attack dice against it.</p>
               <h4 class="learn-sub-min">Doubling your move <span class="learn-optional">Optional</span></h4>
-              <p class="learn-note">Spend 1 CMD on <b>Power to Engines</b> at the start of a unit&rsquo;s movement step and it takes the whole step twice &mdash; pivot and move, then pivot and move again. It is the only way a ship covers more than its Thrust in one activation.</p>
+              <p class="learn-note">Spend 1 CMD on <b>Power to Engines</b> at the start of a unit&rsquo;s movement step and it takes the whole step twice - pivot and move, then pivot and move again. It is the only way a ship covers more than its Thrust in one activation.</p>
               ${learnDiagram("double-move")}`,
            )}
            ${activationStep(
@@ -3771,10 +3542,7 @@ function learnView(state: AppState): string {
              <li>Discard all unused CMD tokens.</li>
              <li>Begin a new Round.</li>
            </ol>
-           <h3 class="learn-sub">Score</h3>
-           <p class="learn-note">In <b>this tutorial mission</b>, this is the scoring. Every mission and game type has its own scoring, though &mdash; always read the mission.</p>
-           <ul class="learn-rules">${bullets(csStep("Victory points"))}</ul>
-           <p class="learn-note">${ruleText(csStep("Game end and victory")?.text ?? "")}</p>`,
+`,
         )}
       </div>
     </div>`,
@@ -3981,5 +3749,5 @@ export function render(state: AppState): string {
         return learnView(state);
     }
   })();
-  return `${body}${optionsModal(state)}${emblemModal(state)}${newOutfitModal(state)}${confirmModal(state)}${tourPopover(state)}`;
+  return `${body}${optionsModal(state)}${emblemModal(state)}${newOutfitModal(state)}${confirmModal(state)}`;
 }

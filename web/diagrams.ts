@@ -272,7 +272,7 @@ function doubleMoveDiagram(): string {
   return `
   <svg class="learn-dg" viewBox="0 0 320 150" role="img"
        aria-label="Power to Engines: spend one CMD token at the start of the movement step to take that step twice - pivot and move, then pivot and move again.">
-    ${LABEL(160, 15, "Power to Engines — move twice", "dg-title")}
+    ${LABEL(160, 15, "Power to Engines - move twice", "dg-title")}
     <line class="dg-straight" x1="${A}" y1="${Y}" x2="${B}" y2="${Y}"/>
     <line class="dg-straight dg-straight-2" x1="${B}" y1="${Y}" x2="${C}" y2="${Y}"/>
     <g class="dg-dbl-mover">${SHIP(0, 0, 90, "dg-ship")}</g>
@@ -355,7 +355,7 @@ function passiveDiagram(): string {
          exactly the rule. Your unit ends at ${END_X},${END_Y} - behind this one. -->
     <g transform="translate(108 48)">
       ${SHIP(0, 0, -90, "dg-ship dg-enemy dg-enemy-away")}
-      ${LABEL(0, 26, "facing away — no shot", "dg-mini dg-mini-out")}
+      ${LABEL(0, 26, "facing away, no shot", "dg-mini dg-mini-out")}
     </g>
 
     <path class="dg-path" d="M46 150 L146 118 L${END_X} ${END_Y}"/>
@@ -444,7 +444,7 @@ function actionDiagram(): string {
       .learn-dg .dgof-beam { stroke-dasharray: 160; }
     </style>
 
-    ${LABEL(160, 15, "Take one Action — here, Open Fire", "dg-title")}
+    ${LABEL(160, 15, "Take one Action - here, Open Fire", "dg-title")}
 
     <g transform="translate(66 58)">
       <path class="dg-arc-fill dg-arc-pri" d="M0 0 L74 -31 L74 31 Z"/>
@@ -567,7 +567,7 @@ function gravityWellDiagram(): string {
   return `
   <svg class="learn-dg" viewBox="0 0 320 190" role="img"
        aria-label="Gravity Well: no jump point may be placed, and no jumping may happen, within nine inches of a planetoid.">
-    ${LABEL(160, 15, 'Gravity Well — 9" around a Planetoid', "dg-title")}
+    ${LABEL(160, 15, 'Gravity Well - 9" around a Planetoid', "dg-title")}
     <g transform="translate(150 104)">
       <circle class="dg-well" r="${9 * IN}"/>
       <circle class="dg-planetoid" r="17"/>

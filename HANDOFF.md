@@ -13,7 +13,7 @@ Nothing is mid-flight. Known deferred items, in rough priority order:
 
 - **All-caps / wide letter-spacing restyle.** ~79 CSS rules use `text-transform: uppercase` + `letter-spacing` (the house "label" style: `.control-label`, `.sheet-section`, `.nfd-*`, `.learn-*`, print headers…). The user asked for the full list, then said to leave it for now. If revisited, decide once: drop the letter-spacing, sentence-case everything but tiny eyebrow labels, or keep.
 - **The "General" emblem bucket.** 88 of 153 library sigils are loose files at `web/emblems/` root, so they all land in the catch-all "General" folder. The other 11 folders are tidy. Filing those into folders is a content decision for the user, not code.
-- **Play Mode depth.** Research (see below) suggests the biggest wins would be: phase-filtered command list (show only commands legal in the current phase), per-ship damage/shield tracking, and an activation-order tracker. Currently Play Mode is a phase/round/CMD/VP tracker only.
+- **Play Mode depth.** Research (see below) suggests the biggest wins would be: phase-filtered command list (show only commands legal in the current phase), per-ship damage/shield tracking, and an activation-order tracker. Currently Play Mode is a phase/round/CMD/VP tracker plus the verbatim Commands panel. Anything added here has to carry transcribed text or none.
 
 ### The three modes — the mental model (implemented)
 
@@ -21,7 +21,7 @@ Nothing is mid-flight. Known deferred items, in rough priority order:
 |---|---|---|---|
 | **Hypergrowth** | **Shipyard** (own single-column screen, `shipyardView` in render.ts — NOT the two-column `builderView`; see `HYPERGROWTH-SHIPYARD.md`) | Ship types with a quantity (stepper on the right of the name line). Cap is a **two-button choice: ¢300bn / No Limit** (`sy-cap-limited` / `sy-cap-nolimit`; No Limit = `unlimitedShipyards`, suppresses the ship list, no ∞, no explainer). Also in the New Fleet modal (`nf-nolimit`). | **Choose up to 3** (7 faction + 5 generic in ONE flat list, no headings/cards, check on the right), no assignment here. |
 
-**Hypergrowth Play Mode** is its own layout (`isShipyard` branch in `playView`): faction ability with the Commands directly under it (left col); the right col is the live **Shipyard requisition tracker** (`playShipyardTracker`) — every class always visible with Deploy / Jumped out / Jump in and a yard·play·reserve tally (`play.req[classId]={play,reserve}`, actions `play-deploy`/`play-jumpout`/`play-jumpin`), NOT the damage-box tracker. Phase content is verbatim and mode-aware (`phasesFor(mode)`): Command Phase = checkboxes A/B; shipyard Jump Phase = a no-checkbox reference block (Open Jump Point / Requisition / Jump In); scoring reminders render in the **End Phase only**. Arc glyphs (`arc-primary` wedge + dome outline, `arc-aux` filled dome) and the left-aligned weapons table (`.wt-row` name col = `1fr`) are global, all modes.
+**Hypergrowth Play Mode** is its own layout (`isShipyard` branch in `playView`): faction ability with the Commands directly under it (left col); the right col is the live **Shipyard requisition tracker** (`playShipyardTracker`) — every class always visible with Deploy / Jumped out / Jump in and a yard·play·reserve tally (`play.req[classId]={play,reserve}`, actions `play-deploy`/`play-jumpout`/`play-jumpin`), NOT the damage-box tracker. Play Mode shows NO phase rules text: the phase switcher (`PHASE_NAMES`) is a position marker only. The per-phase checklists and scoring reminders were removed because they were paraphrases of rules the app already holds verbatim, and the paraphrases had lost clauses. If phase content ever comes back it must be transcribed, not summarised. Arc glyphs (`arc-primary` wedge + dome outline, `arc-aux` filled dome) and the left-aligned weapons table (`.wt-row` name col = `1fr`) are global, all modes.
 | **Armageddon** | **Fleet List** | Discrete units. | **Chosen + assigned pre-play** (enforced). |
 | **Age of Unity** | **Fleet List** | Discrete units. | **Deferred.** Optional at build (with a note); print shows ALL available HVP plus a write-in slot per ship. |
 
@@ -48,7 +48,7 @@ The sheet is laid out at the **true printable width** for the chosen paper (`PAP
 - Mass Ⓜ glyph → inline SVG circled-M, centred (v0.8.25, `ruleText()` in `web/format.ts`).
 - Age of Unity title = Star Wars recede; Hypergrowth = decode/scramble; Armageddon = vertical thump + red underline drawn at ~190ms (v0.8.22/.25). Desktop ≥992px, non-reduced-motion only.
 - New Fleet era chooser = 3 distinct buttons (v0.8.25). Command tokens shown as N triangle marks like the dice; AEGIS/Golem `>`-slogans render as a mono terminal line with a blinking cursor (v0.8.24). Initiative dice + command marks share the value's line and pop in.
-- Options dialog (top-bar gear) = data export/import/clear + about links (v0.8.21). Version/changelog link removed from the footer (it's in Options now).
+- Options dialog (top-bar gear) = data export/import/clear + about links (v0.8.21). Version moved out of the footer into Options.
 - Compendium: filters + "Sort by faction" + "Show custom ships" (off by default) all in one bar (v0.8.21/.24). Solo pilot-class = 3-way icon picker (gunner/hauler/junker, `web/pilots/*.png`) (v0.8.23). Adding a ship animates just the new roster row (v0.8.23).
 
 ---
@@ -57,7 +57,7 @@ The sheet is laid out at the **true printable width** for the chosen paper (`PAP
 
 - **Framework-free.** One `Store<AppState>` (`web/state.ts`, `web/store.ts`). Every state change re-renders the WHOLE app as an HTML string (`render(state)` in `web/render.ts`) and replaces `#app.innerHTML` (`paint()` in `web/main.ts`). No DOM diffing. `setState` is synchronous — the DOM is repainted by the time it returns.
 - **Events:** `data-action="..."` + delegated `click`/`change`/`input` in `web/actions.ts`. Add a `case` in `handleClick` (clicks) or `handleChange` (selects/inputs/file). `actions.ts` is the only place that mutates state.
-- **Routing (hash):** `#/fleets`, `#/list/:id` (builder), `#/ships` (compendium), `#/solo`, `#/foundry` (Custom Rules), `#/play/:id`, `#/print/:id`, `#/learn[/:step]` (Learn to Play), `#/changelog`. Share links are NOT routes: `#s=`/`#z=` payloads are intercepted at boot by `tryImportShare()`.
+- **Routing (hash):** `#/fleets`, `#/list/:id` (builder), `#/ships` (compendium), `#/solo`, `#/foundry` (Custom Rules), `#/play/:id`, `#/print/:id`, `#/learn[/:step]` (Learn to Play). Share links are NOT routes: `#s=`/`#z=` payloads are intercepted at boot by `tryImportShare()`.
 - **Post-render imperative hooks** in `paint()` (`web/main.ts`), run after `innerHTML` is replaced: `enhanceNav()` (nav pill placed WITHOUT transition so it doesn't re-animate each click), `animateFactionTitle()` (era-keyed title entrance, keyed to fire only on a real title change), `animateNewRosterRows()` (entrance on a newly-added roster row — rows carry `data-roster-key="<unitId>"`, diffed vs the previous set), `positionTour()`. Reusable pattern: track a prev-key set in a module var, diff each render, act only on new elements, reset the var when the target is absent.
 - **Persistence:** `web/storage.ts`, one `abs2.*.v1` localStorage key per concern (`abs2.lists.v1`, `abs2.customFactions.v1`, `abs2.outfits.v1`, `abs2.onboarding.v1`, `abs2.seedsApplied.v1`). `exportAllData`/`importAllData`/`clearAllData` scan the `abs2.` prefix.
 - **Data model:** `SavedList` (`web/storage.ts`) = `{ id, mode: GameMode, freePlay, emblem/emblemImage/emblemLib/emblemColor, fleet: Fleet, play?, createdAt, updatedAt }`. `Fleet` (`src/types.ts`) = `{ name?, factionId, creditsLimit, units: FleetUnit[], hvp: FleetHvp[], notes? }`. `FleetUnit` = `{ id, shipClassId, count, name?, species?, ... }`. `GameMode` = `combat-simulator | management-training | armageddon | age-of-unity | hypergrowth | junkspace`. Factions/ships in `src/data/`; rules + validation engine in `src/` (has `node --test` tests). Custom factions live in `state.customFactions`. The **Covenant** (`cf-covenant`) is a seed custom faction HIDDEN from `allFactions()` via `HIDDEN_FACTION_IDS` in `web/catalog.ts` (still resolvable for saved fleets via `findFaction`).
@@ -88,7 +88,7 @@ npm run build                            # vite build -> dist/
 ```
 
 **Deploy — GitHub Pages serves the `gh-pages` branch (legacy Pages, NOT Actions). Pushing `main` does NOT deploy.**
-1. Bump `package.json` "version" AND add a top entry to `CHANGELOG` in `web/changelog.ts` (footer/Options read `CHANGELOG[0].version`).
+1. Bump `package.json` "version". (There is no longer a `web/changelog.ts`; Options reads the version from `package.json`.)
 2. On `main`: stage changed files **explicitly** (not `-A`), commit, `git push origin main`.
 3. Sync `dist/` into the gh-pages worktree and push:
 ```bash
@@ -116,5 +116,5 @@ git add -A && git commit -m "Deploy vX.Y.Z" && git push origin gh-pages   # -A i
 - `web/style.css` — all CSS (single file).
 - `web/icons.ts` — inline SVG icons + `diceRow`/`commandRow`/`commandToken`/`massGlyph`/`initiativeDice`.
 - `web/format.ts` — `ruleText` (renders the Ⓜ SVG), escaping, dates.
-- `web/solo.ts` — Junkspace solo mode; `web/catalog.ts` — `allFactions`/`HIDDEN_FACTION_IDS`; `web/faction-lore.ts` — per-faction slogans (`tagline` only); `web/changelog.ts` — in-app changelog; `web/emblems.ts` — emblem/icon library (`import.meta.glob` over `web/emblems/**`).
+- `web/solo.ts` — Junkspace solo mode; `web/catalog.ts` — `allFactions`/`HIDDEN_FACTION_IDS`; `web/faction-lore.ts` — per-faction slogans (`tagline` only); `web/emblems.ts` — emblem/icon library (`import.meta.glob` over `web/emblems/**`).
 - `src/` — rules data + validation engine + tests. `src/data/commands.ts` holds the 7 core Commands + 6 Actions, transcribed verbatim from `web/public/ABS-2E-Quick-Reference.pdf` (that PDF is the authoritative source; extract it with `python -c "import pypdf; ..."` if you need the text again). Faction rules, HVP rules, and scenario rules are where EXTRA commands come from, so the print sheet prints those in full alongside the core list.

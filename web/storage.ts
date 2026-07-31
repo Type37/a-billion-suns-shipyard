@@ -28,9 +28,6 @@ export interface PlayState {
   cmdMax?: number;
   vp: number;
   oppVp: number;
-  /** Which of the current phase's checklist steps are ticked. Reset every
-   * time the phase changes - it is a per-phase walkthrough, not a log. */
-  checks?: boolean[];
   /**
    * Hypergrowth requisition tracker, keyed by ship-class id: how many of that
    * class are currently in play and how many sit in Reserves (jumped out). The
@@ -204,8 +201,6 @@ export interface Onboarding {
   visits: number;
   /** True once the tutorial suggestion has been dismissed or acted on. */
   tutorialsDismissed: boolean;
-  /** Ids of first-visit coachmark tours the user has finished or closed. */
-  toursSeen: string[];
   /** True once the "make your own faction" nudge has been dismissed or acted on. */
   foundryNudgeDismissed?: boolean;
 }
@@ -215,7 +210,6 @@ export function loadOnboarding(): Onboarding {
   return {
     visits: o.visits ?? 0,
     tutorialsDismissed: o.tutorialsDismissed ?? false,
-    toursSeen: Array.isArray(o.toursSeen) ? o.toursSeen : [],
     foundryNudgeDismissed: o.foundryNudgeDismissed ?? false,
   };
 }

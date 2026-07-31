@@ -327,22 +327,6 @@ function readShipImage(file: File): Promise<string> {
 }
 
 // ---------------------------------------------------------------------------
-// First-visit coachmark tours
-// ---------------------------------------------------------------------------
-
-/** Marks a tour as seen for good (dedup, since dismiss and the last "next" both call this) and closes it. */
-function finishTour(tourId: string): void {
-  store.setState((s) => {
-    const toursSeen = s.onboarding.toursSeen.includes(tourId)
-      ? s.onboarding.toursSeen
-      : [...s.onboarding.toursSeen, tourId];
-    const onboarding = { ...s.onboarding, toursSeen };
-    persistOnboarding(onboarding);
-    return { ...s, onboarding, ui: { ...s.ui, tour: undefined } };
-  });
-}
-
-// ---------------------------------------------------------------------------
 // Click handling
 // ---------------------------------------------------------------------------
 
@@ -843,24 +827,6 @@ function dispatchAction(target: HTMLElement): void {
       clearAllData();
       location.hash = "#/";
       location.reload();
-      break;
-    }
-    case "tour-next": {
-      const tourId = target.dataset["tour"];
-      const step = Number(target.dataset["step"]);
-      const len = Number(target.dataset["len"]);
-      if (!tourId) return;
-      if (step + 1 >= len) {
-        finishTour(tourId);
-      } else {
-        store.setState((s) => ({ ...s, ui: { ...s.ui, tour: { tourId, step: step + 1 } } }));
-      }
-      break;
-    }
-    case "tour-dismiss": {
-      const tourId = target.dataset["tour"];
-      if (!tourId) return;
-      finishTour(tourId);
       break;
     }
     case "toggle-carry": {
@@ -1595,7 +1561,7 @@ function dispatchAction(target: HTMLElement): void {
             // Each phase is its own checklist walkthrough, not a running log,
             // so moving to a (possibly different) phase clears the ticks.
             case "play-phase":
-              return { ...l, play: { ...p, phase: Math.max(0, Math.min(3, phaseTo)), checks: [] } };
+              return { ...l, play: { ...p, phase: Math.max(0, Math.min(3, phaseTo)) } };
             case "play-next": {
               // Advancing past the End Phase rolls into the next round. Unspent
               // CMD tokens are discarded at the end of the round and you gain
@@ -1606,10 +1572,10 @@ function dispatchAction(target: HTMLElement): void {
                 const base = faction ? Number(faction.cmdTokens) || (p.cmdMax ?? p.cmd) : (p.cmdMax ?? p.cmd);
                 return {
                   ...l,
-                  play: { ...p, phase: 0, round: Math.min(maxRound, p.round + 1), cmd: base, cmdMax: base, checks: [] },
+                  play: { ...p, phase: 0, round: Math.min(maxRound, p.round + 1), cmd: base, cmdMax: base },
                 };
               }
-              return { ...l, play: { ...p, phase: p.phase + 1, checks: [] } };
+              return { ...l, play: { ...p, phase: p.phase + 1 } };
             }
             case "play-round":
               return { ...l, play: { ...p, round: Math.max(1, Math.min(maxRound, p.round + delta)) } };
@@ -1654,21 +1620,6 @@ function dispatchAction(target: HTMLElement): void {
             default:
               return l;
           }
-        }),
-      );
-      break;
-    }
-    case "play-check-step": {
-      const id = currentListId();
-      const index = Number(target.dataset["index"]);
-      if (!id || !Number.isInteger(index)) return;
-      store.setState((s) =>
-        updateList(s, id, (l) => {
-          const faction = findFaction(l.fleet.factionId, s.customFactions);
-          const p = l.play ?? freshPlayState(faction);
-          const checks = [...(p.checks ?? [])];
-          checks[index] = !checks[index];
-          return { ...l, play: { ...p, checks } };
         }),
       );
       break;

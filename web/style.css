@@ -518,10 +518,10 @@ button { font-family: inherit; }
   .bar-btn, .ghost-btn, .cta-btn, .stepper-btn, .nf-opt, .card-act,
   .mf-menu-btn, .mf-tally-cap, .nf-custom-btn, .switcher-opt, .learn-btn,
   .cg-build, .comp-groupcheck, .control-group, .add-cue,
-  .learn-dot, .tour-close, .tour-next, .play-bar-id a {
+  .learn-dot, .play-bar-id a {
     min-height: 44px;
   }
-  .learn-dot, .tour-close, .tour-next { display: inline-flex; align-items: center; }
+  .learn-dot { display: inline-flex; align-items: center; }
   /* The faction name is the way into the editor, so it is a control, not prose. */
   .cell-name a { display: inline-flex; align-items: center; min-height: 44px; }
   .play-bar-id a { display: inline-flex; align-items: center; }
@@ -645,7 +645,6 @@ button { font-family: inherit; }
 .onboard-opt { text-align: left; cursor: pointer; background: var(--paper); border: 1px solid var(--hair); border-left: 3px solid var(--color-action); padding: 12px 14px; display: flex; flex-direction: column; gap: 5px; transition: background 0.12s ease, border-color 0.12s ease; }
 .onboard-opt:hover { background: var(--blue-wash); border-left-color: var(--color-accent); }
 .oo-name { display: inline-flex; align-items: center; gap: 7px; font-family: var(--display); font-weight: 700; font-size: 14px; color: var(--color-ink); }
-.oo-desc { font-size: 12.5px; line-height: 1.4; color: var(--ink-2); }
 .onboard-close { background: transparent; border: 1px solid var(--hair); color: var(--ink-3); cursor: pointer; display: inline-flex; padding: 7px; flex-shrink: 0; }
 .onboard-close:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
 
@@ -813,7 +812,6 @@ button { font-family: inherit; }
   font-family: var(--serif); font-size: 16.5px; line-height: 1.6; color: var(--ink);
   max-width: 64ch; margin: 4px 0 26px; padding-left: 16px; border-left: 3px solid var(--red);
 }
-@media (max-width: 620px) { }
 
 .era-block { margin-bottom: 34px; }
 .era-title {
@@ -947,7 +945,6 @@ button { font-family: inherit; }
   padding: 1px 0; width: min(560px, 70vw); background: transparent;
 }
 .fleet-name-input::placeholder { color: var(--placeholder); }
-
 
 .emblem-picker { display: flex; gap: 6px; flex-wrap: wrap; }
 .setup-controls .emblem-picker { margin-top: 0; }
@@ -1654,7 +1651,6 @@ button { font-family: inherit; }
 
 /* ------------------------------------------------------------ changelog */
 
-
 /* ------------------------------------------------------------ misc */
 
 .empty-state { max-width: 600px; margin: 80px auto; text-align: center; font-size: 16px; }
@@ -1692,8 +1688,6 @@ button { font-family: inherit; }
 /* Notes have no numbered badge (they're not a step in the sequence), so the
    body text shouldn't be indented as if a number were sitting to its left. */
 .guide-step-note .guide-step-body { padding-left: 14px; }
-.guide-notes-title { font-family: var(--display); font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-2); margin: 18px 0 2px; padding-top: 14px; border-top: 1px solid var(--hair-soft); }
-.guide-notes-sub { font-size: 12px; color: var(--ink-3); margin-bottom: 8px; }
 .guide-step-body p { font-family: var(--serif); font-size: 14px; line-height: 1.55; color: var(--ink); margin: 0; }
 /* Sub-points (rule lists, D6 tables) shown under a guide step, on-screen. */
 .guide-points { list-style: none; margin: 8px 0 0; padding: 0; }
@@ -1722,18 +1716,6 @@ button { font-family: inherit; }
    five steps, so without this the block resized by up to 68px on every change -
    and "Next phase", the button you press every single turn, moved out from under
    the pointer that had just pressed it. A little slack beats a moving target. */
-.phase-checklist {
-  margin-top: 14px; max-width: 62ch; background: var(--blue-wash);
-  border-left: 3px solid var(--blue); padding: 14px 18px;
-  min-height: 227px;
-}
-.phase-checklist-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-bottom: 6px; }
-.phase-checklist-title { font-family: var(--display); font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink); }
-.phase-checklist-count { font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-.phase-check { display: flex; align-items: flex-start; gap: 10px; padding: 6px 2px; cursor: pointer; font-family: var(--serif); font-size: 14px; line-height: 1.45; color: var(--ink); }
-.phase-check input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--blue); cursor: pointer; flex-shrink: 0; }
-.phase-check.done { color: var(--ink-3); }
-.phase-check.done span { text-decoration: line-through; text-decoration-color: var(--hair); }
 .play-counters { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
 .play-counter { display: flex; flex-direction: column; gap: 6px; }
 
@@ -1866,8 +1848,6 @@ button { font-family: inherit; }
 .pilot-opt.on .pilot-name { color: #fff; }
 .pilot-ability { margin: 8px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
 .pilot-ability b { color: var(--ink); }
-.solo-primer { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; font-size: 14px; color: var(--ink-2); }
-.solo-primer strong { color: var(--ink); }
 .solo-tagline { font-family: var(--serif); font-size: 16px; line-height: 1.55; color: var(--ink-2); max-width: 70ch; margin: 6px 0 0; }
 .solo-panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
 /* New-outfit dialog: start-from list and the quick emblem strip. */
@@ -2223,7 +2203,6 @@ button { font-family: inherit; }
   .comp-filters .control-group { flex: 1 1 100%; }
 }
 
-
 /* Smallest phones still in the wild (iPhone SE, 320px): the labels wrap inside
    their buttons rather than clip, so this only needs to buy back a little room
    from the padding and the type. Never drops a label. */
@@ -2348,7 +2327,6 @@ button { font-family: inherit; }
 .era-opt.on { border-color: var(--blue); border-left-color: var(--red); background: var(--blue-wash); }
 .era-opt-name { font-family: var(--display); font-weight: 700; font-size: 13.5px; color: var(--ink); }
 .era-opt-hint { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); }
-.era-switch-note { font-size: 11.5px; line-height: 1.4; color: var(--ink-3); margin: 4px 2px 0; }
 
 .mf-emblem { flex-shrink: 0; }
 .mf-emblem .emblem-current-btn { border: none; padding: 0; background: none; }
@@ -3080,7 +3058,6 @@ button { font-family: inherit; }
 .opt-body { gap: 24px; }
 .opt-section { display: flex; flex-direction: column; gap: 10px; }
 .opt-h { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); border-bottom: 1px solid var(--hair-soft); padding-bottom: 6px; }
-.opt-note { font-size: 13px; color: var(--ink-2); line-height: 1.45; }
 .opt-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .opt-version { font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-3); margin: 0; font-variant-numeric: tabular-nums; }
 .opt-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
@@ -3304,76 +3281,8 @@ button { font-family: inherit; }
 
 /* First-visit coachmark: a small white popover pinned to a live element by
    main.ts (positionTour). Hidden until placed, so it never flashes at 0,0. */
-.tour-pop {
-  display: none;
-  position: fixed;
-  z-index: 80;
-  visibility: hidden;
-  flex-direction: column;
-  width: min(300px, calc(100vw - 24px));
-  background: var(--paper);
-  border: 2px solid var(--color-line);
-  /* A coachmark is a transient overlay pinned to a live element, same tier as
-     a menu or a callout. */
-  box-shadow: var(--shadow16);
-}
-.tour-pop.placed { visibility: visible; }
-.tour-pop-arrow {
-  position: absolute;
-  top: 50%;
-  left: -9px;
-  width: 16px;
-  height: 16px;
-  transform: translateY(-50%) rotate(45deg);
-  background: var(--paper);
-  border-left: 2px solid var(--color-line);
-  border-bottom: 2px solid var(--color-line);
-}
-.tour-pop.arrow-right .tour-pop-arrow {
-  left: auto;
-  right: -9px;
-  border-left: none;
-  border-bottom: none;
-  border-right: 2px solid var(--color-line);
-  border-top: 2px solid var(--color-line);
-}
 /* Narrow screens place the popover under (or over) its target rather than
    beside it, so the arrow moves to the horizontal edge. See positionTour. */
-.tour-pop.arrow-top .tour-pop-arrow {
-  top: -9px;
-  left: 22px;
-  transform: rotate(45deg);
-  border-left: 2px solid var(--color-line);
-  border-top: 2px solid var(--color-line);
-  border-bottom: none;
-  border-right: none;
-}
-.tour-pop.arrow-bottom .tour-pop-arrow {
-  top: auto;
-  bottom: -9px;
-  left: 22px;
-  transform: rotate(45deg);
-  border-left: none;
-  border-top: none;
-  border-bottom: 2px solid var(--color-line);
-  border-right: 2px solid var(--color-line);
-}
-.tour-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px 0; }
-.tour-title { font-family: var(--display); font-weight: 800; font-size: 15px; letter-spacing: -0.01em; color: var(--color-ink); }
-.tour-close { background: transparent; border: none; color: var(--ink-3); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 4px 6px; margin: -4px; font-family: var(--sans); font-size: 12px; font-weight: 700; }
-.tour-close:hover { color: var(--color-ink); }
-.tour-body { font-family: var(--sans); font-size: 13px; line-height: 1.45; color: var(--ink-2); padding: 8px 14px 14px; }
-.tour-foot { display: flex; align-items: center; justify-content: space-between; padding: 0 14px 14px; }
-.tour-dots { display: inline-flex; gap: 6px; }
-.tour-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--hair-soft); }
-.tour-dot.on { background: var(--color-action); }
-.tour-next {
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  height: 28px; padding: 0 11px;
-  background: transparent; border: 1px solid var(--hair); color: var(--color-ink); cursor: pointer;
-  font-family: var(--sans); font-size: 12px; font-weight: 700;
-}
-.tour-next:hover { border-color: var(--color-action); color: var(--color-action); }
 
 /* ============================================================ PRINT MEDIA */
 
@@ -3825,7 +3734,6 @@ button { font-family: inherit; }
 .lib-more:hover { border-color: var(--blue); color: var(--blue); }
 .lib-more-count { font-family: var(--sans); font-size: 12px; font-weight: 700; }
 
-
 /* Symbol alignment. An inline SVG sits on the text baseline by default, which
    leaves it riding low next to the word it labels - the descender space below
    the baseline is empty, so the glyph looks dropped. Centring it against the
@@ -3852,7 +3760,6 @@ a .icon,
   align-items: center;
 }
 
-
 /* Print-card stat block: a plain 2x2, NOT the shared subgrid alignment used in
    the builder. The subgrid version reserves a column pair sized to the widest
    label across the whole set, which is wider than a print card's left column -
@@ -3869,7 +3776,6 @@ a .icon,
 .print-card .stat-lbl { font-size: 7.5px; }
 .print-card .stat-ico { width: 13px; height: 13px; }
 
-
 /* Generic personnel are the shared pool every fleet can draw on; the faction's
    own are the distinctive ones. Printing both in the same black made a page of
    twelve read as undifferentiated. Generic sits back in grey. */
@@ -3879,7 +3785,6 @@ a .icon,
 
 /* The firing-arcs reference, below the controls rather than among them. */
 .play-arcs { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--hair-soft); }
-
 
 /* Personnel three to a row. Each entry is a name and a sentence or two, so
    stacked full-width they left most of every line empty - and Age of Unity
@@ -3903,7 +3808,6 @@ a .icon,
   .print-hvp-cols { grid-template-columns: 1fr; }
   .print-hvp-own { columns: 1; }
 }
-
 
 /* ---------------------------------------------------------- faction rule block
 
@@ -3942,7 +3846,6 @@ a .icon,
   .frule { grid-template-columns: 1fr; }
   .frule-vitals { flex-direction: row; gap: 20px; }
 }
-
 
 /* Learn to Play: a sub-heading, a quiet note, and the link out to the source. */
 .learn-sub { font-family: var(--display); font-weight: 800; font-size: 18px; margin: 26px 0 4px; color: var(--ink); }
@@ -4209,30 +4112,17 @@ a .icon,
    phase that carries the arc legend the screen was 28px short of fitting. */
 /* No min-height: it reserved 214px of empty box for a phase with two lines in
    it, which pushed the fleet below the fold on every screen. */
-.play-cols .phase-checklist { margin-top: 0; max-width: none; padding: 8px 10px; }
 
 /* Phase steps fold. Mobile-first: a tap-to-open card so the play screen fits
    without scrolling past a wall of steps. On desktop (>=700px) the toggle is
    gone and the steps are always shown, keeping the stable column height. */
-.phase-fold { margin-top: 12px; border: 1px solid var(--hair-soft); background: var(--paper); }
-.phase-fold-summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 9px; padding: 11px 14px; font-family: var(--sans); font-weight: 700; font-size: 13px; color: var(--ink); }
-.phase-fold-summary::-webkit-details-marker { display: none; }
-.phase-fold-summary .phase-checklist-count { margin-left: auto; }
-.phase-fold-caret { color: var(--blue); flex: none; transition: transform 0.15s var(--ease); }
-.phase-fold[open] .phase-fold-caret { transform: rotate(180deg); }
-.phase-fold .phase-checklist { margin-top: 0; min-height: 0; border-left: none; }
 @media (min-width: 700px) {
-  .phase-fold { margin-top: 14px; border: none; background: none; }
-  .phase-fold > .phase-fold-summary { display: none; }
   /* Force the steps visible whether or not the <details> is open: display:block
      for Firefox/Safari (which hide content children), and content-visibility on
      ::details-content for Chromium 128+ (which hides via the pseudo-element). */
-  .phase-fold > .phase-fold-body { display: block; }
-  .phase-fold::details-content { content-visibility: visible; }
   /* No min-height: it reserved 214px of empty box so the four phases were all
      the same height, which cost more screen than the phases themselves and
      pushed the fleet below the fold. The phase is as tall as its own steps. */
-  .phase-fold .phase-checklist { border-left: 3px solid var(--blue); }
 }
 
 /* Nothing decorative survives in Play Mode: the credits/links footer is a whole
@@ -4344,17 +4234,8 @@ main.play-body .roster-section::before { content: none; }
 
 /* Phase reference block: a lead line then bullets you READ, not tick (the
    Shipyard Jump Phase). Verbatim, with nested sub-bullets. */
-.phase-ref { font-family: var(--serif); font-size: 13.5px; line-height: 1.5; color: var(--ink); }
-.phase-ref-lead { margin: 0 0 8px; }
-.phase-ref-list { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 8px; }
-.phase-ref-list > li { padding-left: 2px; }
-.phase-ref-sub { margin: 6px 0 0; padding-left: 16px; }
-.phase-ref-sub > li { color: var(--ink-2); }
 /* The italic aside under a checklist step (e.g. "Unspent CMD tokens are
    discarded..."). Its own line, quieter than the step. */
-.phase-check-note { display: block; margin-top: 2px; font-style: italic; color: var(--ink-3); }
-.phase-scoring { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--hair-soft); }
-.phase-scoring .rule-list { margin: 0; padding-left: 18px; font-family: var(--serif); font-size: 13px; line-height: 1.45; color: var(--ink-2); display: flex; flex-direction: column; gap: 6px; }
 
 /* Hypergrowth Shipyard tracker (Play Mode). Every class always visible, a live
    yard/play/reserve tally, and Deploy / Jumped out / Jump in on their own row. */
@@ -4582,7 +4463,6 @@ main.play-body .roster-section::before { content: none; }
   .cmd-pips { gap: 3px; }
   /* Anything the sticky block scrolls over has to clear it, or a tapped
      accordion opens underneath the header. */
-  .play-body .phase-fold[open] > summary { scroll-margin-top: 210px; }
   /* Left-aligned and capped rather than stretched full width: a two-state
      toggle 340px wide on every one of nine units turns the roster into a
      ladder of bars and buries the ship stats under it. */
@@ -4614,7 +4494,6 @@ main.play-body .roster-section::before { content: none; }
 }
 .learn-sub-min { font-family: var(--display); font-weight: 800; font-size: 14px; margin: 16px 0 3px; color: var(--ink); }
 
-
 /* Learn rail, responsive. Each step is a self-contained chip that never grows,
    so the row reflows cleanly instead of leaving a lopsided gap. */
 .learn-dot { flex: 0 0 auto; }
@@ -4627,7 +4506,6 @@ main.play-body .roster-section::before { content: none; }
   .learn-dot { padding: 5px 7px; gap: 6px; }
   .learn-dot-l { font-size: 12px; }
 }
-
 
 /* ---------------------------------------------------- one rename affordance
    Five things in this app can be renamed in place - the fleet, a unit, an
@@ -4822,8 +4700,6 @@ main.play-body .roster-section::before { content: none; }
   font-family: var(--display); font-weight: 700; font-size: 13.5px; color: var(--ink);
   border-left: 3px solid var(--blue); padding: 5px 0 5px 9px; background: var(--blue-wash);
 }
-.hvp-req-why { font-size: 12.5px; line-height: 1.45; color: var(--ink-2); margin: 0 0 10px; }
-.hvp-req-why strong { color: var(--ink); }
 
 /* A main-game fleet offered as a Junkspace import. Marked apart from the
    outfit-to-outfit copies above it, because this one is a recast rather than a

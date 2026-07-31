@@ -261,8 +261,6 @@ export interface AppState {
           emblemColor?: "ink" | "blue" | "red";
           emblemBg?: "ink" | "blue" | "red" | "steel" | "sand";
         };
-    /** In-progress first-visit coachmark tour, once the user has advanced past step 0. */
-    tour?: { tourId: string; step: number };
     /** Print-setup options. Persisted (abs2.print.v1) so reprinting after an
      * edit is one click. `rules` prints the faction rule + commands reference;
      * on by default so a first-time printer gets it. */

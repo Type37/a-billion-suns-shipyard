@@ -1964,32 +1964,45 @@ button { font-family: inherit; }
 .solo-primer strong { color: var(--ink); }
 .solo-tagline { font-family: var(--serif); font-size: 16px; line-height: 1.55; color: var(--ink-2); max-width: 70ch; margin: 6px 0 0; }
 .solo-panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
-/* New-outfit dialog: start-from list and the quick emblem strip. */
-.no-from { display: grid; gap: 5px; }
-.no-from-opt {
-  display: flex; flex-direction: column; gap: 1px; text-align: left; cursor: pointer;
-  padding: 7px 10px; min-height: 44px; justify-content: center;
-  border: 1px solid var(--hair-soft); border-left: 3px solid var(--hair); background: var(--paper);
-  text-transform: none; letter-spacing: normal;
+/* New-outfit dialog: the mark you were dealt, and the name you give it.
+   One row - the mark is the thing you look at, the name is the thing you type,
+   and neither has to wait for the other. The start-from list and the ten-mark
+   strip that used to be here are gone; the mark opens the real picker now. */
+/* Centred, not top-aligned: the mark's tile is about twice the height of a
+   label and a field, so aligning the tops hung the name off the shoulder of the
+   emblem with a band of nothing under it. */
+.no-identity { display: flex; align-items: center; gap: 16px; }
+.no-emblem-btn {
+  flex: none; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 10px 10px 8px; cursor: pointer; color: var(--ink);
+  border: 1px solid var(--field-edge); background: var(--ground);
+  transition: border-color 0.12s ease, background 0.12s ease;
 }
-.no-from-opt:hover { border-left-color: var(--blue); background: var(--blue-wash); }
-.no-from-opt.on { border-color: var(--blue); border-left-color: var(--red); background: var(--blue-wash); }
-.no-from-name { font-family: var(--display); font-weight: 700; font-size: 13.5px; color: var(--ink); }
-.no-from-sub { font-family: var(--sans); font-size: 11px; font-weight: 600; color: var(--ink-3); }
-.no-emblem { display: flex; flex-wrap: wrap; gap: 5px; }
-.no-emblem-opt {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 44px; height: 44px; padding: 0; cursor: pointer;
-  border: 1px solid var(--hair); background: var(--paper); color: var(--ink-2);
-  transition: border-color 0.12s ease, background 0.12s ease, color 0.12s ease;
+.no-emblem-btn:hover { border-color: var(--blue); background: var(--blue-wash); }
+.no-emblem-mark { display: flex; align-items: center; justify-content: center; min-height: 60px; color: var(--blue); }
+/* The label is always on, never a hover reveal: the mark alone does not say it
+   can be changed, and a mark you cannot tell is a button is a mark you accept
+   by default. */
+.no-emblem-swap {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--sans); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--blue);
 }
-.no-emblem-opt:hover { border-color: var(--ink-3); color: var(--ink); }
-.no-emblem-opt.on { border-color: var(--blue); background: var(--blue); color: #fff; }
-.no-emblem-rnd { align-self: flex-start; margin-top: 6px; }
-
-.new-outfit-form { display: flex; flex-direction: column; gap: 8px; }
-.new-outfit-name { width: 220px; max-width: 100%; }
-.new-outfit-acts { display: flex; gap: 8px; align-items: center; }
+.no-name-field { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+/* An unstyled input rendered at 21px tall - under the 24px floor, and nothing
+   about it said "type here". It is a box with a real edge and a real height,
+   set in the display face it will be wearing on the card a moment later. */
+.new-outfit-name {
+  width: 100%; min-height: var(--tap); padding: 8px 11px;
+  border: 1px solid var(--field-edge); background: var(--paper); color: var(--ink);
+  font-family: var(--display); font-weight: 700; font-size: 16px;
+}
+.new-outfit-name:hover { border-color: var(--ink-3); }
+.new-outfit-name::placeholder { color: var(--placeholder); font-weight: 500; }
+@media (max-width: 420px) {
+  .no-identity { flex-direction: column; align-items: stretch; }
+  .no-emblem-btn { flex-direction: row; justify-content: center; gap: 12px; }
+}
 .solo-empty { margin-top: 10px; display: flex; flex-direction: column; gap: 16px; max-width: 70ch; color: var(--ink-2); font-size: 14px; }
 /* Outfit cards: campaign status at a glance - a debt progress bar, games left. */
 .outfit-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
@@ -5193,8 +5206,3 @@ main.play-body .roster-section::before { content: none; }
 .hvp-req-why { font-size: 12.5px; line-height: 1.45; color: var(--ink-2); margin: 0 0 10px; }
 .hvp-req-why strong { color: var(--ink); }
 
-/* A main-game fleet offered as a Junkspace import. Marked apart from the
-   outfit-to-outfit copies above it, because this one is a recast rather than a
-   copy and the subtitle says what it will actually become. */
-.no-from-opt.is-import { border-left-color: var(--red); }
-.no-from-opt.is-import .no-from-name { display: inline-flex; align-items: center; gap: 6px; }

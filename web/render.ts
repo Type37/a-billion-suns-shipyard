@@ -3886,6 +3886,22 @@ function emblemModal(state: AppState): string {
         currentColor: f.emblemColor,
         currentBg: f.emblemBg,
       };
+  } else if (m.target === "new-outfit") {
+    // The outfit being started in the dialog. It has no id and is not in
+    // `outfits` yet, so it is read off ui.newOutfit - otherwise identical.
+    const d = state.ui.newOutfit;
+    if (d)
+      cfg = {
+        fields: d,
+        currentLib: d.emblemLib,
+        hasImage: Boolean(d.emblemImage || d.emblemLib),
+        libA: "no-set-lib",
+        upA: "no-emblem-upload",
+        rndA: "no-random-emblem",
+        clrA: "no-clear-emblem",
+        currentColor: d.emblemColor,
+        currentBg: d.emblemBg,
+      };
   } else {
     const o = activeOutfit(state);
     if (o)

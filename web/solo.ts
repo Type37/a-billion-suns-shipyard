@@ -20,11 +20,8 @@ const BASE_PERK: Record<string, { perkName: string; text: string }> = Object.fro
   PILOT_PERKS.map((p) => [p.class, { perkName: p.perkName, text: p.text }]),
 );
 import { SOLO_PHASES, SOLO_ALERT_RULES, PERKS_BY_CLASS } from "../src/data/junkspace-solo.ts";
-import { recastAsOutfit } from "../src/data/junkspace.ts";
-import { findFaction } from "./catalog.ts";
-import { resolveShip } from "./render.ts";
 import { escapeHtml, formatDate, ruleText } from "./format.ts";
-import { EMBLEM_IDS, emblem, icon, statChips } from "./icons.ts";
+import { icon, statChips } from "./icons.ts";
 import { emblemView, weaponsTable } from "./render.ts";
 import { libraryUrl } from "./emblems.ts";
 import gunnerIcon from "./pilots/gunner.png";
@@ -61,91 +58,21 @@ function gameTicks(played: number, total: number): string {
 // over the solo list; a blank name is fine - the card falls back to "Unnamed
 // outfit". Outfits are salvage crews, not corporations, so no name is rolled.
 //
-// Three things, in the order you decide them: what it is called, what it flies,
-// and what it flies under. "Start from" is the useful one - a campaign runs
-// eight games and you will want to re-run a crew you liked without rebuilding
-// it ship by ship, so an existing outfit can be used as the starting hull. It
-// copies the ships, pilots and emblem and nothing else: the debt resets, the
-// games played reset, the perks reset. It is a new campaign, not a save-scum.
+// Two things: a mark, already chosen for you, and a name. The mark is rolled
+// when the dialog opens so you never face an empty slot or a decision you did
+// not ask to make, and tapping it opens the real emblem picker - the whole
+// library, uploads, backgrounds - because the draft now lives in ui.newOutfit
+// rather than on ui.modal and so survives the picker opening over it.
+//
+// What used to be here: a strip of ten marks with a "Surprise me" under it, and
+// a "Start from" list offering every saved outfit and every main-game fleet as
+// a starting hull. Three questions at a door you are trying to walk through.
+// Copying an outfit is still one press of Duplicate on the dock, which is where
+// you are looking when you want it.
 export function newOutfitModal(state: AppState): string {
   const m = state.ui.modal;
   if (!m || m.kind !== "new-outfit") return "";
-
-  const from = m.fromId;
-  const source = from ? state.outfits.find((o) => o.id === from) : undefined;
-
-  // Import from the main game. A fleet cannot be copied across - the two sides
-  // share no ship list and no currency - so each offer says up front what it
-  // would actually become: N stock hulls for so many credits, recast by Mass.
-  // See recastAsOutfit. Fleets that recast to nothing are not offered.
-  const fleetImports = state.lists
-    .map((l) => {
-      const masses = l.fleet.units.flatMap((u) => {
-        const r = resolveShip(u.shipClassId, findFaction(l.fleet.factionId, state.customFactions), state.customFactions);
-        return r ? Array.from({ length: u.count }, () => r.ship.mass) : [];
-      });
-      if (!masses.length) return "";
-      const cast = recastAsOutfit(masses);
-      if (!cast.shipClassIds.length) return "";
-      const on = from === `list:${l.id}`;
-      return `<button class="no-from-opt is-import ${on ? "on" : ""}" data-action="solo-new-outfit-from" data-id="list:${l.id}" aria-pressed="${on}">
-        <span class="no-from-name">${icon("fleets", 13)} ${escapeHtml(l.fleet.name || "Unnamed fleet")}</span>
-        <span class="no-from-sub">Recast as ${cast.shipClassIds.length} ship${cast.shipClassIds.length === 1 ? "" : "s"} · ${ck(cast.spentK)}${cast.dropped ? ` · ${cast.dropped} left behind` : ""}</span>
-      </button>`;
-    })
-    .join("");
-
-  // Only worth showing once there is something to copy.
-  const startFrom = state.outfits.length
-    ? `<div class="modal-field">
-         <span class="control-label">Start from</span>
-         <div class="no-from">
-           <button class="no-from-opt ${!from ? "on" : ""}" data-action="solo-new-outfit-from" data-id="" aria-pressed="${!from}">
-             <span class="no-from-name">Empty outfit</span>
-             <span class="no-from-sub">Nothing bought yet</span>
-           </button>
-           ${state.outfits
-             .map((o) => {
-               const on = from === o.id;
-               const n = o.ships.length;
-               return `<button class="no-from-opt ${on ? "on" : ""}" data-action="solo-new-outfit-from" data-id="${o.id}" aria-pressed="${on}">
-                 <span class="no-from-name">${escapeHtml(o.name || "Unnamed outfit")}</span>
-                 <span class="no-from-sub">${n} ship${n === 1 ? "" : "s"} · ${ck(outfitCost(o))}</span>
-               </button>`;
-             })
-             .join("")}
-           ${fleetImports}
-         </div>
-       </div>`
-    : fleetImports
-      ? `<div class="modal-field">
-           <span class="control-label">Start from</span>
-           <div class="no-from">
-             <button class="no-from-opt ${!from ? "on" : ""}" data-action="solo-new-outfit-from" data-id="" aria-pressed="${!from}">
-               <span class="no-from-name">Empty outfit</span>
-               <span class="no-from-sub">Nothing bought yet</span>
-             </button>
-             ${fleetImports}
-           </div>
-         </div>`
-      : "";
-
-  // The marks are inline rather than behind the full 262-sigil library, because
-  // opening that picker replaces ui.modal and would throw away the half-filled
-  // dialog. This is the quick pick: ten marks and a randomiser, enough to leave
-  // with a crew that looks like yours. The whole library is one tap away in the
-  // outfit itself, which is also where you would go to upload your own.
-  const chosen = m.emblem ?? "delta";
-  const marks = EMBLEM_IDS.map(
-    (id) =>
-      `<button class="no-emblem-opt ${id === chosen ? "on" : ""}" data-action="solo-new-outfit-emblem" data-emblem="${id}" aria-pressed="${id === chosen}" title="${id}" aria-label="Emblem: ${id}">${emblem(id, 22)}</button>`,
-  ).join("");
-  const emblemField = `
-    <div class="modal-field">
-      <span class="control-label">Emblem</span>
-      <div class="no-emblem" role="group" aria-label="Emblem">${marks}</div>
-      <button class="bar-btn no-emblem-rnd" data-action="solo-new-outfit-emblem-random">${icon("shuffle", 15)} Surprise me</button>
-    </div>`;
+  const draft = state.ui.newOutfit ?? { emblem: "delta" };
 
   return `
   <div class="modal-root">
@@ -156,12 +83,19 @@ export function newOutfitModal(state: AppState): string {
         <button class="modal-close" data-action="close-modal" aria-label="Close">${icon("close", 18)}</button>
       </header>
       <div class="modal-body no-modal-body">
-        <label class="modal-field">
-          <span class="control-label">Outfit name</span>
-          <input class="new-outfit-name" type="text" placeholder="${escapeHtml(source ? `${source.name || "Unnamed outfit"} II` : "Unnamed outfit")}" value="${escapeHtml(m.name ?? "")}" autocomplete="off" data-action="solo-new-outfit-name" autofocus />
-        </label>
-        ${startFrom}
-        ${emblemField}
+        <div class="no-identity">
+          <button class="no-emblem-btn" data-action="open-emblem-modal" data-target="new-outfit" aria-label="Change emblem">
+            <span class="no-emblem-mark">${emblemView(draft, 60)}</span>
+            <span class="no-emblem-swap">${icon("image", 14)} Change</span>
+          </button>
+          <label class="no-name-field">
+            <span class="control-label">Outfit name</span>
+            <!-- Uncontrolled on purpose: routing it through state on every
+                 keystroke would re-render the input and drop the caret. Start
+                 and the emblem button read it out of the DOM instead. -->
+            <input class="new-outfit-name" type="text" placeholder="Unnamed outfit" value="${escapeHtml(draft.name ?? "")}" autocomplete="off" autofocus />
+          </label>
+        </div>
       </div>
       <footer class="modal-footer">
         <button class="bar-btn" data-action="close-modal">Cancel</button>

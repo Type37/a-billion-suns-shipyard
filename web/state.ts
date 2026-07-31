@@ -215,7 +215,9 @@ export interface AppState {
       | { kind: "ship-reference" }
       | {
           kind: "emblem";
-          target: "list" | "faction" | "outfit";
+          /** "new-outfit" is the outfit being started in the dialog, which does
+           *  not exist in `outfits` yet - it writes into ui.newOutfit instead. */
+          target: "list" | "faction" | "outfit" | "new-outfit";
           tab: "library" | "upload" | "colour";
           libCat?: string;
           libQuery?: string;
@@ -244,23 +246,31 @@ export interface AppState {
           danger?: boolean;
           intent: { action: string; data: Record<string, string> };
         }
-      /**
-       * The new-outfit dialog holds its answers until you press Start, so the
-       * outfit is only written once. `fromId` is an existing outfit to copy the
-       * ships, pilots and emblem from (a fresh campaign either way - debt,
-       * games and perks always reset), and the emblem fields mirror
-       * SavedOutfit's so the shared emblem picker can write straight into them.
-       */
-      | {
-          kind: "new-outfit";
-          name?: string;
-          fromId?: string;
-          emblem?: string;
-          emblemImage?: string;
-          emblemLib?: string;
-          emblemColor?: "ink" | "blue" | "red";
-          emblemBg?: "ink" | "blue" | "red" | "steel" | "sand";
-        };
+      /** The new-outfit dialog is showing. Its answers live in ui.newOutfit,
+       *  not here - see the note there. */
+      | { kind: "new-outfit" };
+    /**
+     * The outfit being started, held until you press Start so the outfit is
+     * only written once.
+     *
+     * This is deliberately NOT on ui.modal. It used to be, and that is why the
+     * dialog offered ten marks and a "Surprise me" instead of the real emblem
+     * picker: opening the picker sets ui.modal, which would have thrown the
+     * half-filled dialog away. Kept beside the modal rather than inside it, the
+     * picker can open over the dialog and hand back to it - so the dialog gets
+     * the whole library, and the strip is gone.
+     *
+     * The emblem fields mirror SavedOutfit's, so the shared picker writes into
+     * this the same way it writes into a saved outfit.
+     */
+    newOutfit?: {
+      name?: string;
+      emblem: string;
+      emblemImage?: string;
+      emblemLib?: string;
+      emblemColor?: "ink" | "blue" | "red";
+      emblemBg?: "ink" | "blue" | "red" | "steel" | "sand";
+    };
     /** In-progress first-visit coachmark tour, once the user has advanced past step 0. */
     tour?: { tourId: string; step: number };
     /** Print-setup options. Persisted (abs2.print.v1) so reprinting after an

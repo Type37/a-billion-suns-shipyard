@@ -121,6 +121,14 @@ function editOutfit(fn: (o: SavedOutfit) => SavedOutfit): void {
   store.setState((s) => updateOutfit(s, id, fn));
 }
 
+/** Edit the outfit being started in the dialog (ui.newOutfit). */
+type NewOutfitDraft = NonNullable<AppState["ui"]["newOutfit"]>;
+function editNewOutfit(fn: (d: NewOutfitDraft) => NewOutfitDraft): void {
+  store.setState((s) =>
+    s.ui.newOutfit ? { ...s, ui: { ...s.ui, newOutfit: fn(s.ui.newOutfit) } } : s,
+  );
+}
+
 /**
  * What is typed in the new-outfit dialog right now.
  *
@@ -207,6 +215,8 @@ function patchEmblemTarget(
   } else if (m.target === "faction") {
     const fid = currentFoundryId();
     if (fid) editFaction(fid, (f) => ({ ...f, ...patch }));
+  } else if (m.target === "new-outfit") {
+    editNewOutfit((d) => ({ ...d, ...patch }));
   } else {
     editOutfit((o) => ({ ...o, ...patch }));
   }
@@ -546,8 +556,20 @@ function dispatchAction(target: HTMLElement): void {
     }
     case "open-emblem-modal": {
       const tgt = target.dataset["target"];
-      const emblemTarget = tgt === "faction" || tgt === "outfit" ? tgt : "list";
-      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "emblem", target: emblemTarget, tab: "library" } } }));
+      const emblemTarget =
+        tgt === "faction" || tgt === "outfit" || tgt === "new-outfit" ? tgt : "list";
+      // The new-outfit name field is uncontrolled, so anything that re-renders
+      // the dialog has to bank what is typed first. Opening the picker replaces
+      // the dialog outright, so this is the last chance to read it.
+      const typed = emblemTarget === "new-outfit" ? liveOutfitName() : undefined;
+      store.setState((s) => ({
+        ...s,
+        ui: {
+          ...s.ui,
+          ...(typed !== undefined && s.ui.newOutfit ? { newOutfit: { ...s.ui.newOutfit, name: typed } } : {}),
+          modal: { kind: "emblem", target: emblemTarget, tab: "library" },
+        },
+      }));
       break;
     }
     case "emblem-modal-tab": {
@@ -640,6 +662,23 @@ function dispatchAction(target: HTMLElement): void {
       if (lib) editOutfit((o) => ({ ...o, ...libFields(lib) }));
       break;
     }
+    // Same three again for the outfit that does not exist yet. They write the
+    // draft instead of a saved outfit; everything else about the picker - the
+    // library, the folders, the search, the upload, the background - is the
+    // one shared component and does not know the difference.
+    case "no-set-lib": {
+      const lib = target.dataset["lib"];
+      if (lib) editNewOutfit((d) => ({ ...d, ...libFields(lib) }));
+      break;
+    }
+    case "no-random-emblem": {
+      const lib = randomIconId();
+      if (lib) editNewOutfit((d) => ({ ...d, ...libFields(lib) }));
+      break;
+    }
+    case "no-clear-emblem":
+      editNewOutfit((d) => ({ ...d, emblemImage: undefined, emblemLib: undefined, emblemColor: undefined }));
+      break;
     case "cf-set-lib": {
       const fid = currentFoundryId();
       const lib = target.dataset["lib"];
@@ -802,7 +841,20 @@ function dispatchAction(target: HTMLElement): void {
       break;
     }
     case "close-modal": {
-      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined } }));
+      store.setState((s) => {
+        // The picker opened OVER the new-outfit dialog, so closing it hands
+        // back to the dialog rather than dropping you on the dock with a
+        // half-typed name gone. Closing the dialog itself is what discards.
+        const backToDialog = s.ui.modal?.kind === "emblem" && s.ui.modal.target === "new-outfit";
+        return {
+          ...s,
+          ui: {
+            ...s.ui,
+            modal: backToDialog ? { kind: "new-outfit" } : undefined,
+            ...(backToDialog ? {} : { newOutfit: undefined }),
+          },
+        };
+      });
       break;
     }
     case "open-add-unit": {
@@ -1164,105 +1216,42 @@ function dispatchAction(target: HTMLElement): void {
       location.hash = routeHash({ view: "solo-outfit", outfitId: outfit.id });
       break;
     }
+    // The mark is rolled here, on open, rather than left blank for you to fill
+    // in: an outfit should arrive already looking like something. It comes from
+    // the same library the picker offers, so "random" means the same thing in
+    // the dialog as it does everywhere else in the app.
     case "solo-new-outfit-open":
-      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "new-outfit" } } }));
+      store.setState((s) => ({
+        ...s,
+        ui: {
+          ...s.ui,
+          modal: { kind: "new-outfit" },
+          newOutfit: { emblem: "delta", ...libFields(randomIconId() ?? "") },
+        },
+      }));
       break;
     case "solo-new-outfit-cancel":
-      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined } }));
+      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined, newOutfit: undefined } }));
       break;
-    // The dialog's three answers are held on the modal until Start, so each of
-    // these just edits that draft. The name is read from the live input rather
-    // than the draft so typing never re-renders the field out from under you.
-    case "solo-new-outfit-from": {
-      const id = target.dataset["id"] || undefined;
-      store.setState((s) =>
-        s.ui.modal?.kind === "new-outfit"
-          ? { ...s, ui: { ...s.ui, modal: { ...s.ui.modal, fromId: id, name: liveOutfitName() } } }
-          : s,
-      );
-      break;
-    }
-    case "solo-new-outfit-emblem": {
-      const em = target.dataset["emblem"];
-      if (!em) return;
-      store.setState((s) =>
-        s.ui.modal?.kind === "new-outfit"
-          ? { ...s, ui: { ...s.ui, modal: { ...s.ui.modal, emblem: em, name: liveOutfitName() } } }
-          : s,
-      );
-      break;
-    }
-    case "solo-new-outfit-emblem-random": {
-      store.setState((s) => {
-        const draft = s.ui.modal;
-        if (draft?.kind !== "new-outfit") return s;
-        // Never hand back the mark already showing, or "Surprise me" looks broken.
-        const pool = EMBLEM_IDS.filter((e) => e !== draft.emblem);
-        const pick = pool[Math.floor(Math.random() * pool.length)] ?? EMBLEM_IDS[0]!;
-        return { ...s, ui: { ...s.ui, modal: { ...draft, emblem: pick, name: liveOutfitName() } } };
-      });
-      break;
-    }
     case "solo-new-outfit-create": {
-      const name = liveOutfitName();
-      const draft = state.ui.modal?.kind === "new-outfit" ? state.ui.modal : undefined;
-      const source = draft?.fromId ? state.outfits.find((o) => o.id === draft.fromId) : undefined;
-
-      // A "list:" source is a main-game fleet being brought across. The two
-      // sides share no ship list and no currency, so this is a recast rather
-      // than a copy: each unit becomes the nearest stock hull by Mass, heaviest
-      // first, stopping at the five-ship cap or the budget. Name and emblem
-      // come over intact, which is what makes it feel like the same outfit.
-      const fromListId = draft?.fromId?.startsWith("list:") ? draft.fromId.slice(5) : undefined;
-      const srcList = fromListId ? state.lists.find((l) => l.id === fromListId) : undefined;
-      let recast: SavedOutfit["ships"] | undefined;
-      if (srcList) {
-        const fac = findFaction(srcList.fleet.factionId, state.customFactions);
-        const masses = srcList.fleet.units.flatMap((u) => {
-          const r = resolveShip(u.shipClassId, fac, state.customFactions);
-          return r ? Array.from({ length: u.count }, () => r.ship.mass) : [];
-        });
-        const cast = recastAsOutfit(masses);
-        recast = cast.shipClassIds.map((shipClassId, i) => ({
-          id: `s${i + 1}`,
-          shipClassId,
-          pilotClass: "Junker" as const,
-        }));
-      }
-
-      // Copying takes the crew and the colours, never the campaign: a copied
-      // outfit starts at the full debt with no games flown and no perks taken,
-      // because it is a new run with the same ships, not a restore point.
-      const base = createOutfit();
+      const draft = state.ui.newOutfit;
       const outfit: SavedOutfit = {
-        ...base,
-        name: name || (source ? `${source.name || "Unnamed outfit"} II` : (srcList?.fleet.name ?? "")),
-        emblem: draft?.emblem ?? source?.emblem ?? srcList?.emblem ?? base.emblem,
-        ...(recast
+        ...createOutfit(),
+        name: liveOutfitName(),
+        ...(draft
           ? {
-              ships: recast,
-              emblemImage: srcList?.emblemImage,
-              emblemLib: srcList?.emblemLib,
-              emblemColor: srcList?.emblemColor,
-              emblemBg: srcList?.emblemBg,
+              emblem: draft.emblem,
+              emblemImage: draft.emblemImage,
+              emblemLib: draft.emblemLib,
+              emblemColor: draft.emblemColor,
+              emblemBg: draft.emblemBg,
             }
           : {}),
-        ...(source
-          ? {
-              ships: structuredClone(source.ships),
-              emblemImage: source.emblemImage,
-              emblemLib: source.emblemLib,
-              emblemColor: source.emblemColor,
-              emblemBg: source.emblemBg,
-            }
-          : {}),
-        // An explicit pick in the dialog beats whatever the source was flying.
-        ...(draft?.emblem ? { emblem: draft.emblem, emblemImage: undefined, emblemLib: undefined } : {}),
       };
       store.setState((s) => {
         const outfits = [...s.outfits, outfit];
         persistOutfits(outfits);
-        return { ...s, outfits, ui: { ...s.ui, modal: undefined, soloTab: "outfit" } };
+        return { ...s, outfits, ui: { ...s.ui, modal: undefined, newOutfit: undefined, soloTab: "outfit" } };
       });
       location.hash = routeHash({ view: "solo-outfit", outfitId: outfit.id });
       break;
@@ -2073,6 +2062,15 @@ function handleChange(e: Event): void {
       target.value = "";
       break;
     }
+    case "no-emblem-upload": {
+      const file = target.files?.[0];
+      if (!file) return;
+      readEmblemImage(file)
+        .then((dataUrl) => editNewOutfit((d) => ({ ...d, emblemImage: dataUrl })))
+        .catch(() => showToast("That image could not be used. Try a PNG or JPEG."));
+      target.value = "";
+      break;
+    }
 
     // ---- Ship compendium --------------------------------------------------
     case "ship-filter":
@@ -2361,7 +2359,19 @@ export function wireActions(root: HTMLElement): void {
     const s = store.getState();
     if (s.ui.modal) {
       e.preventDefault();
-      store.setState((st) => ({ ...st, ui: { ...st.ui, modal: undefined } }));
+      // Escape unstacks one layer, the same as the X and Done: from the emblem
+      // picker back to the new-outfit dialog it opened over, and only then out.
+      // Leaving the draft behind here as well, so Escape out of the dialog
+      // discards it exactly like Cancel does.
+      const backToDialog = s.ui.modal.kind === "emblem" && s.ui.modal.target === "new-outfit";
+      store.setState((st) => ({
+        ...st,
+        ui: {
+          ...st.ui,
+          modal: backToDialog ? { kind: "new-outfit" } : undefined,
+          ...(backToDialog ? {} : { newOutfit: undefined }),
+        },
+      }));
       return;
     }
     // No modal: fall back to closing an open transient popover, innermost first.

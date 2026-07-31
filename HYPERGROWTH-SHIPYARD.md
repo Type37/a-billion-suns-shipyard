@@ -212,8 +212,11 @@ Recorded so they are not re-proposed.
 - **Play mode.** Requisition, striking ships off the roster permanently, and faction
   abilities that operate during play (Galactic Credit's CMD carry-over) all live
   outside this screen.
-- **Armageddon and Age of Unity.** Units exist at build time there, so assignment is a
-  genuine build decision and this personnel pattern does not transfer.
+- **Armageddon and Age of Unity.** Units exist at build time in both, so this
+  Shipyard personnel pattern does not transfer. They are not the same as each
+  other, though: Armageddon chooses *and* assigns at build (p.79 step 4), while
+  Age of Unity chooses at build and assigns at the table once the missions are
+  rolled (p.92 step 5), which is why its carrier picker lives in Play Mode.
 
 ---
 

@@ -25,7 +25,7 @@ Nothing is mid-flight. Known deferred items, in rough priority order:
 
 **Hypergrowth Play Mode** is its own layout (`isShipyard` branch in `playView`): faction ability with the Commands directly under it (left col); the right col is the live **Shipyard requisition tracker** (`playShipyardTracker`) — every class always visible with Deploy / Jumped out / Jump in and a yard·play·reserve tally (`play.req[classId]={play,reserve}`, actions `play-deploy`/`play-jumpout`/`play-jumpin`), NOT the damage-box tracker. Phase content is verbatim and mode-aware (`phasesFor(mode)`): Command Phase = checkboxes A/B; shipyard Jump Phase = a no-checkbox reference block (Open Jump Point / Requisition / Jump In); scoring reminders render in the **End Phase only**. Arc glyphs (`arc-primary` wedge + dome outline, `arc-aux` filled dome) and the left-aligned weapons table (`.wt-row` name col = `1fr`) are global, all modes.
 | **Armageddon** | **Fleet List** | Discrete units. | **Chosen + assigned pre-play** (enforced). |
-| **Age of Unity** | **Fleet List** | Discrete units. | **Deferred.** Optional at build (with a note); print shows ALL available HVP plus a write-in slot per ship. |
+| **Age of Unity** | **Fleet List** | Discrete units. | **Split.** Choose at build (offered, not enforced — `HVP_COUNT` dropped); assign in Play Mode once missions are rolled (p.92 step 5). Print shows the chosen ones, or the full menu if none chosen yet, plus a write-in slot per ship. |
 
 ### ✅ Phases A–E — all DONE
 - **A** (v0.8.26) Two-column builder: sticky roster LEFT, catalogue + HVP pool RIGHT. `builderView()`, CSS `.mf-body`/`.mf-manifest`/`.mf-yard`.

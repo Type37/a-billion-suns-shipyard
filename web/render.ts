@@ -1418,11 +1418,27 @@ function builderView(state: AppState): string {
       <button class="sy-hvp-check ${isChosen ? "is-on" : ""}" data-action="${isChosen ? "remove-hvp" : "add-hvp"}" ${isChosen ? `data-index="${selIndex}"` : `data-hvp="${h.id}"`} aria-pressed="${isChosen}" ${disabled ? 'aria-disabled="true"' : ""} title="${isChosen ? `Remove ${escapeHtml(h.name)}` : disabled ? "Personnel full" : `Add ${escapeHtml(h.name)}`}">${icon(isChosen ? "check" : "plus", 16)}</button>
     </article>`;
   };
-  // Armageddon assigns each chosen HVP to a carrier unit before play; Age of
-  // Unity defers that until the missions are known, so it only toggles on/off.
-  // Armageddon selects AND assigns before the mission is chosen (p.79 step 4),
-  // so its assignment lives here in the builder. Age of Unity and Hypergrowth
-  // both assign only once the missions are known, so theirs is in Play Mode.
+  /**
+   * WHICH HALF OF THE HVP STEP IS DEFERRED, PER ERA.
+   *
+   * "Choose" and "assign" are two things, and the eras split them differently:
+   *
+   *   Armageddon    choose AND assign at build time, before the mission is
+   *                 chosen (p.79 step 4) - so both live in this builder.
+   *   Age of Unity  the Fleet List you bring is built in advance and the HVP
+   *                 system is part of building it, so you CHOOSE here; the
+   *                 units exist at build time but the assignment is step 5,
+   *                 after the missions are rolled (p.92), so that half is in
+   *                 Play Mode.
+   *   Hypergrowth   neither, really: a Shipyard has no units until Requisition
+   *                 forms one mid-game (p.122), so there is nothing to assign
+   *                 to at setup. See hvpRequisitionNote.
+   *
+   * The count is not enforced for Age of Unity (HVP_COUNT is dropped for the
+   * mode) because a player may reasonably arrive with the three in their head
+   * rather than in the app, and a list that is otherwise legal should not be
+   * flagged for it. Choosing here is offered, not demanded.
+   */
   const hvpAssignBlock =
     list.mode === "armageddon" || list.mode === "combat-simulator" ? hvpAssignPanel(list, faction, customs) : "";
   // Combat Simulator issues a fixed crew rather than offering a choice: "All
@@ -1609,7 +1625,7 @@ function builderView(state: AppState): string {
       <div class="sy-fac">
         <span class="mf-fac">${factionControl}</span>
         ${eraSwitch(list)}
-        ${faction && !list.freePlay ? `<button class="sy-ref-btn" data-action="open-ship-reference" title="Faction ship reference">${icon("scroll", 15)} Reference</button>` : ""}
+        ${faction && !list.freePlay ? `<button class="sy-ref-btn" data-action="open-ship-reference" title="Faction ship reference" aria-label="Faction ship reference">${icon("scroll", 15)}<span class="sy-ref-t">Reference</span></button>` : ""}
       </div>
       ${playBtn}
       ${moreMenu}
@@ -1669,7 +1685,7 @@ function builderView(state: AppState): string {
           ? "issued by the scenario"
           : `${list.fleet.hvp.length} of ${list.freePlay ? "any" : hvpMin === hvpMax ? hvpMax : `${hvpMin}–${hvpMax}`} chosen`
       }</span></p>
-      ${list.mode === "age-of-unity" ? '<p class="sy-hvp-note">In Age of Unity you assign HVP after the missions are generated.</p>' : ""}
+      ${list.mode === "age-of-unity" ? '<p class="sy-hvp-note">Choose your personnel here &mdash; in Age of Unity you put them aboard ships at the table, once the missions are rolled.</p>' : ""}
       ${isFixedCrew ? `<div class="mf-list personnel-grid">${personnelCatalog}</div>` : `<div class="sy-hvp-list">${personnelCatalog}</div>${hvpAssignBlock}`}
     </div>`
     }

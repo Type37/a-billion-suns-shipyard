@@ -5328,12 +5328,40 @@ main.play-body .roster-section::before { content: none; }
   .shipyard > .sy-faction { order: 4; border-top: 2px solid var(--hair); margin-top: 18px; }
   .shipyard > .sy-finish { order: 5; }
 
-  /* The masthead ran to three lines: identity, then faction/era/Reference, then
-     Play and the menu orphaned onto a third because those two needed 110px and
-     the faction row had 61px left. Two lines instead, split by what the
-     controls are FOR - what this fleet is and what you do with it on the first,
-     what it is built from on the second. */
-  .sy-head { gap: 3px 6px; padding: 4px 0 2px; }
+  /* TWO LINES: the name, then everything you do to the fleet on ONE row.
+
+     It ran to three. Play and the menu were orphaned onto a third because they
+     needed 110px and the faction row had 61px left - so a phone header was
+     three stacked rows, the last of them mostly empty air, and the fleet you
+     came to look at started a third of the way down the screen.
+
+     They fit on one row once the two controls carrying redundant words give
+     them up. Reference keeps its book glyph and loses the word (the glyph is
+     the same one the footer's Quick Reference link uses, and the button keeps
+     its title and aria-label, so nothing is lost to a screen reader or a
+     hover). The faction name truncates rather than pushing anything off the
+     end. Measured at 360px, the tightest target: faction 90 + era 86 +
+     reference 30 + Play 66 + menu 28 + four 6px gaps = 324 of 344 available. */
+  .sy-head { gap: 3px 4px; padding: 4px 0 2px; }
+  .sy-head > .sy-fac { flex-wrap: nowrap; min-width: 0; }
+  .sy-head .sy-ref-t { display: none; }
+  .sy-head .sy-ref-btn { flex: none; }
+  /* The one thing here that can be any length, so it is the one thing that
+     gives. */
+  /* The faction name is the only item here that can be any length, so it is the
+     only one allowed to shrink. Everything else is fixed and the row is sized
+     to fit them all; a long custom faction name truncates rather than pushing
+     the menu onto a line of its own. */
+  .sy-head .mf-fac { flex: 0 1 auto; min-width: 44px; }
+  /* Measured at 360px: faction 81 + era 117 + reference 33 + Play 74 + menu 36
+     and two 6px gaps came to 374 against 332. The era badge is the widest thing
+     on the row and the one with the most air in it, so it gives up the most:
+     tighter tracking and padding at the same weight. Play and the menu shed a
+     few px of padding each. */
+  .sy-head .mf-era-badge { padding: 3px 5px; font-size: 10px; letter-spacing: 0.01em; gap: 3px; }
+  .sy-head .mf-play-btn { padding: 0 7px; font-size: 10.5px; gap: 4px; }
+  .sy-head .mf-menu > summary { height: 26px; padding: 0 5px; }
+  .sy-head .mf-fac > summary, .sy-head .faction-switch > summary { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   /* The name gets a row to itself. Sharing one with Play and the menu got the
      header down to 97px but left the field 146px wide, and the shortest seed
      name needs 164px - so the fleet name was being cut off, which is the one
@@ -5342,9 +5370,9 @@ main.play-body .roster-section::before { content: none; }
      at 19px and 276px at 17px. So: full row, 17px, and it fits with room over.
      Three short rows beat two rows and a truncated name. */
   .sy-head > .sy-id { order: 1; flex: 1 1 100%; min-width: 0; }
-  .sy-head > .sy-fac { order: 2; flex: 1 1 auto; }
-  .sy-head > .mf-play-btn { order: 3; }
-  .sy-head > .mf-menu { order: 4; }
+  .sy-head > .sy-fac { order: 2; flex: 0 1 auto; gap: 4px; }
+  .sy-head > .mf-play-btn { order: 3; flex: none; }
+  .sy-head > .mf-menu { order: 4; flex: none; }
   /* 16px, not 17: at 17 the longest seed name still needed 276px against 268
      available and was clipped by 8. 16px needs 260. It is also the size below
      which iOS Safari zooms the page on focus, so this is the floor anyway. */

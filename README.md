@@ -1,10 +1,24 @@
 # A Billion Suns 2e Shipyard
 
-A fleet and shipyard builder for **A Billion Suns, 2nd Edition** (Mike Hutchinson / Osprey Games).
+A fleet builder for **A Billion Suns, 2nd Edition** (Mike Hutchinson / Osprey Games).
 
 **Live:** https://type37.github.io/a-billion-suns-shipyard/
 
-Pick an era, pick a faction, build a legal list (or fill a Shipyard), give it an emblem, then print or share it. The app is a static site — everything runs in the browser and lists are stored locally.
+Pick an era, pick a faction, build a legal Fleet List (or fill a Shipyard), give it an emblem, then print or share it. The app is a static site — everything runs in the browser and lists are stored locally.
+
+## Naming
+
+Three words, three jobs. Keep them apart.
+
+| Word | What it names | Where it belongs |
+| --- | --- | --- |
+| **Shipyard** | The product — *and*, in Hypergrowth, the game object it is named for: the stock of hulls you requisition from. | Wordmark, `<title>`, footer credit, README title, the Hypergrowth build screen and everything about it. Always capitalised. |
+| **Fleet List** | What Armageddon and Age of Unity build: units and High-Value Personnel committed before the game, to a credits limit. The rulebook's term. | The build screen's title in those eras, the "Build a Fleet List" button, print and share copy. Capitalised as the rulebook does. |
+| **fleet** | The in-game force itself, and the app's section of saved ones. | "Fleets" nav and page, fleet cards, fleet names, fleet notes. Lowercase in prose, capitalised only as the section name. |
+
+**"fleet builder"** is the *category* the product sits in, not a name for the product or for any screen inside it. In copy a reader sees, it is allowed in exactly three places, lowercase, where a stranger needs a familiar noun to know what this is: the `<meta name="description">` in `web/index.html`, the `description` in `package.json`, and the line under the title of this README. In on-screen copy it is a bug — a Hypergrowth session is not building a fleet at all, it is stocking a Shipyard, and no units exist until they are requisitioned mid-game.
+
+Code identifiers and comments are outside the rule and stay as they are: `builderView`, `.builder`, `view: "builder"`, `MODE_BUILDER_SHAPE`, and the `abs-v2-builder` package/export key all use "builder" as the shape-neutral internal word for "the screen you build on", which is exactly what it has to mean when it covers both shapes.
 
 ## Features
 
@@ -15,7 +29,7 @@ Pick an era, pick a faction, build a legal list (or fill a Shipyard), give it an
   - *Hypergrowth:* Heavy Industries, MegaMart, News Inc, Galactic Credit.
   - *Age of Unity:* The Unity, The Ordinate, The Discord, Golem Mega-Systems.
   - *Armageddon:* Vyke, AEGIS, Gen Ω, Alliance.
-- **Live rules validation** — the builder flags over-budget lists, illegal unit sizes, HVP-count and assignment problems, and the other list-building constraints as you edit.
+- **Live rules validation** — the app flags over-budget lists, illegal unit sizes, HVP-count and assignment problems, and the other list-building constraints as you edit.
 - **Custom faction Foundry** — define your own faction; it merges on top of the built-in catalogue at runtime.
 - **Emblems** — a set of built-in vector marks per faction, plus colour and upload options.
 - **Learn to play** — the rulebook's tutorial fleets (Combat Simulator, Management Training) load as ready-made lists, with guided tours.
@@ -134,4 +148,4 @@ rm -rf .git        # remove the nested repo
 
 ---
 
-*A Billion Suns is © Mike Hutchinson, published by Osprey Games. This is an unofficial fan-made tool. Fleet builder by [WarLore](https://linktr.ee/warlore).*
+*A Billion Suns is © Mike Hutchinson, published by Osprey Games. This is an unofficial fan-made tool. Shipyard by [WarLore](https://linktr.ee/warlore).*

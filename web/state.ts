@@ -204,7 +204,7 @@ export interface AppState {
     lastRoll?: LastRoll;
     /** Filters on the ship compendium. */
     shipFilter?: ShipFilter;
-    /** The Create-army panel is open on the Fleets page. */
+    /** The new-fleet panel is open on the Fleets page. */
     showCreate?: boolean;
     /** Builder credits popover: the Custom amount field is revealed. */
     limitCustomOpen?: boolean;

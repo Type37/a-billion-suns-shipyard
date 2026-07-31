@@ -5,6 +5,34 @@ import { creditsGlyph, MASS_MARK } from "./icons.ts";
 // and a hard budget of one em-dash and one interpunct across the whole project
 // (both are spent in the print document, nowhere else).
 
+/**
+ * A ship class name, made plural, for a unit holding more than one of them.
+ *
+ * A unit of three Epistle-Class Gunships called itself "Epistle-Class Gunship",
+ * which is simply wrong on the roster and on the printout.
+ *
+ * The rules are ordinary English and the ship data is the test set (every class
+ * across the twelve factions, plus Junkspace and the training fleet), but they
+ * have to be safe for custom factions too, where the name can be anything:
+ *
+ *   already plural   Buffalo Heavy Bombers, Rapter Assault Fighters - left alone
+ *   -fish            Dragonfish, Viperfish - English does not pluralise these
+ *   consonant + y    Anvil-Class Auto-Foundry -> Auto-Foundries
+ *   sibilant endings Box -> Boxes. Note this tests the last TWO letters, so
+ *                    "Titan Mallship" ends in "ip" and correctly takes a plain
+ *                    -s; only a real "sh" ending takes -es.
+ *   everything else  + s
+ */
+export function pluralise(name: string): string {
+  const trimmed = name.trim();
+  if (!trimmed) return name;
+  const lower = trimmed.toLowerCase();
+  if (lower.endsWith("s") || lower.endsWith("fish")) return trimmed;
+  if (/[^aeiou]y$/i.test(trimmed)) return `${trimmed.slice(0, -1)}ies`;
+  if (/(x|z|ch|sh)$/i.test(trimmed)) return `${trimmed}es`;
+  return `${trimmed}s`;
+}
+
 // Bracket notation, matching the book's own ship-class table: name, then
 // [dice, range] in brackets. Damage isn't printed - it's a fixed lookup from
 // the die, not a separate figure the book gives a column to.

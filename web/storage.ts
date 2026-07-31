@@ -206,8 +206,6 @@ export interface Onboarding {
   tutorialsDismissed: boolean;
   /** Ids of first-visit coachmark tours the user has finished or closed. */
   toursSeen: string[];
-  /** True once the "make your own faction" nudge has been dismissed or acted on. */
-  foundryNudgeDismissed?: boolean;
 }
 
 export function loadOnboarding(): Onboarding {
@@ -216,7 +214,6 @@ export function loadOnboarding(): Onboarding {
     visits: o.visits ?? 0,
     tutorialsDismissed: o.tutorialsDismissed ?? false,
     toursSeen: Array.isArray(o.toursSeen) ? o.toursSeen : [],
-    foundryNudgeDismissed: o.foundryNudgeDismissed ?? false,
   };
 }
 

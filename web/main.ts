@@ -6,6 +6,7 @@ import { wireActions } from "./actions.ts";
 import { decodeShare, decodeSharePayload, sharePayloadFromHash, type DecodedShare } from "./share.ts";
 import { persistCustomFactions, persistLists } from "./storage.ts";
 import { runDecode, DIGIT_POOL } from "./write-on.ts";
+import { visibleAnchor } from "./tours.ts";
 import "./style.css";
 
 // The app is a hash-routed, single-store, full-re-render SPA. state.ts holds the
@@ -38,8 +39,8 @@ const VIEW_TITLE: Record<string, string> = {
   home: "Home",
   fleets: "Fleets",
   // builder is set per game mode in syncDocumentTitle - Hypergrowth builds a
-  // Shipyard, the other eras build a fleet list.
-  builder: "Fleet builder",
+  // Shipyard, the other eras build a Fleet List.
+  builder: "Fleet List",
   print: "Print setup",
   foundry: "Custom Rules",
   solo: "Solo",
@@ -72,14 +73,14 @@ function syncDocumentTitle(): void {
   const view = s.route.view;
   // "Shipyard" is two things in this app and both are correct: the product name
   // and, in Hypergrowth, the actual game object - the stock of hulls you
-  // requisition from. So the builder titles itself by what you are building.
-  // Calling a Hypergrowth session a "Fleet builder" is wrong on the rules'
-  // own terms: you are not building a fleet, you are stocking a Shipyard and
-  // units are not formed until you requisition them mid-game.
+  // requisition from. So the builder titles itself by what you are building, in
+  // the rulebook's own words: a Shipyard in Hypergrowth, a Fleet List in the
+  // other eras. Never "fleet builder" - that is the category the product sits
+  // in, not a name for any screen inside it.
   let name = VIEW_TITLE[view];
   if (view === "builder") {
     const list = s.lists.find((l) => l.id === (s.route as { listId: string }).listId);
-    name = list && MODE_BUILDER_SHAPE[list.mode] === "shipyard" ? "Shipyard" : "Fleet builder";
+    name = list && MODE_BUILDER_SHAPE[list.mode] === "shipyard" ? "Shipyard" : "Fleet List";
   }
   document.title = name ? `${name} - ${SITE_NAME}` : SITE_NAME;
 }
@@ -817,8 +818,12 @@ function animateFactionTitle(): void {
 function positionTour(): void {
   const pop = document.querySelector<HTMLElement>(".tour-pop");
   if (!pop) return;
-  const selector = pop.dataset["target"];
-  const anchor = selector ? document.querySelector<HTMLElement>(selector) : null;
+  // Out of the way before the hit test, so a popover the last placement left
+  // sitting over its own target cannot be read as something covering it.
+  pop.style.display = "none";
+  pop.classList.remove("placed");
+
+  const anchor = visibleAnchor(pop.dataset["target"]);
   if (!anchor) return; // Target not on this page yet (e.g. an empty roster); stays hidden.
 
   const a = anchor.getBoundingClientRect();
@@ -860,6 +865,23 @@ function positionTour(): void {
   pop.classList.toggle("arrow-right", arrowRight);
   pop.classList.toggle("arrow-top", arrowV === "arrow-top");
   pop.classList.toggle("arrow-bottom", arrowV === "arrow-bottom");
+
+  // The arrow sits at the popover's midpoint in CSS, which is only the anchor's
+  // midpoint when nothing clamped. A tall popover beside a topbar link gets
+  // pushed down to the 12px margin and its arrow then points at the space under
+  // the tab rather than the tab, so aim it at the anchor explicitly. Kept 14px
+  // clear of the corners, where a diamond straddling two borders looks broken.
+  const arrow = pop.querySelector<HTMLElement>(".tour-pop-arrow");
+  if (arrow) {
+    const pin = (v: number, span: number) => Math.max(14, Math.min(v, span - 14));
+    if (arrowV) {
+      arrow.style.top = "";
+      arrow.style.left = `${pin(a.left + a.width / 2 - left, p.width) - 8}px`;
+    } else {
+      arrow.style.left = "";
+      arrow.style.top = `${pin(a.top + a.height / 2 - top, p.height)}px`;
+    }
+  }
   pop.classList.add("placed");
 }
 
@@ -870,6 +892,27 @@ window.addEventListener("resize", () => {
   // roster panel sticks below it, so its height has to be re-read on resize.
   measureStickyHeader();
 });
+
+// Placed against fallback metrics on the first paint, so it lands ~60px adrift
+// of a target that the real fonts then move. One re-aim once they are in.
+if (document.fonts) void document.fonts.ready.then(() => positionTour());
+
+// The coachmark is position:fixed and its anchor usually is not - the topbar
+// scrolls away with the page - so it has to be re-aimed as the page moves or it
+// ends up pointing at whatever has slid under it. Capture, so it also follows
+// anchors inside a scrolling panel; one frame at a time, since this measures.
+let tourFrame = 0;
+window.addEventListener(
+  "scroll",
+  () => {
+    if (tourFrame) return;
+    tourFrame = requestAnimationFrame(() => {
+      tourFrame = 0;
+      positionTour();
+    });
+  },
+  { passive: true, capture: true },
+);
 
 window.addEventListener("hashchange", () => {
   // Dismiss any open dialog on navigation. render() appends the modals after the

@@ -309,7 +309,7 @@ function outfitTab(o: SavedOutfit): string {
     .join("");
 
   return `
-  <main class="workspace">
+  <main class="workspace solo-workspace">
     <section class="catalog">
       <h3 class="catalog-title">Stock ship classes <span class="muted">costs in thousands of Juran credits</span></h3>
       <div class="catalog-list">${soloShipCatalog()}</div>
@@ -339,14 +339,32 @@ function outfitTab(o: SavedOutfit): string {
 
 // --- Play tab ---------------------------------------------------------------
 
+// The Alert Level counted out in ten squares rather than drawn as a percentage
+// bar. It is a 1-to-10 integer that ends the game the moment it lands on 10, so
+// what you need off it is "how many are left", and a 500px-wide fill bar cannot
+// answer that without you measuring it against its own end. Squares can, at a
+// glance, from across a table - which is the same argument (and the same shape)
+// as the campaign clock in gameTicks above.
+function alertPips(level: number): string {
+  const on = Math.max(0, Math.min(10, level));
+  const pips = Array.from(
+    { length: 10 },
+    (_, i) => `<span class="alert-pip ${i < on ? "is-on" : ""}"></span>`,
+  ).join("");
+  return `<div class="alert-pips" role="img" aria-label="Alert Level ${on} of 10">${pips}</div>`;
+}
+
 function rollerPanel(state: AppState): string {
   const last = state.ui.lastRoll;
   const btn = (table: string, label: string) =>
     `<button class="bar-btn" data-action="solo-roll" data-table="${table}">${label}</button>`;
+  // The result sits BELOW the buttons and its slot is always there, empty or
+  // not. Both halves of that matter: reading order is press-then-read, and a
+  // result that appears out of nothing would shove the button you just pressed
+  // out from under your finger every time you rolled.
   return `
-  <section class="solo-card">
-    <h3 class="roster-section">The roller</h3>
-    <p class="panel-note">Roll for the automated enemy and setup.</p>
+  <section class="solo-card solo-card-primary roller-card">
+    <h3 class="roster-section">The roller <span class="muted">the automated enemy, and setup</span></h3>
     <div class="roller-buttons">
       ${btn("behaviour", "Hostile behaviour (D6)")}
       ${btn("glitch", "Glitch a Blip (D6)")}
@@ -354,24 +372,35 @@ function rollerPanel(state: AppState): string {
       ${btn("scatter", "Setup scatter (D10)")}
       ${btn("perk", "Perk (D12)")}
     </div>
-    ${
-      last
-        ? `<div class="roll-result">
-            <div class="roll-die">${last.value}</div>
-            <div class="roll-body">
-              <p class="roll-table">${escapeHtml(last.table)}</p>
-              <p class="roll-headline">${ruleText(last.result)}</p>
-              ${last.detail ? `<p class="roll-detail">${ruleText(last.detail)}</p>` : ""}
-            </div>
-          </div>`
-        : '<p class="muted" style="margin-top:14px">No roll yet.</p>'
-    }
+    <div class="roll-slot">
+      ${
+        last
+          ? `<div class="roll-result">
+              <div class="roll-die">${last.value}</div>
+              <div class="roll-body">
+                <p class="roll-table">${escapeHtml(last.table)}</p>
+                <p class="roll-headline">${ruleText(last.result)}</p>
+                ${last.detail ? `<p class="roll-detail">${ruleText(last.detail)}</p>` : ""}
+              </div>
+            </div>`
+          : '<p class="roll-empty">No roll yet. Pick a table above.</p>'
+      }
+    </div>
   </section>`;
 }
 
+// The two numbers you touch between every activation are the Alert Level and
+// the Round, so they are the whole of the band across the top - the same shape
+// the main game's Play mode uses, and for the same reason. Behind them the page
+// sorts by how often you reach for it: the roller (several times a round) in
+// the lead column, the rules (read once, then never) quiet on the right.
+//
+// Before this, Alert, Round and the roller were three equal cards in a
+// repeat(auto-fit) grid, so a wall of rules text sat at exactly the same weight
+// as the +1 button you press every End Phase, and the game's clock was one of
+// three things competing for the top of the screen.
 function playTab(state: AppState, o: SavedOutfit): string {
   const alert = o.alertLevel;
-  const pct = Math.min(100, (alert / 10) * 100);
   // Why this game is harder than the last one. The starting Alert Level climbs
   // as the debt comes down (p.195), and without saying so the player just sees
   // a number that used to be 1 and now isn't.
@@ -386,37 +415,59 @@ function playTab(state: AppState, o: SavedOutfit): string {
       : "";
   const phases = SOLO_PHASES.map((p) => `<li><strong>${escapeHtml(p.name)}.</strong> ${ruleText(p.text)}</li>`).join("");
   return `
-  <div class="solo-grid">
-    <section class="solo-card">
-      <h3 class="roster-section">Alert Level <span class="muted">ends the game at 10</span></h3>
-      <div class="alert-track ${alert >= 8 ? "high" : ""}">
-        <div class="alert-fill" style="width:${pct}%"></div>
-        <span class="alert-value">${alert}</span>
+  <section class="game-bar ${alert >= 8 ? "high" : ""}">
+    <div class="gb-alert">
+      <div class="gb-head">
+        <span class="control-label">Alert Level</span>
+        <span class="gb-note">the game ends at 10</span>
+      </div>
+      <div class="gb-read">
+        <span class="gb-figure">${alert}</span>
+        ${alertPips(alert)}
       </div>
       <div class="alert-controls">
-        <button class="bar-btn" data-action="alert-adjust" data-delta="1">+1 End Phase</button>
-        <button class="bar-btn" data-action="alert-adjust" data-delta="1">+1 reveal Mass 2-3</button>
-        <button class="bar-btn" data-action="alert-adjust" data-delta="-2">-2 destroy Mass 2-3</button>
-        <button class="ghost-btn" data-action="alert-adjust" data-delta="-1">-1</button>
+        <!-- What just happened on the table, then what it does to the Level.
+             The old labels led with the arithmetic ("+1 End Phase"), which is
+             the wrong way round: you press these because a thing happened. -->
+        <button class="bar-btn" data-action="alert-adjust" data-delta="1">${icon("plus", 13)} End Phase <b class="alert-delta">+1</b></button>
+        <button class="bar-btn" data-action="alert-adjust" data-delta="1">${icon("plus", 13)} Reveal Mass 2-3 <b class="alert-delta">+1</b></button>
+        <button class="bar-btn" data-action="alert-adjust" data-delta="-2">${icon("minus", 13)} Destroy Mass 2-3 <b class="alert-delta">&minus;2</b></button>
+        <button class="ghost-btn" data-action="alert-adjust" data-delta="-1">${icon("minus", 13)} Take one back <b class="alert-delta">&minus;1</b></button>
       </div>
       ${startNote}
-      <ul class="rule-list small">${SOLO_ALERT_RULES.map((r) => `<li>${ruleText(r)}</li>`).join("")}</ul>
-    </section>
-    <section class="solo-card">
-      <h3 class="roster-section">Round</h3>
+    </div>
+    <div class="gb-round">
+      <span class="control-label">Round</span>
       <div class="round-control">
-        <button class="stepper-btn" data-action="round-adjust" data-delta="-1">${icon("minus", 16)}</button>
+        <button class="stepper-btn" data-action="round-adjust" data-delta="-1" aria-label="Previous round">${icon("minus", 16)}</button>
         <span class="round-value">${o.round}</span>
-        <button class="stepper-btn" data-action="round-adjust" data-delta="1">${icon("plus", 16)}</button>
+        <button class="stepper-btn" data-action="round-adjust" data-delta="1" aria-label="Next round">${icon("plus", 16)}</button>
       </div>
-      <ul class="rule-list small">${phases}</ul>
-    </section>
+    </div>
+  </section>
+  <div class="solo-split">
     ${rollerPanel(state)}
+    <div class="solo-ref">
+      <section class="solo-card solo-card-quiet">
+        <h3 class="roster-section">The round <span class="muted">in solo play</span></h3>
+        <ul class="rule-list small">${phases}</ul>
+      </section>
+      <section class="solo-card solo-card-quiet">
+        <h3 class="roster-section">Alert Level rules</h3>
+        <ul class="rule-list small">${SOLO_ALERT_RULES.map((r) => `<li>${ruleText(r)}</li>`).join("")}</ul>
+      </section>
+    </div>
   </div>`;
 }
 
 // --- Campaign tab -----------------------------------------------------------
 
+// The campaign has exactly one number - what you still owe - and it was sitting
+// in a third of the page with 300px of nothing beside it while the game log,
+// two columns over, wrapped "Game 2" onto two lines. The debt takes the band
+// across the top with the campaign clock and the one button that moves either
+// of them; below it the page splits the way the Play tab does, into the thing
+// you act on after a game (perks) and the thing you only read (the log).
 function campaignTab(o: SavedOutfit): string {
   const cleared = o.debtK <= 0;
   const paid = STARTING_DEBT_K - Math.max(0, o.debtK);
@@ -426,48 +477,99 @@ function campaignTab(o: SavedOutfit): string {
     .map((g) => `<tr><td>Game ${g.game}</td><td class="cell-num">${ck(g.earnedK)}</td><td>${escapeHtml(g.note ?? "")}</td></tr>`)
     .join("");
 
-  const perkList = o.perks
-    .map((p, i) => {
-      const ship = o.ships.find((s) => s.id === p.shipId);
-      const who = ship ? ship.pilotName || ship.shipName || "A pilot" : "A pilot";
-      return `<li>${escapeHtml(who)}: ${escapeHtml(p.perk)} <button class="ghost-btn danger" data-action="remove-perk" data-index="${i}" title="Remove">${icon("close", 12)}</button></li>`;
+  // A perk belongs to a pilot, so it is shown under that pilot - what they have
+  // already taken, then the control that grants them another. It used to be two
+  // disconnected lists: five "Grant a perk" dropdowns, and somewhere below them
+  // a flat roll of "Osip: Goblin" lines you had to match back up by name.
+  //
+  // And a taken perk prints its rule in full. The name on its own meant reaching
+  // for the book every time it mattered, which is the one thing this screen
+  // exists to save you.
+  const takenFor = (shipId: string): string =>
+    o.perks
+      .map((p, i) => ({ p, i }))
+      .filter((x) => x.p.shipId === shipId)
+      .map(({ p, i }) => {
+        const ship = o.ships.find((s) => s.id === p.shipId);
+        const def = ship ? PERKS_BY_CLASS[ship.pilotClass].find((x) => x.name === p.perk) : undefined;
+        return `<li>
+          <div class="perk-taken">
+            <p class="perk-taken-head"><b>${escapeHtml(p.perk)}</b></p>
+            ${def ? `<p class="perk-taken-text">${ruleText(def.text)}</p>` : ""}
+          </div>
+          <button class="ghost-btn danger" data-action="remove-perk" data-index="${i}" aria-label="Remove ${escapeHtml(p.perk)}" title="Remove">${icon("close", 12)}</button>
+        </li>`;
+      })
+      .join("");
+
+  const perkPilots = o.ships
+    .map((s) => {
+      const list = PERKS_BY_CLASS[s.pilotClass];
+      const has = new Set(o.perks.filter((p) => p.shipId === s.id).map((p) => p.perk));
+      // "no duplicates" (p.213): a perk this pilot already has is still listed,
+      // marked and unselectable, so the class list stays whole and you can see
+      // what is left rather than watching options quietly disappear.
+      const opts = list
+        .map(
+          (p) =>
+            `<option value="${escapeHtml(p.name)}"${has.has(p.name) ? " disabled" : ""}>${p.n}. ${escapeHtml(p.name)}${has.has(p.name) ? " (taken)" : ""}</option>`,
+        )
+        .join("");
+      const who = s.pilotName || s.shipName || `${s.pilotClass} pilot`;
+      const taken = takenFor(s.id);
+      return `<article class="perk-pilot">
+        <p class="perk-pilot-head"><span class="perk-pilot-name">${escapeHtml(who)}</span> <span class="perk-pilot-class">${s.pilotClass}</span></p>
+        ${taken ? `<ul class="perk-list">${taken}</ul>` : '<p class="perk-pilot-none">No perks taken.</p>'}
+        <label class="inline-field">Grant a perk
+          <select data-action="assign-perk" data-ship="${s.id}"><option value="">Grant a perk&hellip;</option>${opts}</select>
+        </label>
+      </article>`;
     })
     .join("");
 
-  const perkAssign = o.ships
-    .map((s) => {
-      const list = PERKS_BY_CLASS[s.pilotClass];
-      const opts = list.map((p) => `<option value="${escapeHtml(p.name)}">${p.n}. ${escapeHtml(p.name)}</option>`).join("");
-      const who = s.pilotName || s.shipName || `${s.pilotClass} pilot`;
-      return `<label class="inline-field">${escapeHtml(who)} (${s.pilotClass})
-        <select data-action="assign-perk" data-ship="${s.id}"><option value="">Grant a perk...</option>${opts}</select>
-      </label>`;
-    })
+  // Perks left behind by a ship that has since been removed from the outfit.
+  // Shown rather than silently dropped, so the only way one leaves the sheet is
+  // that you deleted it.
+  const orphanPerks = o.perks
+    .map((p, i) => ({ p, i }))
+    .filter((x) => !o.ships.some((s) => s.id === x.p.shipId))
+    .map(
+      ({ p, i }) =>
+        `<li><div class="perk-taken"><p class="perk-taken-head"><b>${escapeHtml(p.perk)}</b></p><p class="perk-taken-text">The pilot who took this is no longer in the outfit.</p></div>
+         <button class="ghost-btn danger" data-action="remove-perk" data-index="${i}" aria-label="Remove ${escapeHtml(p.perk)}" title="Remove">${icon("close", 12)}</button></li>`,
+    )
     .join("");
 
   return `
-  <div class="solo-grid">
-    <section class="solo-card debt-card ${cleared ? "won" : ""}">
-      <h3 class="roster-section">Debt</h3>
+  <section class="game-bar debt-band ${cleared ? "won" : ""}">
+    <div class="gb-debt">
+      <span class="control-label">${cleared ? "Debt" : "Still owed"}</span>
       <p class="debt-figure">${cleared ? "Cleared" : ck(o.debtK)}</p>
+      <p class="gb-note">${ck(paid)} of ${ck(STARTING_DEBT_K)} paid down</p>
+    </div>
+    <div class="gb-clock">
+      <span class="control-label">Campaign clock</span>
       ${gameTicks(o.gamesPlayed, DEBT_CLEAR_GAMES)}
-      <p class="panel-note">${ck(paid)} of ${ck(STARTING_DEBT_K)} paid down.</p>
       ${cleared ? '<p class="inspection-pass">You have cleared your debt. Campaign won.</p>' : ""}
       ${outOfGames ? '<p class="issue-error">Eight games are up with debt remaining. Some very unpleasant people pay a visit: the campaign is lost.</p>' : ""}
-      <div class="roster-actions">
-        <button class="cta-btn" data-action="log-game">${icon("plus", 16)} Log a completed game</button>
-      </div>
-    </section>
-    <section class="solo-card">
-      <h3 class="roster-section">Game log</h3>
-      ${log ? `<table class="dock-table"><thead><tr><th></th><th>Earned</th><th>Notes</th></tr></thead><tbody>${log}</tbody></table>` : '<p class="muted">No games logged yet.</p>'}
-    </section>
-    <section class="solo-card">
+    </div>
+    <div class="gb-act">
+      <button class="cta-btn" data-action="log-game">${icon("plus", 16)} Log a completed game</button>
+    </div>
+  </section>
+  <div class="solo-split">
+    <section class="solo-card solo-card-primary">
       <h3 class="roster-section">Pilot perks</h3>
       <p class="panel-note">For each ¢1k earned in a game, a surviving pilot may take a Perk from their class list (no duplicates). Roll a D12 in the roller, or grant one directly.</p>
-      ${o.ships.length ? `<div class="perk-assign">${perkAssign}</div>` : '<p class="muted">Add ships to your outfit first.</p>'}
-      ${perkList ? `<ul class="perk-list">${perkList}</ul>` : ""}
+      ${o.ships.length ? `<div class="perk-pilots">${perkPilots}</div>` : '<p class="muted">Add ships to your outfit first.</p>'}
+      ${orphanPerks ? `<div class="perk-pilot perk-pilot-orphans"><p class="perk-pilot-head"><span class="perk-pilot-name">Pilots no longer with the outfit</span></p><ul class="perk-list">${orphanPerks}</ul></div>` : ""}
     </section>
+    <div class="solo-ref">
+      <section class="solo-card solo-card-quiet">
+        <h3 class="roster-section">Game log</h3>
+        ${log ? `<table class="dock-table"><thead><tr><th></th><th>Earned</th><th>Notes</th></tr></thead><tbody>${log}</tbody></table>` : '<p class="muted">No games logged yet.</p>'}
+      </section>
+    </div>
   </div>`;
 }
 
@@ -483,7 +585,7 @@ export function soloOutfitView(state: AppState): string {
   else body = `<main class="solo-body">${campaignTab(o)}</main>`;
 
   return `
-  <section class="setup-band">
+  <section class="setup-band solo-band">
     <div class="setup-head">
       <div class="setup-identity">
         <p class="band-eyebrow"><a href="#/solo">Junkspace</a></p>

@@ -1,6 +1,8 @@
 # ABS-V2 Builder — Session Handoff
 
-A Billion Suns 2E fleet builder. Framework-free TypeScript SPA, deployed to GitHub Pages.
+The **A Billion Suns 2e Shipyard**, a fleet builder for ABS 2E. Framework-free TypeScript SPA, deployed to GitHub Pages.
+
+**Naming (see README > Naming):** the product is the **Shipyard**; what you build is a **Fleet List** (Armageddon, Age of Unity) or a **Shipyard** (Hypergrowth); "fleet builder" is a category noun, lowercase, allowed only in `<meta name="description">`, `package.json`, and the README's opening line — never in on-screen copy. Code identifiers and comments (`builderView`, `.builder`, `MODE_BUILDER_SHAPE`, `view: "builder"`) keep "builder" as the shape-neutral internal word.
 
 **Live version:** v0.8.46 (deployed to gh-pages). The per-mode builder redesign (Phases A–E) is **complete**, and print setup has been rebuilt around a real paginated preview.
 (Older v0.8.0 / v0.8.26 handoffs previously lived here; superseded by this file.)

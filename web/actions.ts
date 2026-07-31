@@ -43,6 +43,7 @@ import { randomCorpName } from "../src/corp-names.ts";
 import { creditsText } from "./format.ts";
 import { writeOnInput } from "./write-on.ts";
 import { shareUrl } from "./share.ts";
+import { visibleAnchor } from "./tours.ts";
 import { fleetToMarkdown } from "./export-text.ts";
 
 // --- Solo dice roller -------------------------------------------------------
@@ -863,6 +864,31 @@ function dispatchAction(target: HTMLElement): void {
       finishTour(tourId);
       break;
     }
+    case "tour-go": {
+      const tourId = target.dataset["tour"];
+      if (!tourId) return;
+      const href = target.dataset["href"];
+      const sel = target.dataset["target"];
+      // Close first. That repaints the page, so the element resolved below is
+      // the live one and not a node the re-render is about to throw away.
+      finishTour(tourId);
+      if (href) {
+        location.hash = href;
+        break;
+      }
+      // No route to send them to means the feature is already on this screen,
+      // so put them in it: a field takes focus, anything else takes the click
+      // the coachmark was describing.
+      const el = visibleAnchor(sel);
+      if (!el) break;
+      if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+        el.focus();
+        el.select();
+      } else {
+        el.click();
+      }
+      break;
+    }
     case "toggle-carry": {
       const id = currentListId();
       const unitId = target.dataset["unit"];
@@ -1518,15 +1544,6 @@ function dispatchAction(target: HTMLElement): void {
       });
       break;
     }
-    case "dismiss-foundry-nudge": {
-      store.setState((s) => {
-        const onboarding = { ...s.onboarding, foundryNudgeDismissed: true };
-        persistOnboarding(onboarding);
-        return { ...s, onboarding };
-      });
-      break;
-    }
-
     // ---- Basic Training ---------------------------------------------------
     case "new-training": {
       const mode = target.dataset["mode"] as "combat-simulator" | "management-training";
@@ -1955,6 +1972,36 @@ function handleChange(e: Event): void {
         updateFleet(s, listId, (f) => ({
           ...f,
           units: f.units.map((u) => (u.id === unitId ? { ...u, name: inputValue } : u)),
+        })),
+      );
+      break;
+    }
+    /**
+     * Name a person. p.57 "Naming Your HVP" - "not just 'Chief Engineer', but
+     * 'Lt. Commander Sadie Hyatt, Chief Engineer'".
+     *
+     * Keyed by the selection's index rather than its hvpId, because Combat
+     * Simulator issues three of the same HVP ("All three of your HVP are
+     * Seasoned Captains", p.63) and the whole point of naming them there is to
+     * tell three identical people apart.
+     *
+     * A blank field drops the key rather than storing "", so an emptied name
+     * cannot print or export as a stray leading comma.
+     */
+    case "hvp-name": {
+      if (!listId) return;
+      const index = Number(target.dataset["index"]);
+      if (!Number.isInteger(index) || index < 0) return;
+      const name = inputValue.trim();
+      store.setState((s) =>
+        updateFleet(s, listId, (f) => ({
+          ...f,
+          hvp: f.hvp.map((h, i) => {
+            if (i !== index) return h;
+            if (name) return { ...h, customName: name };
+            const { customName: _drop, ...rest } = h;
+            return rest;
+          }),
         })),
       );
       break;

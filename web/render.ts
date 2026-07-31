@@ -1,4 +1,4 @@
-import type { Era, Faction, FleetUnit, GameMode, Hvp, ShipClass, Weapon } from "../src/types.ts";
+import type { Era, Faction, FleetHvp, FleetUnit, GameMode, Hvp, ShipClass, Weapon } from "../src/types.ts";
 import { ALLIANCE_SPECIES, MODE_BUILDER_SHAPE } from "../src/types.ts";
 import { validateFleet, type ValidationIssue } from "../src/validation.ts";
 import { GENERIC_HVP } from "../src/data/index.ts";
@@ -8,7 +8,7 @@ import { ACTIVATION_STEPS, CORE_ACTIONS, CORE_COMMANDS, ROUND_PHASES } from "../
 import { deriveCommandEffects, effectiveCost } from "../src/command-effects.ts";
 import type { CommandCostChange, CommandEffects, RuleSource } from "../src/command-effects.ts";
 import { allFactions, factionsByEra, findFaction, makeCatalog, ERA_ORDER } from "./catalog.ts";
-import { auxSlotText, credits, escapeHtml, formatDate, primarySlotText, ruleText } from "./format.ts";
+import { auxSlotText, credits, escapeHtml, formatDate, pluralise, primarySlotText, ruleText } from "./format.ts";
 import {
   commandRow,
   diceRow,
@@ -31,7 +31,6 @@ import { FACTION_LORE } from "./faction-lore.ts";
 import type { AppState } from "./state.ts";
 import { activeList, activeOutfit, DEFAULT_PRINT, PAPER } from "./state.ts";
 import type { SavedList, UnitPosition } from "./storage.ts";
-import { SEED_FACTIONS } from "./seed-factions.ts";
 import { soloListView, soloOutfitView, newOutfitModal } from "./solo.ts";
 import { activeTour } from "./tours.ts";
 
@@ -324,7 +323,9 @@ function unitDisplayNames(units: FleetUnit[], faction: Faction | undefined, cust
   const seen = new Map<string, number>();
   for (const u of units) {
     const r = resolveShip(u.shipClassId, faction, customs);
-    const shipName = r?.ship.name ?? u.shipClassId;
+    // Three gunships are Gunships. The default name describes the unit, not the
+    // class it was built from, so it counts the ships in it.
+    const shipName = u.count > 1 ? pluralise(r?.ship.name ?? u.shipClassId) : (r?.ship.name ?? u.shipClassId);
     const count = (seen.get(u.shipClassId) ?? 0) + 1;
     seen.set(u.shipClassId, count);
     names.set(u.id, count === 1 ? shipName : `${shipName} ${count}`);
@@ -499,42 +500,9 @@ function tutorialCallout(state: AppState): string {
   </aside>`;
 }
 
-/**
- * The Foundry nudge, on the third and fourth visit.
- *
- * The tutorial callout owns the first two visits, so this waits until that has
- * had its turn - two nudges stacked on the home page would be a wall of
- * suggestions on the screen you land on. By visit three you have built
- * something and the interesting question stops being "how do I play" and starts
- * being "can I put MY ships in it", which is the one thing the Foundry answers
- * and nothing else in the app hints at.
- *
- * Silent for anyone who has already built one: they have found it. Note that
- * "has a custom faction" is not the test - every browser is seeded with the
- * Covenant, so a plain length check is true for everybody and this would never
- * have shown at all. The test is whether any faction is one the user made.
- */
-function foundryNudge(state: AppState): string {
-  const o = state.onboarding;
-  if (o.foundryNudgeDismissed) return "";
-  if (o.visits < 3 || o.visits > 4) return "";
-  const seeded = new Set(SEED_FACTIONS.map((f) => f.id));
-  if (state.customFactions.some((f) => !seeded.has(f.id))) return "";
-  return `
-  <aside class="onboard onboard-foundry">
-    <div class="onboard-main">
-      <p class="onboard-title">Bring your own ships</p>
-      <p class="onboard-note">Custom Rules lets you build a faction from scratch: your ship classes, your stats, your personnel. It plays exactly like the ones in the book, and you can share it as a file.</p>
-      <div class="onboard-options">
-        <a class="onboard-opt" href="#/foundry">
-          <span class="oo-name">${icon("custom-rules", 15)} Open Custom Rules</span>
-          <span class="oo-desc">Forge a faction, or start by duplicating one that already exists and renaming it.</span>
-        </a>
-      </div>
-    </div>
-    <button class="onboard-close" data-action="dismiss-foundry-nudge" aria-label="Dismiss">${icon("close", 16)}</button>
-  </aside>`;
-}
+// The Foundry nudge used to be a card here on the home page. It is a coachmark
+// pinned to the Custom Rules tab now (see TOURS in tours.ts), because the thing
+// it has to teach is where that tab is.
 
 // ---------------------------------------------------------------------------
 // Home hub: decide what you want to do (Dropfleet-builder mental model)
@@ -568,9 +536,8 @@ function homeView(state: AppState): string {
   <main class="index-wrap">
     <div class="index-col">
       ${tutorialCallout(state)}
-      ${foundryNudge(state)}
       <nav class="index">
-        ${row("#/fleets", "Fleets", "Build, save, print, and share army lists for any faction and era.")}
+        ${row("#/fleets", "Fleets", "Build, save, print, and share fleet lists and shipyards for any faction and era.")}
         ${row("#/solo", "Solo Play", "Play the Junkspace in solo/campaign mode.")}
         ${row("#/ships", "Ship Compendium", "Compare all ships and stats.")}
         ${row("#/learn", "Learn to Play", "A guided walkthrough of the rules.")}
@@ -589,7 +556,7 @@ function homeView(state: AppState): string {
 }
 
 // ---------------------------------------------------------------------------
-// Fleets: your saved lists, and a prominent Create-army flow
+// Fleets: your saved lists, and a prominent Assemble-new-fleet flow
 // ---------------------------------------------------------------------------
 
 function fleetsView(state: AppState): string {
@@ -937,12 +904,55 @@ function shipyardShipRow(s: ShipClass, count: number): string {
   </article>`;
 }
 
-// One person: the name and its verbatim rule, then a single square control on
-// the RIGHT (an HVP is one or nothing - not a stepper). Chosen rows fill the
-// square; at the three-chosen cap the remaining squares are aria-disabled so a
-// tap is visibly refused. The square is a fixed box whether it shows a plus or a
-// tick, so toggling it never changes the row's width.
-function shipyardHvpRow(h: Hvp, chosen: boolean, atCap: boolean, generic = false): string {
+/**
+ * What a chosen person is called, in the book's own order: the name you gave
+ * them, then the job. p.57 "Naming Your HVP" asks for exactly this - "not just
+ * 'Chief Engineer', but 'Lt. Commander Sadie Hyatt, Chief Engineer'".
+ *
+ * The same expression was written out longhand in seven places and one of them
+ * (the carrier-assignment panel) had quietly dropped the custom name, so a
+ * person you had named appeared under their job title there and their full name
+ * everywhere else.
+ */
+function hvpDisplayName(sel: FleetHvp, faction: Faction | undefined): string {
+  const title = hvpById(sel.hvpId, faction)?.name ?? sel.hvpId;
+  return sel.customName ? `${sel.customName}, ${title}` : title;
+}
+
+/**
+ * The name line of a personnel card, in both builders.
+ *
+ * The app has stored a custom name for an HVP since the beginning - it printed
+ * it, exported it, packed it into share links - and there was nowhere in the
+ * app to type one. Naming your people is not a footnote in this game, so this
+ * is the field, and it is one tap: no drill-in, no modal, no pencil to find
+ * first. Tap the box, type "Unhinged Streamer Mike Hutchinson", and the row
+ * reads what the roster will print.
+ *
+ * It wears the same quiet box every renameable thing in the app wears (see "one
+ * rename affordance" in style.css), so on a return visit it is still obviously
+ * a field. Somebody you have NOT chosen gets no box, because the absence is
+ * meaningful too: there is nobody yet to name. The job title never moves into
+ * the box - it is the rule's owner, not a name - so it stays beside it,
+ * always readable, and the comma appears only once there is a name to separate.
+ */
+function hvpNameLine(def: Hvp, selIndex: number, customName?: string, cls = "sy-hvp-name"): string {
+  if (selIndex < 0) return `<span class="${cls}">${escapeHtml(def.name)}</span>`;
+  return `<span class="${cls} is-nameable">
+      <input class="hvp-name-input" type="text" value="${escapeHtml(customName ?? "")}" placeholder="Name them"
+        aria-label="Name for ${escapeHtml(def.name)}" data-action="hvp-name" data-index="${selIndex}" />
+      <span class="hvp-title">${escapeHtml(def.name)}</span>
+    </span>`;
+}
+
+// One person: their name line and its verbatim rule, then a single square
+// control on the RIGHT (an HVP is one or nothing - not a stepper). Chosen rows
+// fill the square; at the three-chosen cap the remaining squares are
+// aria-disabled so a tap is visibly refused. The square is a fixed box whether
+// it shows a plus or a tick, so toggling it never changes the row's width. Once
+// chosen, the name line opens a field for naming them - see hvpNameLine.
+function shipyardHvpRow(h: Hvp, sel: FleetHvp | undefined, selIndex: number, atCap: boolean, generic = false): string {
+  const chosen = selIndex >= 0;
   const disabled = !chosen && atCap;
   const label = chosen
     ? `Remove ${h.name}`
@@ -954,7 +964,7 @@ function shipyardHvpRow(h: Hvp, chosen: boolean, atCap: boolean, generic = false
   return `
   <article class="sy-hvp ${chosen ? "is-chosen" : ""} ${generic ? "is-generic" : ""}" data-key="syhvp-${h.id}">
     <div class="sy-hvp-body">
-      <span class="sy-hvp-name">${escapeHtml(h.name)}</span>
+      ${hvpNameLine(h, selIndex, sel?.customName)}
       <span class="sy-hvp-rule">${ruleText(h.rule)}</span>
     </div>
     <button class="sy-hvp-check ${chosen ? "is-on" : ""}" data-action="sy-hvp-toggle" data-hvp="${h.id}" aria-pressed="${chosen}" ${disabled ? 'aria-disabled="true"' : ""} aria-label="${escapeHtml(label)}" title="${chosen ? "Chosen" : "Choose"}">${icon(chosen ? "check" : "plus", 16)}</button>
@@ -1000,8 +1010,7 @@ function hvpAssignPanel(list: SavedList, faction: Faction | undefined, customs: 
 
   const rows = list.fleet.hvp
     .map((sel, i) => {
-      const def = hvpById(sel.hvpId, faction);
-      const who = def?.name ?? sel.hvpId;
+      const who = hvpDisplayName(sel, faction);
       const assigned = sel.assignedUnitId ? list.fleet.units.find((u) => u.id === sel.assignedUnitId) : undefined;
       const assignedName = assigned ? assigned.name || names.get(assigned.id) || "Unit" : "";
 
@@ -1086,9 +1095,7 @@ function hvpRequisitionNote(list: SavedList, faction: Faction | undefined): stri
   if (!list.fleet.hvp.length) return "";
   const rows = list.fleet.hvp
     .map((sel) => {
-      const def = hvpById(sel.hvpId, faction);
-      const who = sel.customName ? `${sel.customName}, ${def?.name ?? sel.hvpId}` : (def?.name ?? sel.hvpId);
-      return `<li class="hvp-req-row">${escapeHtml(who)}</li>`;
+      return `<li class="hvp-req-row">${escapeHtml(hvpDisplayName(sel, faction))}</li>`;
     })
     .join("");
   return `
@@ -1147,7 +1154,7 @@ function eraSwitch(list: SavedList): string {
 function shipyardView(state: AppState): string {
   const list = activeList(state);
   if (!list)
-    return `${topbar()}<main class="empty-state"><p>That fleet was not found.</p><p><a href="#/">Back to the register</a></p></main>`;
+    return `${topbar()}<main class="empty-state"><p>That fleet was not found.</p><p><a href="#/fleets">Back to Fleets</a></p></main>`;
 
   const customs = state.customFactions;
   const faction = findFaction(list.fleet.factionId, customs);
@@ -1228,7 +1235,12 @@ function shipyardView(state: AppState): string {
   const atCap = chosen.size >= hvpMax;
   const genericIds = new Set(GENERIC_HVP.map((g) => g.id));
   const allHvp = [...(faction?.hvp ?? []), ...GENERIC_HVP];
-  const hvpRows = allHvp.map((h) => shipyardHvpRow(h, chosen.has(h.id), atCap, genericIds.has(h.id))).join("");
+  const hvpRows = allHvp
+    .map((h) => {
+      const selIndex = list.fleet.hvp.findIndex((s) => s.hvpId === h.id);
+      return shipyardHvpRow(h, list.fleet.hvp[selIndex], selIndex, atCap, genericIds.has(h.id));
+    })
+    .join("");
 
   return `
   ${topbar()}
@@ -1284,7 +1296,7 @@ function shipyardView(state: AppState): string {
 function builderView(state: AppState): string {
   const list = activeList(state);
   if (!list)
-    return `${topbar()}<main class="empty-state"><p>That fleet was not found.</p><p><a href="#/">Back to the register</a></p></main>`;
+    return `${topbar()}<main class="empty-state"><p>That fleet was not found.</p><p><a href="#/fleets">Back to Fleets</a></p></main>`;
 
   // Hypergrowth uses its own single-column Shipyard screen, not this two-column
   // Fleet-List builder (see shipyardView and HYPERGROWTH-SHIPYARD.md).
@@ -1360,16 +1372,20 @@ function builderView(state: AppState): string {
   const autoUnitName = (unitId: string) => unitNames.get(unitId) ?? "";
 
   // Personnel catalog. Turning one on is the whole interaction: the card you
-  // just clicked becomes its own complete record, holding the carried-by
-  // assignment and a rename field right there. Nothing lives in a second
-  // place, so there is no separate roster-personnel list to keep in sync.
+  // just clicked becomes its own record, with the field for naming them right
+  // there. Nothing lives in a second place, so there is no separate
+  // roster-personnel list to keep in sync.
   const hvpMax = list.freePlay ? 99 : (faction?.hvpMax ?? 3);
   const hvpMin = faction?.hvpMin ?? 3;
   const atHvpCap = list.fleet.hvp.length >= hvpMax;
   // A stable toggle row (the Shipyard's sy-hvp shape): the check button on the
-  // right flips chosen on/off and NEVER changes the row's size, so clicking one
-  // never reflows the list. Carrier assignment (Armageddon only) is a separate
-  // block below, so choosing an HVP here shifts nothing above it.
+  // right flips chosen on/off and never changes the row's WIDTH, so the list
+  // cannot jitter sideways. Choosing somebody does open a name field on the row
+  // and that costs one line - a deliberate exception, because the alternative
+  // was storing a name the game asks for with nowhere to type it. The line's
+  // height is fixed (see .hvp-title in style.css) so the cost is the same one
+  // line for everybody, every time. Carrier assignment (Armageddon only) is a
+  // separate block below, so choosing an HVP here shifts nothing above it.
   const personnelCard = (h: Hvp, source: string) => {
     const selIndex = list.fleet.hvp.findIndex((sel) => sel.hvpId === h.id);
     const isChosen = selIndex !== -1;
@@ -1378,7 +1394,7 @@ function builderView(state: AppState): string {
     return `
     <article class="sy-hvp ${isChosen ? "is-chosen" : ""} ${isGeneric ? "is-generic" : ""}">
       <div class="sy-hvp-body">
-        <span class="sy-hvp-name">${escapeHtml(h.name)}</span>
+        ${hvpNameLine(h, selIndex, list.fleet.hvp[selIndex]?.customName)}
         <span class="sy-hvp-rule">${ruleText(h.rule)}</span>
       </div>
       <button class="sy-hvp-check ${isChosen ? "is-on" : ""}" data-action="${isChosen ? "remove-hvp" : "add-hvp"}" ${isChosen ? `data-index="${selIndex}"` : `data-hvp="${h.id}"`} aria-pressed="${isChosen}" ${disabled ? 'aria-disabled="true"' : ""} title="${isChosen ? `Remove ${escapeHtml(h.name)}` : disabled ? "Personnel full" : `Add ${escapeHtml(h.name)}`}">${icon(isChosen ? "check" : "plus", 16)}</button>
@@ -1402,10 +1418,13 @@ function builderView(state: AppState): string {
     .map((sel, i) => {
       const def = hvpById(sel.hvpId, faction);
       if (!def) return "";
+      // Three Seasoned Captains, all the same rule and all issued rather than
+      // chosen - so the name is the only thing that tells them apart, and each
+      // row carries its own field keyed to its own index.
       return `
       <article class="personnel-row chosen">
         <div class="personnel-body">
-          <span class="personnel-name">${escapeHtml(def.name)}</span>
+          ${hvpNameLine(def, i, sel.customName, "personnel-name")}
           <span class="personnel-rule">${ruleText(def.rule)}</span>
         </div>
       </article>`;
@@ -1432,7 +1451,9 @@ function builderView(state: AppState): string {
         .filter((h) => h.assignedUnitId === u.id)
         .map((h) => {
           const def = hvpById(h.hvpId, faction);
-          return { name: def?.name ?? h.hvpId, rule: def?.rule ?? "" };
+          // The person you named, not the job you hired - the roster row is
+          // where you look to see who is aboard which ship.
+          return { name: hvpDisplayName(h, faction), rule: def?.rule ?? "" };
         });
       const maxCount = list.freePlay ? 99 : r?.ship.mass === 3 ? 1 : 3;
       const unitLabel = u.name || unitName || r?.ship.name || "this unit";
@@ -1453,7 +1474,7 @@ function builderView(state: AppState): string {
           // placeholder shows. It has to be stated here as well because a
           // placeholder stops counting as the accessible name the moment the
           // field has a value, so renaming a unit used to leave it nameless.
-          `<input class="unit-name-input sy-unit-name" type="text" value="${escapeHtml(u.name ?? "")}" placeholder="${escapeHtml(unitName)}" aria-label="${escapeHtml(r?.ship.name ?? "Unit")}" data-action="unit-name" data-unit="${u.id}" />`;
+          `<input class="unit-name-input sy-unit-name" type="text" value="${escapeHtml(u.name ?? "")}" placeholder="${escapeHtml(unitName)}" aria-label="${escapeHtml(unitName || r?.ship.name || "Unit")}" data-action="unit-name" data-unit="${u.id}" />`;
       const control = !r
         ? ""
         : noStepper
@@ -1849,10 +1870,7 @@ function printView(state: AppState): string {
     if (!fieldsHvp) return "";
     const held = list.fleet.hvp
       .filter((h) => h.assignedUnitId === u.id)
-      .map((h) => {
-        const def = hvpById(h.hvpId, faction);
-        return h.customName ? `${h.customName}, ${def?.name ?? h.hvpId}` : (def?.name ?? h.hvpId);
-      });
+      .map((h) => hvpDisplayName(h, faction));
     return `<td class="pr-hvp-slot">${
       held.length ? `<span class="pr-hvp-start">${escapeHtml(held.join("; "))}</span>` : ""
     }<span class="pr-writein"></span></td>`;
@@ -1870,10 +1888,7 @@ function printView(state: AppState): string {
       const title = u.name || unitNames.get(u.id) || ship.name;
       const carried = list.fleet.hvp
         .filter((h) => h.assignedUnitId === u.id)
-        .map((h) => {
-          const def = hvpById(h.hvpId, faction);
-          return h.customName ? `${h.customName}, ${def?.name ?? h.hvpId}` : (def?.name ?? h.hvpId);
-        });
+        .map((h) => hvpDisplayName(h, faction));
       // Carried personnel used to be repeated here as well as in the HVP
       // column; the column is the one that can be amended mid-game, so this
       // line carries only what the column does not.
@@ -1944,10 +1959,7 @@ function printView(state: AppState): string {
       const title = u.name || unitNames.get(u.id) || ship.name;
       const carried = list.fleet.hvp
         .filter((h) => h.assignedUnitId === u.id)
-        .map((h) => {
-          const def = hvpById(h.hvpId, faction);
-          return h.customName ? `${h.customName}, ${def?.name ?? h.hvpId}` : (def?.name ?? h.hvpId);
-        });
+        .map((h) => hvpDisplayName(h, faction));
       const named = (u.shipNames ?? []).slice(0, u.count).filter((n) => n && n.trim());
       // Card layout follows the sketch: name and count on one line with the
       // cost, then a left column (stat block) beside a right column of weapons
@@ -2006,7 +2018,7 @@ function printView(state: AppState): string {
   const selectedBlock = (sel: (typeof list.fleet.hvp)[number]) => {
     const def = hvpById(sel.hvpId, faction);
     if (!def) return "";
-    const displayName = sel.customName ? `${sel.customName}, ${def.name}` : def.name;
+    const displayName = hvpDisplayName(sel, faction);
     const generic = GENERIC_HVP.some((g) => g.id === sel.hvpId);
     return `
       <section class="print-hvp ${generic ? "is-generic" : ""}">
@@ -2114,7 +2126,7 @@ function printView(state: AppState): string {
   ${topbar()}
   <main class="print-page ${opts.inkSaver ? "is-inksaver" : ""}">
     <div class="print-toolbar">
-      <a class="bar-btn" href="#/list/${list.id}">${icon("chevronRight", 15, "flip-x")} Back to the builder</a>
+      <a class="bar-btn" href="#/list/${list.id}">${icon("chevronRight", 15, "flip-x")} Back to the ${isShipyard ? "Shipyard" : "Fleet List"}</a>
       <div class="print-opts">
         <span class="segment" role="group" aria-label="Layout">
           <button class="${opts.format === "roster" ? "selected" : ""}" data-action="print-format" data-format="roster">Roster</button>
@@ -2293,7 +2305,7 @@ function foundryListView(state: AppState): string {
     ${
       state.customFactions.length === 0
         ? '<p class="muted">No custom factions yet.</p>'
-        : `<div class="table-scroll"><table class="dock-table">
+        : `<div class="table-scroll"><table class="dock-table cf-table">
             <thead><tr><th>Faction</th><th>Era</th><th>Ships</th><th>Personnel</th><th></th></tr></thead>
             <tbody>${rows}</tbody>
           </table></div>`
@@ -2330,10 +2342,11 @@ function weaponEditor(shipIndex: number, slot: "primary" | "auxiliary", weapons:
       </div>`,
     )
     .join("");
-  const head = weapons.length
-    ? `<div class="weapon-edit-head"><span>Weapon</span><span>Attack</span><span>Range (inches)</span><span></span></div>`
-    : "";
-  return `${head}${rows}
+  // No column header row: the fields carry their own inline labels now, in
+  // every layout. A header only lines up with its columns while the row is a
+  // single line, and this row has not been one since the name moved onto a line
+  // of its own to stop "Pulse Laser Turrets" being clipped to "Pulse Las".
+  return `${rows}
     <button class="ghost-btn" data-action="cf-weapon-add" data-ship="${shipIndex}" data-slot="${slot}">${icon("plus", 14)} Add ${slot === "auxiliary" ? "an" : "a"} ${slot} weapon</button>`;
 }
 
@@ -2347,7 +2360,7 @@ function foundryEditView(state: AppState, factionId: string): string {
       (s, si) => `
     <article class="cf-ship">
       <div class="cf-ship-grid">
-        <label class="field-block wide">Ship class name
+        <label class="field-block cf-ship-name">Ship class name
           <input type="text" value="${escapeHtml(s.name)}" data-action="cf-ship" data-ship="${si}" data-field="name" /></label>
         <label class="field-block">Mass
           <select data-action="cf-ship" data-ship="${si}" data-field="mass">
@@ -2361,14 +2374,17 @@ function foundryEditView(state: AppState, factionId: string): string {
           <input type="number" min="0" value="${s.shields}" data-action="cf-ship" data-ship="${si}" data-field="shields" /></label>
         <label class="field-block">Cost in billions
           <input type="number" min="1" value="${s.cost}" data-action="cf-ship" data-ship="${si}" data-field="cost" /></label>
-        <div class="field-block wide">Ship image
-          <div class="cf-shipimg-row">
-            <label class="cf-shipimg-drop ${s.image ? "has-img" : ""}" title="Click to choose an image">
-              ${s.image ? `<img src="${s.image}" alt="" />` : `<span class="cf-shipimg-cue">${icon("upload", 20)}<span>Click to upload an image</span></span>`}
-              <input type="file" accept="image/*" data-action="cf-ship-image-upload" data-ship="${si}" hidden />
-            </label>
-            ${s.image ? `<button class="ghost-btn danger" data-action="cf-ship-image-clear" data-ship="${si}" title="Remove image">${icon("close", 14)} Remove</button>` : ""}
-          </div>
+      </div>
+      <!-- The art sits in its own column beside the fields rather than on a row
+           under them: as a full-width block it was adding ~90px of height to
+           every ship class, and there are nine of them in a faction. -->
+      <div class="field-block cf-ship-img">Ship image
+        <div class="cf-shipimg-row">
+          <label class="cf-shipimg-drop ${s.image ? "has-img" : ""}" title="Click to choose an image">
+            ${s.image ? `<img src="${s.image}" alt="" />` : `<span class="cf-shipimg-cue">${icon("upload", 18)}<span>Click to upload an image</span></span>`}
+            <input type="file" accept="image/*" data-action="cf-ship-image-upload" data-ship="${si}" hidden />
+          </label>
+          ${s.image ? `<button class="ghost-btn danger" data-action="cf-ship-image-clear" data-ship="${si}" title="Remove image">${icon("close", 14)} Remove</button>` : ""}
         </div>
       </div>
       <div class="cf-slots">
@@ -2643,7 +2659,7 @@ function playFleetPanel(list: SavedList, faction: Faction | undefined, customs: 
       const here = posOf(u.id);
       const carried = list.fleet.hvp
         .filter((h) => h.assignedUnitId === u.id)
-        .map((h) => hvpById(h.hvpId, faction)?.name ?? h.hvpId);
+        .map((h) => hvpDisplayName(h, faction));
       const places = PLACES.map(
         (pl) => `<button class="pf-pos-opt ${here === pl.key ? "on" : ""}" data-action="play-pos" data-unit="${u.id}" data-to="${pl.key}" aria-pressed="${here === pl.key}">${pl.label}</button>`,
       ).join("");
@@ -2833,7 +2849,7 @@ function playCommandsPanel(list: SavedList, cmdLeft: number, faction: Faction | 
 function playView(state: AppState): string {
   const list = activeList(state);
   if (!list)
-    return `${topbar()}<main class="empty-state"><p>That fleet was not found.</p><p><a href="#/">Back to the register</a></p></main>`;
+    return `${topbar()}<main class="empty-state"><p>That fleet was not found.</p><p><a href="#/fleets">Back to Fleets</a></p></main>`;
   const customs = state.customFactions;
   const faction = findFaction(list.fleet.factionId, customs);
   const play = list.play ?? { round: 1, phase: 0, cmd: faction ? Number(faction.cmdTokens) || 0 : 0, vp: 0, oppVp: 0 };
@@ -3361,23 +3377,31 @@ function tourPopover(state: AppState): string {
   const { tour, step } = active;
   const s = tour.steps[step];
   if (!s) return "";
-  const dots = tour.steps
-    .map((_, i) => `<span class="tour-dot ${i === step ? "on" : ""}"></span>`)
-    .join("");
+  // One step has no progress to report, and a single dot beside a lone button
+  // reads as a stray bullet rather than "you are here".
+  const dots =
+    tour.steps.length > 1
+      ? tour.steps.map((_, i) => `<span class="tour-dot ${i === step ? "on" : ""}"></span>`).join("")
+      : "";
   const isLast = step >= tour.steps.length - 1;
+  // Every feature tooltip ends in the same pair: dismiss on the left, go and see
+  // it on the right. There is no Skip - "Got it" already closes the thing for
+  // good, and two words for one outcome only made the reader choose between
+  // them. A multi-step tour keeps Next in the primary slot until its last step.
+  const primary = isLast
+    ? `<button class="tour-go" data-action="tour-go" data-tour="${tour.id}" data-target="${escapeHtml(s.selector)}" ${s.go ? `data-href="${escapeHtml(s.go)}"` : ""}>${icon("chevronRight", 15)} Check it out now!</button>`
+    : `<button class="tour-next" data-action="tour-next" data-tour="${tour.id}" data-step="${step}" data-len="${tour.steps.length}">${icon("chevronRight", 15)} Next</button>`;
   return `
   <div class="tour-pop" data-target="${escapeHtml(s.selector)}">
     <div class="tour-pop-arrow"></div>
-    <div class="tour-head">
-      <h4 class="tour-title">${escapeHtml(s.title)}</h4>
-      <button class="tour-close" data-action="tour-dismiss" data-tour="${tour.id}">${icon("close", 15)} Skip</button>
-    </div>
+    ${s.title ? `<div class="tour-head"><h4 class="tour-title">${escapeHtml(s.title)}</h4></div>` : ""}
     <p class="tour-body">${escapeHtml(s.body)}</p>
     <div class="tour-foot">
       <span class="tour-dots">${dots}</span>
-      <!-- "Got it" rather than "Done" on the last step: this is a teaching
-           popover, not a task you completed. -->
-      <button class="tour-next" data-action="tour-next" data-tour="${tour.id}" data-step="${step}" data-len="${tour.steps.length}">${icon(isLast ? "check" : "chevronRight", 15)} ${isLast ? "Got it" : "Next"}</button>
+      <span class="tour-btns">
+        <button class="tour-got" data-action="tour-dismiss" data-tour="${tour.id}">${icon("check", 15)} Got it</button>
+        ${primary}
+      </span>
     </div>
   </div>`;
 }

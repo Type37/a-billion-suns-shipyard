@@ -3,7 +3,7 @@
   "version": "0.12.0",
   "private": true,
   "type": "module",
-  "description": "Fleet/army builder for A Billion Suns 2E. Phase 1: Armageddon era, validation engine.",
+  "description": "A Billion Suns 2e Shipyard - a fleet builder for A Billion Suns, 2nd Edition. All three eras, twelve factions, live rules validation.",
   "scripts": {
     "test": "node --test",
     "test:watch": "node --test --watch",

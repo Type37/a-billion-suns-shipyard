@@ -1,5 +1,5 @@
 /* ===========================================================================
-   A BILLION SUNS / FLEET REGISTER
+   A BILLION SUNS 2E SHIPYARD
    ---------------------------------------------------------------------------
    International Typographic Style, pushed hard. White ground, commanding
    blocks of NASA insignia blue (#0b3d91) and rocket red (#fc3d21), thin black
@@ -103,6 +103,14 @@
 
   --hair: #0a0e14;                 /* full-strength Swiss rule */
   --hair-soft: #d3d8e0;            /* quiet divider */
+  /* The inert foreground: an unavailable control's label, its glyph and its
+     edge. All of these were painted in --hair-soft, which is a divider colour
+     and nothing else - 1.43:1 on white, so a greyed-out "+", a "Jump in"
+     button and the dots between tallies were not quiet, they were gone. Same
+     value as --field-edge and for the same reason: 3.52:1 on --paper, 3.20:1
+     on --ground and 3.08:1 on --blue-wash, so it clears WCAG 1.4.11's 3:1 on
+     every ground one of these sits on. --hair-soft stays a rule, never ink. */
+  --ink-off: #818997;
 
   --display: "Archivo", "Libre Franklin", Arial, sans-serif;
   --sans: "Libre Franklin", "Helvetica Neue", Arial, sans-serif;
@@ -133,6 +141,14 @@
      this wider shell and tighter side padding, so the roster gets real room
      on a normal monitor instead of stopping at the site's article width. */
   --shell-wide: 1760px;
+  /* Junkspace. Solo is a play-and-track surface, not a data table: the widest
+     thing on it is a two-column outfit builder, and everything else is one
+     number, one control, or one paragraph. At the site's article width its
+     three panels came out ~370px each - too narrow for the rules prose, absurd
+     for a 1-to-10 counter - and the rest of the page went on gutters. This is
+     what the builder already measures at a 1280px window, which is the width
+     the whole thing was designed against. */
+  --shell-solo: 1040px;
   --tap: 44px;
 
   /* ------------------------------------------------------------- elevation
@@ -173,7 +189,7 @@
    across two voices depending on the screen. */
 .ship-cost, .roster-unit-cost, .readout-value, .cell-num, .comp-num, .comp-cost,
 .print-stats td, .pr-num, .pr-cost, .round-value, .roll-die, .debt-figure,
-.segment button, .limit-input, .stepper-count, .alert-value {
+.segment button, .limit-input, .stepper-count, .gb-figure {
   font-variant-numeric: tabular-nums;
 }
 /* Prominent money/quantity figures share one voice (Archivo) everywhere they
@@ -232,7 +248,7 @@ a:hover { text-decoration: underline; }
     content: ""; position: absolute; left: 0; bottom: -1px; width: 100%; height: 1px;
     background-color: var(--underline-color);
     transform: scaleX(0); transform-origin: right bottom;
-    transition: transform 0.25s ease-out;
+    transition: transform 250ms var(--ease);
   }
   .hover-link:hover { text-decoration: none; }
   .hover-link:hover::after { transform: scaleX(1); transform-origin: left bottom; }
@@ -382,7 +398,7 @@ button { font-family: inherit; }
 }
 .ship-row .add-btn { padding: 6px 9px; }
 .add-btn:hover { background: var(--blue-deep); border-color: var(--blue-deep); }
-.add-btn:disabled { background: var(--paper); color: var(--ink-3); border-color: var(--hair-soft); cursor: default; }
+.add-btn:disabled { background: var(--paper); color: var(--ink-3); border-color: var(--ink-off); cursor: default; }
 
 /* --------------------------------------------------------------------- chrome */
 
@@ -464,7 +480,7 @@ button { font-family: inherit; }
     content: ""; position: absolute; left: 0; bottom: -1px; width: 100%; height: 1px;
     background-color: var(--underline-color);
     transform: scaleX(0); transform-origin: right bottom;
-    transition: transform 0.25s ease-out;
+    transition: transform 250ms var(--ease);
   }
   .game-info-footer a:hover { text-decoration: none; }
   .game-info-footer a:hover::after { transform: scaleX(1); transform-origin: left bottom; }
@@ -518,10 +534,10 @@ button { font-family: inherit; }
   .bar-btn, .ghost-btn, .cta-btn, .stepper-btn, .nf-opt, .card-act,
   .mf-menu-btn, .mf-tally-cap, .nf-custom-btn, .switcher-opt, .learn-btn,
   .cg-build, .comp-groupcheck, .control-group, .add-cue,
-  .learn-dot, .tour-close, .tour-next, .play-bar-id a {
+  .learn-dot, .tour-got, .tour-go, .tour-next, .play-bar-id a {
     min-height: 44px;
   }
-  .learn-dot, .tour-close, .tour-next { display: inline-flex; align-items: center; }
+  .learn-dot, .tour-got, .tour-go, .tour-next { display: inline-flex; align-items: center; }
   /* The faction name is the way into the editor, so it is a control, not prose. */
   .cell-name a { display: inline-flex; align-items: center; min-height: 44px; }
   .play-bar-id a { display: inline-flex; align-items: center; }
@@ -633,10 +649,6 @@ button { font-family: inherit; }
    floating toast. Retires itself after the second visit. */
 .onboard { display: flex; align-items: flex-start; gap: 16px; margin: 0 0 22px; padding: 18px 18px 18px 22px; border: 2px solid var(--color-line); border-left: 6px solid var(--color-accent); background: var(--paper); }
 .onboard-main { flex: 1; min-width: 0; }
-/* The Foundry nudge is the same card in blue, not red: it is an invitation on a
-   quiet visit, where the tutorial callout is a first-run instruction. */
-.onboard-foundry { border-left-color: var(--blue); }
-.onboard-foundry .onboard-opt { text-decoration: none; }
 .onboard-title { font-family: var(--display); font-weight: 800; font-size: 18px; }
 .onboard-note { font-size: 14px; color: var(--ink-2); margin-top: 4px; max-width: 62ch; }
 .onboard-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
@@ -781,7 +793,7 @@ button { font-family: inherit; }
 }
 .card-act:hover { color: var(--blue); border-color: var(--hair); background: var(--blue-wash); }
 .card-act.is-danger:hover { color: var(--red); border-color: var(--red); background: transparent; }
-.card-act:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+.card-act:focus-visible { outline: 2px solid var(--red); outline-offset: 1px; }
 /* The labelled Delete: auto width for the word, a red keyline at rest so the
    action reads as destructive before it is hovered or tapped. */
 .card-act-labeled { width: auto; gap: 6px; padding: 0 11px; border-color: var(--red-wash); color: var(--red-deep); }
@@ -984,6 +996,17 @@ button { font-family: inherit; }
 .cf-shipimg-drop.has-img { border-style: solid; border-color: var(--blue); padding: 0; min-height: 0; }
 .cf-shipimg-drop img { width: 100%; max-width: 240px; height: auto; object-fit: cover; display: block; }
 .cf-shipimg-cue { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sans); font-size: 12.5px; font-weight: 700; }
+/* In the ship editor the tile is a side column, so it is a narrow portrait box
+   with the cue stacked under its icon rather than a 220px landscape strip. */
+.cf-ship-img .cf-shipimg-row { margin-top: 0; gap: 6px; }
+.cf-ship-img .cf-shipimg-drop { min-width: 0; width: 150px; min-height: 50px; padding: 5px; }
+.cf-ship-img .cf-shipimg-drop.has-img { padding: 0; }
+/* A thumbnail, capped in height: at full width a 5:3 photo was the tallest
+   thing on the line and set the height of a row of 26px fields. */
+.cf-ship-img .cf-shipimg-drop img { max-width: 150px; max-height: 56px; width: auto; }
+/* Wide enough for the cue to sit on two lines, which is what keeps this tile
+   from being the tallest thing on the row. */
+.cf-ship-img .cf-shipimg-cue { flex-direction: column; gap: 3px; font-size: 11px; line-height: 1.2; text-align: center; }
 
 /* Icon library picker */
 /* Reworked emblem picker: a large preview beside labelled actions, so "upload
@@ -1609,7 +1632,7 @@ button { font-family: inherit; }
 .mf-hvp-note { font-family: var(--serif); font-size: 13px; font-style: italic; color: var(--ink-2); margin: 2px 0 10px; }
 
 .cf-section { margin-bottom: 36px; border-top: 2px solid var(--hair); padding-top: 20px; }
-.cf-grid, .cf-ship-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.cf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
 .field-block { display: flex; flex-direction: column; gap: 5px; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
 .field-block.wide { grid-column: 1 / -1; }
 .field-block input, .field-block select, .field-block textarea,
@@ -1618,38 +1641,80 @@ button { font-family: inherit; }
   border: 1px solid var(--hair); background: var(--paper); color: var(--ink); letter-spacing: 0;
 }
 .field-block textarea, .cf-hvp textarea { font-family: var(--serif); resize: vertical; }
-.cf-ship { border: 1px solid var(--hair); padding: 18px; margin-bottom: 14px; }
-.cf-slots { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 16px 0; }
-@media (max-width: 720px) { .cf-slots { grid-template-columns: 1fr; } }
-.cf-slot h5 { font-family: var(--sans); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+/*
+ * One ship class ran 465px tall and a faction has nine of them, so the editor
+ * was 4,000px of scrolling, most of it air: a full-width name row, a full-width
+ * art row, and 18px of padding around the lot.
+ *
+ * Everything here packs rather than places. No fixed columns and no grid areas:
+ * each field is as wide as it needs to be, they sit side by side until they run
+ * out of room, and then they wrap. That is why it survives any width - there is
+ * no track for content to be forced into and overflow out of.
+ */
+.cf-ship {
+  border: 1px solid var(--hair); padding: 8px 10px; margin-bottom: 8px;
+  display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px 12px;
+}
+/* Fields and art on one line together, art last so it drops away first. */
+.cf-ship-grid { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px 10px; flex: 1 1 320px; }
+/* A stat is as wide as its value needs, not as wide as its label: "Thrust in
+   inches" on one line made a 173px box for a two-digit number, and five of
+   those pushed the name onto a row of its own. The label wraps instead. */
+.cf-ship-grid > .field-block { flex: 0 1 auto; max-width: 116px; }
+.cf-ship-grid > .field-block > input, .cf-ship-grid > .field-block > select { width: 100%; }
+/* Beats the 116px stat cap above on specificity - the name holds words. */
+.cf-ship-grid > .cf-ship-name { flex: 1 1 220px; min-width: 0; max-width: none; }
+.cf-ship-img { flex: 0 0 auto; }
+/* Bottom right of whatever line it lands on, so it costs no line of its own. */
+.cf-ship > .ghost-btn { flex: 0 0 auto; align-self: flex-end; margin-left: auto; }
+.cf-ship .field-block { gap: 2px; }
+.cf-ship .cf-slot h5 { margin-bottom: 4px; }
+.cf-ship .weapon-edit-row { margin-bottom: 4px; }
+.cf-ship .field-block input, .cf-ship .field-block select,
+.cf-ship .weapon-edit-row input, .cf-ship .weapon-edit-row select { padding: 5px 8px; font-size: 13px; }
+/* A line of their own, less the width of the Remove button so that button can
+   sit at the end of it instead of claiming a fourth line for itself. */
+.cf-slots { display: flex; flex-wrap: wrap; gap: 10px 14px; margin: 0; flex: 1 1 calc(100% - 172px); min-width: min(100%, 320px); }
+.cf-slot { flex: 1 1 280px; min-width: 0; }
+.cf-slot h5 { font-family: var(--sans); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .check-inline { font-size: 10px; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--ink-2); display: inline-flex; gap: 5px; align-items: center; }
-.weapon-edit-row, .weapon-edit-head { display: grid; grid-template-columns: minmax(0, 2fr) auto auto auto; gap: 10px; align-items: center; }
-.weapon-edit-row { margin-bottom: 6px; }
-/* Column labels so each field's meaning is obvious, not just a tooltip. */
-.weapon-edit-head { margin-bottom: 4px; }
-.weapon-edit-head span { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); }
+/*
+ * Name, attack, range, remove - in that order, on one line while they fit and
+ * wrapping when they do not.
+ *
+ * It was a four-column grid, which gave the name whatever the three fixed
+ * groups left over: 69px inside a two-up slot, clipping anything longer than
+ * "Laser". Wrapping means the name never has to give up its 170px; the groups
+ * drop to the next line instead, and they are the ones that can afford to.
+ */
+.weapon-edit-row {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 5px 8px; margin-bottom: 6px;
+}
+.weapon-edit-row .we-name { flex: 1 1 170px; min-width: 0; }
+.weapon-edit-row .we-group { flex: 0 0 auto; }
+.weapon-edit-row > .ghost-btn { flex: 0 0 auto; margin-left: auto; }
 /* Attack and range read as single grouped controls: "2 x D6", "0 - 12 in". */
 .we-group { display: inline-flex; align-items: center; gap: 6px; }
-.weapon-edit-row .we-num { width: 52px; text-align: center; }
-.weapon-edit-row .we-die { width: 68px; }
+.weapon-edit-row .we-num { width: 46px; text-align: center; }
+.weapon-edit-row .we-die { width: 60px; }
 .we-x, .we-dash { font-weight: 700; color: var(--ink-3); }
 .we-unit { font-size: 12px; font-weight: 600; color: var(--ink-3); }
-.cf-hvp { display: grid; grid-template-columns: auto 220px 1fr auto; gap: 8px; align-items: start; margin-bottom: 10px; }
+/* The name column can grow: fixed at 220px it cut "Special Operations
+   Commander" to "Special Operations Comman". */
+.cf-hvp { display: grid; grid-template-columns: auto minmax(220px, 320px) 1fr auto; gap: 8px; align-items: start; margin-bottom: 10px; }
 .cf-hvp-num { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; margin-top: 8px; border: 1.5px solid var(--blue); color: var(--blue); font-family: var(--display); font-weight: 800; font-size: 13px; font-variant-numeric: tabular-nums; flex-shrink: 0; }
-/* Inline labels for the weapon editor, shown only in the stacked layout. The
-   column headers ARE the only visible labels for these fields, so hiding them
-   when the row stacks left a sighted user with an unlabelled "[1] x [D6]" and
-   "[0] - [6] in" - the aria-labels covered screen readers and nobody else.
-   Same swap the weapons table already uses (.wt-inline-lbl). */
-.we-inline-lbl { display: none; }
+/* Each field says what it is, in every layout. These used to appear only in the
+   stacked one, where the column header disappeared - which left a sighted user
+   with an unlabelled "[1] x [D6]" and "[0] - [6] in". Now there is no header to
+   lose them with. Same swap the weapons table uses (.wt-inline-lbl). */
+.we-inline-lbl {
+  display: inline-block;
+  font-family: var(--narrow); font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3);
+}
 @media (max-width: 720px) {
-  .weapon-edit-row, .weapon-edit-head, .cf-hvp { grid-template-columns: 1fr; }
-  .weapon-edit-head { display: none; }
-  .we-inline-lbl {
-    display: inline-block; min-width: 52px;
-    font-family: var(--narrow); font-size: 10px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3);
-  }
+  .cf-hvp { grid-template-columns: 1fr; }
 }
 
 /* ------------------------------------------------------------ changelog */
@@ -1923,18 +1988,157 @@ button { font-family: inherit; }
 .game-ticks { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin: 8px 0 2px; }
 .game-tick { width: 12px; height: 12px; border: 1.5px solid var(--hair-soft); background: transparent; flex-shrink: 0; }
 .game-tick.is-played { background: var(--blue); border-color: var(--blue); }
-.outfit-card-debt.is-clear .game-tick.is-played, .debt-card.won .game-tick.is-played { background: var(--go); border-color: var(--go); }
+.outfit-card-debt.is-clear .game-tick.is-played, .debt-band.won .game-tick.is-played { background: var(--go); border-color: var(--go); }
 .game-ticks-label { font-family: var(--sans); font-size: 11px; font-weight: 700; color: var(--ink-3); margin-left: 4px; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
 .outfit-card-actions { display: flex; gap: 6px; align-items: center; padding: 0 12px 12px; margin-top: auto; }
 .outfit-card-actions .ghost-btn:first-child { margin-right: auto; }
 
-.solo-tabs { max-width: var(--shell); margin: 0 auto; padding: 0 clamp(16px, 4vw, 40px); display: flex; gap: 0; border-bottom: 2px solid var(--hair); }
+/* ---------------------------------------------------------------- solo shell
+
+   One measure and one left edge for the whole of Junkspace. It had three: the
+   name band, the tab strip and the body each set their own max-width, and the
+   first two are flex children of #app carrying `margin: 0 auto` with no
+   `width: 100%` - which on the cross axis of a flex column does not centre a
+   full-width box, it shrinks the box to its content and centres THAT. Measured
+   at a 1738px window the band came out 842px, the tabs 420px and the body
+   1240px, each starting at a different x. Nothing on the page lined up with
+   anything else on the page.
+
+   width:100% first, then the cap, on every one of them. The `#app >` prefix is
+   not decoration: `#app > * { max-width: 100% }` carries ID specificity and
+   silently beats any bare class trying to set a shell width here. */
+#app > .solo-band,
+#app > .solo-tabs,
+#app > .solo-body,
+#app > .solo-workspace {
+  width: 100%; max-width: var(--shell-solo); margin-inline: auto;
+}
+.solo-band { padding: 14px clamp(16px, 4vw, 40px) 15px; }
+/* One scroller, the page. The outfit roster was the last panel in the app still
+   pinned with its own overflow-y and a max-height, so five ships read through a
+   ~250px porthole with a second scrollbar inside the page's - the exact pattern
+   the fleet builder pulled out (see .mf-manifest) because the wheel scrolled
+   the roster or the page depending on where the pointer happened to be. */
+.solo-workspace .roster { position: static; max-height: none; }
+.solo-workspace .roster-sheet { overflow-y: visible; }
+.solo-workspace { padding: clamp(14px, 2vw, 22px) clamp(16px, 4vw, 40px) 0; gap: clamp(16px, 2.4vw, 30px); }
+
+.solo-tabs { padding: 0 clamp(16px, 4vw, 40px); display: flex; gap: 0; border-bottom: 2px solid var(--hair); }
 .solo-tab { background: transparent; border: none; border-bottom: 3px solid transparent; margin-bottom: -2px; font-family: var(--sans); font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 14px 18px; cursor: pointer; color: var(--ink-3); }
 .solo-tab:hover { color: var(--ink); }
 .solo-tab.selected { color: var(--blue); border-bottom-color: var(--red); }
 
-.solo-body { max-width: var(--shell); margin: 0 auto; padding: clamp(20px, 3vw, 32px) clamp(16px, 4vw, 40px) 0; }
-.solo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; align-items: start; }
+.solo-body { padding: clamp(18px, 2.4vw, 26px) clamp(16px, 4vw, 40px) 0; }
+
+/* ------------------------------------------------------------- the game band
+
+   Play and Campaign both open with one band holding the live figures and the
+   controls that move them, and only then split into columns. It is the shape
+   the main game's Play mode already uses (status bar, then do-on-the-left /
+   read-on-the-right), so the two play surfaces read as the same screen.
+
+   Top-left is where a reader lands and it gets the most attention of any part
+   of a dashboard, so it holds the game's clock: Alert Level here, Debt on the
+   Campaign tab. The secondary figure sits to its right against the band's own
+   edge, boxed off by a rule - Round, or the campaign clock. */
+.game-bar {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px clamp(18px, 3vw, 40px); align-items: start;
+  border-top: 3px solid var(--blue); border-bottom: 1px solid var(--hair);
+  padding: 12px 0 14px; margin-bottom: 4px;
+}
+.game-bar.high { border-top-color: var(--red); }
+.gb-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.gb-note { font-family: var(--sans); font-size: 11.5px; font-weight: 600; color: var(--ink-3); }
+.gb-read { display: flex; align-items: center; gap: 14px; margin: 6px 0 10px; }
+.gb-figure {
+  font-family: var(--display); font-weight: 900; font-size: 44px; line-height: 1;
+  font-variant-numeric: tabular-nums; color: var(--blue); min-width: 1.6ch; text-align: right;
+}
+.game-bar.high .gb-figure { color: var(--red); }
+
+/* Ten squares, not a fill bar. Same component logic as .game-ticks. */
+.alert-pips { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.alert-pip { width: 22px; height: 22px; border: 1.5px solid var(--hair-soft); background: transparent; flex: none; }
+.alert-pip.is-on { background: var(--blue); border-color: var(--blue); }
+.game-bar.high .alert-pip.is-on { background: var(--red); border-color: var(--red); }
+
+.gb-alert .alert-controls { margin: 0; }
+.alert-delta { font-family: var(--display); font-weight: 900; font-size: 12px; color: var(--blue); font-variant-numeric: tabular-nums; }
+.ghost-btn .alert-delta { color: var(--ink-3); }
+.alert-start-note { font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--red-deep); margin-top: 9px; }
+
+/* The round is the band's second figure: quieter than Alert, still one glance,
+   and its steppers sit under it rather than beside a number three cards away. */
+.gb-round { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; border-left: 1px solid var(--hair-soft); padding-left: clamp(16px, 2.4vw, 32px); }
+.gb-round .round-control { margin-bottom: 0; gap: 10px; }
+.gb-round .round-value { font-size: 34px; min-width: 1.5ch; }
+
+/* Campaign band: the debt figure, the clock, and the single button that moves
+   both of them - so "log a game" is beside the number it changes instead of
+   buried under a column of prose. */
+/* Three zones, not two: what you owe, how many games are left to pay it, and
+   the one button that changes either. Two zones left the debt figure alone in a
+   740px column with 500px of nothing to its right, which is the exact complaint
+   this whole pass is about. */
+.debt-band { grid-template-columns: auto minmax(0, 1fr) auto; border-top-color: var(--blue); align-items: center; }
+.debt-band.won { border-top-color: var(--go); }
+.gb-debt .debt-figure { color: var(--blue); margin: 4px 0 2px; }
+.debt-band.won .gb-debt .debt-figure { color: var(--go); }
+.gb-clock { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; border-left: 1px solid var(--hair-soft); padding-left: clamp(16px, 2.4vw, 32px); }
+.gb-clock .game-ticks { margin: 2px 0; }
+.gb-clock .inspection-pass, .gb-clock .issue-error { max-width: 46ch; }
+.gb-act { display: flex; justify-content: flex-end; }
+
+/* One block per pilot: what they have taken, then how to give them more. */
+.perk-pilots { display: flex; flex-direction: column; gap: 4px; }
+.perk-pilot { border-top: 1px solid var(--hair-soft); padding: 11px 0 13px; }
+.perk-pilot:first-child { border-top: none; padding-top: 2px; }
+.perk-pilot-head { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; margin-bottom: 6px; }
+.perk-pilot-name { font-family: var(--display); font-weight: 800; font-size: 15px; color: var(--ink); }
+.perk-pilot-class { font-family: var(--sans); font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.perk-pilot-none { font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-3); margin-bottom: 8px; }
+.perk-pilot .perk-list { margin-bottom: 9px; }
+.perk-pilot .inline-field { width: 100%; }
+.perk-pilot .inline-field select { width: 100%; }
+.perk-pilot-orphans { border-top: 2px solid var(--hair); margin-top: 10px; }
+
+/* -------------------------------------------------------------- act / refer
+
+   Left column is what you press; right column is what you read. Not an
+   auto-fit grid: the three panels used to be dealt out at equal width in
+   whatever order they were written, so a wall of rules text carried the same
+   weight as the button you press every End Phase. */
+.solo-split { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); gap: clamp(20px, 3vw, 38px); align-items: start; margin-top: 18px; }
+.solo-split > * { min-width: 0; }
+.solo-ref { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+
+/* The roller's result slot is always present, so a roll never shoves the
+   buttons out from under the finger that just pressed one. */
+.roll-slot { min-height: 104px; margin-top: 14px; display: flex; align-items: flex-start; }
+.roll-slot .roll-result { margin-top: 0; width: 100%; }
+.roll-empty {
+  width: 100%; border: 1px dashed var(--hair); padding: 14px; color: var(--ink-3);
+  font-family: var(--sans); font-size: 13px; font-weight: 600;
+}
+.roller-card .roller-buttons { margin: 4px 0 0; }
+
+/* A taken perk prints its rule, not just its name. */
+.perk-list li { align-items: flex-start; gap: 10px; padding-bottom: 9px; }
+.perk-taken { min-width: 0; }
+.perk-taken-head { font-size: 13px; }
+.perk-taken-head b { font-family: var(--display); font-weight: 800; font-size: 14px; color: var(--ink); }
+.perk-taken-text { font-family: var(--serif); font-size: 13px; line-height: 1.45; color: var(--ink-2); margin-top: 2px; }
+
+/* One column below the split point: the band's two halves stack, and act/refer
+   becomes act-then-refer, which is the order you want on a phone anyway. */
+@media (max-width: 900px) {
+  .game-bar, .debt-band { grid-template-columns: minmax(0, 1fr); }
+  .gb-round, .gb-clock { border-left: none; border-top: 1px solid var(--hair-soft); padding-left: 0; padding-top: 12px; }
+  .gb-act { justify-content: stretch; }
+  .gb-act .cta-btn { width: 100%; justify-content: center; }
+  .solo-split { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+}
 /* A single top rule marks where each card starts, instead of boxing the
    whole thing on all four sides - the heading's own weight (bold, uppercase,
    from .roster-section) carries the separation from here down. */
@@ -1950,11 +2154,8 @@ button { font-family: inherit; }
 .solo-readout { margin: 12px 0 0; }
 .solo-readout.over { border-color: var(--red); }
 
-.alert-track { position: relative; height: 30px; background: var(--panel, #eef0f4); border: 1px solid var(--hair); overflow: hidden; }
-.alert-fill { position: absolute; inset: 0 auto 0 0; background: var(--blue); transition: width 0.2s ease; }
-.alert-track.high .alert-fill { background: var(--red); }
-.alert-fill.go { background: var(--go); }
-.alert-value { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-family: var(--display); font-weight: 900; font-size: 16px; color: var(--ink); }
+/* The Alert Level's percentage fill bar lived here. It is ten squares now
+   (.alert-pips, in the game band above) - see the note there. */
 .alert-controls { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
 .alert-controls .bar-btn, .alert-controls .ghost-btn { padding: 8px 11px; font-size: 11px; }
 
@@ -1970,9 +2171,7 @@ button { font-family: inherit; }
 .roll-headline { font-family: var(--display); font-weight: 800; font-size: 18px; margin-top: 2px; }
 .roll-detail { font-family: var(--serif); font-size: 13px; color: var(--ink-2); margin-top: 4px; }
 
-.debt-card.won { border-color: var(--go); }
 .debt-figure { font-family: var(--display); font-weight: 900; font-size: 44px; letter-spacing: -0.02em; margin: 6px 0 12px; }
-.perk-assign { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
 .perk-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
 .perk-list li { display: flex; align-items: center; gap: 8px; justify-content: space-between; border-bottom: 1px solid var(--hair-soft); padding-bottom: 6px; }
 
@@ -2003,7 +2202,6 @@ button { font-family: inherit; }
    viewport. */
 .home-main > section,
 .workspace > *,
-.solo-grid > *,
 .setup-controls > * { min-width: 0; }
 .faction-plaques { grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr)); }
 
@@ -2165,6 +2363,28 @@ button { font-family: inherit; }
   .dock-table .cell-actions { justify-content: flex-start; flex-wrap: wrap; gap: 8px; padding-top: 8px; margin-top: 6px; border-top: 1px solid var(--hair-soft); display: flex; }
   .comp-weap { min-width: 0; }
 
+  /* One faction card came to 338px: a 44px line each for Era, Ships and
+     Personnel - three values of one word or one digit - and the four actions
+     on two rows. None of it is long enough to need a line of its own, so the
+     stats share one line and the actions are trimmed to fit on one. Same
+     information, every label still there, half the card. */
+  .cf-table tbody tr { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; padding: 8px 10px; margin-bottom: 8px; }
+  .cf-table tbody td { padding: 1px 0; }
+  .cf-table tbody .cell-name, .cf-table tbody .cell-actions { flex: 0 0 100%; }
+  .cf-table tbody td[data-label] { flex: 0 0 auto; gap: 5px; }
+  /* The 84px label gutter is for a stacked layout; on one line it is just air. */
+  .cf-table tbody td[data-label]::before { flex: 0 0 auto; }
+  .cf-table .cell-name { padding-bottom: 0; }
+  .cf-table .cell-actions { gap: 6px; padding-top: 6px; margin-top: 4px; flex-wrap: nowrap; }
+  /* Label under icon, not beside it. Side by side the four came to 344px and
+     wrapped to a second row on every phone, which cost more height than the
+     three stat lines did. Stacked they fit one row down to ~330px wide, and
+     both halves of every button are still there - no icon-only buttons. */
+  .cf-table .cell-actions .ghost-btn {
+    flex: 0 1 auto; min-width: 0; flex-direction: column; gap: 2px;
+    padding: 5px 6px; font-size: 10.5px; letter-spacing: 0.01em;
+  }
+
   /* The generic table-to-card rule above gives every cell its own labelled
      line. For the fleets and foundry tables that is right - a handful of rows.
      For the Compendium it is not: 115 ships x 7 stacked lines came to a 28,781px
@@ -2212,7 +2432,13 @@ button { font-family: inherit; }
   .roster-sheet { overflow-y: visible; }
   .fleet-dock { position: static; }
 
-  .foundry-main, .compendium, .solo-body { padding-left: 14px; padding-right: 14px; }
+  .foundry-main, .compendium, .solo-body, .solo-band, .solo-workspace { padding-left: 14px; padding-right: 14px; }
+
+  /* The band's figure is the one thing you read from a metre away; the pips
+     shrink so ten of them still make one row beside it at 360px. */
+  .gb-figure { font-size: 36px; }
+  .alert-pip { width: 16px; height: 16px; }
+  .alert-pips { gap: 4px; }
 
   .index-row { grid-template-columns: 1fr 22px; gap: 12px; padding: 16px 14px; }
 }
@@ -2242,9 +2468,16 @@ button { font-family: inherit; }
 /* Solo roster row: the ship's spec (chips + weapons) on the left, the pilot
    controls beside it, so the row uses its width instead of stacking a 320px
    table above a 320px control block and leaving half the row empty. */
+/* Both tracks flexible, neither `auto`. An auto track sizes to the content's
+   min-content and refuses to go below it, and the pilot-name <input> in the
+   tools column has a chunky default min-content - so in a roster column under
+   about 520px the tools track took ~310px, the spec track was left with 95,
+   and the stat chips ran out from under it and printed on top of the pilot
+   picker. Two flexible tracks share what there is and nothing overflows; the
+   container query further down stacks them before either gets silly. */
 .roster-sheet .roster-unit {
   background: var(--paper);
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+  display: grid; grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr);
   grid-template-areas: "head head" "spec tools";
   align-items: start; gap: 10px 18px;
   padding: 9px 14px 9px 16px; border-bottom: 1px solid var(--hair-soft);
@@ -2369,7 +2602,7 @@ button { font-family: inherit; }
 }
 .mf-name-gen:hover { background: var(--hair-soft); color: var(--ink); }
 .mf-name-gen:active { transform: rotate(-18deg); }
-.mf-name-gen:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+.mf-name-gen:focus-visible { outline: 2px solid var(--red); outline-offset: 1px; }
 
 /* Budget sits at the right end of the one-line header (margin-left:auto pushes
    it past the faction/era), with the Actions button after it. */
@@ -2619,7 +2852,7 @@ button { font-family: inherit; }
 .sy-hvp-check:hover { border-color: var(--blue); background: var(--blue-wash); }
 .sy-hvp-check.is-on { background: var(--blue); border-color: var(--blue); color: #fff; }
 .sy-hvp-check.is-on:hover { background: var(--blue-deep); }
-.sy-hvp-check[aria-disabled="true"] { color: var(--hair-soft); border-color: var(--hair-soft); cursor: default; background: var(--paper); }
+.sy-hvp-check[aria-disabled="true"] { color: var(--ink-off); border-color: var(--ink-off); cursor: default; background: var(--paper); }
 .sy-hvp-check[aria-disabled="true"]:hover { background: var(--paper); }
 .sy-hvp-check:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 .sy-hvp-body { min-width: 0; }
@@ -2751,7 +2984,13 @@ button { font-family: inherit; }
    stat pills lose their outlines here too. Boxes inside boxes inside a modal was
    three frames around one ship. */
 .au-card { display: block; width: 100%; text-align: left; border: none; border-bottom: 1px solid var(--hair-soft); background: none; padding: 4px 2px 5px; cursor: pointer; position: relative; font-family: inherit; color: var(--ink); }
-.au-card:hover, .au-card:focus-visible { background: var(--blue-wash); outline: none; }
+.au-card:hover { background: var(--blue-wash); }
+/* This shared a rule with :hover and killed the outline for both, so keyboard
+   focus was INVISIBLE on the main action of the Add Unit dialog - a tint that
+   also appears on hover is not a focus indicator. It keeps the tint and gets
+   the system ring back (SC 2.4.7). Inset, because the card is flush to the
+   dialog's edge and an offset ring would be clipped. */
+.au-card:focus-visible { background: var(--blue-wash); outline: 2px solid var(--red); outline-offset: -2px; }
 .au-card:last-child { border-bottom: none; }
 .au-card-top { display: flex; align-items: baseline; gap: 7px; }
 .au-card-name { font-weight: 700; font-size: 13.5px; }
@@ -2765,7 +3004,7 @@ button { font-family: inherit; }
 .au-card .stat-chips { gap: 0 10px; }
 .au-card-wep { font-size: 11.5px; line-height: 1.35; color: var(--ink-2); flex: 1 1 200px; min-width: 0; }
 .au-wl { font-family: var(--display); font-weight: 800; font-size: 9px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3); margin-right: 4px; }
-.au-wsep { margin: 0 5px; color: var(--hair-soft); }
+.au-wsep { margin: 0 5px; color: var(--ink-off); }
 
 /* Armageddon carrier-assignment block, below the HVP choose list. */
 /* Carrier assignment. Mobile-first: the HVP's name on its own line and a
@@ -2927,7 +3166,7 @@ button { font-family: inherit; }
   color: var(--blue); border: 2px solid var(--blue); padding: 5px 10px;
 }
 .is-option:hover .add-cue { background: var(--blue); color: #fff; }
-.add-cue.is-off { color: var(--ink-2); border-color: var(--hair-soft); }
+.add-cue.is-off { color: var(--ink-2); border-color: var(--ink-off); }
 .personnel-row.is-full { opacity: 0.55; }
 .owned-tag { font-family: var(--display); font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--go); white-space: nowrap; }
 
@@ -2944,7 +3183,7 @@ button { font-family: inherit; }
   min-width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center;
 }
 .builder .add-btn:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
-.builder .add-btn:disabled { border-color: var(--hair-soft); color: var(--ink-3); background: none; }
+.builder .add-btn:disabled { border-color: var(--ink-off); color: var(--ink-3); background: none; }
 
 /* faction rule: ruled prose, not a card */
 .mf-rule { padding: 4px 0 14px; }
@@ -3055,13 +3294,39 @@ button { font-family: inherit; }
 /* Modal system (after the Dropfleet builder): overlay, solid panel,
    header / body / footer. Industrial framing, mono title. */
 .modal-root { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.modal-backdrop { position: absolute; inset: 0; background: rgba(10, 14, 20, 0.55); }
+.modal-backdrop {
+  position: absolute; inset: 0; background: rgba(10, 14, 20, 0.55);
+  /* The scrim is Fluent's smoke material and it arrives first, on its own and
+     slightly faster than the panel, so the page is already reading as blocked
+     by the time the dialog lands on top of it. */
+  animation: modal-scrim-in 140ms linear both;
+}
 .modal-panel {
   position: relative; z-index: 1; width: min(560px, 100%); max-height: 90vh; overflow-y: auto;
   background: var(--paper); border: 2px solid var(--color-line);
   /* Top of the ramp: a dialog is the furthest thing from the page and the only
      one that blocks you until you deal with it. */
   box-shadow: var(--shadow64);
+  /* Elevation has to be earned in motion as well as in shadow: a thing sitting
+     64px off the page should be seen arriving there, or the shadow is just a
+     decoration painted under a rectangle that blinked into existence. It rises
+     and comes slightly toward you, on the same decelerate curve and the same
+     8-12px travel as every other entrance in the app (toast, fleet card, learn
+     stage). No overshoot, because a dialog is not a bouncy thing. */
+  animation: modal-panel-in 200ms var(--ease) both;
+  transform-origin: center;
+}
+@keyframes modal-scrim-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes modal-panel-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+/* The dialog still has to appear instantly and completely; only the travel goes. */
+@media (prefers-reduced-motion: reduce) {
+  .modal-backdrop, .modal-panel { animation: none; }
 }
 /* Destructive confirm. Red header and a red confirm button, so the weight of
    the thing is visible before the words are read - but Cancel stays a normal
@@ -3172,7 +3437,7 @@ button { font-family: inherit; }
 .nfd-title { position: relative; display: inline-block; font-family: var(--display); font-weight: 800; font-size: 22px; margin-bottom: 2px; text-transform: none; letter-spacing: -0.01em; color: var(--ink); }
 .nfd-title--unity { color: var(--blue); }
 .nfd-title .c { display: inline-block; white-space: pre; }
-.nfd-title .nfd-underline { position: absolute; left: 0; bottom: -1px; height: 3px; width: 100%; background: var(--red); transform: scaleX(0); transform-origin: left bottom; transition: transform 260ms ease-out; }
+.nfd-title .nfd-underline { position: absolute; left: 0; bottom: -1px; height: 3px; width: 100%; background: var(--red); transform: scaleX(0); transform-origin: left bottom; transition: transform 260ms var(--ease); }
 /* Armageddon's underline is shown at rest (mobile / reduced-motion / repaint).
    During the slam the title carries .is-landing, which holds it collapsed with
    no transition; removing that class on landing lets the transition draw it in. */
@@ -3360,20 +3625,27 @@ button { font-family: inherit; }
 }
 .tour-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px 0; }
 .tour-title { font-family: var(--display); font-weight: 800; font-size: 15px; letter-spacing: -0.01em; color: var(--color-ink); }
-.tour-close { background: transparent; border: none; color: var(--ink-3); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 4px 6px; margin: -4px; font-family: var(--sans); font-size: 12px; font-weight: 700; }
-.tour-close:hover { color: var(--color-ink); }
 .tour-body { font-family: var(--sans); font-size: 13px; line-height: 1.45; color: var(--ink-2); padding: 8px 14px 14px; }
-.tour-foot { display: flex; align-items: center; justify-content: space-between; padding: 0 14px 14px; }
+/* A titleless step has no head above it, so the body carries the top padding. */
+.tour-pop-arrow + .tour-body { padding-top: 14px; }
+.tour-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 14px 14px; }
+/* Dismiss then go, always in that order. They wrap rather than shrink: "Check
+   it out now!" is the button's whole meaning and must never be clipped. */
+.tour-btns { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; margin-left: auto; }
 .tour-dots { display: inline-flex; gap: 6px; }
 .tour-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--hair-soft); }
 .tour-dot.on { background: var(--color-action); }
-.tour-next {
+.tour-next, .tour-got, .tour-go {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   height: 28px; padding: 0 11px;
   background: transparent; border: 1px solid var(--hair); color: var(--color-ink); cursor: pointer;
   font-family: var(--sans); font-size: 12px; font-weight: 700;
 }
-.tour-next:hover { border-color: var(--color-action); color: var(--color-action); }
+.tour-next:hover, .tour-got:hover { border-color: var(--color-action); color: var(--color-action); }
+/* The one thing the tooltip is asking you to do, so it is the filled button and
+   the quiet outline beside it is the way out. */
+.tour-go { background: var(--color-action); border-color: var(--color-action); color: #fff; }
+.tour-go:hover { background: var(--color-ink); border-color: var(--color-ink); color: #fff; }
 
 /* ============================================================ PRINT MEDIA */
 
@@ -3811,8 +4083,18 @@ button { font-family: inherit; }
 .roster-sheet .roster-unit > .roster-unit-tools { grid-area: tools; margin-top: 0; align-items: flex-start; flex-direction: column; gap: 8px; }
 .roster-sheet .roster-unit > .roster-unit-tools .pilot-field { width: 100%; }
 .roster-sheet .roster-unit .pilot-ability { max-width: 34ch; }
-@media (max-width: 900px) {
+.roster-sheet .roster-unit > .roster-unit-tools .ship-name-input { width: 100%; min-width: 0; }
+/* Spec beside pilot controls needs about 500px of row. Below that the two halves
+   stack, and it is the ROSTER COLUMN's width that decides - not the window's.
+   The old @media (max-width: 900px) missed the case this actually breaks on: a
+   wide monitor where the shell is capped and the roster column is narrow
+   anyway. The container is the sheet, because a container cannot query itself
+   and .roster-unit is already one (for its weapons table). */
+.roster-sheet { container: soloroster / inline-size; }
+@container soloroster (max-width: 500px) {
   .roster-sheet .roster-unit { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "spec" "tools"; }
+  .roster-sheet .roster-unit > .roster-unit-tools { flex-direction: row; flex-wrap: wrap; align-items: flex-end; gap: 10px 16px; }
+  .roster-sheet .roster-unit > .roster-unit-tools .pilot-field { width: auto; }
 }
 
 /* Foot of the emblem library: both the "there is more" cue and the sentinel the
@@ -3954,10 +4236,9 @@ a .icon,
 /* Nothing on a wide monitor should run the full width of the glass. Same
    specificity problem as above for anything that is a direct child of #app. */
 #app > .print-page { max-width: 1000px; margin-left: auto; margin-right: auto; }
-#app > .solo-body { max-width: 1240px; margin-left: auto; margin-right: auto; }
-.solo-body, .setup-band > .setup-head, .workspace, .mf-body {
-  max-width: 1240px; margin-left: auto; margin-right: auto;
-}
+/* Junkspace used to be capped here, at 1240px, separately from the band and the
+   tab strip above it. Its shell is now set once, with those two, in the SOLO
+   block - see --shell-solo. */
 
 /* ------------------------------------------------- Learn to Play diagrams
 
@@ -4361,7 +4642,7 @@ main.play-body .roster-section::before { content: none; }
 .sy-req .pf-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; justify-content: space-between; }
 .sy-req-tally { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.02em; color: var(--ink-3); text-transform: uppercase; font-variant-numeric: tabular-nums; }
 .sy-req-yard { color: var(--blue); font-weight: 800; }
-.sy-req-sep { color: var(--hair-soft); }
+.sy-req-sep { color: var(--ink-off); }
 .sy-req-acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .sy-req-btn {
   flex: 1 1 auto; min-height: 34px; padding: 6px 10px; border: 1px solid var(--hair); background: var(--paper);
@@ -4370,7 +4651,7 @@ main.play-body .roster-section::before { content: none; }
 }
 .sy-req-btn:not(:disabled):hover { background: var(--blue); border-color: var(--blue); color: #fff; }
 .sy-req-btn:not(:disabled):active { transform: scale(0.94); }
-.sy-req-btn:disabled { color: var(--hair-soft); border-color: var(--hair-soft); cursor: default; }
+.sy-req-btn:disabled { color: var(--ink-off); border-color: var(--ink-off); cursor: default; }
 /* The Deploy button (first) is the primary move: fill it so it reads as the CTA. */
 .sy-req-btn:first-child:not(:disabled) { background: var(--blue); border-color: var(--blue); color: #fff; }
 .sy-req-btn:first-child:not(:disabled):hover { background: var(--blue-deep); }
@@ -4420,6 +4701,12 @@ main.play-body .roster-section::before { content: none; }
 #app > .index-wrap { max-width: 1100px; margin-left: auto; margin-right: auto; }
 #app > .fleets-main { max-width: 1100px; margin-left: auto; margin-right: auto; }
 #app > .home-main { max-width: 1100px; margin-left: auto; margin-right: auto; }
+/* The Junkspace dock is a .home-main too, so it was being widened back out to
+   1100px and its own 760px cap never took: one outfit card sat in a 1100px row
+   with "Start a new outfit" stranded 800px from the heading it belongs to. It
+   is a short list of cards, not a workspace - it keeps the narrow measure its
+   author asked for. */
+#app > .solo-main { max-width: 760px; }
 #app > .foundry-main { max-width: 1100px; margin-left: auto; margin-right: auto; }
 #app > .compendium { max-width: 1320px; margin-left: auto; margin-right: auto; }
 #app > .builder { max-width: 1280px; margin-left: auto; margin-right: auto; }
@@ -4432,13 +4719,9 @@ main.play-body .roster-section::before { content: none; }
    820 plus 10%: enough that the personnel rules stop breaking to three and four
    words a line, without letting the roster run past a comfortable measure. */
 #app > .shipyard.builder-fleet { max-width: 902px; }
-/* Junkspace was the one view missing from this list, so it kept .workspace's
-   --shell-wide (1760px) while everything around it sat between 900 and 1320.
-   On a wide monitor an outfit of five ships was spread across the full width of
-   the screen with the roster and the catalogue drifting apart. Two dense
-   columns, so it is wider than the fleet builder and narrower than the
-   Compendium's table. */
-#app > .workspace { max-width: 1180px; margin-left: auto; margin-right: auto; }
+/* Junkspace's outfit builder was capped here at 1180px, on its own, while the
+   band and tabs above it were capped somewhere else again. It is now part of
+   the one solo shell - see --shell-solo in the SOLO block. */
 
 /* Gravity well and jump strain. */
 .learn-dg .dg-well { fill: var(--red); fill-opacity: 0.07; stroke: var(--red); stroke-width: 1; stroke-dasharray: 4 4; }
@@ -4664,7 +4947,8 @@ main.play-body .roster-section::before { content: none; }
    cannot tell somebody on arrival what is renameable.
 
    Names that CANNOT be renamed - a ship class in the catalogue, a faction's own
-   name in a roster row - have no box, so the absence carries meaning.
+   name in a roster row, an HVP nobody has hired yet - have no box, so the
+   absence carries meaning.
 
    The Foundry keeps its explicit labelled fields: those sit in a form where
    every row is a field and already have visible labels. */
@@ -4672,7 +4956,8 @@ main.play-body .roster-section::before { content: none; }
 .sy-unit-name,
 .fleet-name-input,
 .unit-name-input,
-.ship-name-input {
+.ship-name-input,
+.hvp-name-input {
   border: 1px solid var(--field-edge);
   background: var(--ground);
   border-radius: 2px;
@@ -4688,17 +4973,65 @@ main.play-body .roster-section::before { content: none; }
 .sy-unit-name:hover,
 .fleet-name-input:hover,
 .unit-name-input:hover,
-.ship-name-input:hover { border-color: var(--ink-3); background: var(--paper); }
+.ship-name-input:hover,
+.hvp-name-input:hover { border-color: var(--ink-3); background: var(--paper); }
 .mf-name:focus,
 .sy-unit-name:focus,
 .fleet-name-input:focus,
 .unit-name-input:focus,
-.ship-name-input:focus {
-  outline: 2px solid var(--blue);
+.ship-name-input:focus,
+.hvp-name-input:focus {
+  /* The ring is the system red everywhere; the blue border is the field's own
+     focused state underneath it, not a second focus indicator. */
+  outline: 2px solid var(--red);
   outline-offset: -2px;
   border-color: var(--blue);
   background: var(--paper);
 }
+
+/* ------------------------------------------------ naming your personnel
+   The sixth renameable thing, and the one that had been storable but not
+   typeable: an HVP's own name. The rules ask for it directly (p.57 "Naming Your
+   HVP": not just "Chief Engineer", but "Lt. Commander Sadie Hyatt, Chief
+   Engineer"), the roster printed it and share links carried it, and there was
+   no field anywhere in the app to put one in.
+
+   The field sits in the personnel card's name line, in front of the job title,
+   in the order it will print. One tap, nothing to open first. It appears only
+   once the person is in the fleet, which is the rest state carrying meaning
+   again: no box, nobody to name.
+
+   Placed AFTER the .sy-hvp-name / .personnel-name rules above so the flex line
+   wins on source order (this stylesheet is unlayered). */
+.sy-hvp-name,
+.personnel-name {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 2px;
+  /* The 24px target floor, held in BOTH states, so choosing somebody opens the
+     field without the list under it moving a pixel. */
+  min-height: 24px;
+}
+.hvp-name-input {
+  /* The line already carries the display face at the right size and colour, and
+     a chosen row turns blue - the field should be the same text you were just
+     reading, in a box, not a different-looking control. */
+  font: inherit;
+  color: inherit;
+  flex: 1 1 120px;
+  min-width: 6ch;
+}
+.hvp-name-input::placeholder { color: var(--ink-3); font-weight: 600; }
+/* The job title takes the whole next line rather than sharing where it happens
+   to fit. Sharing was tried first and it is worse in both directions: a long
+   title wraps under the box anyway, so the row's height moved with the length
+   of somebody's job, and the comma that made it read as it prints
+   ("Sadie Hyatt, Chief Engineer") ended up stranded at the start of the wrapped
+   line. A chosen row is now always exactly two lines, whatever the name, the
+   title or the screen. The comma goes with it - the box is the separator here,
+   and the roster prints the comma where it belongs. */
+.hvp-title { flex: 1 0 100%; }
 
 /* ------------------------------------------- Junkspace header on a phone
    Measured on a 390x670 screen: 285px, 43% of the screen, went by before the

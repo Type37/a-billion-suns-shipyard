@@ -2314,20 +2314,38 @@ function printView(state: AppState): string {
         // Your own personnel sit directly under your ships: they are part of the
         // fleet you brought. The Actions and Commands reference below is the
         // same for everyone, so it comes after the things specific to you.
-        // ONLY THE ONES YOU PICKED. Age of Unity used to print the faction's
-        // entire roster of personnel plus all five generics - a dozen blocks,
-        // most of a page - on the theory that you choose at the table once the
-        // missions are known. But you choose them in the app, and the app
-        // already knows which: printing all twelve buried your three in nine
-        // you did not take, and did it differently from every other mode. Every
-        // mode prints the chosen ones now.
+        // ONLY THE ONES YOU PICKED - if you have picked any.
+        //
+        // Age of Unity used to print the faction's entire roster of personnel
+        // plus all five generics, a dozen blocks and most of a page, whatever
+        // you had chosen. That buried your three in nine you did not take, and
+        // it did it differently from every other mode. If the app knows which
+        // three are yours, those are the three that print.
+        //
+        // The menu survives for the one case it was actually built for. Age of
+        // Unity defers the HVP step - you assign after the missions are rolled
+        // (p.92 step 5), and the builder marks the count optional there
+        // (HVP_COUNT is dropped for this mode) - so a Unity player can quite
+        // legitimately reach the table having chosen nobody. For them the sheet
+        // is the menu they will choose from, and printing nothing would take
+        // away the one page that has the rules on it.
         //
         // You choose three, so print three columns - one personnel each, side by
         // side. A CSS multi-column flow was used here before; it packs by height
         // rather than by item, so two blocks landed in the first row and the
         // third started a second row with a column and a half of blank paper
         // beside it.
-        hasHvpBlocks ? `<div class="print-hvp-chosen">${hvpBlocks.own}${hvpBlocks.shared}</div>` : ""
+        hasHvpBlocks
+          ? `<div class="print-hvp-chosen">${hvpBlocks.own}${hvpBlocks.shared}</div>`
+          : isUnity
+            ? `<p class="print-note print-hvp-note">None chosen yet &mdash; in Age of Unity you pick and assign once the missions are rolled. Every one available to you:</p>
+               <div class="print-hvp-menu">${[...(faction?.hvp ?? []), ...GENERIC_HVP]
+                 .map(
+                   (d) =>
+                     `<section class="print-hvp ${GENERIC_HVP.some((g) => g.id === d.id) ? "is-generic" : ""}"><h4>${escapeHtml(d.name)}</h4><p>${ruleText(d.rule)}</p></section>`,
+                 )
+                 .join("")}</div>`
+            : ""
       }
 
       ${commandsSection}

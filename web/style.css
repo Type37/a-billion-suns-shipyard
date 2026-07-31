@@ -1612,7 +1612,16 @@ button { font-family: inherit; }
    lines. Widths are declared on both the th and the td (see render.ts), so the
    name and weapons get the room and the numbers collapse to what they need. */
 .print-roster { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.pr-unit { width: 18%; }
+/* The guns give width back to the name. They had grown to 27% each - 54% of the
+   table between them - which was more than they need for a 31-character string
+   and left unit names wrapping to three lines beside all that air. 24% still
+   clears the longest gun in the game; the 4 points go to the column that was
+   actually short, which also starts the weapons further right.
+   The crowded sheet keeps the old split: with damage and jump trackers on there
+   are two more columns and the weapons have about 3px of slack, so there is
+   nothing there to give away. */
+.pr-unit { width: 22%; }
+.print-roster[data-dense] .pr-unit { width: 18%; }
 /* A heading NEVER breaks inside a word. overflow-wrap:anywhere was here to stop
    "AUXILIARY WEAPONS" bleeding into its neighbour, but it also split THRUST into
    "THRUS / T" and SHIELDS into "SHIEL / DS", which is unreadable. Multi-word
@@ -1698,18 +1707,27 @@ button { font-family: inherit; }
    not fit shows as a clipped line rather than silently splitting a weapon name
    down the middle. Measured across every seed fleet and every faction's full
    catalogue: nothing overflows. */
-.pr-weap { width: 27%; }
+.pr-weap { width: 25%; }
+.print-roster[data-dense] .pr-weap { width: 27%; }
 /* Written against `.print-roster tbody td` and `thead th`, both of which set a
    font-size that a bare .pr-weap loses to on specificity. */
-/* ONE FACE FOR THE DATA TOO. The stat figures were Libre Franklin 11px, the
-   weapons Archivo Narrow 10px and the cost something else again - three
-   typefaces across one row of a table. Narrow throughout: it is what buys the
-   weapons their single line, and there is no reason for the number beside them
-   to be set in something else. The unit NAME stays Archivo, because it is the
-   row's title rather than one of its figures. */
-.print-roster tbody td.pr-weap, .print-roster tbody td.pr-num, .print-roster tbody td.pr-cost {
-  font-family: var(--narrow); letter-spacing: -0.01em;
-}
+/* NARROW IS FOR THE THINGS THAT NEED IT, AND ONLY THOSE.
+
+   The weapons need it: 31 characters in a 27% column is the whole reason the
+   face is here, and it is what keeps a gun on one line.
+
+   The glyph-and-figure pairs do NOT. Mass, Thrust, Sil, Shields and Cost are a
+   mark and one or two characters in a 30-40px column - they have never been
+   short of room, so condensing them bought nothing and cost legibility on the
+   one part of a row you read at a glance mid-turn. A condensed digit next to a
+   10px glyph reads cramped in a way an uncondensed one does not. They stay in
+   the sans, which is what they were.
+
+   So the table is not one face, deliberately: it is the sans for figures, the
+   narrow where width is genuinely scarce, and Archivo for the row's title. The
+   column HEADS are all one face, which is what actually needed unifying. */
+.print-roster tbody td.pr-weap { font-family: var(--narrow); letter-spacing: -0.01em; }
+.print-roster tbody td.pr-num, .print-roster tbody td.pr-cost { font-family: var(--sans); letter-spacing: 0; }
 .print-roster tbody td.pr-weap { font-weight: 600; font-size: 10px; line-height: 1.25; white-space: nowrap; }
 /* A notch smaller once a tracker column is on. Turning on damage and jump
    trackers adds two columns to a table that already had eleven, and the
@@ -4386,6 +4404,14 @@ a .icon,
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 14px; align-items: start;
 }
 .print-hvp-chosen .print-hvp { break-inside: avoid; margin-bottom: 2px; }
+/* The full menu, for an Age of Unity sheet with nobody chosen yet. Same blocks,
+   three to a row, with the generics reading back in grey as they do everywhere
+   else. */
+.print-hvp-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 14px; align-items: start; }
+.print-hvp-menu .print-hvp { break-inside: avoid; margin-bottom: 2px; }
+.print-hvp-note { margin: 0 0 4px; }
+@media (max-width: 760px) { .print-hvp-menu { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .print-hvp-menu { grid-template-columns: 1fr; } }
 /* Three across is only right when three fit. Below that they stack, rather than
    squeezing a name and two lines of rule into a third of a phone. */
 @media (max-width: 760px) { .print-hvp-chosen { grid-template-columns: repeat(2, 1fr); } }

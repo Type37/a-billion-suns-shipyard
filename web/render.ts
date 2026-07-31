@@ -1871,6 +1871,46 @@ function printView(state: AppState): string {
   // boxes to tick off as damage lands.
   const hpBoxes = (hp: number) => `<span class="pr-hp">${Array.from({ length: hp }, () => '<span class="pr-hp-box"></span>').join("")}</span>`;
 
+  /**
+   * Jump trackers: where a unit IS, as opposed to how hurt it is.
+   *
+   * One labelled box per ship in the unit. Everywhere it is "Jumped in" alone,
+   * because that is the one thing that changes about a unit's position that a
+   * roster cannot know in advance. Hypergrowth adds "In reserve": a Shipyard's
+   * ships are bought but not in play, and do not become a unit at all until the
+   * Requisition command forms one mid-game (p.122), so "not jumped in yet" and
+   * "still sitting in the Shipyard" are genuinely different states there.
+   *
+   * The label is on the box rather than on the column, so a row read on its own
+   * mid-turn still says what the box means.
+   */
+  const jumpMarks = isShipyard ? 2 : 1;
+  const jumpBoxes = (count: number): string =>
+    Array.from(
+      { length: count },
+      (_, i) =>
+        `<span class="pr-jump-ship">${count > 1 ? `<span class="pr-jump-n">${i + 1}</span>` : ""}${Array.from(
+          { length: jumpMarks },
+          () => '<span class="pr-jump-box"></span>',
+        ).join("")}</span>`,
+    ).join("");
+  /**
+   * The labels live in the column head, once, over the boxes they name - not
+   * spelled out beside every box.
+   *
+   * Written out per ship they were the tallest thing on the sheet: a five-ship
+   * unit in Hypergrowth is ten labelled lines in one cell, which stretched its
+   * row past everything else in it, and the words repeated forty times down a
+   * page said nothing the first two did not. Two mini-headings over two columns
+   * of boxes say it once and keep a ship to one line.
+   */
+  // Single letters, because the column head above them already says "Jumped in
+  // / in reserve" in full - these only have to say which box is which, and
+  // "Jump" and "Res." at 6.5px in an 11px track ran into each other.
+  const jumpHead = isShipyard
+    ? '<span class="pr-jump-head"><span class="pr-jump-n"></span><span class="pr-jump-hl">J</span><span class="pr-jump-hl">R</span></span>'
+    : "";
+
   const unitNames = unitDisplayNames(list.fleet.units, faction, customs);
   // Units the player has dropped from this printout (still in the fleet).
   // Lightest Mass first, matching the builder and the book's ship-class tables.
@@ -1956,6 +1996,7 @@ function printView(state: AppState): string {
       const trackCell = opts.trackers
         ? `<td class="pr-track">${Array.from({ length: u.count }, () => `<span class="pr-track-ship">${hpBoxes(ship.silhouette)}</span>`).join("")}</td>`
         : "";
+      const jumpCell = opts.jumpTrackers ? `<td class="pr-jump">${jumpBoxes(u.count)}</td>` : "";
       // Shipyard modes: one checkbox per ship, ticked off as each is
       // requisitioned into play over the course of the game (p.122).
       const reqCell = isShipyard
@@ -1989,6 +2030,7 @@ function printView(state: AppState): string {
         <td class="pr-num pr-cost">${credits(ship.cost * u.count)}</td>
         ${reqCell}
         ${trackCell}
+        ${jumpCell}
         ${hvpCarrierCell(u)}
       </tr>`;
     })
@@ -1996,7 +2038,7 @@ function printView(state: AppState): string {
 
   const unitBlocks = unitRows
     ? `
-    <table class="print-roster">
+    <table class="print-roster" ${opts.trackers || opts.jumpTrackers ? 'data-dense="1"' : ""}>
       <thead>
         <tr>
           <th class="pr-unit">${isShipyard ? "Ship class" : "Unit"}</th>
@@ -2006,7 +2048,7 @@ function printView(state: AppState): string {
             page, and this sheet is read at a table with a row under a finger.
           -->
           <th class="pr-num">Mass</th><th class="pr-num">Thr</th><th class="pr-num">Sil</th><th class="pr-num">Shd</th>
-          <th class="pr-weap">Primary weapons</th><th class="pr-weap">Auxiliary weapons</th><th class="pr-cost">Cost</th>${isShipyard ? '<th class="pr-req">Req’d</th>' : ""}${opts.trackers ? '<th class="pr-track">Hull tracker</th>' : ""}${fieldsHvp ? '<th class="pr-hvp-slot">HVP carried</th>' : ""}
+          <th class="pr-weap">Primary weapons</th><th class="pr-weap">Auxiliary weapons</th><th class="pr-cost">Cost</th>${isShipyard ? '<th class="pr-req">Req’d</th>' : ""}${opts.trackers ? '<th class="pr-track">Hull tracker</th>' : ""}${opts.jumpTrackers ? `<th class="pr-jump">${isShipyard ? "Jumped in / in reserve" : "Jumped in"}${jumpHead}</th>` : ""}${fieldsHvp ? '<th class="pr-hvp-slot">HVP carried</th>' : ""}
         </tr>
       </thead>
       <tbody>${unitRows}</tbody>
@@ -2048,6 +2090,11 @@ function printView(state: AppState): string {
         </div>
         ${named.length ? `<p class="pc-ships">${escapeHtml(named.join(" / "))}</p>` : ""}
         ${carried.length ? `<p class="pc-carry">Carrying: ${escapeHtml(carried.join("; "))}</p>` : ""}
+        ${
+          opts.jumpTrackers
+            ? `<div class="pc-track pc-jump"><p class="pc-track-h">${isShipyard ? "Jumped in / in reserve" : "Jumped in"}</p>${jumpHead}${jumpBoxes(u.count)}</div>`
+            : ""
+        }
         ${
           // One row per ship in the unit, one box per point of Silhouette,
           // because Silhouette is the ship's starting HP (src/types.ts). It
@@ -2102,27 +2149,6 @@ function printView(state: AppState): string {
   };
   const hasHvpBlocks = hvpBlocks.own !== "" || hvpBlocks.shared !== "";
 
-  // Age of Unity: every HVP the faction can field, so you can assign them to the
-  // ship slots above once the missions are known. Faction HVP first, then generics.
-  const availableHvp: Hvp[] = [...(faction?.hvp ?? []), ...GENERIC_HVP];
-  // No "carried by ______" line here. The roster above now has an HVP column
-  // per unit, which is where the assignment is actually written and amended, so
-  // a second blank on each of these twelve blocks was twelve lines of ink
-  // recording the same thing in a worse place.
-  // Generic personnel are the shared pool; the faction's own are the ones worth
-  // reading first. Printed in the same black, twelve blocks read as one
-  // undifferentiated wall, so the generics sit back in grey.
-  const hvpEntry = (def: Hvp, generic: boolean) => `
-      <section class="print-hvp ${generic ? "is-generic" : ""}">
-        <h4>${escapeHtml(def.name)}</h4>
-        <p>${ruleText(def.rule)}</p>
-      </section>`;
-  // Faction personnel fill the left two columns; the generic pool - the same
-  // five for everybody - is kept together in the right-hand column so the
-  // faction's own are read as a set rather than interleaved with them.
-  const availableHvpBlocks = `
-    <div class="print-hvp-own">${(faction?.hvp ?? []).map((d) => hvpEntry(d, false)).join("")}</div>
-    <div class="print-hvp-shared">${GENERIC_HVP.map((d) => hvpEntry(d, true)).join("")}</div>`;
 
   // Actions and Commands reference: the full set every fleet can use, so the
   // sheet replaces the rulebook at the table. Requisition is Hypergrowth-only,
@@ -2170,21 +2196,41 @@ function printView(state: AppState): string {
         .join(" ")}</p>`
     : "";
 
-  const commandsSection = `
-      <div class="print-ref-cols">
+  /**
+   * Actions and Commands, each printed only if its own checkbox is ticked.
+   *
+   * They used to be one block gated by `rules`, which also gated the faction
+   * rule box - so there was no way to print your faction's ability without four
+   * pages of core reference behind it, or the reference without the faction box.
+   * They are separate facts and they get separate switches, both on by default.
+   *
+   * The wrapper is told how many columns it actually has (see .print-ref-cols
+   * in style.css). With both on it is the two-column spread it has always been;
+   * with one on that column takes the full width rather than sitting in half a
+   * page with the other half blank.
+   */
+  const refCols: string[] = [];
+  if (opts.actions) {
+    refCols.push(`
         <div class="print-ref-col">
           <h4 class="print-ref-h">Actions</h4>
           <dl class="print-ref-list">
             ${CORE_ACTIONS.map((a) => `<dt>${escapeHtml(a.name)}</dt><dd>${ruleText(a.text)}</dd>`).join("")}
           </dl>
-        </div>
+        </div>`);
+  }
+  if (opts.commands) {
+    refCols.push(`
         <div class="print-ref-col">
           <h4 class="print-ref-h">Commands</h4>
           ${globalBlock}
           <dl class="print-ref-list">${coreEntries}${grantedEntries}</dl>
           ${grantedBlock}
-        </div>
-      </div>`;
+        </div>`);
+  }
+  const commandsSection = refCols.length
+    ? `<div class="print-ref-cols" data-cols="${refCols.length}">${refCols.join("")}</div>`
+    : "";
 
   // The project's single interpunct lives in this subtitle, and its single
   // em-dash lives in the attribution line below. Nowhere else, ever.
@@ -2206,8 +2252,11 @@ function printView(state: AppState): string {
           <button class="${opts.paper === "letter" ? "selected" : ""}" data-action="print-paper" data-paper="letter">Letter</button>
           <button class="${opts.paper === "a4" ? "selected" : ""}" data-action="print-paper" data-paper="a4">A4</button>
         </span>
-        <label class="print-toggle"><input type="checkbox" data-action="print-trackers" ${opts.trackers ? "checked" : ""} /> Trackers</label>
-        <label class="print-toggle"><input type="checkbox" data-action="print-rules" ${opts.rules ? "checked" : ""} /> Rules</label>
+        <label class="print-toggle" title="A row of HP boxes per ship, to cross off as damage lands"><input type="checkbox" data-action="print-trackers" ${opts.trackers ? "checked" : ""} /> Damage trackers</label>
+        <label class="print-toggle" title="${isShipyard ? "A Jumped in and an In reserve box per ship" : "A Jumped in box per ship"}"><input type="checkbox" data-action="print-jumptrackers" ${opts.jumpTrackers ? "checked" : ""} /> Jump trackers</label>
+        <label class="print-toggle" title="Your faction's own rule, Initiative and CMD"><input type="checkbox" data-action="print-rules" ${opts.rules ? "checked" : ""} /> Rules</label>
+        <label class="print-toggle" title="The core Actions reference"><input type="checkbox" data-action="print-actions" ${opts.actions ? "checked" : ""} /> Actions</label>
+        <label class="print-toggle" title="The Commands reference, including any your faction changes"><input type="checkbox" data-action="print-commands" ${opts.commands ? "checked" : ""} /> Commands</label>
         <label class="print-toggle" title="Drops the solid fills and heavy rules. Colour is kept: a coloured line costs no more ink than a black one"><input type="checkbox" data-action="print-inksaver" ${opts.inkSaver ? "checked" : ""} /> Ink saver</label>
       </div>
       <div class="print-go">
@@ -2265,19 +2314,23 @@ function printView(state: AppState): string {
         // Your own personnel sit directly under your ships: they are part of the
         // fleet you brought. The Actions and Commands reference below is the
         // same for everyone, so it comes after the things specific to you.
-        isUnity
-          ? `<div class="print-hvp-cols">${availableHvpBlocks}</div>`
-          : hasHvpBlocks
-            ? // You choose three, so print three columns - one personnel each,
-              // side by side. A CSS multi-column flow was used here before; it
-              // packs by height rather than by item, so two blocks landed in the
-              // first row and the third started a second row with a column and a
-              // half of blank paper beside it.
-              `<div class="print-hvp-chosen">${hvpBlocks.own}${hvpBlocks.shared}</div>`
-            : ""
+        // ONLY THE ONES YOU PICKED. Age of Unity used to print the faction's
+        // entire roster of personnel plus all five generics - a dozen blocks,
+        // most of a page - on the theory that you choose at the table once the
+        // missions are known. But you choose them in the app, and the app
+        // already knows which: printing all twelve buried your three in nine
+        // you did not take, and did it differently from every other mode. Every
+        // mode prints the chosen ones now.
+        //
+        // You choose three, so print three columns - one personnel each, side by
+        // side. A CSS multi-column flow was used here before; it packs by height
+        // rather than by item, so two blocks landed in the first row and the
+        // third started a second row with a column and a half of blank paper
+        // beside it.
+        hasHvpBlocks ? `<div class="print-hvp-chosen">${hvpBlocks.own}${hvpBlocks.shared}</div>` : ""
       }
 
-      ${opts.rules ? commandsSection : ""}
+      ${commandsSection}
 
       ${(() => {
         const maxRound = list.mode === "management-training" ? 3 : 4;

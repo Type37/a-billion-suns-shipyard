@@ -1175,6 +1175,18 @@ function dispatchAction(target: HTMLElement): void {
       patchPrint({ rules: !(store.getState().ui.print ?? DEFAULT_PRINT).rules });
       break;
     }
+    case "print-jumptrackers": {
+      patchPrint({ jumpTrackers: !(store.getState().ui.print ?? DEFAULT_PRINT).jumpTrackers });
+      break;
+    }
+    case "print-actions": {
+      patchPrint({ actions: !(store.getState().ui.print ?? DEFAULT_PRINT).actions });
+      break;
+    }
+    case "print-commands": {
+      patchPrint({ commands: !(store.getState().ui.print ?? DEFAULT_PRINT).commands });
+      break;
+    }
     case "print-inksaver": {
       patchPrint({ inkSaver: !(store.getState().ui.print ?? DEFAULT_PRINT).inkSaver });
       break;

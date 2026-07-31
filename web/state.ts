@@ -151,8 +151,29 @@ export interface LastRoll {
 /** Print setup options. Persisted (abs2.print.v1) so reprinting is one click. */
 export interface PrintOpts {
   format: "roster" | "cards" | "guide";
+  /**
+   * Damage trackers: a row of HP boxes per ship. Off by default - most sheets
+   * are printed to build from and to read at the table, and a fleet's worth of
+   * hull boxes is a lot of ink for something only some players cross off.
+   */
   trackers: boolean;
+  /**
+   * Jump trackers: a box per ship for "Jumped in", plus "In reserve" in
+   * Hypergrowth, where a Shipyard's ships sit out of play until they are
+   * requisitioned. Separate from damage, because they answer a different
+   * question - where is this unit, not how hurt is it.
+   */
+  jumpTrackers: boolean;
   rules: boolean;
+  /**
+   * The two halves of the reference section, each on its own. They used to ride
+   * `rules` with the faction block, so wanting your faction's rule on the sheet
+   * meant taking four pages of core reference with it, and wanting the reference
+   * meant taking the faction block. Both default on: the sheet has always
+   * printed them, and a default that drops content is a default that loses work.
+   */
+  actions: boolean;
+  commands: boolean;
   /** Paper the preview is laid out at, and what the page count is based on. */
   paper: "letter" | "a4";
   /** No coloured fills or bars: survives "Background graphics: off" and saves toner. */
@@ -164,7 +185,10 @@ export interface PrintOpts {
 export const DEFAULT_PRINT: PrintOpts = {
   format: "roster",
   trackers: false,
+  jumpTrackers: false,
   rules: true,
+  actions: true,
+  commands: true,
   paper: "letter",
   inkSaver: false,
   excluded: [],

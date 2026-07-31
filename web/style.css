@@ -1516,13 +1516,20 @@ button { font-family: inherit; }
 .pcw-name { font-family: var(--narrow); font-size: 10px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.15; color: var(--ink); }
 .pcw-fig { font-family: var(--narrow); font-size: 9.5px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; color: var(--ink-2); white-space: nowrap; }
 .pc-carry { font-size: 9px; font-style: italic; color: var(--ink-2); margin-top: 2px; }
-.pc-track { margin-top: 6px; padding-top: 5px; border-top: 1px solid var(--hair-soft); display: flex; flex-direction: column; gap: 2px; }
+.pc-track { margin-top: 5px; padding-top: 4px; border-top: 1px solid var(--hair-soft); display: flex; flex-direction: column; gap: 1px; }
 .pc-track-h { font-family: var(--display); font-weight: 800; font-size: 9px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-2); margin: 0 0 3px; }
 .pc-track-sub { font-family: var(--sans); font-weight: 600; font-size: 8.5px; letter-spacing: 0; text-transform: none; color: var(--ink-3); margin-left: 5px; }
-.pc-track-row { display: flex; align-items: center; gap: 5px; }
+.pc-track-row { display: flex; align-items: center; gap: 4px; }
 .pc-track-label { font-family: var(--narrow, var(--sans)); font-size: 8.5px; font-weight: 700; color: var(--ink-3); min-width: 34px; }
-.pr-hp { display: inline-flex; flex-wrap: wrap; gap: 3px; }
-.pr-hp-box { width: 11px; height: 11px; border: 1px solid var(--ink-3); display: inline-block; }
+/* HP boxes touch. A ship with nine Silhouette is nine boxes, and at 11px with
+   3px between them that was 123px of a roster row - a strip of scattered
+   squares wider than the unit's name, for a fleet's worth of ships. Smaller
+   boxes and no gap at all: they share edges like graph paper, so a hull reads
+   as one bar you cross off along rather than a spray of separate marks, and
+   nine of them now cost 73px. -1px margins collapse the shared borders so the
+   line between two boxes is one hairline, not two. */
+.pr-hp { display: inline-flex; flex-wrap: wrap; }
+.pr-hp-box { width: 9px; height: 9px; border: 1px solid var(--ink-3); display: inline-block; margin: 0 -1px -1px 0; }
 .print-track-strip { display: flex; gap: 24px; flex-wrap: wrap; margin: 5px 0; padding: 4px 0; border-top: 1px solid var(--hair-soft); border-bottom: 1px solid var(--hair-soft); }
 .pts-item { display: flex; align-items: center; gap: 10px; }
 .pts-label { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
@@ -1580,7 +1587,12 @@ button { font-family: inherit; }
    rather than YOUR fleet. Set smaller and lighter than the roster above it so
    the page reads in the right order - your ships first, the rulebook extract
    last. Still full text, never trimmed. */
+/* Actions and Commands, each printed only if its box is ticked (see the print
+   toolbar). With both on this is the two-column spread it has always been; with
+   one on that column takes the whole width instead of leaving half the page
+   blank beside it - hence data-cols rather than a fixed 1fr 1fr. */
 .print-ref-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 16px; }
+.print-ref-cols[data-cols="1"] { grid-template-columns: 1fr; }
 @media (max-width: 640px) { .print-ref-cols { grid-template-columns: 1fr; } }
 .print-ref-h { font-family: var(--display); font-size: 10px; font-weight: 600; text-transform: uppercase; margin: 0 0 3px; color: var(--ink-2); }
 .print-ref-list { margin: 0; }
@@ -1600,7 +1612,7 @@ button { font-family: inherit; }
    lines. Widths are declared on both the th and the td (see render.ts), so the
    name and weapons get the room and the numbers collapse to what they need. */
 .print-roster { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.pr-unit { width: 20.5%; }
+.pr-unit { width: 18%; }
 /* A heading NEVER breaks inside a word. overflow-wrap:anywhere was here to stop
    "AUXILIARY WEAPONS" bleeding into its neighbour, but it also split THRUST into
    "THRUS / T" and SHIELDS into "SHIEL / DS", which is unreadable. Multi-word
@@ -1668,7 +1680,7 @@ button { font-family: inherit; }
    short of room. */
 .pr-num { text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; width: 30px; }
 .print-roster tbody .pr-num { white-space: nowrap; }
-.pr-cost { color: var(--blue); width: 44px; }
+.pr-cost { color: var(--blue); width: 40px; }
 .print-roster tbody .pr-cost { white-space: nowrap; }
 /* WEAPONS NEVER WRAP. The longest string in the game is 31 characters -
    `Bioplasm Ejectors [4D10, 0-12"]` - and at 11px Spectral in a 17% column it
@@ -1686,7 +1698,7 @@ button { font-family: inherit; }
    not fit shows as a clipped line rather than silently splitting a weapon name
    down the middle. Measured across every seed fleet and every faction's full
    catalogue: nothing overflows. */
-.pr-weap { width: 25%; }
+.pr-weap { width: 27%; }
 /* Written against `.print-roster tbody td` and `thead th`, both of which set a
    font-size that a bare .pr-weap loses to on specificity. */
 /* ONE FACE FOR THE DATA TOO. The stat figures were Libre Franklin 11px, the
@@ -1699,12 +1711,39 @@ button { font-family: inherit; }
   font-family: var(--narrow); letter-spacing: -0.01em;
 }
 .print-roster tbody td.pr-weap { font-weight: 600; font-size: 10px; line-height: 1.25; white-space: nowrap; }
-.pr-track { width: 78px; }
-.pr-track-ship { display: block; margin-bottom: 4px; }
+/* A notch smaller once a tracker column is on. Turning on damage and jump
+   trackers adds two columns to a table that already had eleven, and the
+   weapons are the only ones holding a sentence rather than a digit - so they
+   are what runs out of room first, and they are the one thing here that must
+   never wrap. Half a point buys the difference. The table says whether it is
+   crowded (data-dense in render.ts) rather than the CSS trying to count. */
+.print-roster[data-dense] tbody td.pr-weap { font-size: 9px; }
+.pr-track { width: 46px; }
+/* Jump trackers: a labelled box per ship, the label ON the box so a row read on
+   its own mid-turn still says what ticking it means. Hypergrowth gets two per
+   ship (jumped in / in reserve), everywhere else one. */
+/* One line per ship: its number, then a box per state. The words are in the
+   column head, above the boxes they name. */
+.pr-jump { width: 40px; }
+.pr-jump-head, .pr-jump-ship { display: flex; align-items: center; gap: 2px; }
+.pr-jump-ship { margin-bottom: 1px; }
+.pr-jump-ship:last-child { margin-bottom: 0; }
+.pr-jump-n { width: 7px; flex: none; font-family: var(--narrow); font-size: 7px; font-weight: 700; color: var(--ink-3); }
+.pr-jump-hl { width: 11px; flex: none; text-align: center; font-family: var(--narrow); font-size: 7px; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--ink-3); }
+.pr-jump-box { display: inline-block; width: 11px; height: 11px; flex: none; border: 1px solid var(--ink-3); }
+/* The header cell says it in full once; the mini-labels under it line the boxes
+   up. On a phone the full wording is what survives. */
+.print-roster thead th.pr-jump { white-space: normal; }
+.pc-jump .pr-jump-head, .pc-jump .pr-jump-ship { display: inline-flex; margin-right: 8px; }
+/* One ship's hull per line, with only enough air between ships to tell one row
+   of boxes from the next. */
+.pr-track-ship { display: block; margin-bottom: 2px; }
 .pr-track-ship:last-child { margin-bottom: 0; }
 /* Two rows of boxes rather than one wide row, for the same reason. */
-.pr-req { width: 42px; }
-.pr-req-box { display: inline-block; width: 13px; height: 13px; border: 1px solid var(--ink-3); margin: 0 3px 3px 0; }
+.pr-req { width: 34px; }
+/* Same treatment as the hull boxes: one requisition tick per ship, sharing
+   edges rather than scattered across the column. */
+.pr-req-box { display: inline-block; width: 11px; height: 11px; border: 1px solid var(--ink-3); margin: 0 -1px -1px 0; }
 .print-roster tfoot td { border-top: 1px solid var(--ink-3); padding: 4px 5px; font-weight: 700; }
 .pr-total-label { text-align: right; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
 
@@ -1724,7 +1763,7 @@ button { font-family: inherit; }
 .print-hvp p { font-family: var(--serif); font-size: 11.5px; line-height: 1.14; margin: 0; }
 .print-hvp-slot { font-family: var(--sans); font-size: 10px; font-weight: 600; letter-spacing: 0.02em; color: var(--ink-3); text-transform: none; }
 /* Age of Unity: a blank line per ship to pencil in who carries an HVP. */
-.pr-hvp-slot { width: 8%; }
+.pr-hvp-slot { width: 7%; }
 /* Where the carrier started, so it can be struck through and rewritten when
    the token changes hands mid-game. */
 .pr-hvp-start { display: block; font-size: 9.5px; color: var(--ink-3); line-height: 1.2; }
@@ -4332,16 +4371,14 @@ a .icon,
 .play-arcs { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--hair-soft); }
 
 
-/* Personnel three to a row. Each entry is a name and a sentence or two, so
-   stacked full-width they left most of every line empty - and Age of Unity
-   prints twelve of them. Each block still avoids breaking across a page. */
-/* Faction personnel across the left two columns, the shared generic pool kept
-   together in the right-hand one. A plain 3-column flow interleaved them
-   wherever the break happened to land. */
-.print-hvp-cols { display: grid; grid-template-columns: 2fr 1fr; gap: 0 16px; align-items: start; }
-.print-hvp-own { columns: 2; column-gap: 16px; }
-.print-hvp-cols .print-hvp { break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 4px; }
-/* The three personnel you actually chose: one per column, side by side.
+/* The all-available layout (.print-hvp-cols / -own / -shared) is gone with the
+   code that built it: Age of Unity printed the faction's whole personnel roster
+   plus the generic pool, and now every mode prints the ones you chose.
+
+   Personnel one to a column. Each entry is a name and a sentence or two, so
+   stacked full-width they left most of every line empty. Each block still
+   avoids breaking across a page. */
+/* The personnel you actually chose: one per column, side by side.
    align-items:start so a short entry does not get stretched to match a long
    one, and a real grid rather than a CSS column flow, which balances by height
    and would drop the third block onto its own row. */
@@ -4349,11 +4386,10 @@ a .icon,
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 14px; align-items: start;
 }
 .print-hvp-chosen .print-hvp { break-inside: avoid; margin-bottom: 2px; }
-@media (max-width: 620px) { .print-hvp-chosen { grid-template-columns: 1fr; } }
-@media (max-width: 700px) {
-  .print-hvp-cols { grid-template-columns: 1fr; }
-  .print-hvp-own { columns: 1; }
-}
+/* Three across is only right when three fit. Below that they stack, rather than
+   squeezing a name and two lines of rule into a third of a phone. */
+@media (max-width: 760px) { .print-hvp-chosen { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .print-hvp-chosen { grid-template-columns: 1fr; } }
 
 
 /* ---------------------------------------------------------- faction rule block

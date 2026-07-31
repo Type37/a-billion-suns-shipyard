@@ -5171,7 +5171,14 @@ main.play-body .roster-section::before { content: none; }
      margin and keeps the pinned block to one line instead of two: a second row
      would be ~44px of the ~210 the whole pinned block gets, spent on three
      controls you press once a session. */
-  .play-sticky .play-bar { gap: 4px 8px; }
+  /* wrap, not the nowrap above: at 44px targets the row needs 352px and a
+     390px phone gives it 362, but a 360 or 375px one gives 332 and 347. nowrap
+     does not shrink them, it clips them - End play lost its right edge off the
+     side of the screen. Wrapping puts the three buttons on a second line on
+     those two sizes only, which costs 47px of pinned header on the phones that
+     can least afford it and is still the better of the two: a control you
+     cannot see the edge of is worse than a control one row further down. */
+  .play-sticky .play-bar { gap: 4px; flex-wrap: wrap; }
   .play-sticky .play-bar-id { flex: 0 0 auto; min-width: 0; font-size: 11px; line-height: 1.25; white-space: nowrap; }
   .play-sticky .play-bar-id-tail, .play-sticky .play-bar-name { display: none; }
   .play-sticky .play-bar-id a { justify-content: center; min-width: var(--tap); }
@@ -5190,6 +5197,9 @@ main.play-body .roster-section::before { content: none; }
     padding: 0 9px; min-height: var(--tap); font-size: 11px;
   }
   .play-sticky .play-bar-reset, .play-sticky .play-bar-print { font-size: 0; gap: 0; padding: 0 10px; }
+  /* Only has an effect on the sizes where the row wraps: it fills the second
+     line rather than sitting in a corner of it with 240px of white beside it. */
+  .play-sticky .play-bar-end { flex: 1 0 auto; justify-content: center; }
   .play-sticky .play-bar-reset .icon, .play-sticky .play-bar-print .icon { margin: 0; }
   .play-sticky .phase-track { margin: 0; }
   .play-sticky .cmd-strip { padding: 4px 0 2px; border-bottom: none; }
@@ -5473,7 +5483,12 @@ main.play-body .roster-section::before { content: none; }
   .sy-head .mf-era-badge { padding: 3px 5px; font-size: 10px; letter-spacing: 0.01em; gap: 3px; }
   .sy-head .mf-play-btn { padding: 0 7px; font-size: 10.5px; gap: 4px; }
   .sy-head .mf-menu > summary { height: 26px; padding: 0 5px; }
-  .sy-head .mf-fac > summary, .sy-head .faction-switch > summary { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* max-width, and not only overflow:hidden. The summary is an inline-flex box
+     sized to its own content, and a <details> does not clip its child: with
+     .mf-fac shrunk to 61px the summary still laid out at 170 and printed
+     "Golem Mega-Systems" straight across the era badge next to it. Capping it
+     at its own parent's width is what makes the ellipsis fire. */
+  .sy-head .mf-fac > summary, .sy-head .faction-switch > summary { min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   /* The name gets a row to itself. Sharing one with Play and the menu got the
      header down to 97px but left the field 146px wide, and the shortest seed
      name needs 164px - so the fleet name was being cut off, which is the one
@@ -5482,7 +5497,14 @@ main.play-body .roster-section::before { content: none; }
      at 19px and 276px at 17px. So: full row, 17px, and it fits with room over.
      Three short rows beat two rows and a truncated name. */
   .sy-head > .sy-id { order: 1; flex: 1 1 100%; min-width: 0; }
-  .sy-head > .sy-fac { order: 2; flex: 0 1 auto; gap: 4px; }
+  /* `1 1 0`, not `0 1 auto`. Flex decides wrapping from an item's hypothetical
+     main size and only shrinks what already shares a line, so an auto-basis
+     faction group that wants 232px takes the whole row with it and orphans Play
+     and the menu onto a third - which is what a 360 and a 375px phone got once
+     Reference grew to a 44px target. A zero basis puts all three on one line
+     first and lets this group take what is left, which is the shrink-not-wrap
+     behaviour the budget below was always describing. */
+  .sy-head > .sy-fac { order: 2; flex: 1 1 0; gap: 4px; }
   .sy-head > .mf-play-btn { order: 3; flex: none; }
   .sy-head > .mf-menu { order: 4; flex: none; }
   /* 16px, not 17: at 17 the longest seed name still needed 276px against 268
@@ -5559,9 +5581,12 @@ main.play-body .roster-section::before { content: none; }
     box-sizing: border-box;
   }
   /* Square controls need the other axis too: these were 24-34px wide inside a
-     row that had already given them 44 of height. */
+     row that had already given them 44 of height. Every one of them is
+     icon-only, which is exactly the class of control that ends up narrow: there
+     is no label holding the box open. */
   .mf-name-gen, .emblem-current-btn, .sy-hvp-check, .onboard-close, .card-act,
-  .learn-dot.is-sub {
+  .learn-dot.is-sub, .sy-ref-btn, .play-bar-print, .play-bar-reset,
+  .foundry-main .ghost-btn {
     min-width: var(--tap);
   }
   /* Icon-only buttons centre their glyph in the grown box rather than pinning

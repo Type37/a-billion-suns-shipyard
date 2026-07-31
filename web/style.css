@@ -568,8 +568,10 @@ button { font-family: inherit; }
   .cg-build { display: inline-flex; align-items: center; justify-content: center; }
   .nf-custom-btn, .mf-tally-cap { display: inline-flex; align-items: center; justify-content: center; }
   /* Footer links are 19px of text. Padding, not min-height, so the row does not
-     become four fat bars stacked up the bottom of the screen. */
-  .gif-inner > a { padding-top: 10px; padding-bottom: 10px; }
+     become four fat bars stacked up the bottom of the screen. 13, not 10: at 10
+     they measured 39, four px short of the thumb floor the rest of the app now
+     holds to. */
+  .gif-inner > a { padding-top: 13px; padding-bottom: 13px; }
 }
 
 /* --------------------------------------------------------------------- toast */
@@ -1551,11 +1553,21 @@ button { font-family: inherit; }
 .print-page { max-width: 940px; margin: 0 auto; padding: 20px; width: 100%; min-width: 0; }
 .print-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; }
 
-.sheet { background: #fff; border: 1px solid var(--hair-soft); padding: clamp(10px, 1.5vw, 16px); }
+/* No vw anywhere on the sheet, in this rule or any other. The sheet is 710px
+   wide on a phone and on a desktop - that is the point of it - so a vw unit
+   inside it does not scale with its container, it scales with a viewport it has
+   nothing to do with. This padding used to be clamp(10px, 1.5vw, 16px), which
+   resolved to 10 on a phone and 16 on a desktop and left the preview's content
+   column 12px wider on the phone: every column width, every wrap point and, at
+   the margin, the page count came out different on the two. Flat 16. */
+.sheet { background: #fff; border: 1px solid var(--hair-soft); padding: 16px; }
 .sheet-head { display: flex; align-items: center; gap: 10px; padding-bottom: 4px; border-bottom: 1px solid var(--ink-3); }
 .sheet-emblem { color: var(--blue); flex-shrink: 0; }
 .sheet-title-block { flex: 1; }
-.sheet-title { font-family: var(--display); font-weight: 800; font-size: clamp(19px, 2.8vw, 26px); letter-spacing: -0.02em; text-transform: uppercase; line-height: 0.98; }
+/* 26px flat, not clamp(19px, 2.8vw, 26px): see the .sheet rule above. The fleet
+   name printed at 26 and previewed at 19 on a phone, which is a different
+   header height and a different first page. */
+.sheet-title { font-family: var(--display); font-weight: 800; font-size: 26px; letter-spacing: -0.02em; text-transform: uppercase; line-height: 0.98; }
 .sheet-subtitle { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-top: 4px; }
 .sheet-totals { text-align: right; }
 .sheet-total-line { font-family: var(--display); font-weight: 700; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--ink-2); }
@@ -1593,7 +1605,9 @@ button { font-family: inherit; }
    blank beside it - hence data-cols rather than a fixed 1fr 1fr. */
 .print-ref-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 16px; }
 .print-ref-cols[data-cols="1"] { grid-template-columns: 1fr; }
-@media (max-width: 640px) { .print-ref-cols { grid-template-columns: 1fr; } }
+/* No viewport query here either: this grid is only ever drawn on the 710px
+   sheet, so a max-width:640px rule collapsed the reference to one column in the
+   preview and printed it in two. See .print-hvp-chosen for the same fix. */
 .print-ref-h { font-family: var(--display); font-size: 10px; font-weight: 600; text-transform: uppercase; margin: 0 0 3px; color: var(--ink-2); }
 .print-ref-list { margin: 0; }
 .print-ref-list dt { font-family: var(--sans); font-weight: 600; font-size: 9px; color: var(--ink-2); margin-top: 2px; }
@@ -2818,6 +2832,20 @@ button { font-family: inherit; }
 .era-opt-name { font-family: var(--display); font-weight: 700; font-size: 13.5px; color: var(--ink); }
 .era-opt-hint { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); }
 .era-switch-note { font-size: 11.5px; line-height: 1.4; color: var(--ink-3); margin: 4px 2px 0; }
+/* The badge sits mid-row, so a 300px panel hung off its left edge started at
+   x=103 and ended at x=403 on a 390px screen: the era you are switching TO was
+   the part that fell off. Nothing an absolute panel can do fixes that - its
+   containing block is the badge, and the badge's position is whatever the row
+   gave it - so on a phone it stops being anchored to the badge and becomes a
+   sheet at the bottom of the screen. It cannot overflow, it is the one place a
+   thumb reaches without shifting grip, and it is the shape a phone user already
+   expects a choice to arrive in. Tapping outside closes it (see main.ts). */
+@media (max-width: 760px) {
+  .era-switch-panel {
+    position: fixed; left: 10px; right: 10px; bottom: 10px; top: auto; width: auto;
+    max-height: 70vh; overflow-y: auto;
+  }
+}
 
 .mf-emblem { flex-shrink: 0; }
 .mf-emblem .emblem-current-btn { border: none; padding: 0; background: none; }
@@ -4182,11 +4210,35 @@ button { font-family: inherit; }
 .print-page { display: flex; flex-direction: column; align-items: center; }
 .print-page > .print-toolbar,
 .print-page > .print-excluded-note { width: 100%; max-width: var(--shell); }
-/* The sheet always stays at the TRUE printable width for the paper, at every
+/* The sheet always LAYS OUT at the TRUE printable width for the paper, at every
    screen size - if it reflowed narrower the preview would break in different
-   places than the printer, and the page count would lie. On a narrow screen it
-   scrolls inside its own viewport instead. */
+   places than the printer, and the page count would lie.
+   It used to scroll inside its own viewport on a narrow screen, and that was
+   the worst screen in the app on a phone: a 710px page in a 350px window,
+   parked mid-page by justify-content:center, so it opened on a vertical strip
+   out of the middle of the roster with the fleet name off to the left and the
+   costs off to the right. Reading it meant panning in two axes, and the page
+   guides - the entire point of the preview - were never both on screen.
+   So it is scaled to fit instead. `zoom`, not `transform: scale`: zoom is the
+   one that shrinks the layout box too, so the sheet stops overflowing rather
+   than merely being painted smaller inside a box that still overflows. The
+   layout above it is untouched, and pinch-zoom magnifies real 710px-wide
+   layout, so it sharpens rather than blurring the way a scaled bitmap would.
+
+   `transform: scale`, not `zoom`. Both fit the page on screen; only transform
+   leaves the layout alone. zoom re-runs layout at the scaled size, and the
+   fractional widths that fell out of it (646.5px of content against the
+   desktop's 648) wrapped one extra line in the roster and pushed a one-page
+   Megamart sheet onto a second page in the preview - the exact lie this
+   preview exists to avoid. Transform does not touch layout at all, so the
+   phone fragments the sheet into the same pages as the printer, to the pixel.
+   The cost is that the sheet's layout box stays 710px wide and would still
+   overflow, so fitPrintSheet() in main.ts gives the viewport `is-fit`, which
+   clips it, and sets the viewport's height to the scaled height by hand -
+   a transformed box contributes its UNscaled size to its parent. */
 .sheet-viewport { width: 100%; max-width: var(--shell); overflow-x: auto; display: flex; justify-content: center; }
+.sheet-viewport.is-fit { overflow: hidden; display: block; }
+.sheet-viewport.is-fit > .sheet { transform: scale(var(--sheet-scale, 1)); transform-origin: top left; }
 .sheet {
   position: relative;
   width: var(--page-w, 710px);
@@ -4244,11 +4296,12 @@ button { font-family: inherit; }
   .print-go { justify-content: space-between; }
 }
 @media print {
-  /* On paper the browser does the real pagination; the guides and the width
-     cap are preview-only scaffolding. */
+  /* On paper the browser does the real pagination; the guides, the width cap
+     and the fit-to-screen scale are preview-only scaffolding. */
   .page-guide { display: none !important; }
   .sheet { width: auto; box-shadow: none; }
-  .sheet-viewport { overflow: visible; display: block; max-width: none; }
+  .sheet-viewport, .sheet-viewport.is-fit { overflow: visible; display: block; max-width: none; height: auto !important; }
+  .sheet-viewport.is-fit > .sheet { transform: none; }
   .print-excluded-note { display: none !important; }
 }
 
@@ -4410,12 +4463,17 @@ a .icon,
 .print-hvp-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 14px; align-items: start; }
 .print-hvp-menu .print-hvp { break-inside: avoid; margin-bottom: 2px; }
 .print-hvp-note { margin: 0 0 4px; }
-@media (max-width: 760px) { .print-hvp-menu { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 560px) { .print-hvp-menu { grid-template-columns: 1fr; } }
-/* Three across is only right when three fit. Below that they stack, rather than
-   squeezing a name and two lines of rule into a third of a phone. */
-@media (max-width: 760px) { .print-hvp-chosen { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 560px) { .print-hvp-chosen { grid-template-columns: 1fr; } }
+/* These two used to drop to two columns at 760 and one at 560, on the reasoning
+   that three names and their rules do not fit across a third of a phone. True
+   of a phone, and irrelevant here: both grids exist only inside .sheet, which
+   is 710px wide on every screen because that is the paper's printable width.
+   The viewport was never their container, so the queries did nothing but make
+   the preview disagree with the printer - the personnel block came out 89px
+   tall on a phone against 56 on a desktop, which was enough to push a Megamart
+   roster onto a second page in the preview and one page on paper. The page
+   count is the whole reason this preview exists, so it may not lie.
+   If these ever need to reflow, it is on the sheet's own width - a container
+   query, the way the weapons table does it (see "reflow on its OWN width"). */
 
 
 /* ---------------------------------------------------------- faction rule block
@@ -4455,6 +4513,13 @@ a .icon,
   .frule { grid-template-columns: 1fr; }
   .frule-vitals { flex-direction: row; gap: 20px; }
 }
+/* Except on the sheet. The rule block appears on four screens and on the paper,
+   and only the paper has a width that does not move: 710px, on a phone as much
+   as on a desktop. Letting the phone breakpoint reach inside stacked the two
+   per-round figures under the rule text in the preview and printed them beside
+   it, which is a different block height and so a different page break. */
+.sheet .frule { grid-template-columns: minmax(0, 1fr) max-content; }
+.sheet .frule-vitals { flex-direction: column; gap: 6px; }
 
 
 /* Learn to Play: a sub-heading, a quiet note, and the link out to the source. */
@@ -4810,6 +4875,9 @@ main.play-body .roster-section::before { content: none; }
 .play-bar-id { margin: 0; font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); }
 .play-bar-id a { color: var(--blue); text-decoration: none; }
 .play-bar-id a:hover { text-decoration: underline; }
+/* The crumb reads as a sentence on a wide screen and collapses to this arrow on
+   a phone, where the row cannot afford the name. See the .play-sticky block. */
+.play-bar-back { display: none; }
 .play-bar-round { display: flex; align-items: center; gap: 9px; margin-left: auto; }
 .play-bar-round .control-label { margin: 0; }
 .play-bar-round { margin-block: 0; }
@@ -5081,27 +5149,71 @@ main.play-body .roster-section::before { content: none; }
      41% of a 670px screen; the breadcrumb was wrapping and the round readout
      was set at 28px. Nothing is dropped - it is the same four rows, tighter. */
   .play-sticky .play-bar { padding-bottom: 3px; border-bottom: none; gap: 4px 10px; flex-wrap: nowrap; }
-  .play-sticky .play-bar-id { flex: 1 1 auto; min-width: 0; font-size: 10.5px; line-height: 1.25; }
-  .play-sticky .play-bar-round { flex: none; gap: 5px; }
+  /* The breadcrumb is `min-width: 0` so the round readout keeps its width, and
+     a box narrower than its own min-content does not clip its text - it spills.
+     "Megamart Starter Shipyard / Play mode" wrapped to five lines and then ran
+     straight through the ROUND 1 OF 4 beside it, which is what a phone actually
+     showed: two readouts printed on top of each other.
+
+     Truncating it to one line fixed the overlap and exposed the real problem:
+     add up what this row carries on a 350px content column - the round readout
+     at 92, Print at 68, Reset at 36, End play at 105, four gaps at 10 - and 341
+     of 350 is spent before the name gets a pixel. It was being ellipsised to
+     14px wide, which is not a fleet name, not a tap target, and not worth the
+     row it sits in.
+
+     So on a phone the crumb is the back arrow it always was, without the label:
+     a 44px chevron to the fleet you came from. Nothing is lost that the screen
+     was not already saying - the roster underneath IS the fleet, and you got
+     here by pressing Enter play mode on it one screen ago. The "/ Play mode"
+     tail goes with it for the same reason. Print drops its label to match
+     Reset, which was already icon-only here. That buys the row back its
+     margin and keeps the pinned block to one line instead of two: a second row
+     would be ~44px of the ~210 the whole pinned block gets, spent on three
+     controls you press once a session. */
+  .play-sticky .play-bar { gap: 4px 8px; }
+  .play-sticky .play-bar-id { flex: 0 0 auto; min-width: 0; font-size: 11px; line-height: 1.25; white-space: nowrap; }
+  .play-sticky .play-bar-id-tail, .play-sticky .play-bar-name { display: none; }
+  .play-sticky .play-bar-id a { justify-content: center; min-width: var(--tap); }
+  .play-sticky .play-bar-back { display: block; }
+  .play-sticky .play-bar-round { flex: none; gap: 5px; margin-left: auto; }
   .play-sticky .play-bar-round .round-value { font-size: 19px; }
   .play-sticky .play-bar-of { font-size: 10.5px; }
-  .play-sticky .play-bar-reset, .play-sticky .play-bar-print, .play-sticky .play-bar-end { padding: 0 9px; min-height: 34px; font-size: 11px; }
-  /* On a phone the bar is pinned and every pixel of it is height the table
-     never gets back, so Reset loses its word. It is the destructive one and the
-     one you press least; End play and Print keep their labels. */
-  .play-sticky .play-bar-reset { font-size: 0; gap: 0; padding: 0 10px; }
-  .play-sticky .play-bar-reset .icon { margin: 0; }
+  /* The word each of these three keeps or loses, and why. Reset is destructive
+     and pressed least, so it was already an icon; Print joins it now that the
+     row is paying for a 44px crumb (its own icon is a printer, which is not a
+     word anyone needs). End play keeps its label: it is the one control here
+     that ends the session, and an unlabelled icon is the wrong way to offer
+     that. 44px tall, not 34 - the row is the tallest thing in it either way,
+     and the crumb beside them already sets that height. */
+  .play-sticky .play-bar-reset, .play-sticky .play-bar-print, .play-sticky .play-bar-end {
+    padding: 0 9px; min-height: var(--tap); font-size: 11px;
+  }
+  .play-sticky .play-bar-reset, .play-sticky .play-bar-print { font-size: 0; gap: 0; padding: 0 10px; }
+  .play-sticky .play-bar-reset .icon, .play-sticky .play-bar-print .icon { margin: 0; }
   .play-sticky .phase-track { margin: 0; }
   .play-sticky .cmd-strip { padding: 4px 0 2px; border-bottom: none; }
-  .play-sticky .cmd-strip-adjust .stepper-btn { width: 26px; height: 26px; min-height: 26px; }
+  /* 26px was under the 44px thumb floor by a long way, on the pair of buttons
+     that correct a mis-counted CMD pool mid-turn. 40 with the 4px gap either
+     side clears the 24px-target + 24px-spacing route through SC 2.5.8 and is
+     within 4px of the HIG figure, and the row it sits in has 84px of the 350
+     available - the height was never the constraint here, only habit. */
+  .play-sticky .cmd-strip-adjust .stepper-btn { width: 40px; height: 40px; min-height: 40px; }
   /* Next phase joins the pinned block, so the button you press four times a
      round is always under your thumb. */
   .play-sticky-next { margin: 5px 0 0; }
   .play-sticky-next .cta-btn { width: 100%; }
   /* The pile is the one thing that must never wrap out of sight, and a big
      faction can hand out eight or more, so the tokens shrink rather than
-     spilling onto a third row. */
-  .cmd-pip { width: 30px; height: 30px; }
+     spilling onto a third row.
+
+     They shrank too far. 30px is a token you spend and un-spend several times a
+     round with a thumb, six px under the legal floor's spacing route and 14
+     under the HIG figure. Re-measured against the constraint that set 30: at
+     40px with a 3px gap, eight tokens need 341px of the 350 a 390px screen
+     gives the content column, so the largest pool any faction hands out still
+     sits on one row. Nine wraps to two, which was always allowed. */
+  .cmd-pip { width: 40px; height: 40px; }
   .cmd-pips { gap: 3px; }
   /* Anything the sticky block scrolls over has to clear it, or a tapped
      accordion opens underneath the header. */
@@ -5413,6 +5525,74 @@ main.play-body .roster-section::before { content: none; }
 .foundry-main input[type="checkbox"],
 .print-opts input[type="checkbox"] {
   width: 18px; height: 18px; margin: 3px;
+}
+
+/* --------------------------------------------- 44px thumb floor, touch only
+   24px is the legal floor (SC 2.5.8, AA) and it is the wrong number for a
+   finger. Apple's HIG says 44pt, Material says 48dp, and WCAG's own enhanced
+   criterion (2.5.5, AAA) says 44px - three independent bodies landing on the
+   same figure because it is roughly the contact patch of an adult thumb, not
+   an arbitrary round number. The block above got the app to legal; this gets
+   it to usable.
+
+   Split from that block rather than merged into it for one reason: 24px is
+   unconditional and 44px must not be. On a mouse a 44px minimum on a dense
+   roster row is wasted vertical space - so this is gated on the same
+   `max-width OR pointer: coarse` test the older thumb-target block near the
+   top of the file uses, and lists the controls a 390x844 audit found still
+   under 44 after that block had run.
+
+   Re-audited after every change with a headless pass that walks every
+   interactive element on all ten views and reports anything whose shorter side
+   is under 44. Keep it at zero. */
+@media (max-width: 760px), (pointer: coarse) {
+  /* Builder chrome: name field, its roll/clear pair, the era badge, Reference,
+     Play, the emblem swatch. Measured 24-34px each. */
+  .mf-name, .sy-name, .unit-name-input, .hvp-name-input,
+  .mf-name-gen, .mf-era-badge, .mf-era-badge.is-control, .sy-ref-btn, .mf-play-btn,
+  .emblem-current-btn, .sy-hvp-check, .sy-req-btn, .sy-ledger-btn,
+  .sy-hvp-name > summary, .ru-carry .hvp-pop > summary,
+  /* Chrome and catalogue. */
+  .nav-fold-btn, .onboard-close, .comp-view-btn, .comp-filters select,
+  .comp-search, .limit-input, .print-toggle {
+    min-height: var(--tap);
+    box-sizing: border-box;
+  }
+  /* Square controls need the other axis too: these were 24-34px wide inside a
+     row that had already given them 44 of height. */
+  .mf-name-gen, .emblem-current-btn, .sy-hvp-check, .onboard-close, .card-act,
+  .learn-dot.is-sub {
+    min-width: var(--tap);
+  }
+  /* Icon-only buttons centre their glyph in the grown box rather than pinning
+     it to the top-left corner the padding used to put it in. */
+  .mf-name-gen, .sy-hvp-check, .onboard-close, .emblem-current-btn,
+  .comp-view-btn, .sy-req-btn, .sy-ledger-btn, .print-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .print-toggle { justify-content: flex-start; }
+  /* A checkbox you tick mid-print-setup with a thumb. The label around it is
+     44px now, but the box itself is what people aim at. */
+  .foundry-main input[type="checkbox"],
+  .print-opts input[type="checkbox"] { width: 24px; height: 24px; }
+  /* The wordmark is the way home from every screen, and it was 26px tall. */
+  .wordmark { display: inline-flex; align-items: center; min-height: var(--tap); }
+  /* WarLore's credit sits inside the footer row that already pads its direct
+     children; this one is nested a level deeper and missed it. */
+  .wl-sig { display: inline-flex; align-items: center; min-height: var(--tap); }
+  /* The hamburger menu's own items: 12px of padding on a 17px line came to 41.
+     These are the five links every screen is reached through. */
+  .nav-fold > .topnav a, .nav-fold > .topnav .topnav-btn { min-height: var(--tap); }
+  /* Ellipsis menus and disclosures that had the height but not the width. */
+  .mf-menu-btn { min-width: var(--tap); }
+  .limit-switch > summary, .phase-fold-summary, .sy-add-unit {
+    min-height: var(--tap); box-sizing: border-box;
+  }
+  .limit-switch > summary { display: inline-flex; align-items: center; }
+  /* Play Mode's per-step ticks are the control you press most in a whole game,
+     and they were the native 16px default. The label around them is already a
+     full-width row, so only the box itself needed the size. */
+  .phase-check input[type="checkbox"] { width: 24px; height: 24px; flex: none; }
 }
 
 /* Hypergrowth's personnel note. No picker: there are no units to pick until

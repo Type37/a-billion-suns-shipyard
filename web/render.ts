@@ -3191,7 +3191,7 @@ function playView(state: AppState): string {
     -->
     <div class="play-sticky">
       <header class="play-bar">
-        <p class="play-bar-id"><a href="#/list/${list.id}">${escapeHtml(list.fleet.name || "Unnamed fleet")}</a> <span aria-hidden="true">/</span> Play mode</p>
+        <p class="play-bar-id"><a href="#/list/${list.id}" aria-label="Back to ${escapeHtml(list.fleet.name || "Unnamed fleet")}">${icon("chevronRight", 16, "flip-x play-bar-back")}<span class="play-bar-name">${escapeHtml(list.fleet.name || "Unnamed fleet")}</span></a><span class="play-bar-id-tail"> <span aria-hidden="true">/</span> Play mode</span></p>
         <!--
           A readout, not a control. The round only ever moves one way and it moves
           by itself: Next phase past the End Phase rolls it over. A pair of steppers

@@ -280,15 +280,62 @@ function tryImportShare(): boolean {
  * The guides are absolutely positioned inside the (relative) sheet, so drawing
  * them never moves any content.
  */
+/**
+ * Scale the print preview down until the whole page width is on screen.
+ *
+ * The sheet is laid out at the paper's true printable width (710px for Letter)
+ * and must stay that way, or the preview would break in different places than
+ * the printer. On a phone that left a 710px page inside a ~350px window: see
+ * the .sheet-viewport comment in style.css for what that actually looked like.
+ *
+ * A transform, so the sheet's LAYOUT is untouched and the preview fragments
+ * into exactly the pages the printer will produce (see the .sheet-viewport
+ * comment in style.css for what `zoom` did instead). A transformed box still
+ * reports its unscaled size to its parent, so the viewport's height is set here
+ * to match what is actually painted, or the page would keep a few hundred
+ * pixels of blank space under the sheet.
+ *
+ * Never scaled above 1: a sheet blown up past its paper size on a desktop would
+ * be a preview of a page nobody is printing.
+ */
+function fitPrintSheet(): void {
+  const sheet = document.querySelector<HTMLElement>("[data-print-sheet]");
+  const view = sheet?.parentElement;
+  if (!sheet || !view) return;
+  const pageW = parseFloat(getComputedStyle(sheet).getPropertyValue("--page-w")) || 710;
+  // clientWidth, not getBoundingClientRect: the viewport is the scroll box, and
+  // its border box would count a scrollbar the sheet cannot paint into. Read
+  // before the class goes on, so a fit already in force does not measure itself.
+  view.classList.remove("is-fit");
+  view.style.height = "";
+  const avail = view.clientWidth;
+  if (!avail || !pageW || avail >= pageW) return;
+  const scale = avail / pageW;
+  sheet.style.setProperty("--sheet-scale", String(scale));
+  view.classList.add("is-fit");
+  view.style.height = `${Math.ceil(sheet.offsetHeight * scale)}px`;
+}
+
 function paginatePrintPreview(): void {
   const sheet = document.querySelector<HTMLElement>("[data-print-sheet]");
   const readout = document.querySelector<HTMLElement>("[data-print-pagecount]");
   if (!sheet) return;
 
   for (const old of sheet.querySelectorAll(".page-guide")) old.remove();
+  fitPrintSheet();
 
-  const pageH = parseFloat(getComputedStyle(sheet).getPropertyValue("--page-h")) || 950;
-  const sheetTop = sheet.getBoundingClientRect().top;
+  const cs = getComputedStyle(sheet);
+  const pageH = parseFloat(cs.getPropertyValue("--page-h")) || 950;
+  const pageW = parseFloat(cs.getPropertyValue("--page-w")) || 710;
+  const box = sheet.getBoundingClientRect();
+  const sheetTop = box.top;
+  // Every rect below is read through the fit-to-width transform, so it comes
+  // back in painted pixels; --page-h and the guide offsets written back are in
+  // layout pixels. One divisor converts between the two, and it is 1 whenever
+  // the sheet is at full size. Measured off the sheet's own box rather than
+  // taken from the property that set it, so it stays right even if the fit is
+  // ever computed somewhere else.
+  const zoom = box.width > 0 ? box.width / pageW : 1;
 
   // A flat list of LEAF breakable units in document order - never a container
   // and its own descendants, or the same content would be counted twice. Table
@@ -298,7 +345,7 @@ function paginatePrintPreview(): void {
   const walk = (el: HTMLElement): void => {
     for (const child of Array.from(el.children) as HTMLElement[]) {
       if (child.classList.contains("page-guide")) continue;
-      const h = child.getBoundingClientRect().height;
+      const h = child.getBoundingClientRect().height / zoom;
       if (h <= 0) continue;
       const rows = child.querySelectorAll<HTMLElement>("tbody tr");
       if (rows.length > 1) {
@@ -322,8 +369,8 @@ function paginatePrintPreview(): void {
   let pageBottom = pageH;
   for (const u of units) {
     const r = u.getBoundingClientRect();
-    const top = r.top - sheetTop;
-    const bottom = r.bottom - sheetTop;
+    const top = (r.top - sheetTop) / zoom;
+    const bottom = (r.bottom - sheetTop) / zoom;
     if (bottom > pageBottom) {
       if (top > 0 && top < bottom) breaks.push(top);
       pageBottom = top + pageH;
@@ -885,12 +932,43 @@ function positionTour(): void {
   pop.classList.add("placed");
 }
 
+// A popover you opened by accident had exactly one way out: find the small
+// summary again, or press Escape. A phone has no Escape key, so on the device
+// where the mis-tap is most likely the dismissal was the least available - and
+// the era switcher, the ledger and the overflow menu all sit over content you
+// then cannot reach. Tapping anywhere outside closes them, which is what every
+// menu on the platform does.
+//
+// A popover is identified by its own layout, not by a marker attribute: an
+// out-of-flow panel is floating over the page and must yield to a tap
+// elsewhere, whereas an in-flow <details> is an accordion whose content is part
+// of the document and has to stay put. That test needs no markup in the
+// eighteen templates and cannot fall out of date when a new one is added.
+document.addEventListener(
+  "pointerdown",
+  (e) => {
+    const t = e.target as Node | null;
+    for (const d of document.querySelectorAll<HTMLDetailsElement>("details[open]")) {
+      if (t && d.contains(t)) continue;
+      const panel = d.querySelector<HTMLElement>(":scope > *:not(summary)");
+      if (!panel) continue;
+      const pos = getComputedStyle(panel).position;
+      if (pos !== "absolute" && pos !== "fixed") continue;
+      d.open = false;
+    }
+  },
+  true,
+);
+
 window.addEventListener("resize", () => {
   enhanceNav();
   positionTour();
   // The pinned header wraps to a second line as the viewport narrows, and the
   // roster panel sticks below it, so its height has to be re-read on resize.
   measureStickyHeader();
+  // Rotating a phone changes the fit scale, which changes where every page
+  // guide lands. Re-paginating re-fits first, so this is the whole job.
+  paginatePrintPreview();
 });
 
 // Placed against fallback metrics on the first paint, so it lands ~60px adrift

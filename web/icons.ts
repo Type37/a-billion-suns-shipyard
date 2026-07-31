@@ -111,12 +111,30 @@ const PATHS: Record<string, string> = {
   "stat-mass": MASS_MARK,
   "stat-thrust":
     '<path fill="currentColor" stroke="none" d="m13.061 4.939l-2.122 2.122L15.879 12l-4.94 4.939l2.122 2.122L20.121 12z"/><path fill="currentColor" stroke="none" d="M6.061 19.061L13.121 12l-7.06-7.061l-2.122 2.122L8.879 12l-4.94 4.939z"/>',
-  // si:target-fill and solar:shield-bold, both as supplied: solid marks, so they
-  // carry their own fill and stroke:none and ignore icon()'s stroke wrapper.
+  // si:target-fill, as supplied: a solid mark, so it carries its own fill and
+  // stroke:none and ignores icon()'s stroke wrapper.
   "stat-silhouette":
     '<path fill="currentColor" stroke="none" d="M11.997 4.5C7.312 4.5 3.5 8.312 3.5 13s3.813 8.5 8.5 8.5c4.688 0 8.5-3.812 8.5-8.5s-3.812-8.5-8.503-8.5m.003 15c-3.584 0-6.5-2.916-6.5-6.5S8.414 6.5 12 6.5c3.584 0 6.5 2.916 6.5 6.5s-2.916 6.5-6.5 6.5m3.348-7.469L15.5 12h.879A4.5 4.5 0 0 0 13 8.622V9.5c0 .551-.449 1-1 1a.99.99 0 0 1-.969-.846L11 9.5v-.88A4.5 4.5 0 0 0 7.62 12h.88l.153.031c.476.076.847.472.847.969s-.371.893-.846.969L8.5 14h-.878A4.51 4.51 0 0 0 11 17.379V16.5l.031-.154c.077-.476.472-.846.969-.846s.893.371.969.848L13 16.5v.879A4.5 4.5 0 0 0 16.379 14H15.5l-.152-.031c-.477-.076-.848-.472-.848-.969s.371-.893.848-.969m-.446 2.867a3.5 3.5 0 0 1-1.004 1.002c-.256-.81-1.004-1.401-1.897-1.401s-1.642.592-1.898 1.401c-.4-.262-.74-.603-1.003-1.002A1.995 1.995 0 0 0 10.501 13c0-.895-.592-1.643-1.402-1.898c.263-.399.603-.74 1.004-1.002a1.99 1.99 0 0 0 1.898 1.401c.894 0 1.644-.593 1.899-1.403c.399.264.74.604 1.002 1.004A1.995 1.995 0 0 0 13.501 13a1.99 1.99 0 0 0 1.401 1.898"/>',
+  /**
+   * Shields: the half-filled shield mark inside a ring - the shield is the
+   * device, the circle is the field it projects. Both parts as supplied, on the
+   * shield's own 512 grid, with the shield scaled to 0.64 about the centre so
+   * its top corners (circumradius 252 at full size, 161 scaled) clear the ring's
+   * inner edge at every stroke weight strokeFor can hand it.
+   *
+   * The shield's trailing half is a TINT, not the outline it arrives as. Stroke
+   * width here is set for a 512 grid, so at 13px the shield's own outline would
+   * be a fifth of its width and the whole device would fill in solid. Filling
+   * the outline path at low opacity and laying the leading half over it at full
+   * gives the same two-tone read at any size, the way the arc glyphs below use
+   * a tinted sector rather than a second outline.
+   */
   "stat-shields":
-    '<path fill="currentColor" stroke="none" d="M11.25 2.073c-.606.113-1.318.357-2.412.732L8.265 3c-3.007 1.03-4.51 1.544-4.887 2.082C3.008 5.608 3 7.15 3 10.21l8.25-2.75zm0 6.967L3 11.79v.201c0 5.638 4.239 8.374 6.899 9.536c.51.223.84.367 1.351.432zm1.5 12.92V9.04L21 11.79v.201c0 5.638-4.239 8.374-6.899 9.536c-.51.223-.84.367-1.351.432m0-14.499V2.072c.606.113 1.318.357 2.412.732l.573.196c3.007 1.029 4.51 1.543 4.887 2.081c.37.526.378 2.068.378 5.127z"/>',
+    '<circle cx="256" cy="256" r="224" fill="none"/>' +
+    '<g transform="translate(92.16 92.16) scale(0.64)">' +
+    '<path fill="currentColor" stroke="none" opacity="0.3" d="M463.1 112.37C373.68 96.33 336.71 84.45 256 48c-80.71 36.45-117.68 48.33-207.1 64.37C32.7 369.13 240.58 457.79 256 464c15.42-6.21 223.3-94.87 207.1-351.63"/>' +
+    '<path fill="currentColor" stroke="none" d="M256 48c-80.71 36.45-117.68 48.33-207.1 64.37C32.7 369.13 240.58 457.79 256 464Z"/>' +
+    "</g>",
   // Firing-arc glyphs: two solid filled sectors on the same baseline, told apart
   // purely by how wide they open. PRIMARY is a narrow ~45 degree cone straight
   // ahead; AUXILIARY is a full 180 degree half-disc. Filled (not outlined) so
@@ -149,7 +167,7 @@ export const EMBLEMS: Record<string, string> = {
 /**
  * The four ship-stat glyphs come from different icon sets and draw wildly
  * different amounts of ink inside the same 24 grid - measured bounding boxes are
- * Mass 23 units tall, Shields 19.9, Silhouette 17, Thrust 14.1. Rendered at one
+ * Mass 23 units tall, Shields 21.5, Silhouette 17, Thrust 14.1. Rendered at one
  * pixel size they therefore looked like four different sizes, Mass reading 63%
  * bigger than Thrust.
  *
@@ -163,7 +181,12 @@ const ICON_VIEWBOX: Record<string, string> = {
   "stat-mass": "0.04 0.04 23.92 23.92",
   "stat-thrust": "3.62 3.59 16.83 16.83",
   "stat-silhouette": "3.16 4.16 17.68 17.68",
-  "stat-shields": "1.66 1.67 20.69 20.69",
+  // Shields is the one stroked stat glyph, so its box has to clear the OUTER
+  // edge of the ring's stroke, not just the path bbox: r 224 plus half of
+  // strokeFor's ceiling on this grid, then the same 4% air as the others. That
+  // lands just outside the shield's native 512 box, which is fine - a viewBox
+  // is a window, not a canvas.
+  "stat-shields": "-6 -6 524 524",
   // Siemens ix icons ship on a 512 grid, not the 24 the rest of this set uses.
   "ix-context-menu": "0 0 512 512",
 };

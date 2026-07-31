@@ -27,6 +27,14 @@
 @font-face { font-family: "Libre Franklin"; src: url("./fonts/libre-franklin-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: swap; }
 @font-face { font-family: "Libre Franklin"; src: url("./fonts/libre-franklin-600italic.woff2") format("woff2"); font-weight: 600; font-style: italic; font-display: swap; }
 
+/* Archivo Narrow (OFL), Archivo's own condensed sibling, shipped as the single
+   variable file Google serves for the family - one 18KB request covers 400-700,
+   so there is no per-weight file list here. It backs --narrow, which until now
+   named a face nobody had: the stack's first choice was never bundled, so every
+   condensed label fell through to whatever Arial Narrow the machine happened to
+   have, or to plain Libre Franklin on the many that have none. */
+@font-face { font-family: "Archivo Narrow"; src: url("./fonts/archivo-narrow-var.woff2") format("woff2"); font-weight: 400 700; font-style: normal; font-display: swap; }
+
 @font-face { font-family: "Spectral"; src: url("./fonts/spectral-regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
 @font-face { font-family: "Spectral"; src: url("./fonts/spectral-600.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; }
 @font-face { font-family: "Spectral"; src: url("./fonts/spectral-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: swap; }
@@ -76,7 +84,20 @@
      these sit on. The old --stat-thrust was 4.11:1 there and failed AA. */
   --stat-mass: #2d5da8;
   --stat-thrust: #975f2a;
-  --stat-sil: #26634f;
+  /* Silhouette is deliberately OUT of the band above: it is the stat a player
+     scans for first when checking what can see what, and at #26634f it was the
+     quietest of the four - the lowest chroma in the set and a lightness below
+     the middle of it. This green is 27% lighter and carries 75% more chroma, so
+     it is the one mark in a chip row that jumps.
+     What that costs, and why it is still fine: 3.6:1 on --blue-wash, under the
+     4.6:1 floor the other three hold. These vars only ever colour an icon
+     (.stat-ico-*, never .stat-val or .stat-lbl), so the bar is WCAG 1.4.11
+     non-text contrast at 3:1, which it clears on white, --ground and
+     --blue-wash alike - and the colour is a redundant cue anyway, with the
+     glyph and its label both saying which stat this is.
+     Colour-blind separation is unchanged or better: worst-pair dE holds at 13.0
+     deutan and 12.3 protan, and tritan improves from 9.0 to 14.3. */
+  --stat-sil: #008f63;
   --stat-shields: #6d3d6b;
   /* Motion: one curve, and it does not overshoot. Instruments settle onto a
      value, they do not bounce past it and come back - that bounce is the thing
@@ -114,7 +135,10 @@
 
   --display: "Archivo", "Libre Franklin", Arial, sans-serif;
   --sans: "Libre Franklin", "Helvetica Neue", Arial, sans-serif;
-  /* Condensed face for dense labels (stat chips), so a word costs little width. */
+  /* Condensed face for dense labels (stat chips) and for names that run long
+     in a fixed column (HVPs), so a word costs little width. Bundled, so it is
+     the same face everywhere; the rest of the stack is only a swap-in. Tops out
+     at 700 - ask for 800 here and the browser fakes it. */
   --narrow: "Archivo Narrow", "Roboto Condensed", "Liberation Sans Narrow", "Arial Narrow", var(--sans);
   --serif: "Spectral", Georgia, "Times New Roman", serif;
   /* Easy, common, friendly: the fleet-name field only, not the whole app's type system. */
@@ -1329,10 +1353,20 @@ button { font-family: inherit; }
 .personnel-body { min-width: 0; }
 .personnel-actions { display: flex; align-items: center; gap: 6px; }
 .personnel-assign { font-family: var(--sans); font-size: 12px; font-weight: 600; padding: 6px 8px; border: 1px solid var(--hair-soft); background: var(--paper); color: var(--ink); max-width: 150px; }
-.personnel-name { display: block; font-family: var(--display); font-weight: 700; font-size: 13px; white-space: normal; }
+/* HVP NAMES ARE SET NARROW, HERE AND EVERYWHERE ELSE THEY APPEAR.
+   An HVP's name is the longest short string in the app and the only one the
+   player writes themselves: the rules ask for "Lt. Commander Sadie Hyatt, Chief
+   Engineer", not "Chief Engineer" (p.57), and that goes into a name line inside
+   a fixed column beside a checkbox. In Archivo it wrapped to three lines or ran
+   out of its field. Archivo Narrow sets the same words about 18% shorter, which
+   buys back roughly a word a line, and it is the display face's own condensed
+   sibling, so the row does not change voice - it just stops running out of room.
+   Sizes go up a point with it, since a condensed face at the same size reads
+   smaller. Nothing else about the row moves. */
+.personnel-name { display: block; font-family: var(--narrow); font-weight: 700; font-size: 14px; white-space: normal; }
 /* Generic personnel (any faction can take them) read quieter than a faction's
    own named HVPs, so the two pools are distinguishable at a glance. */
-.personnel-name.is-generic { font-family: var(--sans); font-weight: 600; color: var(--ink-2); }
+.personnel-name.is-generic { font-family: var(--sans); font-weight: 600; font-size: 13px; color: var(--ink-2); }
 .personnel-rule { display: block; font-size: 11px; line-height: 1.35; color: var(--ink-3); white-space: normal; }
 
 /* roster (right) */
@@ -1585,7 +1619,7 @@ button { font-family: inherit; }
 .print-score { width: 100%; border-collapse: collapse; }
 
 .print-hvp { border-left: 1px solid var(--hair-soft); padding: 0 0 0 7px; margin-bottom: 4px; break-inside: avoid; }
-.print-hvp h4 { font-family: var(--display); font-size: 12.5px; margin-bottom: 1px; }
+.print-hvp h4 { font-family: var(--narrow); font-weight: 700; font-size: 13.5px; margin-bottom: 1px; }
 .print-hvp p { font-family: var(--serif); font-size: 11.5px; line-height: 1.3; }
 .print-hvp-slot { font-family: var(--sans); font-size: 10px; font-weight: 600; letter-spacing: 0.02em; color: var(--ink-3); text-transform: none; }
 /* Age of Unity: a blank line per ship to pencil in who carries an HVP. */
@@ -2548,7 +2582,9 @@ button { font-family: inherit; }
   box-shadow: var(--shadow16);
   font-weight: 400; text-transform: none; letter-spacing: normal;
 }
-.hvp-pop-name { font-family: var(--display); font-weight: 800; font-size: 13px; color: var(--ink); text-transform: none; }
+/* 700, not the 800 this was: --narrow's variable range stops there and a heavier
+   ask would be synthesised into a smeared fake bold. */
+.hvp-pop-name { font-family: var(--narrow); font-weight: 700; font-size: 14px; color: var(--ink); text-transform: none; }
 .hvp-pop-rule { font-size: 12.5px; line-height: 1.4; color: var(--ink-2); }
 /* Full-width detail line: stat chips + weapons, so the whole unit is legible
    without opening it. */
@@ -2907,12 +2943,12 @@ button { font-family: inherit; }
 .sy-hvp-check[aria-disabled="true"]:hover { background: var(--paper); }
 .sy-hvp-check:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 .sy-hvp-body { min-width: 0; }
-.sy-hvp-name { display: block; font-family: var(--display); font-weight: 700; font-size: 14px; line-height: 1.2; }
+.sy-hvp-name { display: block; font-family: var(--narrow); font-weight: 700; font-size: 15px; line-height: 1.2; }
 .sy-hvp-rule { display: block; font-family: var(--serif); font-size: 13px; line-height: 1.4; color: var(--ink-2); margin-top: 2px; }
 /* Generics read a touch quieter than a faction's own HVP: a shade greyer and a
    hair smaller. Still in the same flat list, just slightly less appealing. A
    chosen generic still turns blue like any chosen pick. */
-.sy-hvp.is-generic .sy-hvp-name { font-size: 13px; }
+.sy-hvp.is-generic .sy-hvp-name { font-size: 14px; }
 .sy-hvp.is-generic:not(.is-chosen) .sy-hvp-name { color: var(--ink-2); }
 .sy-hvp.is-generic .sy-hvp-rule { color: var(--ink-3); font-size: 12.5px; }
 
@@ -3067,7 +3103,7 @@ button { font-family: inherit; }
 .hvp-assign-note { font-family: var(--sans); font-size: 11.5px; font-weight: 600; color: var(--ink-3); margin: 0; }
 .hvp-assign-row { display: flex; flex-direction: column; gap: 3px; padding: 6px 0; border-bottom: 1px solid var(--hair-soft); }
 .hvp-assign-row:last-child { border-bottom: none; }
-.hvp-assign-name { font-family: var(--display); font-weight: 700; font-size: 13.5px; }
+.hvp-assign-name { font-family: var(--narrow); font-weight: 700; font-size: 14.5px; }
 
 .hvp-pick { position: relative; }
 .hvp-pick > summary {
@@ -3098,7 +3134,7 @@ button { font-family: inherit; }
 }
 .hvp-pick-opt:hover { border-left-color: var(--blue); background: var(--blue-wash); }
 .hvp-pick-opt.on { border-color: var(--blue); border-left-color: var(--red); background: var(--blue-wash); }
-.hvp-pick-name { font-family: var(--display); font-weight: 700; font-size: 13.5px; color: var(--ink); }
+.hvp-pick-name { font-family: var(--narrow); font-weight: 700; font-size: 14.5px; color: var(--ink); }
 .hvp-pick-why { font-family: var(--sans); font-size: 10.5px; font-weight: 600; color: var(--ink-3); }
 /* Too light to carry: shown, never hidden, so you can see the unit is there and
    why it is not an option. Not a button, so it cannot be tapped or tabbed to. */
@@ -5203,7 +5239,7 @@ main.play-body .roster-section::before { content: none; }
 .hvp-req { margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--hair-soft); }
 .hvp-req-list { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-direction: column; gap: 3px; }
 .hvp-req-row {
-  font-family: var(--display); font-weight: 700; font-size: 13.5px; color: var(--ink);
+  font-family: var(--narrow); font-weight: 700; font-size: 14.5px; color: var(--ink);
   border-left: 3px solid var(--blue); padding: 5px 0 5px 9px; background: var(--blue-wash);
 }
 .hvp-req-why { font-size: 12.5px; line-height: 1.45; color: var(--ink-2); margin: 0 0 10px; }

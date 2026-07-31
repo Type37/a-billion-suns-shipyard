@@ -79,28 +79,61 @@ export const TOURS: TourDef[] = [
       },
     ],
   },
+  /**
+   * Renaming, taught in two goes rather than one.
+   *
+   * A single coachmark saying "anything in a box can be renamed" was asking a
+   * first-time reader to hold an abstraction about the whole app. Split, each
+   * one points at a single thing and says what to do with it:
+   *
+   *   visit 2  the fleet's own name, the easiest and most obviously yours
+   *   visit 3  the personnel, where the naming is the point of the exercise
+   *
+   * Visits 2 and 3, not 1: the first-run tutorial callout owns the first visit,
+   * and stacking a coachmark on top of it is a wall. They are also one visit
+   * apart on purpose, so neither lands in the same session as the other.
+   * "foundry-tab" also fires on visit 3 but on the home view, so the two never
+   * share a screen.
+   */
+  {
+    id: "rename-fleet",
+    view: "builder",
+    // >= 2, not === 2: somebody who does not open the builder on their second
+    // visit should still get this, and it stays ahead of the personnel one
+    // because activeTour takes the first eligible tour in this array's order.
+    when: (s) => s.onboarding.visits >= 2,
+    steps: [
+      {
+        // The die is the point of this one, so it must be on screen: both the
+        // Fleet List builder and the Shipyard put it next to the name.
+        selector: ".mf-name",
+        body: "Rename your fleet! If you need ideas, click the die button to randomize and get some ideas. It's fun to make it *yours*.",
+      },
+    ],
+  },
   {
     /**
-     * The rename affordance, said once out loud.
+     * The personnel, on visit 3.
      *
      * This step used to point at ".roster-unit" and describe opening a row to
      * rename what was inside it. Neither survives: the class is gone and there
-     * is no drill-in any more, so the step anchored to nothing and taught a
-     * gesture the app does not have.
+     * is no drill-in any more, so it anchored to nothing and taught a gesture
+     * the app does not have.
      *
-     * What it teaches now is the one rule that covers every name in the app -
-     * if it is in a box, it is yours to change - because the box is doing that
-     * work silently on every screen and one sentence makes it legible on the
-     * first visit rather than on the day you happen to click one.
+     * It points at a chosen person's name field now, because that is where the
+     * copy's own example lives. If nobody has been chosen yet there is no field
+     * to point at, so it falls back to the section heading and waits to be
+     * useful rather than pointing at empty air.
      */
-    id: "rename-anything",
+    id: "rename-personnel",
     view: "builder",
+    when: (s) => s.onboarding.visits >= 3,
     steps: [
       {
         // The user's own words, near enough verbatim. No headline: the first
         // sentence is the headline, and a title above it saying the same thing
         // is exactly the doubling they threw out.
-        selector: ".sy-unit-name|.mf-name",
+        selector: ".hvp-name-input|.sy-hvp-count",
         body: "Anything in a box like this can be renamed. Mike gave them generic titles but you are encouraged to name them; try “Chief Engineer Sadie Hyatt” instead of just “Chief Engineer.” It’s fun!",
       },
     ],

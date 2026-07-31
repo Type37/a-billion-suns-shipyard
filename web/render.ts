@@ -3399,6 +3399,16 @@ function tourPopover(state: AppState): string {
       ? tour.steps.map((_, i) => `<span class="tour-dot ${i === step ? "on" : ""}"></span>`).join("")
       : "";
   const isLast = step >= tour.steps.length - 1;
+  /**
+   * One word of emphasis in a coachmark, written as *asterisks* in the copy.
+   *
+   * The bodies are escaped, not trusted HTML, and that stays true: the escape
+   * runs FIRST and the emphasis is applied to the already-safe string, so the
+   * only tags that can reach the page are the two this line writes. Anything
+   * else an author types is still inert text.
+   */
+  const tourEmphasis = (body: string): string =>
+    escapeHtml(body).replace(/\*([^*]+)\*/g, "<em>$1</em>");
   // Every feature tooltip ends in the same pair: dismiss on the left, go and see
   // it on the right. There is no Skip - "Got it" already closes the thing for
   // good, and two words for one outcome only made the reader choose between
@@ -3410,7 +3420,7 @@ function tourPopover(state: AppState): string {
   <div class="tour-pop" data-target="${escapeHtml(s.selector)}">
     <div class="tour-pop-arrow"></div>
     ${s.title ? `<div class="tour-head"><h4 class="tour-title">${escapeHtml(s.title)}</h4></div>` : ""}
-    <p class="tour-body">${escapeHtml(s.body)}</p>
+    <p class="tour-body">${tourEmphasis(s.body)}</p>
     <div class="tour-foot">
       <span class="tour-dots">${dots}</span>
       <span class="tour-btns">

@@ -68,8 +68,9 @@ export function fleetToMarkdown(list: SavedList, customs: Faction[]): string {
   } else {
     for (const sel of list.fleet.hvp) {
       const def = hvpDef(sel.hvpId, faction);
-      // The name you gave them replaces the job title, exactly as it does on
-      // screen and on the printed roster; the rule below still says what they do.
+      // The whole line as the player wrote it ("Kyle Hawkins, Flight
+      // Controller"), or the job title if they never wrote one. Nothing here
+      // composes the two halves; the field they typed into already did.
       const name = sel.customName || def?.name || sel.hvpId;
       lines.push(`- **${name}**${def ? `: ${def.rule}` : ""}`);
     }

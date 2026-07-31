@@ -1996,7 +1996,11 @@ function handleChange(e: Event): void {
       if (!listId) return;
       const index = Number(target.dataset["index"]);
       if (!Number.isInteger(index) || index < 0) return;
-      const name = inputValue.trim();
+      // The field starts out holding the job title, so "unchanged" and "empty"
+      // both mean the same thing: nobody has been named. Neither is stored, and
+      // an untouched person keeps no custom name at all.
+      const typed = inputValue.trim();
+      const name = typed === (target.dataset["default"] ?? "") ? "" : typed;
       store.setState((s) =>
         updateFleet(s, listId, (f) => {
           const sel = f.hvp[index];
@@ -2349,6 +2353,35 @@ function handleChange(e: Event): void {
 export function wireActions(root: HTMLElement): void {
   root.addEventListener("click", handleClick);
   root.addEventListener("change", handleChange);
+  /**
+   * Naming a person puts the caret in FRONT of their job.
+   *
+   * The personnel field opens holding "Flight Controller", and the useful thing
+   * to do with it is write a name before that, not after: "Kyle Hawkins, Flight
+   * Controller". A click would otherwise drop the caret wherever the pointer
+   * landed, and a keyboard tab would land at the end, so the first keystroke
+   * would append to the job instead of introducing the person.
+   *
+   * focusin, not click, for two reasons. It fires for the keyboard as well as
+   * the pointer, and it fires only on ENTERING the field - so once you are
+   * inside, clicking again positions the caret exactly where you clicked, which
+   * is what anyone editing the middle of a name expects.
+   *
+   * Set twice, on purpose. The immediate call is the one that works for the
+   * keyboard, and it is the only one that runs at all on a backgrounded tab,
+   * where rAF is paused. The deferred call is for the pointer: focus arrives on
+   * mousedown, and the mouseup that follows sets its own caret position and
+   * would undo an immediate-only fix. Waiting a frame puts this last. Setting
+   * the same position twice costs nothing and is invisible.
+   */
+  root.addEventListener("focusin", (e) => {
+    const t = e.target;
+    if (!(t instanceof HTMLInputElement) || t.dataset["action"] !== "hvp-name") return;
+    t.setSelectionRange(0, 0);
+    requestAnimationFrame(() => {
+      if (document.activeElement === t) t.setSelectionRange(0, 0);
+    });
+  });
   // Keyboard activation for the custom role="button" controls (the ship-row and
   // personnel-row "Add" tiles are <article>s, which - unlike <button>/<a>/
   // <summary> - do not fire click on Enter/Space on their own). Route those keys

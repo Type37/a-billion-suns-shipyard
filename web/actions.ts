@@ -608,15 +608,6 @@ function dispatchAction(target: HTMLElement): void {
       );
       break;
     }
-    case "emblem-lib-cat": {
-      const cat = target.dataset["cat"];
-      store.setState((s) =>
-        s.ui.modal?.kind === "emblem"
-          ? { ...s, ui: { ...s.ui, modal: { ...s.ui.modal, libCat: cat, libShown: LIB_PAGE } } }
-          : s,
-      );
-      break;
-    }
     case "clear-emblem-image": {
       const id = currentListId();
       if (!id) return;
@@ -2125,10 +2116,6 @@ function handleChange(e: Event): void {
                   ...s.ui.modal,
                   libQuery: q,
                   libShown: LIB_PAGE,
-                  // Searching leaves the open folder. Otherwise the query is
-                  // silently scoped to it, and a search for "skull" from inside
-                  // Faith reports that nothing matches - in a library with 11.
-                  libCat: q ? "all" : s.ui.modal.libCat,
                 },
               },
             }

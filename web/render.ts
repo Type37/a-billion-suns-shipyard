@@ -18,12 +18,9 @@ import {
   tacticalDiagram,
 } from "./icons.ts";
 import {
-  ICON_CATEGORIES,
   LIB_PAGE,
-  categoryLabel,
   iconLibraryGrid,
   libraryUrl,
-  matchCount,
 } from "./emblems.ts";
 import pkg from "../package.json";
 import { learnDiagram } from "./diagrams.ts";
@@ -3958,18 +3955,10 @@ function emblemModal(state: AppState): string {
     )
     .join("");
 
-  // Folder chips. Counts follow the active search, so a chip cannot promise
-  // "All 253" while the grid shows eleven; a folder with no match is dimmed
-  // rather than removed, so the row does not reflow as you type.
-  const activeCat = m.libCat ?? "all";
-  const q = m.libQuery ?? "";
-  const folderChips = `<div class="em-folders">
-      <button class="em-folder ${activeCat === "all" ? "on" : ""}" data-action="emblem-lib-cat" data-cat="all">All <span class="em-folder-n">${matchCount(q)}</span></button>
-      ${ICON_CATEGORIES.map((c) => {
-        const n = matchCount(q, c);
-        return `<button class="em-folder ${activeCat === c ? "on" : ""} ${n === 0 ? "is-empty" : ""}" data-action="emblem-lib-cat" data-cat="${escapeHtml(c)}">${escapeHtml(categoryLabel(c))} <span class="em-folder-n">${n}</span></button>`;
-      }).join("")}
-    </div>`;
+  // No folder chips. Twelve of them wrapped to two rows on a desktop and five on
+  // a phone, which cost the grid more height than the filter ever saved anybody
+  // scrolling - and the search box below already reaches every mark by what it
+  // depicts, folder or not. The grid is one list of everything now.
 
   const body =
     tab === "upload"
@@ -3983,8 +3972,7 @@ function emblemModal(state: AppState): string {
            <input id="emblem-upload-input" type="file" accept="image/*" data-action="${cfg.upA}" hidden />
          </div>`
       : `<input id="emblem-lib-search" class="em-search" type="search" placeholder="Search sigils: try skull, wings, money" value="${escapeHtml(m.libQuery ?? "")}" data-action="emblem-lib-search" aria-label="Search sigils" />
-         ${folderChips}
-         <div class="em-scroll">${iconLibraryGrid(cfg.libA, cfg.currentLib, activeCat, m.libQuery, m.libShown ?? LIB_PAGE)}</div>`;
+         <div class="em-scroll">${iconLibraryGrid(cfg.libA, cfg.currentLib, m.libQuery, m.libShown ?? LIB_PAGE)}</div>`;
 
   return `
   <div class="modal-root">

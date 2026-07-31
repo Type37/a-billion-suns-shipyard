@@ -219,7 +219,6 @@ export interface AppState {
            *  not exist in `outfits` yet - it writes into ui.newOutfit instead. */
           target: "list" | "faction" | "outfit" | "new-outfit";
           tab: "library" | "upload" | "colour";
-          libCat?: string;
           libQuery?: string;
           /**
            * How many library tiles are currently rendered. The library holds 250+

@@ -199,19 +199,6 @@ export function categoryLabel(cat: string): string {
   return cat.charAt(0).toUpperCase() + cat.slice(1);
 }
 
-// Folders in reading order: named sub-folders alphabetically BY THEIR LABEL (so
-// the chips read A-Z as displayed), then the loose-files "General" bucket last
-// (it's the catch-all, not a real folder).
-export const ICON_CATEGORIES: string[] = [...new Set(ICON_LIBRARY.map((i) => i.category))].sort((a, b) =>
-  a === "General" ? 1 : b === "General" ? -1 : categoryLabel(a).localeCompare(categoryLabel(b)),
-);
-
-/** How many icons live in each category folder. */
-export const ICON_COUNT_BY_CATEGORY: Record<string, number> = ICON_LIBRARY.reduce<Record<string, number>>((acc, i) => {
-  acc[i.category] = (acc[i.category] ?? 0) + 1;
-  return acc;
-}, {});
-
 /** A random library icon id (Math.random is fine in app code). */
 export function randomIconId(): string | undefined {
   if (ICON_LIBRARY.length === 0) return undefined;
@@ -241,24 +228,14 @@ export function queryTerms(query?: string): string[] {
   return q ? q.split(/\s+/) : [];
 }
 
-/** Marks matching a query, ignoring the folder filter. Used for folder counts. */
-export function matchCount(query: string | undefined, category?: string): number {
-  const terms = queryTerms(query);
-  return ICON_LIBRARY.filter((i) => (!category || i.category === category) && matchesQuery(i, terms)).length;
-}
-
 export function iconLibraryGrid(
   actLib: string,
   currentLib?: string,
-  activeCat?: string,
   query?: string,
   shown: number = LIB_PAGE,
 ): string {
-  const q = (query ?? "").trim().toLowerCase();
   const terms = queryTerms(query);
-  const matches = ICON_LIBRARY.filter(
-    (i) => (!activeCat || activeCat === "all" || i.category === activeCat) && matchesQuery(i, terms),
-  );
+  const matches = ICON_LIBRARY.filter((i) => matchesQuery(i, terms));
   // Only the first `shown` are built. The rest arrive as the sentinel below
   // scrolls into view (see main.ts), which keeps the modal instant to open and
   // keeps the images near enough to the viewport that lazy loading fetches them.
@@ -284,19 +261,11 @@ export function iconLibraryGrid(
         `<button class="lib-icon ${currentLib === i.id ? "selected" : ""}" data-cat="${escapeHtml(i.category)}" data-action="${actLib}" data-lib="${escapeHtml(i.id)}" title="${escapeHtml(i.label)}" aria-pressed="${currentLib === i.id}" aria-label="${escapeHtml(i.label)}"><img loading="${n < EAGER ? "eager" : "lazy"}" decoding="async" width="64" height="64" src="${i.thumb}" alt="" /></button>`,
     )
     .join("");
-  if (!items) {
-    // Never just "no match": the search is scoped to the open folder, and an
-    // unqualified denial made a folder-scoped miss look like the library had
-    // nothing. Say where it looked and how many there are elsewhere.
-    if (!q) return `<p class="muted">No sigils in this folder.</p>`;
-    const everywhere = matchCount(query);
-    const folder = activeCat && activeCat !== "all" ? categoryLabel(activeCat) : "";
-    return folder
-      ? `<p class="muted">Nothing matching that in ${escapeHtml(folder)}.${
-          everywhere ? ` <button class="linklike" data-action="emblem-lib-cat" data-cat="all">Search all ${everywhere} instead</button>` : ""
-        }</p>`
-      : `<p class="muted">No sigils match that search.</p>`;
-  }
+  // With no folder filter there is only one way to miss, so there is only one
+  // thing left to say. The old copy named the folder it had searched and offered
+  // to search the rest, which was the right answer to a question nobody can ask
+  // now.
+  if (!items) return `<p class="muted">No sigils match that search.</p>`;
   // A real button, not a bare sentinel. The scroll observer in main.ts loads the
   // next page automatically when this comes into view, but an observer inside a
   // short modal scroller is not something to bet the feature on - and a button

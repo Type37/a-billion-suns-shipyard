@@ -3983,13 +3983,6 @@ button { font-family: inherit; }
 .em-search { width: 100%; margin-bottom: 10px; font-family: var(--sans); font-size: 14px; padding: 9px 11px; border: 1px solid var(--hair); background: var(--paper); color: var(--ink); }
 .em-search:focus { outline: none; border-color: var(--blue); }
 /* Folder chips for the emblem library. */
-.em-folders { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-.em-folder { padding: 5px 11px; border: 1px solid var(--hair); background: var(--paper); cursor: pointer; font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--ink-2); }
-.em-folder:hover { border-color: var(--ink); }
-.em-folder.on { background: var(--blue); border-color: var(--blue); color: #fff; }
-.em-folder-n { font-size: 10px; font-weight: 700; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-.em-folder.on .em-folder-n { color: #cdddf6; }
-.em-folder.is-empty { opacity: 0.4; }
 .em-foot { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 12px 18px; border-top: 1px solid var(--hair); }
 .em-foot .em-done { margin-left: auto; }
 
@@ -4012,16 +4005,7 @@ button { font-family: inherit; }
   .em-tab { padding: 9px 8px; }
   .em-body { padding: 10px 12px; }
   .em-search { padding: 8px 10px; margin-bottom: 8px; }
-  .em-folders {
-    flex-wrap: nowrap; overflow-x: auto; margin-bottom: 9px; padding-bottom: 3px;
-    scroll-snap-type: x proximity; overscroll-behavior-x: contain;
-    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
-            mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
-  }
-  .em-folder { flex: 0 0 auto; scroll-snap-align: start; padding: 5px 9px; }
   .em-foot { padding: 8px 12px; }
-  /* The background picker is one line: label and swatches share a row instead
-     of stacking, and the swatches shrink to a still-comfortable 30px. */
 }
 
 /* Play Mode: the commands legal in the current phase, with cost and full text. */
@@ -4854,7 +4838,7 @@ main.play-body .roster-section::before { content: none; }
 .ru-stepper .stepper-count { min-width: 44px; line-height: 44px; }
 .ru-controls { gap: 10px; }
 .lib-icon { min-height: 44px; }
-.em-folder, .em-tab { min-height: 40px; }
+.em-tab { min-height: 40px; }
 @media (max-width: 900px) {
   .ship-row .add-cue { min-height: 46px; padding: 10px 16px; }
   .bar-btn, .ghost-btn, .cta-btn { min-height: 44px; }

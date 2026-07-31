@@ -8,7 +8,7 @@ import { ACTIVATION_STEPS, CORE_ACTIONS, CORE_COMMANDS, ROUND_PHASES } from "../
 import { deriveCommandEffects, effectiveCost } from "../src/command-effects.ts";
 import type { CommandCostChange, CommandEffects, RuleSource } from "../src/command-effects.ts";
 import { allFactions, factionsByEra, findFaction, makeCatalog, ERA_ORDER } from "./catalog.ts";
-import { auxSlotText, credits, escapeHtml, formatDate, pluralise, primarySlotText, ruleText } from "./format.ts";
+import { auxSlotText, credits, escapeHtml, formatDate, formatWeapon, pluralise, primarySlotText, ruleText } from "./format.ts";
 import {
   commandRow,
   diceRow,
@@ -1898,6 +1898,35 @@ function printView(state: AppState): string {
   // roster printouts: every unit is one scannable row with stat columns, and
   // per-unit annotations (species, carried personnel) fold into a quiet
   // second line under the unit name rather than their own boxes.
+  /**
+   * A stat figure with its own glyph, and a weapon line with its arc.
+   *
+   * The glyphs belong on the ROWS, not in the column heads. A header reads once,
+   * at the top of a page - and on a roster that runs past one page, not even
+   * that - while a row is what somebody has a finger on mid-turn. The per-unit
+   * cards below already pair every figure with its mark (statChips) and every
+   * gun with its arc (cardWeapons), so this makes the table read the same way
+   * the cards do rather than making you count columns back to a heading.
+   *
+   * Uncoloured, unlike on screen: this sheet has to survive a black-and-white
+   * office printer, where four stat colours become four identical greys. The
+   * shapes are doing the work.
+   */
+  const prNum = (name: string, value: string): string =>
+    `<span class="prn">${icon(name, 10, "prn-ico")}<span class="prn-v">${value}</span></span>`;
+  const prWeapCell = (ship: ShipClass, arc: "primary" | "aux"): string => {
+    const glyph = icon(arc === "primary" ? "arc-primary" : "arc-aux", 10, "prw-ico");
+    const list = arc === "primary" ? ship.primary : ship.auxiliary;
+    const lines = list.length
+      ? list.map((w) => escapeHtml(formatWeapon(w)))
+      : [escapeHtml(arc === "primary" ? primarySlotText(ship) : auxSlotText(ship))];
+    // "None" gets no arc: there is no arc to mark, and the glyph beside it read
+    // as a weapon that had been struck out.
+    return lines
+      .map((s) => `<span class="prw">${s === "None" ? "" : glyph}<span class="prw-t">${s}</span></span>`)
+      .join("");
+  };
+
   const unitRows = printUnits
     .map((u) => {
       const r = resolveShip(u.shipClassId, faction, customs);
@@ -1944,12 +1973,12 @@ function printView(state: AppState): string {
           ${named.length ? `<span class="pr-unit-ships">${escapeHtml(named.join(" / "))}</span>` : ""}
           ${notes ? `<span class="pr-unit-notes">${escapeHtml(notes)}</span>` : ""}
         </td>
-        <td class="pr-num">${ship.mass}</td>
-        <td class="pr-num">${ship.thrust}"</td>
-        <td class="pr-num">${ship.silhouette}</td>
-        <td class="pr-num">${ship.shields}</td>
-        <td class="pr-weap">${primarySlotText(ship)}</td>
-        <td class="pr-weap">${auxSlotText(ship)}</td>
+        <td class="pr-num">${prNum("stat-mass", String(ship.mass))}</td>
+        <td class="pr-num">${prNum("stat-thrust", `${ship.thrust}"`)}</td>
+        <td class="pr-num">${prNum("stat-silhouette", String(ship.silhouette))}</td>
+        <td class="pr-num">${prNum("stat-shields", String(ship.shields))}</td>
+        <td class="pr-weap">${prWeapCell(ship, "primary")}</td>
+        <td class="pr-weap">${prWeapCell(ship, "aux")}</td>
         <td class="pr-num pr-cost">${credits(ship.cost * u.count)}</td>
         ${reqCell}
         ${trackCell}
@@ -1965,24 +1994,12 @@ function printView(state: AppState): string {
         <tr>
           <th class="pr-unit">${isShipyard ? "Ship class" : "Unit"}</th>
           <!--
-            The stat and arc glyphs, in the roster's headers.
-
-            The per-unit cards below have carried them all along - statChips()
-            for the four figures, cardWeapons() for the two arcs - so the sheet
-            was already teaching them, and then the table above printed the same
-            eight columns as bare words. Now one mark means one thing down the
-            whole page: the disc that says Silhouette on a card says it in the
-            column head too, and the narrow cone and the half-disc tell Primary
-            from Auxiliary at a glance instead of by reading two long words that
-            share their first letter at a distance.
-
-            Deliberately uncoloured. On screen these glyphs carry one colour per
-            stat, but this is a sheet that has to survive a black-and-white
-            office printer, where four colours become four indistinguishable
-            greys. Shape is doing the work here, so they print as ink.
+            Plain words up here. The glyphs are on the ROWS - see prNum and
+            prWeapCell below - because a header only reads once, at the top of a
+            page, and this sheet is read at a table with a row under a finger.
           -->
-          <th class="pr-num">${icon("stat-mass", 11)}Mass</th><th class="pr-num">${icon("stat-thrust", 11)}Thr</th><th class="pr-num">${icon("stat-silhouette", 11)}Sil</th><th class="pr-num">${icon("stat-shields", 11)}Shd</th>
-          <th class="pr-weap">${icon("arc-primary", 12)} Primary weapons</th><th class="pr-weap">${icon("arc-aux", 12)} Auxiliary weapons</th><th class="pr-cost">Cost</th>${isShipyard ? '<th class="pr-req">Req’d</th>' : ""}${opts.trackers ? '<th class="pr-track">Hull tracker</th>' : ""}${fieldsHvp ? '<th class="pr-hvp-slot">HVP carried</th>' : ""}
+          <th class="pr-num">Mass</th><th class="pr-num">Thr</th><th class="pr-num">Sil</th><th class="pr-num">Shd</th>
+          <th class="pr-weap">Primary weapons</th><th class="pr-weap">Auxiliary weapons</th><th class="pr-cost">Cost</th>${isShipyard ? '<th class="pr-req">Req’d</th>' : ""}${opts.trackers ? '<th class="pr-track">Hull tracker</th>' : ""}${fieldsHvp ? '<th class="pr-hvp-slot">HVP carried</th>' : ""}
         </tr>
       </thead>
       <tbody>${unitRows}</tbody>

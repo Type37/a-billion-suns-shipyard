@@ -1595,7 +1595,7 @@ button { font-family: inherit; }
    lines. Widths are declared on both the th and the td (see render.ts), so the
    name and weapons get the room and the numbers collapse to what they need. */
 .print-roster { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.pr-unit { width: 21%; }
+.pr-unit { width: 20.5%; }
 /* A heading NEVER breaks inside a word. overflow-wrap:anywhere was here to stop
    "AUXILIARY WEAPONS" bleeding into its neighbour, but it also split THRUST into
    "THRUS / T" and SHIELDS into "SHIEL / DS", which is unreadable. Multi-word
@@ -1610,20 +1610,20 @@ button { font-family: inherit; }
   font-size: 8px; font-weight: 600; text-transform: uppercase;
   color: var(--ink-2); padding: 3px 4px;
 }
-/* The header glyphs (see the roster thead in render.ts) print as ink: this sheet
-   has to survive a black-and-white printer, where the four stat colours are four
-   indistinguishable greys, so shape does the telling apart. */
-.print-roster thead th .icon { color: var(--ink-2); }
-/* Over the word, not beside it. The stat columns are 30px - a single digit is
-   all they ever hold - and an inline glyph plus "SHIELDS" needed about 46, so
-   the headers ran into each other. Stacked, the column only has to be as wide as
-   the wider of a 11px glyph and a three-letter word, and the abbreviations are
-   safe now that the glyph above them says which stat this is. */
-.print-roster thead th.pr-num .icon { display: block; margin: 0 auto 1px; }
-.print-roster thead th.pr-num { white-space: nowrap; }
-/* The arc glyphs stay inline: those columns have the room, and the cone and the
-   half-disc are what tell Primary from Auxiliary faster than the words do. */
-.print-roster thead th.pr-weap .icon { vertical-align: -2px; margin-right: 3px; }
+/* Row glyphs (prNum / prWeapCell in render.ts). Uncoloured: this sheet has to
+   survive a black-and-white printer, where the four stat colours become four
+   identical greys, so the shapes do the telling apart. */
+.prn { display: inline-flex; align-items: center; gap: 2px; }
+.prn-ico, .prw-ico { color: var(--ink-2); flex: none; }
+.prn-v { font-variant-numeric: tabular-nums; }
+/* One weapon per line, its arc in a fixed 10px gutter so the names start on a
+   common left edge down the column instead of stepping in and out with the
+   glyph. flex-start, not centre: a two-line entry should hang its text under
+   itself, with the arc against the first line. */
+.prw { display: flex; align-items: flex-start; gap: 3px; }
+.prw + .prw { margin-top: 1px; }
+.prw-ico { width: 10px; margin-top: 1px; }
+.prw-t { min-width: 0; }
 .print-roster tbody td { border-bottom: 1px solid var(--hair-soft); padding: 2px 5px; vertical-align: top; font-size: 11px; }
 .print-roster tbody tr { break-inside: avoid; }
 .pr-unit-name { display: block; font-family: var(--display); font-weight: 800; font-size: 12.5px; line-height: 1.2; }
@@ -1643,7 +1643,7 @@ button { font-family: inherit; }
    short of room. */
 .pr-num { text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; width: 30px; }
 .print-roster tbody .pr-num { white-space: nowrap; }
-.pr-cost { color: var(--blue); width: 48px; }
+.pr-cost { color: var(--blue); width: 44px; }
 .print-roster tbody .pr-cost { white-space: nowrap; }
 /* WEAPONS NEVER WRAP. The longest string in the game is 31 characters -
    `Bioplasm Ejectors [4D10, 0-12"]` - and at 11px Spectral in a 17% column it
@@ -1661,7 +1661,7 @@ button { font-family: inherit; }
    not fit shows as a clipped line rather than silently splitting a weapon name
    down the middle. Measured across every seed fleet and every faction's full
    catalogue: nothing overflows. */
-.pr-weap { width: 23.5%; }
+.pr-weap { width: 25%; }
 /* Written against `.print-roster tbody td` and `thead th`, both of which set a
    font-size that a bare .pr-weap loses to on specificity. */
 .print-roster tbody td.pr-weap, .print-roster thead th.pr-weap {
@@ -1672,7 +1672,7 @@ button { font-family: inherit; }
 .pr-track-ship { display: block; margin-bottom: 4px; }
 .pr-track-ship:last-child { margin-bottom: 0; }
 /* Two rows of boxes rather than one wide row, for the same reason. */
-.pr-req { width: 46px; }
+.pr-req { width: 42px; }
 .pr-req-box { display: inline-block; width: 13px; height: 13px; border: 1px solid var(--ink-3); margin: 0 3px 3px 0; }
 .print-roster tfoot td { border-top: 1px solid var(--ink-3); padding: 4px 5px; font-weight: 700; }
 .pr-total-label { text-align: right; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
@@ -1693,7 +1693,7 @@ button { font-family: inherit; }
 .print-hvp p { font-family: var(--serif); font-size: 11.5px; line-height: 1.14; margin: 0; }
 .print-hvp-slot { font-family: var(--sans); font-size: 10px; font-weight: 600; letter-spacing: 0.02em; color: var(--ink-3); text-transform: none; }
 /* Age of Unity: a blank line per ship to pencil in who carries an HVP. */
-.pr-hvp-slot { width: 9%; }
+.pr-hvp-slot { width: 8%; }
 /* Where the carrier started, so it can be struck through and rewritten when
    the token changes hands mid-game. */
 .pr-hvp-start { display: block; font-size: 9.5px; color: var(--ink-3); line-height: 1.2; }

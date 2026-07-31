@@ -97,9 +97,11 @@ export const TOURS: TourDef[] = [
     view: "builder",
     steps: [
       {
+        // The user's own words, near enough verbatim. No headline: the first
+        // sentence is the headline, and a title above it saying the same thing
+        // is exactly the doubling they threw out.
         selector: ".sy-unit-name|.mf-name",
-        title: "Everything in a box is yours to name",
-        body: "The fleet, each unit, and each of your personnel sit in a box like this one. Tap it and type - your names print on the roster.",
+        body: "Anything in a box like this can be renamed. Mike gave them generic titles but you are encouraged to name them; try “Chief Engineer Sadie Hyatt” instead of just “Chief Engineer.” It’s fun!",
       },
     ],
   },

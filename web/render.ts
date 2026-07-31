@@ -2359,32 +2359,36 @@ function foundryEditView(state: AppState, factionId: string): string {
     .map(
       (s, si) => `
     <article class="cf-ship">
-      <div class="cf-ship-grid">
-        <label class="field-block cf-ship-name">Ship class name
-          <input type="text" value="${escapeHtml(s.name)}" data-action="cf-ship" data-ship="${si}" data-field="name" /></label>
-        <label class="field-block">Mass
-          <select data-action="cf-ship" data-ship="${si}" data-field="mass">
-            ${[0, 1, 2, 3].map((m) => `<option value="${m}" ${s.mass === m ? "selected" : ""}>${m}</option>`).join("")}
-          </select></label>
-        <label class="field-block">Thrust in inches
-          <input type="number" min="0" value="${s.thrust}" data-action="cf-ship" data-ship="${si}" data-field="thrust" /></label>
-        <label class="field-block">Silhouette
-          <input type="number" min="1" max="12" value="${s.silhouette}" data-action="cf-ship" data-ship="${si}" data-field="silhouette" /></label>
-        <label class="field-block">Shields
-          <input type="number" min="0" value="${s.shields}" data-action="cf-ship" data-ship="${si}" data-field="shields" /></label>
-        <label class="field-block">Cost in billions
-          <input type="number" min="1" value="${s.cost}" data-action="cf-ship" data-ship="${si}" data-field="cost" /></label>
-      </div>
-      <!-- The art sits in its own column beside the fields rather than on a row
-           under them: as a full-width block it was adding ~90px of height to
-           every ship class, and there are nine of them in a faction. -->
-      <div class="field-block cf-ship-img">Ship image
-        <div class="cf-shipimg-row">
-          <label class="cf-shipimg-drop ${s.image ? "has-img" : ""}" title="Click to choose an image">
-            ${s.image ? `<img src="${s.image}" alt="" />` : `<span class="cf-shipimg-cue">${icon("upload", 18)}<span>Click to upload an image</span></span>`}
+      <!--
+        Three rows that always mean the same thing: what it is called, what it
+        is, what it shoots with. Nothing wraps by accident - the stats are one
+        fixed run of five and the art holds the left of that run - so the shape
+        of a ship class is the same shape every time you scroll past one.
+      -->
+      <button class="cf-ship-x" data-action="cf-ship-remove" data-ship="${si}" title="Remove this ship class" aria-label="Remove ship class ${escapeHtml(s.name)}">${icon("close", 20)}</button>
+      <div class="cf-ship-head">
+        <span class="cf-shipimg-cell">
+          <label class="cf-shipimg-drop ${s.image ? "has-img" : ""}" title="Click to choose an image for this ship class">
+            ${s.image ? `<img src="${s.image}" alt="" />` : `<span class="cf-shipimg-cue">${icon("upload", 16)}<span>Add art</span></span>`}
             <input type="file" accept="image/*" data-action="cf-ship-image-upload" data-ship="${si}" hidden />
           </label>
-          ${s.image ? `<button class="ghost-btn danger" data-action="cf-ship-image-clear" data-ship="${si}" title="Remove image">${icon("close", 14)} Remove</button>` : ""}
+          ${s.image ? `<button class="cf-shipimg-x" data-action="cf-ship-image-clear" data-ship="${si}" title="Remove this image" aria-label="Remove image">${icon("close", 12)}</button>` : ""}
+        </span>
+        <label class="field-block cf-ship-name">Ship class name
+          <input type="text" value="${escapeHtml(s.name)}" data-action="cf-ship" data-ship="${si}" data-field="name" /></label>
+        <div class="cf-ship-stats">
+          <label class="field-block">Mass
+            <select data-action="cf-ship" data-ship="${si}" data-field="mass">
+              ${[0, 1, 2, 3].map((m) => `<option value="${m}" ${s.mass === m ? "selected" : ""}>${m}</option>`).join("")}
+            </select></label>
+          <label class="field-block">Thrust
+            <input type="number" min="0" value="${s.thrust}" data-action="cf-ship" data-ship="${si}" data-field="thrust" /></label>
+          <label class="field-block">Silhouette
+            <input type="number" min="1" max="12" value="${s.silhouette}" data-action="cf-ship" data-ship="${si}" data-field="silhouette" /></label>
+          <label class="field-block">Shields
+            <input type="number" min="0" value="${s.shields}" data-action="cf-ship" data-ship="${si}" data-field="shields" /></label>
+          <label class="field-block">Cost
+            <input type="number" min="1" value="${s.cost}" data-action="cf-ship" data-ship="${si}" data-field="cost" /></label>
         </div>
       </div>
       <div class="cf-slots">
@@ -2397,7 +2401,6 @@ function foundryEditView(state: AppState, factionId: string): string {
           ${s.auxiliaryUtility ? "" : weaponEditor(si, "auxiliary", s.auxiliary)}
         </div>
       </div>
-      <button class="ghost-btn danger" data-action="cf-ship-remove" data-ship="${si}">${icon("trash", 14)} Remove ship class</button>
     </article>`,
     )
     .join("");

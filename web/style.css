@@ -996,17 +996,28 @@ button { font-family: inherit; }
 .cf-shipimg-drop.has-img { border-style: solid; border-color: var(--blue); padding: 0; min-height: 0; }
 .cf-shipimg-drop img { width: 100%; max-width: 240px; height: auto; object-fit: cover; display: block; }
 .cf-shipimg-cue { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sans); font-size: 12.5px; font-weight: 700; }
-/* In the ship editor the tile is a side column, so it is a narrow portrait box
-   with the cue stacked under its icon rather than a 220px landscape strip. */
-.cf-ship-img .cf-shipimg-row { margin-top: 0; gap: 6px; }
-.cf-ship-img .cf-shipimg-drop { min-width: 0; width: 150px; min-height: 50px; padding: 5px; }
-.cf-ship-img .cf-shipimg-drop.has-img { padding: 0; }
-/* A thumbnail, capped in height: at full width a 5:3 photo was the tallest
-   thing on the line and set the height of a row of 26px fields. */
-.cf-ship-img .cf-shipimg-drop img { max-width: 150px; max-height: 56px; width: auto; }
-/* Wide enough for the cue to sit on two lines, which is what keeps this tile
-   from being the tallest thing on the row. */
-.cf-ship-img .cf-shipimg-cue { flex-direction: column; gap: 3px; font-size: 11px; line-height: 1.2; text-align: center; }
+/* In the ship editor the tile is a thumbnail at the head of the stat row, sized
+   to that row rather than being the tallest thing on it. It had a "Ship image"
+   label and a 220x70 dashed panel reading "Click to upload an image", which was
+   three lines of chrome to say what a dashed box with an up-arrow says. */
+/* Flex, not block: as a block the newlines around the tile in the template made
+   a stray line box and the cell measured 70px for a 44px thumbnail. */
+.cf-shipimg-cell { position: relative; flex: 0 0 auto; display: flex; }
+/* min-height as well as height - the base tile's 70px floor beats a plain
+   height and held the whole row open. */
+.cf-shipimg-cell > .cf-shipimg-drop { min-width: 0; width: 78px; height: 44px; min-height: 44px; padding: 3px; }
+.cf-shipimg-cell > .cf-shipimg-drop.has-img { padding: 0; }
+.cf-shipimg-cell > .cf-shipimg-drop img { width: 100%; max-width: none; height: 100%; object-fit: cover; }
+.cf-shipimg-cell .cf-shipimg-cue { flex-direction: column; gap: 1px; font-size: 9px; line-height: 1.1; text-align: center; }
+/* Clears the art, and only exists when there is art to clear. Sits on the
+   corner of the thumbnail it clears rather than taking a slot in the row. */
+.cf-shipimg-x {
+  position: absolute; top: -6px; right: -6px;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; padding: 0; cursor: pointer;
+  background: var(--paper); border: 1px solid var(--red-wash); color: var(--red);
+}
+.cf-shipimg-x:hover { background: var(--red); border-color: var(--red); color: #fff; }
 
 /* Icon library picker */
 /* Reworked emblem picker: a large preview beside labelled actions, so "upload
@@ -1631,7 +1642,19 @@ button { font-family: inherit; }
 .cf-new-heading { font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--ink-3); margin: 14px 0 8px; }
 .mf-hvp-note { font-family: var(--serif); font-size: 13px; font-style: italic; color: var(--ink-2); margin: 2px 0 10px; }
 
-.cf-section { margin-bottom: 36px; border-top: 2px solid var(--hair); padding-top: 20px; }
+/* Custom Rules is a workbench, not a reading page: it is nine ship classes and
+   seven personnel on one screen, so the air between them was costing a screen
+   and a half of scrolling on its own. Everything below tightens the page
+   furniture - section rules, headings, notes - without touching the controls. */
+.cf-section { margin-bottom: 18px; border-top: 2px solid var(--hair); padding-top: 10px; }
+.cf-section .panel-title { margin-bottom: 8px; }
+.foundry-main { padding-top: clamp(14px, 2vw, 22px); }
+.foundry-main .page-title { margin-bottom: 6px; }
+.foundry-main .panel-note { margin-bottom: 12px; }
+.foundry-main .breadcrumb { margin-bottom: 6px; }
+.foundry-actions { margin: 12px 0 16px; }
+.cf-grid { gap: 8px; }
+.cf-hvp { margin-bottom: 6px; }
 .cf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
 .field-block { display: flex; flex-direction: column; gap: 5px; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
 .field-block.wide { grid-column: 1 / -1; }
@@ -1642,39 +1665,39 @@ button { font-family: inherit; }
 }
 .field-block textarea, .cf-hvp textarea { font-family: var(--serif); resize: vertical; }
 /*
- * One ship class ran 465px tall and a faction has nine of them, so the editor
- * was 4,000px of scrolling, most of it air: a full-width name row, a full-width
- * art row, and 18px of padding around the lot.
+ * A ship class is three rows, always the same three: name, stats, weapons.
  *
- * Everything here packs rather than places. No fixed columns and no grid areas:
- * each field is as wide as it needs to be, they sit side by side until they run
- * out of room, and then they wrap. That is why it survives any width - there is
- * no track for content to be forced into and overflow out of.
+ * The previous pass let everything wrap freely, which meant the row a field
+ * landed on depended on how long its own label happened to be - the same block
+ * broke differently at every width and read as arbitrary. These rows are fixed
+ * and only their contents flex, so a ship class looks like a ship class.
  */
-.cf-ship {
-  border: 1px solid var(--hair); padding: 8px 10px; margin-bottom: 8px;
-  display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px 12px;
+.cf-ship { position: relative; border: 1px solid var(--hair); padding: 8px 10px; margin-bottom: 6px; }
+/* Row 1, always: art, name, the five stats. Art and name hold the left, and
+   the stats wrap under them as a block when the row runs out of room - never
+   two of them on one line and three on the next. */
+.cf-ship-head { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 6px 8px; padding-right: 34px; }
+.cf-ship-name { flex: 1 1 200px; min-width: 0; }
+.cf-ship-name > input { width: 100%; }
+.cf-ship-stats { flex: 1 1 430px; display: flex; gap: 6px; min-width: 0; }
+/* Top right, out of the flow, so it is in the same place on every class no
+   matter how the row below it wraps. */
+.cf-ship-x {
+  position: absolute; top: 6px; right: 6px;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; padding: 0; cursor: pointer;
+  background: transparent; border: 1px solid var(--red-wash); color: var(--red);
 }
-/* Fields and art on one line together, art last so it drops away first. */
-.cf-ship-grid { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px 10px; flex: 1 1 320px; }
-/* A stat is as wide as its value needs, not as wide as its label: "Thrust in
-   inches" on one line made a 173px box for a two-digit number, and five of
-   those pushed the name onto a row of its own. The label wraps instead. */
-.cf-ship-grid > .field-block { flex: 0 1 auto; max-width: 116px; }
-.cf-ship-grid > .field-block > input, .cf-ship-grid > .field-block > select { width: 100%; }
-/* Beats the 116px stat cap above on specificity - the name holds words. */
-.cf-ship-grid > .cf-ship-name { flex: 1 1 220px; min-width: 0; max-width: none; }
-.cf-ship-img { flex: 0 0 auto; }
-/* Bottom right of whatever line it lands on, so it costs no line of its own. */
-.cf-ship > .ghost-btn { flex: 0 0 auto; align-self: flex-end; margin-left: auto; }
+.cf-ship-x:hover { background: var(--red); border-color: var(--red); color: #fff; }
+.cf-ship-stats > .field-block { flex: 1 1 0; min-width: 0; }
+.cf-ship-stats > .field-block > input, .cf-ship-stats > .field-block > select { width: 100%; }
 .cf-ship .field-block { gap: 2px; }
 .cf-ship .cf-slot h5 { margin-bottom: 4px; }
 .cf-ship .weapon-edit-row { margin-bottom: 4px; }
 .cf-ship .field-block input, .cf-ship .field-block select,
 .cf-ship .weapon-edit-row input, .cf-ship .weapon-edit-row select { padding: 5px 8px; font-size: 13px; }
-/* A line of their own, less the width of the Remove button so that button can
-   sit at the end of it instead of claiming a fourth line for itself. */
-.cf-slots { display: flex; flex-wrap: wrap; gap: 10px 14px; margin: 0; flex: 1 1 calc(100% - 172px); min-width: min(100%, 320px); }
+/* Row 3: the two weapon slots, side by side while they each have ~280px. */
+.cf-slots { display: flex; flex-wrap: wrap; gap: 8px 12px; margin: 8px 0 0; }
 .cf-slot { flex: 1 1 280px; min-width: 0; }
 .cf-slot h5 { font-family: var(--sans); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .check-inline { font-size: 10px; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--ink-2); display: inline-flex; gap: 5px; align-items: center; }
@@ -1925,7 +1948,13 @@ button { font-family: inherit; }
 }
 .pilot-opt:hover { border-color: var(--blue); background: var(--blue-wash); }
 .pilot-opt.on { border-color: var(--blue); background: var(--blue); }
-.pilot-ico-img { width: 20px; height: 20px; object-fit: contain; display: block; }
+/* The three source PNGs are WHITE artwork on transparent, drawn for the selected
+   chip's blue fill. Unfiltered they are white-on-white, so an unpicked Hauler or
+   Junker showed a name and no glyph at all - the icon was there the whole time,
+   painted the same colour as the button. brightness(0) crushes the art to a
+   black silhouette for the resting and hovered chip, matching .pilot-name's ink;
+   the selected chip inverts that back to white for the blue ground. */
+.pilot-ico-img { width: 20px; height: 20px; object-fit: contain; display: block; filter: brightness(0); }
 .pilot-opt.on .pilot-ico-img { filter: brightness(0) invert(1); }
 .pilot-name { font-family: var(--display); font-weight: 800; font-size: 12px; letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink); }
 .pilot-opt.on .pilot-name { color: #fff; }
@@ -5009,10 +5038,16 @@ main.play-body .roster-section::before { content: none; }
   align-items: center;
   flex-wrap: wrap;
   row-gap: 2px;
-  /* The 24px target floor, held in BOTH states, so choosing somebody opens the
-     field without the list under it moving a pixel. */
-  min-height: 24px;
 }
+/* Only the chosen line needs the 24px target floor, and its input already
+   carries it. A blanket min-height here padded every ROW in the list with
+   3.5px of dead air above and below the name, which is most of what made the
+   personnel list read as double-spaced. */
+.is-nameable { min-height: 24px; }
+/* Personnel rule text was set at 1.4, which on a 13px serif is 18.2px a line
+   and reads as double-spacing down a twelve-row list. 1.15 is the ceiling. */
+.sy-hvp-rule,
+.personnel-rule { line-height: 1.15; }
 .hvp-name-input {
   /* The line already carries the display face at the right size and colour, and
      a chosen row turns blue - the field should be the same text you were just

@@ -118,7 +118,6 @@ export interface Faction {
   /** Optional tint for a vector (SVG) emblem: ink, blue, or red. */
   emblemColor?: "ink" | "blue" | "red";
   /** Optional background colour behind the emblem (works for any sigil). */
-  emblemBg?: "ink" | "blue" | "red" | "steel" | "sand";
   /** When true, every unit in a fleet must declare a species (Alliance only). */
   requiresSpecies?: boolean;
   /**

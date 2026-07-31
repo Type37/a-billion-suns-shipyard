@@ -77,7 +77,6 @@ export interface SavedList {
   /** Optional tint for a vector (SVG) library mark: ink, blue, or red. */
   emblemColor?: "ink" | "blue" | "red";
   /** Optional background colour behind the emblem (works for any sigil). */
-  emblemBg?: "ink" | "blue" | "red" | "steel" | "sand";
   /** Hypergrowth only: lift the credits cap on the Shipyard. Default false. */
   unlimitedShipyards?: boolean;
   fleet: Fleet;
@@ -168,7 +167,6 @@ export interface SavedOutfit {
   emblemImage?: string;
   emblemLib?: string;
   emblemColor?: "ink" | "blue" | "red";
-  emblemBg?: "ink" | "blue" | "red" | "steel" | "sand";
   ships: OutfitShip[];
   /** Remaining Debt in ¢k. Starts at 30; clearing it wins the campaign. */
   debtK: number;

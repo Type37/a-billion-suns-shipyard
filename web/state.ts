@@ -269,7 +269,6 @@ export interface AppState {
       emblemImage?: string;
       emblemLib?: string;
       emblemColor?: "ink" | "blue" | "red";
-      emblemBg?: "ink" | "blue" | "red" | "steel" | "sand";
     };
     /** In-progress first-visit coachmark tour, once the user has advanced past step 0. */
     tour?: { tourId: string; step: number };

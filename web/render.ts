@@ -347,20 +347,11 @@ export function listTotals(list: SavedList, customs: Faction[]): { total: number
 // Shared chrome
 // ---------------------------------------------------------------------------
 
-export const EMBLEM_BG: Record<string, string> = {
-  ink: "var(--ink)",
-  blue: "var(--blue)",
-  red: "var(--red)",
-  steel: "#5b6472",
-  sand: "#caa96a",
-};
-
 interface EmblemFields {
   emblem?: string;
   emblemImage?: string;
   emblemLib?: string;
   emblemColor?: string;
-  emblemBg?: string;
 }
 
 // The bare sigil: a tinted vector (SVG + chosen colour, painted via CSS mask),
@@ -410,15 +401,19 @@ function renderSigil(e: EmblemFields, size: number, cls = ""): string {
   return emblemMark(e.emblem ?? "delta", e.emblemImage ?? libraryUrl(e.emblemLib), size, cls);
 }
 
-// Full emblem: the sigil, optionally on a coloured background tile (so any
-// mark can be given a colour ground). Only when the user actually chose one -
-// no tile is ever added automatically.
+/**
+ * Full emblem: the mark, and nothing behind it.
+ *
+ * There used to be an optional coloured ground here - pick Ink/Blue/Red/Steel/
+ * Sand and the mark sat on a tile of it, shrunk to 72% to leave a border. It is
+ * gone, along with the swatch row that set it. Emblems are round now (see
+ * .emblem-round in style.css), and a round mark on a round tile is a mark with a
+ * ring of paint around it for no reason: the shape already separates the emblem
+ * from whatever it sits on, which is the whole job a ground was doing. Marks
+ * with their own solid ground - most of the circles/ set arrives that way - keep
+ * it, because that is the artwork, and the clip turns their square into a disc.
+ */
 export function emblemView(e: EmblemFields, size: number, cls = ""): string {
-  const bg = e.emblemBg ? EMBLEM_BG[e.emblemBg] : undefined;
-  if (bg) {
-    const inSize = Math.round(size * 0.72);
-    return `<span class="emblem-bgbox ${cls}" style="width:${size}px;height:${size}px;background:${bg};">${renderSigil(e, inSize)}</span>`;
-  }
   return renderSigil(e, size, cls);
 }
 
@@ -3890,7 +3885,6 @@ function emblemModal(state: AppState): string {
     rndA: string;
     clrA: string;
     currentColor?: string;
-    currentBg?: string;
   }
   let cfg: Cfg | undefined;
   if (m.target === "list") {
@@ -3905,7 +3899,6 @@ function emblemModal(state: AppState): string {
         rndA: "random-emblem",
         clrA: "clear-emblem-image",
         currentColor: l.emblemColor,
-        currentBg: l.emblemBg,
       };
   } else if (m.target === "faction") {
     const fid = state.route.view === "foundry" ? state.route.factionId : undefined;
@@ -3920,7 +3913,6 @@ function emblemModal(state: AppState): string {
         rndA: "cf-random-emblem",
         clrA: "cf-clear-emblem",
         currentColor: f.emblemColor,
-        currentBg: f.emblemBg,
       };
   } else if (m.target === "new-outfit") {
     // The outfit being started in the dialog. It has no id and is not in
@@ -3936,7 +3928,6 @@ function emblemModal(state: AppState): string {
         rndA: "no-random-emblem",
         clrA: "no-clear-emblem",
         currentColor: d.emblemColor,
-        currentBg: d.emblemBg,
       };
   } else {
     const o = activeOutfit(state);
@@ -3950,7 +3941,6 @@ function emblemModal(state: AppState): string {
         rndA: "outfit-random-emblem",
         clrA: "outfit-clear-emblem",
         currentColor: o.emblemColor,
-        currentBg: o.emblemBg,
       };
   }
   if (!cfg) return "";
@@ -3968,9 +3958,6 @@ function emblemModal(state: AppState): string {
     )
     .join("");
 
-  const bgSwatch = (val: string, style: string, label: string) =>
-    `<button class="bg-swatch ${(cfg!.currentBg ?? "") === val ? "selected" : ""}" data-action="emblem-set-bg" data-bg="${val}" aria-label="${label}" title="${label}" style="${style}">${val === "" ? icon("close", 12) : ""}</button>`;
-
   // Folder chips. Counts follow the active search, so a chip cannot promise
   // "All 253" while the grid shows eleven; a folder with no match is dimmed
   // rather than removed, so the row does not reflow as you type.
@@ -3982,22 +3969,6 @@ function emblemModal(state: AppState): string {
         const n = matchCount(q, c);
         return `<button class="em-folder ${activeCat === c ? "on" : ""} ${n === 0 ? "is-empty" : ""}" data-action="emblem-lib-cat" data-cat="${escapeHtml(c)}">${escapeHtml(categoryLabel(c))} <span class="em-folder-n">${n}</span></button>`;
       }).join("")}
-    </div>`;
-
-  // Background only. The Tint row is gone: painting a colour through the mark's
-  // alpha channel flattens it to a silhouette, so any logo with internal detail
-  // came out as a shape, and the one real problem it was reaching for - a white
-  // mark vanishing on white - is now handled automatically by giving measured
-  // near-white marks a black ground (see emblemView).
-  //
-  // These sit directly above the footer rather than under the grid: below it
-  // they were 1156px off-screen at the default page size and 4886px after
-  // "Show all". Shown on both tabs, since a background applies to an upload too.
-  const colourBlock = `<div class="em-colour">
-      <div class="em-colour-row">
-        <span class="em-colour-label">Background</span>
-        <div class="em-swatches">${bgSwatch("", "", "None")}${bgSwatch("ink", "background:var(--ink)", "Ink")}${bgSwatch("blue", "background:var(--blue)", "Blue")}${bgSwatch("red", "background:var(--red)", "Red")}${bgSwatch("steel", "background:#5b6472", "Steel")}${bgSwatch("sand", "background:#caa96a", "Sand")}</div>
-      </div>
     </div>`;
 
   const body =
@@ -4025,7 +3996,6 @@ function emblemModal(state: AppState): string {
       </header>
       <div class="em-tabs" role="tablist">${tabBtns}</div>
       <div class="em-body">${body}</div>
-      ${colourBlock}
       <div class="em-foot">
         <button class="bar-btn" data-action="${cfg.rndA}">${icon("shuffle", 15)} Random</button>
         ${cfg.hasImage ? `<button class="bar-btn danger" data-action="${cfg.clrA}">${icon("close", 15)} Remove</button>` : ""}

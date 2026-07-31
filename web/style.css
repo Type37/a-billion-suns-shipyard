@@ -991,7 +991,7 @@ button { font-family: inherit; }
 /* Collapsed emblem control: one button showing the current mark; the whole
    picker opens in a popover so it no longer clutters the setup band. */
 .emblem-menu { position: relative; }
-.emblem-current-btn .emblem, .emblem-current-btn .emblem-img, .emblem-current-btn .emblem-bgbox { width: 46px; height: 46px; color: var(--blue); }
+.emblem-current-btn .emblem, .emblem-current-btn .emblem-img { width: 46px; height: 46px; color: var(--blue); }
 .emblem-menu-panel {
   position: absolute; top: calc(100% + 4px); left: 0; z-index: 40;
   width: 320px; max-height: 360px; overflow-y: auto;
@@ -1000,12 +1000,32 @@ button { font-family: inherit; }
 }
 .emblem-menu-tools { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 .emblem-menu-panel .lib-cat:first-of-type { margin-top: 0; }
-/* contain, never cover. `cover` fills the square by scaling the art up and
-   cropping whatever falls outside it, so any emblem that isn't already square
-   lost its edges - a wide wordmark lost both ends. Letterboxing inside the tile
-   is the correct trade: the whole mark stays visible, which is the entire job of
-   a picker. */
-.emblem-img { object-fit: contain; display: block; }
+/* EMBLEMS ARE ROUND. Raster art is clipped to a disc wherever it appears - the
+   picker, the header button, the roster, the printed sheet.
+
+   This is also what got rid of the backgrounds. Most of the library arrives as
+   circular badge art painted onto a square canvas, so the corners were a block
+   of flat colour around the mark - the thing that made these read as stickers
+   rather than insignia. Clipping to the disc removes exactly those corners and
+   leaves the artwork's own ground as the fill, which is how the art was drawn to
+   be seen. Nothing is painted behind a mark any more; the shape does the
+   separating that a coloured tile used to.
+
+   `cover`, not `contain`, and that reverses an earlier decision worth stating.
+   `contain` was here because a non-square mark lost its ends to `cover` - a wide
+   wordmark lost both. The library no longer holds any: the marks that were not
+   square (three 2:1 stickers, a wordmark, four odd crops) are gone, and every
+   one that remains is square within 2%, where the two are identical. What can
+   still be non-square is an UPLOAD, and inside a round frame `cover` is the
+   right answer for those too - a centre crop fills the disc, where `contain`
+   would letterbox a wide image into a thin band and then clip its ends off with
+   the curve anyway.
+
+   Built-in vector glyphs are NOT clipped: they are free-standing shapes on
+   nothing, with no ground to remove, and the delta's bottom corners sit in the
+   corners of its box - a disc would slice them off to fix a problem they do not
+   have. */
+.emblem-img { object-fit: cover; display: block; border-radius: 50%; }
 /* Emblem art renders in full colour, in the picker and everywhere it lands. */
 .emblem-img, .lib-icon img { filter: none; }
 /* Per-ship-class art upload in the Foundry ship editor. */
@@ -1059,26 +1079,22 @@ button { font-family: inherit; }
 .ep-lib-scroll { overflow-y: auto; padding: 14px; }
 .lib-cat-title { font-family: var(--sans); font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--hair-soft); }
 .lib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; align-items: stretch; }
-/* A faint checkerboard behind each tile so all-white / transparent sigils are
-   still visible while browsing (colours read fine over it too). */
-.lib-icon { padding: 6px 4px; border: 1px solid var(--hair-soft); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background:
-    repeating-conic-gradient(var(--hair-soft) 0% 25%, var(--paper) 0% 50%) 0 0 / 16px 16px; }
+/* No checkerboard, and no box. The chequer existed so an all-white sigil was
+   visible against a white tile; a round tile with a hairline ring says where the
+   mark is without painting anything behind it, and a white mark on white now
+   reads by its own edge against that ring. Square tiles around round marks were
+   also the last place the grid still looked like a sticker sheet. */
+.lib-icon { padding: 5px; border: 1px solid var(--hair-soft); border-radius: 50%; aspect-ratio: 1; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--paper); }
 /* No content-visibility here, despite the 250-tile grid looking like the textbook
    case for it. Measured on this grid it saved about 1ms of a 14ms keystroke: the
    cost was never tile layout, it was image weight, and downscaled thumbnails
    (scripts/make-emblem-thumbs.py) took that from 9.7MB to 1.3MB. Not worth the
    extra moving part for 1ms. */
 .lib-icon:hover { border-color: var(--ink); }
-.lib-icon.selected { border-color: var(--blue); box-shadow: inset 0 0 0 2px var(--blue); }
-.lib-icon img { width: 100%; height: 100%; object-fit: contain; min-height: 0; }
+.lib-icon.selected { border-color: var(--blue); box-shadow: 0 0 0 2px var(--blue); }
+.lib-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; min-height: 0; }
 /* No .lib-icon-name rules: the caption under each tile is gone (see
    iconLibraryGrid in emblems.ts). The name lives on title/aria-label now. */
-/* Tinted vector mark: the SVG painted as a solid colour via CSS mask. */
-.tint-none { background: var(--paper); color: var(--ink-3); }
-.tint-ink { background: var(--ink); }
-.tint-blue { background: var(--blue); }
-.tint-red { background: var(--red); }
 
 .band-readout { display: flex; gap: 0; border: 1px solid var(--hair); }
 .readout { padding: 10px 20px; text-align: right; border-left: 1px solid var(--hair-soft); }
@@ -3936,7 +3952,7 @@ button { font-family: inherit; }
   border: 1px solid var(--hair); background: var(--paper); padding: 8px 14px 8px 8px; text-align: left;
 }
 .emblem-choose-btn:hover { border-color: var(--ink); }
-.emblem-choose-preview { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; border: 1px solid var(--hair-soft); color: var(--blue); flex-shrink: 0; }
+.emblem-choose-preview { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; border: 1px solid var(--hair-soft); border-radius: 50%; color: var(--blue); flex-shrink: 0; }
 .emblem-choose-preview .emblem, .emblem-choose-preview .emblem-img { width: 34px; height: 34px; }
 .emblem-choose-label { display: inline-flex; align-items: center; gap: 7px; font-family: var(--sans); font-weight: 700; font-size: 14px; color: var(--ink); }
 
@@ -3945,7 +3961,10 @@ button { font-family: inherit; }
 .em-modal .modal-header, .em-modal .em-tabs, .em-modal .em-foot { flex: none; }
 .em-modal .em-body { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
 .em-head { display: flex; align-items: center; gap: 12px; }
-.em-preview { display: inline-flex; width: 56px; height: 56px; align-items: center; justify-content: center; background: rgba(255,255,255,0.14); color: #fff; flex-shrink: 0; }
+/* Round, like every other emblem frame. The wash behind it stays: this one sits
+   on the modal's blue header band, where it is a well for the preview rather
+   than a ground painted behind a mark out in the page. */
+.em-preview { display: inline-flex; width: 56px; height: 56px; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,0.14); color: #fff; flex-shrink: 0; }
 .em-preview .emblem, .em-preview .emblem-img { width: 44px; height: 44px; }
 .em-tabs { display: flex; border-bottom: 1px solid var(--hair); }
 .em-tab { flex: 1; padding: 12px 8px; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-family: var(--sans); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3); }
@@ -3961,16 +3980,6 @@ button { font-family: inherit; }
 }
 .em-drop:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-wash); }
 .em-drop-cue { display: inline-flex; flex-direction: column; align-items: center; gap: 8px; font-family: var(--sans); font-weight: 700; font-size: 14px; }
-.em-colour { flex: none; padding: 10px 18px; border-top: 1px solid var(--hair); display: flex; flex-direction: column; gap: 8px; }
-.em-colour-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-.em-colour-label { font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--ink); min-width: 84px; }
-.em-colour-row.is-off { opacity: 0.45; }
-.em-colour-note { font-size: 13px; font-weight: 700; color: var(--ink); margin: 0 0 8px; }
-.em-colour-note + .em-swatches + .em-colour-note { margin-top: 14px; }
-.em-colour-sub { font-weight: 500; font-size: 11px; color: var(--ink-3); }
-.em-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
-.bg-swatch { width: 34px; height: 34px; border: 1px solid var(--hair); cursor: pointer; padding: 0; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-3); background: var(--paper); }
-.bg-swatch.selected { box-shadow: inset 0 0 0 2px var(--paper), 0 0 0 2px var(--ink); }
 .em-search { width: 100%; margin-bottom: 10px; font-family: var(--sans); font-size: 14px; padding: 9px 11px; border: 1px solid var(--hair); background: var(--paper); color: var(--ink); }
 .em-search:focus { outline: none; border-color: var(--blue); }
 /* Folder chips for the emblem library. */
@@ -3981,8 +3990,6 @@ button { font-family: inherit; }
 .em-folder-n { font-size: 10px; font-weight: 700; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 .em-folder.on .em-folder-n { color: #cdddf6; }
 .em-folder.is-empty { opacity: 0.4; }
-/* Emblem on a coloured ground (for all-white sigils, or any chosen background). */
-.emblem-bgbox { display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
 .em-foot { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 12px 18px; border-top: 1px solid var(--hair); }
 .em-foot .em-done { margin-left: auto; }
 
@@ -4015,11 +4022,6 @@ button { font-family: inherit; }
   .em-foot { padding: 8px 12px; }
   /* The background picker is one line: label and swatches share a row instead
      of stacking, and the swatches shrink to a still-comfortable 30px. */
-  .em-colour { padding: 8px 12px; gap: 6px; }
-  .em-colour-row { gap: 10px; }
-  .em-colour-label { min-width: 0; font-size: 11px; }
-  .em-swatches { gap: 6px; flex-wrap: nowrap; overflow-x: auto; }
-  .bg-swatch { width: 30px; height: 30px; flex: 0 0 auto; }
 }
 
 /* Play Mode: the commands legal in the current phase, with cost and full text. */

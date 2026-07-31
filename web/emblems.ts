@@ -23,17 +23,11 @@ const thumbUrls = import.meta.glob("./emblem-thumbs/**/*.webp", {
   import: "default",
 }) as Record<string, string>;
 
-// Which marks are too light to sit on white paper, measured by
-// scripts/find-light-emblems.py (mean luminance of the pixels the mark actually
-// paints). 48 of the 154 raster marks are near-white cut-outs that simply
-// vanished on the sheet; those get a black tile behind them automatically.
-//
-// This replaces the tint list. Tinting existed to solve the same problem by
-// re-colouring the mark, but a mask flattens artwork to a silhouette, so a
-// detailed logo came out as a blob and it was never worth using.
-import lightList from "./emblem-thumbs/light.json";
-
-const LIGHT = new Set<string>(lightList as string[]);
+// Nothing measures a mark's lightness any more. The light list existed to give
+// near-white cut-outs a black tile so they did not vanish on white paper - that
+// tile is gone with every other emblem ground (see emblemView in render.ts), and
+// the round frame's hairline ring is what tells you where a white mark is now.
+// scripts/find-light-emblems.py and emblem-thumbs/light.json are dead with it.
 
 const THUMB_BY_REL = new Map<string, string>(
   Object.entries(thumbUrls).map(([path, url]) => [path.replace(/^\.\/emblem-thumbs\//, "").replace(/\.webp$/i, ""), url]),
@@ -50,8 +44,6 @@ export interface LibraryIcon {
   label: string;
   /** Extra search terms describing what the mark depicts. */
   keywords: string[];
-  /** True if the mark is near-white and needs a dark ground to be visible. */
-  light: boolean;
 }
 
 function titleCase(s: string): string {
@@ -165,10 +157,7 @@ export const ICON_LIBRARY: LibraryIcon[] = Object.entries(urls)
     const label = cleanLabel(file.replace(/\.[^.]+$/, ""));
     // SVGs have no thumbnail (and need none) - they fall back to the original.
     const thumb = THUMB_BY_REL.get(rel.replace(/\.[^.]+$/, "")) ?? url;
-    // SVGs draw with currentColor, so they inherit the ink colour and are dark by
-    // construction - only rasters can be measured, and only rasters can be white.
-    const light = !/\.svg$/i.test(rel) && LIGHT.has(rel.replace(/\.[^.]+$/, ""));
-    return { id: rel, url, thumb, category, label, keywords: keywordsFor(file, category, label), light };
+    return { id: rel, url, thumb, category, label, keywords: keywordsFor(file, category, label) };
   })
   .sort((a, b) => a.category.localeCompare(b.category) || a.label.localeCompare(b.label));
 

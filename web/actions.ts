@@ -218,7 +218,7 @@ function currentFoundryId(): string | null {
  *  modal currently targets: the active list, custom faction, or outfit. */
 function patchEmblemTarget(
   state: AppState,
-  patch: { emblemColor?: "ink" | "blue" | "red"; emblemBg?: "ink" | "blue" | "red" | "steel" | "sand" },
+  patch: { emblemColor?: "ink" | "blue" | "red" },
 ): void {
   const m = state.ui.modal;
   if (m?.kind !== "emblem") return;
@@ -617,13 +617,6 @@ function dispatchAction(target: HTMLElement): void {
       );
       break;
     }
-    case "emblem-set-bg": {
-      const raw = target.dataset["bg"];
-      const bg =
-        raw === "ink" || raw === "blue" || raw === "red" || raw === "steel" || raw === "sand" ? raw : undefined;
-      patchEmblemTarget(store.getState(), { emblemBg: bg });
-      break;
-    }
     case "clear-emblem-image": {
       const id = currentListId();
       if (!id) return;
@@ -633,7 +626,6 @@ function dispatchAction(target: HTMLElement): void {
           emblemImage: undefined,
           emblemLib: undefined,
           emblemColor: undefined,
-          emblemBg: undefined,
         })),
       );
       break;
@@ -646,7 +638,6 @@ function dispatchAction(target: HTMLElement): void {
         emblemImage: undefined,
         emblemLib: undefined,
         emblemColor: undefined,
-        emblemBg: undefined,
       }));
       break;
     }
@@ -1259,7 +1250,6 @@ function dispatchAction(target: HTMLElement): void {
               emblemImage: draft.emblemImage,
               emblemLib: draft.emblemLib,
               emblemColor: draft.emblemColor,
-              emblemBg: draft.emblemBg,
             }
           : {}),
       };
@@ -1356,7 +1346,6 @@ function dispatchAction(target: HTMLElement): void {
         emblemImage: undefined,
         emblemLib: undefined,
         emblemColor: undefined,
-        emblemBg: undefined,
       }));
       break;
     }

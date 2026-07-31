@@ -1486,7 +1486,7 @@ button { font-family: inherit; }
 .pc-name { font-family: var(--display); font-weight: 800; font-size: 13px; line-height: 1.1; flex: 1; }
 .pc-x { font-weight: 900; color: var(--blue); }
 .pc-cost { font-weight: 700; font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.pc-sub { font-size: 9.5px; color: var(--ink-2); margin-bottom: 2px; }
+.pc-sub { margin-bottom: 2px; }
 /* The stat block takes exactly the width its four figures need and never less
    (flex-shrink 0) - squeezing it was what pushed the second column of stats out
    over the weapons text. The weapons take whatever is left. No divider rule
@@ -1508,8 +1508,13 @@ button { font-family: inherit; }
   display: inline-flex; align-items: center; flex: none;
   font-family: var(--narrow); font-size: 9px; font-weight: 700; letter-spacing: 0.04em; color: var(--ink-3);
 }
-.pcw-name { font-family: var(--serif); font-size: 10px; font-weight: 400; line-height: 1.15; color: var(--ink); }
-.pcw-fig { font-size: 9px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; color: var(--ink-2); white-space: nowrap; }
+/* PARITY WITH THE ROSTER. A card and a roster row carry the same eight facts
+   about the same ship, and they were setting them in different faces: the gun
+   name serif here and narrow there, the stat figure Libre Franklin here and
+   narrow there. Whichever view you print, the numbers and the guns now look
+   like the same numbers and guns. */
+.pcw-name { font-family: var(--narrow); font-size: 10px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.15; color: var(--ink); }
+.pcw-fig { font-family: var(--narrow); font-size: 9.5px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; color: var(--ink-2); white-space: nowrap; }
 .pc-carry { font-size: 9px; font-style: italic; color: var(--ink-2); margin-top: 2px; }
 .pc-track { margin-top: 6px; padding-top: 5px; border-top: 1px solid var(--hair-soft); display: flex; flex-direction: column; gap: 2px; }
 .pc-track-h { font-family: var(--display); font-weight: 800; font-size: 9px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-2); margin: 0 0 3px; }
@@ -1602,6 +1607,13 @@ button { font-family: inherit; }
    headings still wrap at the space; single words get a column wide enough to
    hold them, at a size and weight that fits rather than a size that has to be
    hyphenated into nonsense. */
+/* EVERY column header in one face. The weapons header had drifted to Archivo
+   Narrow (it shared a rule with its cells) while the other seven stayed Libre
+   Franklin, so one heading in the row was a different typeface at the same size
+   - which is exactly the kind of thing you see without being able to name. The
+   narrow face is the right one for 8px uppercase in a 30px column, and it is
+   what the cells below now use, so the table reads as one thing. */
+.print-roster thead th { font-family: var(--narrow); font-weight: 700; letter-spacing: 0.03em; }
 .print-roster th {
   white-space: normal; overflow-wrap: normal; word-break: normal; hyphens: none;
 }
@@ -1610,29 +1622,42 @@ button { font-family: inherit; }
   font-size: 8px; font-weight: 600; text-transform: uppercase;
   color: var(--ink-2); padding: 3px 4px;
 }
-/* Row glyphs (prNum / prWeapCell in render.ts). Uncoloured: this sheet has to
-   survive a black-and-white printer, where the four stat colours become four
-   identical greys, so the shapes do the telling apart. */
-.prn { display: inline-flex; align-items: center; gap: 2px; }
-.prn-ico, .prw-ico { color: var(--ink-2); flex: none; }
+/* Row glyphs (prNum / prWeapCell in render.ts), coloured the same way the cards
+   colour them - one stat colour per stat, blue for both arcs - so the same fact
+   looks the same whichever view gets printed. */
+.prn { display: inline-flex; align-items: center; justify-content: center; gap: 2px; }
+.prn-ico { flex: none; }
+.prn-ico.icon { top: 0; }
 .prn-v { font-variant-numeric: tabular-nums; }
-/* One weapon per line, its arc in a fixed 10px gutter so the names start on a
-   common left edge down the column instead of stepping in and out with the
-   glyph. flex-start, not centre: a two-line entry should hang its text under
-   itself, with the arc against the first line. */
-.prw { display: flex; align-items: flex-start; gap: 3px; }
+/* The arc sits in a gutter that is ALWAYS there, glyph or no glyph. It used to
+   be reserved only when there was an arc to put in it, so "None" and "Utility
+   Bays" started 13px left of every weapon name and the Primary and Auxiliary
+   columns disagreed about where their text began on the same row.
+   A real flex track, not an absolutely-placed glyph: the global `.icon` rule
+   (position: relative, a small baseline nudge) is declared later in this file
+   and won on specificity, which threw the mark above its line. A fixed-width
+   flex item cannot be undone that way, and the nudge is cancelled here the same
+   way it is for buttons and chips. */
+.prw { display: flex; align-items: center; gap: 3px; }
 .prw + .prw { margin-top: 1px; }
-.prw-ico { width: 10px; margin-top: 1px; }
+.prw-ico { flex: none; width: 10px; height: 10px; display: inline-flex; align-items: center; justify-content: center; }
+.prw-ico .icon { top: 0; }
+.prw-ico .prw-mark { vertical-align: 0; margin-left: 0; top: 0; }
 .prw-t { min-width: 0; }
 .print-roster tbody td { border-bottom: 1px solid var(--hair-soft); padding: 2px 5px; vertical-align: top; font-size: 11px; }
 .print-roster tbody tr { break-inside: avoid; }
 .pr-unit-name { display: block; font-family: var(--display); font-weight: 800; font-size: 12.5px; line-height: 1.2; }
 .pr-unit-x { font-weight: 900; color: var(--blue); }
-/* Quite a bit smaller than the name it sits under. It is a footnote to that
-   name - which class the thing you called "Bright Hammer" actually is - and at
-   11px against a 12.5px name it was competing with it instead of annotating it.
-   Narrow and uppercase-ish weight keeps it legible at 8.5px. */
-.pr-unit-class { display: block; font-family: var(--narrow); font-size: 8.5px; font-weight: 700; letter-spacing: 0.02em; line-height: 1.15; color: var(--ink-3); }
+/* A footnote to the name above it - which class the thing you called "Bright
+   Hammer" actually is - so it is quiet in all three ways at once: quite a bit
+   smaller (8.5px against a 12.5px name), NOT bold (500, where the name is 800),
+   and grey rather than ink. At 11px semibold it was competing with the name
+   instead of annotating it. Shared verbatim with the card's .pc-sub, so the two
+   views say it the same way. */
+.pr-unit-class, .pc-sub {
+  display: block; font-family: var(--narrow); font-size: 8.5px; font-weight: 500;
+  letter-spacing: 0.02em; line-height: 1.2; color: var(--ink-3);
+}
 .pr-unit-ships { display: block; font-family: var(--serif); font-size: 11.5px; color: var(--ink); margin-top: 2px; }
 .pr-unit-notes { display: block; font-family: var(--serif); font-style: italic; font-size: 11.5px; color: var(--ink-2); margin-top: 2px; }
 /* Wide enough for SHIELDS, the longest single-word heading, so it sits on one
@@ -1664,10 +1689,16 @@ button { font-family: inherit; }
 .pr-weap { width: 25%; }
 /* Written against `.print-roster tbody td` and `thead th`, both of which set a
    font-size that a bare .pr-weap loses to on specificity. */
-.print-roster tbody td.pr-weap, .print-roster thead th.pr-weap {
-  font-family: var(--narrow); font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; white-space: nowrap;
+/* ONE FACE FOR THE DATA TOO. The stat figures were Libre Franklin 11px, the
+   weapons Archivo Narrow 10px and the cost something else again - three
+   typefaces across one row of a table. Narrow throughout: it is what buys the
+   weapons their single line, and there is no reason for the number beside them
+   to be set in something else. The unit NAME stays Archivo, because it is the
+   row's title rather than one of its figures. */
+.print-roster tbody td.pr-weap, .print-roster tbody td.pr-num, .print-roster tbody td.pr-cost {
+  font-family: var(--narrow); letter-spacing: -0.01em;
 }
-.print-roster tbody td.pr-weap { font-size: 10px; }
+.print-roster tbody td.pr-weap { font-weight: 600; font-size: 10px; line-height: 1.25; white-space: nowrap; }
 .pr-track { width: 78px; }
 .pr-track-ship { display: block; margin-bottom: 4px; }
 .pr-track-ship:last-child { margin-bottom: 0; }
@@ -4284,7 +4315,7 @@ a .icon,
 }
 .print-card .stat-chips > .stat-chip {
   display: flex; grid-column: auto; align-items: center; gap: 2px;
-  border: none; padding: 0; font-size: 9.5px; line-height: 1.3; min-width: 0; white-space: nowrap;
+  border: none; padding: 0; font-family: var(--narrow); font-size: 10px; line-height: 1.3; min-width: 0; white-space: nowrap;
 }
 .print-card .stat-lbl { font-size: 7.5px; }
 .print-card .stat-ico { width: 13px; height: 13px; }

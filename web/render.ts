@@ -1908,22 +1908,29 @@ function printView(state: AppState): string {
    * gun with its arc (cardWeapons), so this makes the table read the same way
    * the cards do rather than making you count columns back to a heading.
    *
-   * Uncoloured, unlike on screen: this sheet has to survive a black-and-white
-   * office printer, where four stat colours become four identical greys. The
-   * shapes are doing the work.
+   * Coloured exactly as the cards colour them - the same stat-ico classes, the
+   * same blue arc - because parity is the point: whichever view you print, the
+   * same fact should look the same. The sheet keeps colour on purpose anyway
+   * (see the Ink saver toggle, which drops fills and heavy rules but keeps
+   * colour, since a coloured line costs no more ink than a black one).
    */
   const prNum = (name: string, value: string): string =>
-    `<span class="prn">${icon(name, 10, "prn-ico")}<span class="prn-v">${value}</span></span>`;
+    `<span class="prn">${icon(name, 10, `prn-ico stat-ico stat-ico-${name.replace("stat-", "")}`)}<span class="prn-v">${value}</span></span>`;
   const prWeapCell = (ship: ShipClass, arc: "primary" | "aux"): string => {
-    const glyph = icon(arc === "primary" ? "arc-primary" : "arc-aux", 10, "prw-ico");
+    const glyph = icon(arc === "primary" ? "arc-primary" : "arc-aux", 10, "prw-mark slot-arc");
     const list = arc === "primary" ? ship.primary : ship.auxiliary;
     const lines = list.length
       ? list.map((w) => escapeHtml(formatWeapon(w)))
       : [escapeHtml(arc === "primary" ? primarySlotText(ship) : auxSlotText(ship))];
-    // "None" gets no arc: there is no arc to mark, and the glyph beside it read
-    // as a weapon that had been struck out.
+    // The gutter is always emitted, with or without a glyph in it. "None" gets
+    // no arc - there is no arc to mark, and the glyph beside it read as a weapon
+    // struck through - but it still gets the space, so the Primary column and
+    // the Auxiliary column agree about where their text starts on a given row.
     return lines
-      .map((s) => `<span class="prw">${s === "None" ? "" : glyph}<span class="prw-t">${s}</span></span>`)
+      .map(
+        (s) =>
+          `<span class="prw"><span class="prw-ico">${s === "None" ? "" : glyph}</span><span class="prw-t">${s}</span></span>`,
+      )
       .join("");
   };
 
@@ -2021,7 +2028,12 @@ function printView(state: AppState): string {
       // Card layout follows the sketch: name and count on one line with the
       // cost, then a left column (stat block) beside a right column of weapons
       // - not stacked, so the card uses its full width instead of running tall.
-      const classLine = title === ship.name ? "" : escapeHtml(ship.name);
+      // Same rule as the roster row above: the class line is only worth ink when
+      // a PERSON named this unit. `title === ship.name` never caught the common
+      // case, because the auto-name pluralises - "Taurus Assault Wings" over
+      // "Taurus Assault Wing" printed on every multi-ship card too, not just in
+      // the table. Roster and cards now say it or stay quiet together.
+      const classLine = u.name?.trim() && u.name.trim() !== ship.name ? escapeHtml(ship.name) : "";
       const extras = [classLine, u.species ? escapeHtml(u.species) : ""].filter(Boolean).join(" · ");
       return `
       <article class="print-card">

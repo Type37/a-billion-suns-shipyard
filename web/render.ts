@@ -1925,12 +1925,16 @@ function printView(state: AppState): string {
       const reqCell = isShipyard
         ? `<td class="pr-req">${Array.from({ length: u.count }, () => `<span class="pr-req-box"></span>`).join("")}</td>`
         : "";
-      // An unnamed unit takes its ship class as its display name, so printing
-      // the class underneath repeated it verbatim - "Hierophant Cathedral Ship"
-      // twice, once bold and once grey. The class line is only worth ink when it
-      // differs from the title. The count rides in the name ("Epistle-Class
-      // Gunship x2") rather than earning a column of its own.
-      const showClass = title !== ship.name || list.freePlay;
+      // The class line only appears when YOU named the unit. An unnamed unit
+      // takes its ship class as its display name, so printing the class
+      // underneath repeated it - and a `title !== ship.name` test did not catch
+      // that, because the auto-name pluralises: "Taurus Assault Wings x3" over
+      // "Taurus Assault Wing" is the same words twice with one letter between
+      // them, and every multi-ship unit in the fleet printed that way. What
+      // matters is whether the name came from a person, so that is what is
+      // tested. Free Play keeps the line whatever the name, because there it
+      // also carries which faction the class belongs to.
+      const showClass = (u.name?.trim() ? u.name.trim() !== ship.name : false) || list.freePlay;
       const countSuffix = u.count > 1 ? ` <span class="pr-unit-x">&times;${u.count}</span>` : "";
       return `
       <tr>
@@ -1959,8 +1963,26 @@ function printView(state: AppState): string {
     <table class="print-roster">
       <thead>
         <tr>
-          <th class="pr-unit">${isShipyard ? "Ship class" : "Unit"}</th><th class="pr-num">Mass</th><th class="pr-num">Thrust</th><th class="pr-num">Sil.</th><th class="pr-num">Shields</th>
-          <th class="pr-weap">Primary weapons</th><th class="pr-weap">Auxiliary weapons</th><th class="pr-cost">Cost</th>${isShipyard ? '<th class="pr-req">Req’d</th>' : ""}${opts.trackers ? '<th class="pr-track">Hull tracker</th>' : ""}${fieldsHvp ? '<th class="pr-hvp-slot">HVP carried</th>' : ""}
+          <th class="pr-unit">${isShipyard ? "Ship class" : "Unit"}</th>
+          <!--
+            The stat and arc glyphs, in the roster's headers.
+
+            The per-unit cards below have carried them all along - statChips()
+            for the four figures, cardWeapons() for the two arcs - so the sheet
+            was already teaching them, and then the table above printed the same
+            eight columns as bare words. Now one mark means one thing down the
+            whole page: the disc that says Silhouette on a card says it in the
+            column head too, and the narrow cone and the half-disc tell Primary
+            from Auxiliary at a glance instead of by reading two long words that
+            share their first letter at a distance.
+
+            Deliberately uncoloured. On screen these glyphs carry one colour per
+            stat, but this is a sheet that has to survive a black-and-white
+            office printer, where four colours become four indistinguishable
+            greys. Shape is doing the work here, so they print as ink.
+          -->
+          <th class="pr-num">${icon("stat-mass", 11)}Mass</th><th class="pr-num">${icon("stat-thrust", 11)}Thr</th><th class="pr-num">${icon("stat-silhouette", 11)}Sil</th><th class="pr-num">${icon("stat-shields", 11)}Shd</th>
+          <th class="pr-weap">${icon("arc-primary", 12)} Primary weapons</th><th class="pr-weap">${icon("arc-aux", 12)} Auxiliary weapons</th><th class="pr-cost">Cost</th>${isShipyard ? '<th class="pr-req">Req’d</th>' : ""}${opts.trackers ? '<th class="pr-track">Hull tracker</th>' : ""}${fieldsHvp ? '<th class="pr-hvp-slot">HVP carried</th>' : ""}
         </tr>
       </thead>
       <tbody>${unitRows}</tbody>
@@ -3064,9 +3086,27 @@ function playView(state: AppState): string {
           <span class="round-value">${play.round}</span>
           <span class="play-bar-of">of ${maxRound}</span>
         </p>
-        <!-- "Reset" alone does not say what it resets, and it is sitting next
-             to a round counter and a phase track it would wipe. -->
+        <!--
+          Three controls, and the two new ones are the way out.
+
+          Play Mode had no exit. The only way back to the fleet was the
+          breadcrumb at the far left, which reads as a location - "Megamart /
+          Play mode" - not as a door, and on a phone it is a 10.5px line of
+          uppercase grey. So the screen you stand at a table with was the one
+          screen you could not obviously leave. "End play" says what it does and
+          sits with the other controls, where you look when you want one.
+
+          Print sits beside it because the moment you want the sheet is the
+          moment you are setting up or packing down, which is the same moment
+          you are leaving - and until now Play Mode had no print button at all,
+          so getting a roster meant going back to the builder to find one.
+
+          "Reset" alone does not say what it resets, and it is sitting next to a
+          round counter and a phase track it would wipe.
+        -->
+        <a class="ghost-btn play-bar-print" href="#/print/${list.id}">${icon("print", 14)} Print</a>
         <button class="ghost-btn play-bar-reset" data-action="play-reset">${icon("shuffle", 14)} Reset game</button>
+        <a class="cta-btn play-bar-end" href="#/list/${list.id}">${icon("check", 15)} End play</a>
       </header>
       <div class="phase-track">${phaseBtns}</div>
       ${cmdStrip}

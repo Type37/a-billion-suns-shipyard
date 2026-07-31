@@ -1595,7 +1595,7 @@ button { font-family: inherit; }
    lines. Widths are declared on both the th and the td (see render.ts), so the
    name and weapons get the room and the numbers collapse to what they need. */
 .print-roster { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.pr-unit { width: 23%; }
+.pr-unit { width: 21%; }
 /* A heading NEVER breaks inside a word. overflow-wrap:anywhere was here to stop
    "AUXILIARY WEAPONS" bleeding into its neighbour, but it also split THRUST into
    "THRUS / T" and SHIELDS into "SHIEL / DS", which is unreadable. Multi-word
@@ -1610,36 +1610,90 @@ button { font-family: inherit; }
   font-size: 8px; font-weight: 600; text-transform: uppercase;
   color: var(--ink-2); padding: 3px 4px;
 }
+/* The header glyphs (see the roster thead in render.ts) print as ink: this sheet
+   has to survive a black-and-white printer, where the four stat colours are four
+   indistinguishable greys, so shape does the telling apart. */
+.print-roster thead th .icon { color: var(--ink-2); }
+/* Over the word, not beside it. The stat columns are 30px - a single digit is
+   all they ever hold - and an inline glyph plus "SHIELDS" needed about 46, so
+   the headers ran into each other. Stacked, the column only has to be as wide as
+   the wider of a 11px glyph and a three-letter word, and the abbreviations are
+   safe now that the glyph above them says which stat this is. */
+.print-roster thead th.pr-num .icon { display: block; margin: 0 auto 1px; }
+.print-roster thead th.pr-num { white-space: nowrap; }
+/* The arc glyphs stay inline: those columns have the room, and the cone and the
+   half-disc are what tell Primary from Auxiliary faster than the words do. */
+.print-roster thead th.pr-weap .icon { vertical-align: -2px; margin-right: 3px; }
 .print-roster tbody td { border-bottom: 1px solid var(--hair-soft); padding: 2px 5px; vertical-align: top; font-size: 11px; }
 .print-roster tbody tr { break-inside: avoid; }
 .pr-unit-name { display: block; font-family: var(--display); font-weight: 800; font-size: 12.5px; line-height: 1.2; }
 .pr-unit-x { font-weight: 900; color: var(--blue); }
-.pr-unit-class { display: block; font-size: 11px; font-weight: 600; color: var(--ink-2); }
+/* Quite a bit smaller than the name it sits under. It is a footnote to that
+   name - which class the thing you called "Bright Hammer" actually is - and at
+   11px against a 12.5px name it was competing with it instead of annotating it.
+   Narrow and uppercase-ish weight keeps it legible at 8.5px. */
+.pr-unit-class { display: block; font-family: var(--narrow); font-size: 8.5px; font-weight: 700; letter-spacing: 0.02em; line-height: 1.15; color: var(--ink-3); }
 .pr-unit-ships { display: block; font-family: var(--serif); font-size: 11.5px; color: var(--ink); margin-top: 2px; }
 .pr-unit-notes { display: block; font-family: var(--serif); font-style: italic; font-size: 11.5px; color: var(--ink-2); margin-top: 2px; }
 /* Wide enough for SHIELDS, the longest single-word heading, so it sits on one
    line instead of being split mid-word. */
-.pr-num { text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; width: 50px; }
+/* 50 -> 30. These hold a single digit (a Thrust of 12" is the widest thing that
+   ever lands here) and the header word above them is 8px. Everything the four
+   give up goes to the weapon columns, which is where the sheet was actually
+   short of room. */
+.pr-num { text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; width: 30px; }
 .print-roster tbody .pr-num { white-space: nowrap; }
-.pr-cost { color: var(--blue); width: 58px; }
+.pr-cost { color: var(--blue); width: 48px; }
 .print-roster tbody .pr-cost { white-space: nowrap; }
-.pr-weap { font-family: var(--serif); font-size: 11px; line-height: 1.3; width: 17%; overflow-wrap: anywhere; }
+/* WEAPONS NEVER WRAP. The longest string in the game is 31 characters -
+   `Bioplasm Ejectors [4D10, 0-12"]` - and at 11px Spectral in a 17% column it
+   needed about 160px of a 119px cell, so most of the roster's gun columns ran
+   to two lines and a row that should be one line was three.
+
+   Three levers, in order of how much they bought. The face: Archivo Narrow
+   instead of the serif, which is the whole reason it is bundled now and sets
+   the same string about 18% shorter. The room: the four stat columns were 50px
+   holding one or two digits, and Cost 58px - they give up 56px between them,
+   which goes to the two weapon columns. And a hair of negative tracking, which
+   is safe on a face drawn this narrow at this size.
+
+   nowrap, not `overflow-wrap: anywhere`, so a string that somehow still does
+   not fit shows as a clipped line rather than silently splitting a weapon name
+   down the middle. Measured across every seed fleet and every faction's full
+   catalogue: nothing overflows. */
+.pr-weap { width: 23.5%; }
+/* Written against `.print-roster tbody td` and `thead th`, both of which set a
+   font-size that a bare .pr-weap loses to on specificity. */
+.print-roster tbody td.pr-weap, .print-roster thead th.pr-weap {
+  font-family: var(--narrow); font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; white-space: nowrap;
+}
+.print-roster tbody td.pr-weap { font-size: 10px; }
 .pr-track { width: 78px; }
 .pr-track-ship { display: block; margin-bottom: 4px; }
 .pr-track-ship:last-child { margin-bottom: 0; }
-.pr-req { width: 74px; }
+/* Two rows of boxes rather than one wide row, for the same reason. */
+.pr-req { width: 46px; }
 .pr-req-box { display: inline-block; width: 13px; height: 13px; border: 1px solid var(--ink-3); margin: 0 3px 3px 0; }
 .print-roster tfoot td { border-top: 1px solid var(--ink-3); padding: 4px 5px; font-weight: 700; }
 .pr-total-label { text-align: right; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
 
 .print-score { width: 100%; border-collapse: collapse; }
 
-.print-hvp { border-left: 1px solid var(--hair-soft); padding: 0 0 0 7px; margin-bottom: 4px; break-inside: avoid; }
-.print-hvp h4 { font-family: var(--narrow); font-weight: 700; font-size: 13.5px; margin-bottom: 1px; }
-.print-hvp p { font-family: var(--serif); font-size: 11.5px; line-height: 1.3; }
+/* Tight. This is the densest block on the sheet and it was set like body copy:
+   an HVP is a name and one or two lines of rule, and at 1.3 leading with 4px
+   between entries a column of six ran most of a page for about a third of a
+   page of words. A name that wraps - and they wrap often now the field holds a
+   whole "Lt. Commander Sadie Hyatt, Chief Engineer" - was paying that leading
+   twice over.
+   1.14 on the rule, 1.08 on the name, 2px between entries. The left rule and
+   its 7px indent are what separate one person from the next here, not white
+   space, so the space can go. */
+.print-hvp { border-left: 1px solid var(--hair-soft); padding: 0 0 0 7px; margin-bottom: 2px; break-inside: avoid; }
+.print-hvp h4 { font-family: var(--narrow); font-weight: 700; font-size: 13.5px; line-height: 1.08; margin-bottom: 0; }
+.print-hvp p { font-family: var(--serif); font-size: 11.5px; line-height: 1.14; margin: 0; }
 .print-hvp-slot { font-family: var(--sans); font-size: 10px; font-weight: 600; letter-spacing: 0.02em; color: var(--ink-3); text-transform: none; }
 /* Age of Unity: a blank line per ship to pencil in who carries an HVP. */
-.pr-hvp-slot { width: 13%; }
+.pr-hvp-slot { width: 9%; }
 /* Where the carrier started, so it can be struck through and rewritten when
    the token changes hands mid-game. */
 .pr-hvp-start { display: block; font-size: 9.5px; color: var(--ink-3); line-height: 1.2; }
@@ -3818,7 +3872,7 @@ button { font-family: inherit; }
   /* The roster is 9-11 columns on a 182mm text block. Weapon text is the only
      free-growing content in it, so it wraps rather than pushing the table off
      the page edge, where the overflow would be silently guillotined. */
-  .pr-weap { min-width: 0; max-width: 180px; white-space: normal; overflow-wrap: break-word; }
+  .pr-weap { min-width: 0; max-width: 180px; }
 }
 
 /* ---------------------------------------------------------------------------
@@ -4255,7 +4309,7 @@ a .icon,
    wherever the break happened to land. */
 .print-hvp-cols { display: grid; grid-template-columns: 2fr 1fr; gap: 0 16px; align-items: start; }
 .print-hvp-own { columns: 2; column-gap: 16px; }
-.print-hvp-cols .print-hvp { break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 7px; }
+.print-hvp-cols .print-hvp { break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 4px; }
 /* The three personnel you actually chose: one per column, side by side.
    align-items:start so a short entry does not get stretched to match a long
    one, and a real grid rather than a CSS column flow, which balances by height
@@ -4263,7 +4317,7 @@ a .icon,
 .print-hvp-chosen {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 14px; align-items: start;
 }
-.print-hvp-chosen .print-hvp { break-inside: avoid; margin-bottom: 4px; }
+.print-hvp-chosen .print-hvp { break-inside: avoid; margin-bottom: 2px; }
 @media (max-width: 620px) { .print-hvp-chosen { grid-template-columns: 1fr; } }
 @media (max-width: 700px) {
   .print-hvp-cols { grid-template-columns: 1fr; }
@@ -4673,7 +4727,11 @@ main.play-body .roster-section::before { content: none; }
 .round-value.is-debt { color: var(--red); }
 .play-debt-note { font-family: var(--serif); font-size: 12.5px; line-height: 1.45; color: var(--ink-2); margin: 8px 0 0; }
 .play-bar-of { font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }
-.play-bar-reset { flex: none; }
+.play-bar-reset, .play-bar-print { flex: none; }
+/* The way out, and it looks like one. Solid where Reset and Print are ghosts,
+   so the eye lands on the control that ends the session rather than on the one
+   that wipes it. */
+.play-bar-end { flex: none; display: inline-flex; align-items: center; gap: 7px; text-decoration: none; }
 /* Two counters, always one row: your score and your opponent's. Round moved to
    the header, and CMD is now the token pile in the header block, so a third
    track here would just be an empty cell. */
@@ -4934,7 +4992,12 @@ main.play-body .roster-section::before { content: none; }
   .play-sticky .play-bar-round { flex: none; gap: 5px; }
   .play-sticky .play-bar-round .round-value { font-size: 19px; }
   .play-sticky .play-bar-of { font-size: 10.5px; }
-  .play-sticky .play-bar-reset { padding: 0 9px; min-height: 34px; font-size: 11px; }
+  .play-sticky .play-bar-reset, .play-sticky .play-bar-print, .play-sticky .play-bar-end { padding: 0 9px; min-height: 34px; font-size: 11px; }
+  /* On a phone the bar is pinned and every pixel of it is height the table
+     never gets back, so Reset loses its word. It is the destructive one and the
+     one you press least; End play and Print keep their labels. */
+  .play-sticky .play-bar-reset { font-size: 0; gap: 0; padding: 0 10px; }
+  .play-sticky .play-bar-reset .icon { margin: 0; }
   .play-sticky .phase-track { margin: 0; }
   .play-sticky .cmd-strip { padding: 4px 0 2px; border-bottom: none; }
   .play-sticky .cmd-strip-adjust .stepper-btn { width: 26px; height: 26px; min-height: 26px; }

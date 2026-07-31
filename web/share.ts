@@ -159,7 +159,19 @@ export function decodeShareJson(jsonStr: string): DecodedShare | null {
         ...(typeof t.u === "number" && units[t.u] ? { assignedUnitId: units[t.u]!.id } : {}),
         ...(t.n ? { customName: t.n } : {}),
       }));
-      const fleet: Fleet = { name: p.n ?? "", factionId: p.f, creditsLimit: p.c, units, hvp };
+      // Rebuild the by-role name memory from the selections rather than putting
+      // it in the payload twice: an imported fleet should survive unchoosing
+      // somebody just as well as one built here.
+      const hvpNames: Record<string, string> = {};
+      for (const h of hvp) if (h.customName) hvpNames[h.hvpId] = h.customName;
+      const fleet: Fleet = {
+        name: p.n ?? "",
+        factionId: p.f,
+        creditsLimit: p.c,
+        units,
+        hvp,
+        ...(Object.keys(hvpNames).length ? { hvpNames } : {}),
+      };
       const list: SavedList = {
         id: newId("fl"),
         mode: p.d ?? "armageddon",

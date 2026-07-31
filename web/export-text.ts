@@ -56,7 +56,7 @@ export function fleetToMarkdown(list: SavedList, customs: Faction[]): string {
       const carried = list.fleet.hvp.filter((h) => h.assignedUnitId === u.id);
       for (const h of carried) {
         const def = hvpDef(h.hvpId, faction);
-        lines.push(`    - Carrying: ${h.customName ? `${h.customName}, ` : ""}${def?.name ?? h.hvpId}`);
+        lines.push(`    - Carrying: ${h.customName || def?.name || h.hvpId}`);
       }
     }
   }
@@ -68,7 +68,9 @@ export function fleetToMarkdown(list: SavedList, customs: Faction[]): string {
   } else {
     for (const sel of list.fleet.hvp) {
       const def = hvpDef(sel.hvpId, faction);
-      const name = sel.customName ? `${sel.customName}, ${def?.name ?? sel.hvpId}` : (def?.name ?? sel.hvpId);
+      // The name you gave them replaces the job title, exactly as it does on
+      // screen and on the printed roster; the rule below still says what they do.
+      const name = sel.customName || def?.name || sel.hvpId;
       lines.push(`- **${name}**${def ? `: ${def.rule}` : ""}`);
     }
   }

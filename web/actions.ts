@@ -1,4 +1,4 @@
-import type { Faction, GameMode, Mass, PilotClass, Weapon } from "../src/types.ts";
+import type { Faction, Fleet, FleetHvp, GameMode, Mass, PilotClass, Weapon } from "../src/types.ts";
 import { maxUnitSize } from "../src/validation.ts";
 import { MODE_BUILDER_SHAPE } from "../src/types.ts";
 import { JUNKSPACE_SHIPS, OUTFIT_MAX_SHIPS, recastAsOutfit, startingAlertLevel } from "../src/data/junkspace.ts";
@@ -55,6 +55,19 @@ import { fleetToMarkdown } from "./export-text.ts";
  */
 function libFields(lib: string): { emblemLib: string; emblemImage: undefined; emblemColor: undefined } {
   return { emblemLib: lib, emblemImage: undefined, emblemColor: undefined };
+}
+
+/**
+ * A newly chosen HVP, carrying back whatever you last called them.
+ *
+ * Unchoosing somebody drops their selection, and their name went with it, so
+ * an accidental tap on the tick erased "Chief Engineer Sadie Hyatt" with no way
+ * back. The fleet remembers names by role (Fleet.hvpNames) precisely so that
+ * choosing them again returns the person you had, not a blank job title.
+ */
+function chosenHvp(fleet: Fleet, hvpId: string): FleetHvp {
+  const remembered = fleet.hvpNames?.[hvpId];
+  return remembered ? { hvpId, customName: remembered } : { hvpId };
 }
 
 function d(sides: number): number {
@@ -1056,7 +1069,9 @@ function dispatchAction(target: HTMLElement): void {
       const hvpId = target.dataset["hvp"];
       if (!id || !hvpId) return;
       store.setState((s) =>
-        updateFleet(s, id, (f) => (f.hvp.some((h) => h.hvpId === hvpId) ? f : { ...f, hvp: [...f.hvp, { hvpId }] })),
+        updateFleet(s, id, (f) =>
+          f.hvp.some((h) => h.hvpId === hvpId) ? f : { ...f, hvp: [...f.hvp, chosenHvp(f, hvpId)] },
+        ),
       );
       // The store re-renders synchronously, so the chosen card (with its
       // still-closed config popover) already exists in the DOM by this line.
@@ -1132,7 +1147,7 @@ function dispatchAction(target: HTMLElement): void {
             return { ...f, hvp: f.hvp.filter((h) => h.hvpId !== hvpId) };
           }
           if (f.hvp.length >= hvpMax) return f;
-          return { ...f, hvp: [...f.hvp, { hvpId }] };
+          return { ...f, hvp: [...f.hvp, chosenHvp(f, hvpId)] };
         });
       });
       break;
@@ -1983,15 +1998,25 @@ function handleChange(e: Event): void {
       if (!Number.isInteger(index) || index < 0) return;
       const name = inputValue.trim();
       store.setState((s) =>
-        updateFleet(s, listId, (f) => ({
-          ...f,
-          hvp: f.hvp.map((h, i) => {
-            if (i !== index) return h;
-            if (name) return { ...h, customName: name };
-            const { customName: _drop, ...rest } = h;
-            return rest;
-          }),
-        })),
+        updateFleet(s, listId, (f) => {
+          const sel = f.hvp[index];
+          if (!sel) return f;
+          // Remembered by role as well as held on the selection, so unchoosing
+          // somebody and choosing them again brings their name back with them.
+          const names = { ...(f.hvpNames ?? {}) };
+          if (name) names[sel.hvpId] = name;
+          else delete names[sel.hvpId];
+          return {
+            ...f,
+            hvpNames: names,
+            hvp: f.hvp.map((h, i) => {
+              if (i !== index) return h;
+              if (name) return { ...h, customName: name };
+              const { customName: _cleared, ...rest } = h;
+              return rest;
+            }),
+          };
+        }),
       );
       break;
     }

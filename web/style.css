@@ -5038,48 +5038,34 @@ main.play-body .roster-section::before { content: none; }
    Engineer"), the roster printed it and share links carried it, and there was
    no field anywhere in the app to put one in.
 
-   The field sits in the personnel card's name line, in front of the job title,
-   in the order it will print. One tap, nothing to open first. It appears only
-   once the person is in the fleet, which is the rest state carrying meaning
-   again: no box, nobody to name.
+   THE TITLE IS THE FIELD. The first cut opened an empty box above the job
+   title, which cost a chosen row a second line and left a blank prompt sitting
+   in a list you are meant to be reading. Now the title is the field's own
+   placeholder: you click the name you can already see and type over it, the way
+   you rename a unit. Same words in the same place, and a box around them once
+   the person is yours. No box when they are not - the absence carries meaning.
 
-   Placed AFTER the .sy-hvp-name / .personnel-name rules above so the flex line
-   wins on source order (this stylesheet is unlayered). */
-.sy-hvp-name,
-.personnel-name {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  row-gap: 2px;
-}
-/* Only the chosen line needs the 24px target floor, and its input already
-   carries it. A blanket min-height here padded every ROW in the list with
-   3.5px of dead air above and below the name, which is most of what made the
-   personnel list read as double-spaced. */
-.is-nameable { min-height: 24px; }
-/* Personnel rule text was set at 1.4, which on a 13px serif is 18.2px a line
-   and reads as double-spacing down a twelve-row list. 1.15 is the ceiling. */
-.sy-hvp-rule,
-.personnel-rule { line-height: 1.15; }
+   So a chosen row gains a border, not a line. Nothing below it moves further
+   than the 7px the box's own padding costs.
+
+   Placed AFTER the .sy-hvp-name / .personnel-name rules above, since this
+   stylesheet is unlayered and source order decides. */
 .hvp-name-input {
   /* The line already carries the display face at the right size and colour, and
      a chosen row turns blue - the field should be the same text you were just
      reading, in a box, not a different-looking control. */
   font: inherit;
   color: inherit;
-  flex: 1 1 120px;
-  min-width: 6ch;
+  width: 100%;
 }
-.hvp-name-input::placeholder { color: var(--ink-3); font-weight: 600; }
-/* The job title takes the whole next line rather than sharing where it happens
-   to fit. Sharing was tried first and it is worse in both directions: a long
-   title wraps under the box anyway, so the row's height moved with the length
-   of somebody's job, and the comma that made it read as it prints
-   ("Sadie Hyatt, Chief Engineer") ended up stranded at the start of the wrapped
-   line. A chosen row is now always exactly two lines, whatever the name, the
-   title or the screen. The comma goes with it - the box is the separator here,
-   and the roster prints the comma where it belongs. */
-.hvp-title { flex: 1 0 100%; }
+/* The title-as-placeholder is the row's real content, not a hint, so it is not
+   dimmed to hint-grey. It sits one step back from a name you actually typed,
+   which is the whole difference between "still called that" and "renamed". */
+.hvp-name-input::placeholder { color: var(--ink-2); opacity: 1; }
+/* Personnel rule text was set at 1.4, which on a 13px serif is 18.2px a line
+   and reads as double-spacing down a twelve-row list. 1.15 is the ceiling. */
+.sy-hvp-rule,
+.personnel-rule { line-height: 1.15; }
 
 /* ------------------------------------------- Junkspace header on a phone
    Measured on a 390x670 screen: 285px, 43% of the screen, went by before the

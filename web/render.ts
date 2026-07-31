@@ -905,18 +905,23 @@ function shipyardShipRow(s: ShipClass, count: number): string {
 }
 
 /**
- * What a chosen person is called, in the book's own order: the name you gave
- * them, then the job. p.57 "Naming Your HVP" asks for exactly this - "not just
- * 'Chief Engineer', but 'Lt. Commander Sadie Hyatt, Chief Engineer'".
+ * What a chosen person is called: whatever you called them, or the job title
+ * if you have not called them anything.
+ *
+ * The name REPLACES the title rather than sitting in front of it. The first
+ * cut appended the title back on, to print the book's "Lt. Commander Sadie
+ * Hyatt, Chief Engineer" (p.57) automatically - but then anybody who writes
+ * that phrase themselves, which is precisely what the book asks for, gets the
+ * job twice: "Chief Engineer Sadie Hyatt, Chief Engineer". A renamed unit does
+ * not carry its ship class around after you rename it, and a person should not
+ * carry their job. The whole label is yours; the rule prints underneath it, so
+ * nothing is lost by letting you own the line.
  *
  * The same expression was written out longhand in seven places and one of them
- * (the carrier-assignment panel) had quietly dropped the custom name, so a
- * person you had named appeared under their job title there and their full name
- * everywhere else.
+ * (the carrier-assignment panel) had quietly dropped the name altogether.
  */
 function hvpDisplayName(sel: FleetHvp, faction: Faction | undefined): string {
-  const title = hvpById(sel.hvpId, faction)?.name ?? sel.hvpId;
-  return sel.customName ? `${sel.customName}, ${title}` : title;
+  return sel.customName || (hvpById(sel.hvpId, faction)?.name ?? sel.hvpId);
 }
 
 /**
@@ -932,17 +937,24 @@ function hvpDisplayName(sel: FleetHvp, faction: Faction | undefined): string {
  * It wears the same quiet box every renameable thing in the app wears (see "one
  * rename affordance" in style.css), so on a return visit it is still obviously
  * a field. Somebody you have NOT chosen gets no box, because the absence is
- * meaningful too: there is nobody yet to name. The job title never moves into
- * the box - it is the rule's owner, not a name - so it stays beside it,
- * always readable, and the comma appears only once there is a name to separate.
+ * meaningful too: there is nobody yet to name.
+ *
+ * THE TITLE IS THE FIELD. The first cut put an empty box above the job title
+ * and asked you to fill it in, which meant a chosen row carried a blank
+ * prompt and a second line, and left the app to glue the two halves together
+ * on the roster. Now you click the name you can already see and type over it,
+ * exactly as you rename a unit: the title is the field's own placeholder, so
+ * the row says the same words whether or not you have touched it, and the
+ * whole label is yours. That is also the only version that can produce the
+ * book's "Lt. Commander Sadie Hyatt, Chief Engineer" without printing the job
+ * twice.
  */
 function hvpNameLine(def: Hvp, selIndex: number, customName?: string, cls = "sy-hvp-name"): string {
   if (selIndex < 0) return `<span class="${cls}">${escapeHtml(def.name)}</span>`;
-  return `<span class="${cls} is-nameable">
-      <input class="hvp-name-input" type="text" value="${escapeHtml(customName ?? "")}" placeholder="Name them"
-        aria-label="Name for ${escapeHtml(def.name)}" data-action="hvp-name" data-index="${selIndex}" />
-      <span class="hvp-title">${escapeHtml(def.name)}</span>
-    </span>`;
+  // The job title IS the field's name, the same string the placeholder shows.
+  // It has to be stated as an aria-label as well, because a placeholder stops
+  // counting as the accessible name the moment the field has a value.
+  return `<span class="${cls} is-nameable"><input class="hvp-name-input" type="text" value="${escapeHtml(customName ?? "")}" placeholder="${escapeHtml(def.name)}" aria-label="${escapeHtml(def.name)}" data-action="hvp-name" data-index="${selIndex}" /></span>`;
 }
 
 // One person: their name line and its verbatim rule, then a single square

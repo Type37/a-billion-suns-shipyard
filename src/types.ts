@@ -169,8 +169,11 @@ export interface FleetHvp {
   /** Optional at build time; if set, must reference a fleet unit (Mass >= 1 except Nameless Punk). */
   assignedUnitId?: string;
   /**
-   * Player-given personal name, printed alongside the title (p.57 "Naming Your
-   * HVP": not just "Chief Engineer" but "Lt. Commander Sadie Hyatt, Chief Engineer").
+   * Player-given name, which REPLACES the job title wherever this person is
+   * named (p.57 "Naming Your HVP": not just "Chief Engineer" but "Lt. Commander
+   * Sadie Hyatt, Chief Engineer"). The whole label is yours to write, exactly
+   * like renaming a unit - the app does not append the title back on, because
+   * you may well have written it yourself.
    */
   customName?: string;
 }
@@ -183,6 +186,17 @@ export interface Fleet {
   creditsLimit: number;
   units: FleetUnit[];
   hvp: FleetHvp[];
+  /**
+   * Names you have given, remembered by role, so unchoosing somebody and
+   * choosing them again does not throw away what you called them. The live
+   * name is FleetHvp.customName; this is only the memory behind it.
+   *
+   * Keyed by role rather than by selection because a selection is transient.
+   * That cannot hold two names for one role, which is fine: the only mode that
+   * fields duplicates is Combat Simulator, whose crew is issued and cannot be
+   * unchosen, so there is nothing there to remember through.
+   */
+  hvpNames?: Record<string, string>;
   /** Freeform player notes (tactics, list rationale, reminders). */
   notes?: string;
 }

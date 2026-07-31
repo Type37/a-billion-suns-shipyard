@@ -47,7 +47,7 @@ export const ALLIANCE: Faction = {
       rule: "Yynnx units in this fleet can Jump In and Jump Hop using enemy Jump Points. When they do, all in-play Jump Points count as connected." },
     { id: "yynnx-data-wraith", name: "Yynnx Data Wraith",
       rule: "Units in this unit's battlegroup cannot be targeted by passive attacks." },
-    { id: "the-council-of-heth-memnah", name: "The Council of Heth-Memnah",
+    { id: "the-council-of-heth-memnah", name: "Council of Heth-Memnah",
       rule: "In the Command Phase, you gain an additional 3 CMD tokens (e.g. D12+3 in total)." },
   ],
 };

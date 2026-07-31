@@ -47,7 +47,7 @@ export const THE_UNITY: Faction = {
       rule: "While under Mother's Wing, ships in this fleet subtract 1 from the result of each of their attack dice, to a minimum of 1. This increases the chance of critical hits, but doesn't prevent duds." },
     { id: "flight-controller", name: "Flight Controller",
       rule: "Ships in this fleet may take the Scramble action as an additional free action." },
-    { id: "the-hand-of-the-registrar", name: "The Hand of the Registrar",
+    { id: "the-hand-of-the-registrar", name: "Hand of the Registrar",
       rule: "You start each Round with 3 additional CMD tokens that can only be spent on this unit." },
     { id: "tractor-beam-officer", name: "Tractor Beam Officer",
       rule: "Units in this fleet have access to the following command: Tractor Beam Locked On (1 CMD): After damaging an enemy unit with a lower Mass, spend 1 CMD to give the target unit a 'Trapped' token. A unit with a Trapped token reduces its Thrust value to 2\" until the end of its next activation." },

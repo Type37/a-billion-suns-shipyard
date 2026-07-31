@@ -43,7 +43,7 @@ export const GEN_OMEGA: Faction = {
       rule: "Units in this fleet gain: While there is a friendly ship within 6\" that has been given the 'Red Alert' command this round (including this unit itself), this unit may re-roll any misses once each time it attacks." },
     { id: "righteous-saboteurs", name: "Righteous Saboteurs",
       rule: "When an enemy ship within 6\" of a ship in this fleet is reduced to 0HP it automatically explodes, during which it counts its Mass as D3 higher." },
-    { id: "the-nameless-punk", name: "The Nameless Punk", canEmbarkMass0: true,
+    { id: "the-nameless-punk", name: "Nameless Punk", canEmbarkMass0: true,
       rule: "May be carried by a Mass 0 unit. When units in this unit's battlegroup make attacks, they count their targets' Shields values as 2 lower than the listed value." },
     { id: "unhinged-live-streamer", name: "Unhinged Live-Streamer",
       rule: "Ships in this fleet can use the 'Red Alert' command for 0 CMD tokens." },

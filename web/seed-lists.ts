@@ -180,7 +180,7 @@ const GEN_OMEGA_LIST: SavedList = {
       { hvpId: "prophet-of-the-end-times", assignedUnitId: "u2" },
     ],
     notes:
-      "Unhinged Live-Streamer makes Red Alert free, Prophet of the End Times turns any nearby Red Alert into a fleet-wide re-roll, and The Nameless Punk (legal on a Mass 0 unit) stacks a shields debuff onto the stealth bombers. Martyrs' Fury means every hit taken just makes the counterpunch worse.",
+      "Unhinged Live-Streamer makes Red Alert free, Prophet of the End Times turns any nearby Red Alert into a fleet-wide re-roll, and the Nameless Punk (legal on a Mass 0 unit) stacks a shields debuff onto the stealth bombers. Martyrs' Fury means every hit taken just makes the counterpunch worse.",
   },
   createdAt: CREATED,
   updatedAt: CREATED,

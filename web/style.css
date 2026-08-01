@@ -143,6 +143,11 @@
   --serif: "Spectral", Georgia, "Times New Roman", serif;
   /* Easy, common, friendly: the fleet-name field only, not the whole app's type system. */
   --ios: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* The NASA/Swiss redesign dropped mono everywhere it was decorative (see
+     abs-nasa-redesign notes), but Markdown source (richtext.ts) and a Sync
+     Token are literal machine-readable text, not prose, where a fixed-width
+     face is functional rather than a style choice. */
+  --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 
   /* Semantic colour tokens. Colour signals function, not decoration:
      action = primary/interactive, accent = attention/keyline, and the three
@@ -3643,6 +3648,41 @@ button { font-family: inherit; }
 .opt-version { font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-3); margin: 0; font-variant-numeric: tabular-nums; }
 .opt-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
 .opt-links a { display: inline-flex; align-items: center; gap: 9px; padding: 8px 4px; color: var(--blue); font-weight: 600; font-size: 14px; }
+
+/* Fleet Sync dialog. Reuses .opt-section/.opt-h/.opt-actions/.field-block's
+   input look rather than inventing a second visual language for what is,
+   structurally, one more settings panel. */
+.sync-note { font-size: 12px; line-height: 1.5; color: var(--ink-3); padding: 8px 10px; border: 1px dashed var(--hair-soft); background: var(--paper); }
+.sync-hint { font-size: 13px; color: var(--ink-2); }
+.sync-on-state { font-size: 13.5px; color: var(--ink-2); line-height: 1.5; }
+.sync-token-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.sync-token {
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 8px 10px;
+  border: 1px solid var(--hair);
+  background: var(--paper);
+  color: var(--ink);
+  flex: 1 1 auto;
+  word-break: break-word;
+}
+.sync-join-row { display: flex; gap: 8px; align-items: stretch; }
+.sync-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 9px 11px;
+  border: 1px solid var(--hair);
+  background: var(--paper);
+  font-family: var(--sans);
+  font-size: 13.5px;
+  color: var(--ink);
+}
+.sync-input:focus { outline: none; border-color: var(--blue); }
+.sync-status { font-size: 12.5px; color: var(--ink-3); }
+.sync-error { font-size: 12.5px; color: var(--red-deep); font-weight: 600; }
+@media (max-width: 480px) {
+  .sync-join-row { flex-direction: column; }
+}
 /* Sticky so the close control stays reachable when the body scrolls - it does on
    a short landscape phone, where a static header (and its X) scrolled away and
    left tap-the-backdrop or Esc as the only way out. z-index clears the modal's

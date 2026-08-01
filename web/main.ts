@@ -8,6 +8,7 @@ import { persistCustomFactions, persistLists } from "./storage.ts";
 import { runDecode, DIGIT_POOL } from "./write-on.ts";
 import { visibleAnchor } from "./tours.ts";
 import { renderMarkdown } from "./richtext.ts";
+import { FleetSync } from "./fleet-sync.ts";
 import "./style.css";
 
 // Keep every Markdown notes editor's preview in step with its textarea as the
@@ -1033,3 +1034,11 @@ if (!tryImportShare()) {
   store.setState((s) => ({ ...s, route: parseRoute(location.hash) }));
 }
 paint();
+
+// Fleet Sync: a merge that lands while the app is already open (another
+// device edited first) has to reach the roster on screen, not just storage.
+FleetSync.onChange = (lists) => store.setState((s) => ({ ...s, lists }));
+// Deferred, same as the share-link import above settling before its own
+// paint: let the very first paint happen before spending a network round
+// trip on a sync nobody is looking at yet.
+if (FleetSync.enabled()) setTimeout(() => void FleetSync.sync().catch(() => {}), 800);

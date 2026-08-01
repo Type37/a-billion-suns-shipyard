@@ -1,0 +1,92 @@
+// Firestore security rules for this app's Fleet Sync feature (web/fleet-sync.ts).
+//
+// This app reuses the `dropfleet-builder` Firebase project (same author,
+// same free Firestore instance) rather than standing up a second one, under
+// its OWN top-level collection, `abs-sync`, so a document here can never
+// collide with Dropfleet Commander's `sync` collection even if two tokens
+// happened to match.
+//
+// IMPORTANT: Firestore has ONE rules document per project. This file is only
+// the `abs-sync` block - it must be merged with whatever Dropfleet Commander's
+// own firestore.rules already has for `match /sync/{token}` before publishing,
+// or publishing this file alone would take Dropfleet Commander's sync offline.
+// Paste the MERGED result into: Firebase console > Firestore Database >
+// Rules > Publish, for the dropfleet-builder project. Kept in this repo too
+// (not just Dropfleet Commander's) so the abs-sync half is reviewable and
+// restorable from here as well.
+//
+// The model is "the token IS the key" (a capability, not an account). There
+// is no Firebase Auth here on purpose: a user's Sync Token is a six-word
+// phrase that doubles as the document id. Knowing it grants read and write to
+// that one document and nothing else.
+//
+// The single most important line below is `allow list: if false`. Without
+// it, anyone could ask Firestore to enumerate the /abs-sync collection and
+// walk every user's fleets without guessing a single token. Denying `list`
+// means a token can only be fetched by naming it exactly.
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /abs-sync/{token} {
+      // Length floor: blocks probing for short/obvious ids like "test" or "a".
+      // Six hyphenated words always clear this comfortably.
+      function sane() {
+        return token.size() >= 24 && token.size() <= 200;
+      }
+
+      allow get: if sane();
+
+      // The whole list registry travels as one JSON string, so the schema
+      // check is exact: three known fields, nothing else. The size cap keeps
+      // a single token from being used as free unlimited storage (Firestore's
+      // own hard limit is 1 MiB per document).
+      allow create, update: if sane()
+        && request.resource.data.keys().hasOnly(['payload', 'updatedAt', 'version'])
+        && request.resource.data.payload is string
+        && request.resource.data.payload.size() <= 900000
+        && request.resource.data.updatedAt is int
+        && request.resource.data.version is int;
+
+      // Deleting is allowed to whoever holds the token, because it has to be:
+      // without it a user could never remove their fleets from the cloud,
+      // only stop syncing locally. It costs nothing extra in security terms,
+      // since anyone who can reach this document can already overwrite its
+      // payload.
+      allow delete: if sane();
+
+      // Enumeration stays off. This is the line that matters.
+      allow list: if false;
+    }
+
+    // Dropfleet Commander's own collection. Copied here, not re-derived, so
+    // this file shows the FULL ruleset that must be live at once - see the
+    // header note above. Keep this block's shape identical to Dropfleet
+    // Commander's firestore.rules; if that file changes, mirror the change
+    // here too.
+    match /sync/{token} {
+      function sane() {
+        return token.size() >= 24 && token.size() <= 200;
+      }
+
+      allow get: if sane();
+
+      allow create, update: if sane()
+        && request.resource.data.keys().hasOnly(['payload', 'updatedAt', 'version'])
+        && request.resource.data.payload is string
+        && request.resource.data.payload.size() <= 900000
+        && request.resource.data.updatedAt is int
+        && request.resource.data.version is int;
+
+      allow delete: if sane();
+
+      allow list: if false;
+    }
+
+    // Everything outside /abs-sync and /sync stays closed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

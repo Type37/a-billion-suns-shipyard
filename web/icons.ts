@@ -105,6 +105,9 @@ const PATHS: Record<string, string> = {
   // read "settings / tune" control, cleaner than a many-spoked gear.
   sliders: '<line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="9" cy="7" r="2.3" fill="var(--paper,#fff)"/><circle cx="15" cy="12" r="2.3" fill="var(--paper,#fff)"/><circle cx="8" cy="17" r="2.3" fill="var(--paper,#fff)"/>',
   compare: '<line x1="6" y1="4" x2="6" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/><rect x="3" y="9" width="6" height="7"/><rect x="15" y="7" width="6" height="9"/>',
+  // Two curved arrows chasing each other: cross-device sync. The Fleet Sync
+  // dialog's own mark, so a synced fleet reads as "syncing" wherever it shows.
+  sync: '<path d="M20 11.5A8 8 0 0 0 6.3 6.3L4 8.5M4 12.5a8 8 0 0 0 13.7 5.2l2.3-2.2"/><path d="M4 4.5v4h4M20 19.5v-4h-4"/>',
   image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.8" fill="currentColor" stroke="none"/><path d="M4 18 9 12 13 16 16 13 20 18" fill="none"/>',
   die: '<rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="9" cy="9" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="9" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="9" cy="15" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="15" r="1.5" fill="currentColor" stroke="none"/>',
   // ship-stat glyphs, drawn on the 24 grid to sit inline with numbers

@@ -257,6 +257,16 @@ export interface AppState {
         }
       | { kind: "options" }
       /**
+       * Fleet Sync (fleet-sync.ts). `pendingJoin` holds a token the user is
+       * about to adopt, once its remote/local counts have come back from
+       * `preview()`, so the dialog can show "combine 6 + 3 fleets?" before
+       * anything is written - it is NOT set for the plain off/on panel.
+       */
+      | {
+          kind: "sync";
+          pendingJoin?: { token: string; remoteCount: number; localCount: number; exists: boolean };
+        }
+      /**
        * A destructive action waiting on a yes. `intent` is the click that was
        * intercepted - its action name and data-* payload - so confirming can
        * replay it rather than duplicating what it does. See needsConfirm.

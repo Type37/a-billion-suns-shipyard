@@ -8,6 +8,9 @@ const LISTS_KEY = "abs2.lists.v1";
 const FACTIONS_KEY = "abs2.customFactions.v1";
 const OUTFITS_KEY = "abs2.outfits.v1";
 const LIST_SEEDS_APPLIED_KEY = "abs2.listSeedsApplied.v1";
+const SYNC_TOKEN_KEY = "abs2.sync.token.v1";
+const SYNC_LASTSYNC_KEY = "abs2.sync.lastSync.v1";
+const SYNC_DELETED_KEY = "abs2.sync.deleted.v1";
 
 /** Live table-companion state for a fleet list, persisted with it. */
 export interface PlayState {
@@ -105,8 +108,20 @@ export function loadLists(): SavedList[] {
   return applyListSeeds(read<SavedList[]>(LISTS_KEY, []));
 }
 
+// Fleet Sync (fleet-sync.ts) needs to know whenever the saved-list registry
+// changes, from WHATEVER call site changed it, so a debounced push to the
+// cloud copy never needs a matching call added by hand at each one. Rather
+// than have fleet-sync.ts import this module and this module import it back,
+// it registers itself here once at load; storage.ts stays ignorant of what
+// sync even is.
+let onListsWritten: (() => void) | undefined;
+export function setListsWrittenHook(fn: () => void): void {
+  onListsWritten = fn;
+}
+
 export function persistLists(lists: SavedList[]): void {
   write(LISTS_KEY, lists);
+  onListsWritten?.();
 }
 
 // Seed fleets ship as ready-made starter lists (see seed-lists.ts), one per
@@ -184,6 +199,38 @@ export function persistOutfits(outfits: SavedOutfit[]): void {
 
 export function newId(prefix: string): string {
   return `${prefix}${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
+}
+
+// --- Fleet Sync (cross-device) ----------------------------------------------
+// Just the local bookkeeping a sync engine needs: which token (if any) this
+// device has joined, when it last synced, and a tombstone per list deleted
+// locally so a later pull never resurrects it. The engine itself, and why it
+// looks like this, is in fleet-sync.ts.
+
+export function loadSyncToken(): string | null {
+  return read<string | null>(SYNC_TOKEN_KEY, null);
+}
+
+export function persistSyncToken(token: string | null): void {
+  if (token) write(SYNC_TOKEN_KEY, token);
+  else localStorage.removeItem(SYNC_TOKEN_KEY);
+}
+
+export function loadSyncLastSync(): number | null {
+  return read<number | null>(SYNC_LASTSYNC_KEY, null);
+}
+
+export function persistSyncLastSync(ms: number): void {
+  write(SYNC_LASTSYNC_KEY, ms);
+}
+
+/** Fleet id -> when it was deleted (epoch ms). */
+export function loadSyncDeleted(): Record<string, number> {
+  return read<Record<string, number>>(SYNC_DELETED_KEY, {});
+}
+
+export function persistSyncDeleted(map: Record<string, number>): void {
+  write(SYNC_DELETED_KEY, map);
 }
 
 // --- First-run onboarding ---------------------------------------------------

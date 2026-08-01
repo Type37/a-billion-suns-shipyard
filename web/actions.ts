@@ -11,6 +11,7 @@ import {
   clearAllData,
   exportAllData,
   importAllData,
+  loadLists,
   newId,
   persistCustomFactions,
   persistLists,
@@ -19,6 +20,7 @@ import {
   persistOutfits,
 } from "./storage.ts";
 import type { SavedOutfit } from "./storage.ts";
+import { FleetSync } from "./fleet-sync.ts";
 import {
   createList,
   createOutfit,
@@ -178,6 +180,36 @@ function showToast(message: string, opts: { icon?: string; loud?: boolean } = {}
     },
     opts.loud ? 3000 : 2200,
   );
+}
+
+/**
+ * Busy/error text for the Fleet Sync dialog. Deliberately NOT store state: a
+ * fetch takes real time, and the join flow's token field is a live input the
+ * user may still be typing into - routing "loading…" through setState would
+ * re-render the whole dialog mid-keystroke and drop focus/selection, the same
+ * reason richtext.ts's Markdown preview updates the DOM directly instead of
+ * going through the store. These two spans are the one place this app writes
+ * outside the render cycle for something other than a live preview.
+ */
+function syncBusy(on: boolean, label?: string): void {
+  const el = document.getElementById("sync-busy");
+  if (el) {
+    el.textContent = on ? label || "Working…" : "";
+    el.hidden = !on;
+  }
+  // Only one modal is ever open at once, so while this dialog is up ".opt-modal"
+  // unambiguously means the Sync dialog (Options uses the same class, but the
+  // two can never be on screen together).
+  document
+    .querySelectorAll<HTMLButtonElement | HTMLInputElement>(".opt-modal button, .opt-modal input")
+    .forEach((b) => (b.disabled = on));
+}
+function syncError(msg?: string): void {
+  const el = document.getElementById("sync-error");
+  if (el) {
+    el.textContent = msg || "";
+    el.hidden = !msg;
+  }
 }
 
 /**
@@ -525,6 +557,9 @@ function dispatchAction(target: HTMLElement): void {
         })
       )
         return;
+      // Tombstone first: without it, the next Fleet Sync pull would helpfully
+      // restore the fleet just deleted.
+      if (id) FleetSync.recordDeleted(id);
       store.setState((s) => {
         const lists = s.lists.filter((l) => l.id !== id);
         persistLists(lists);
@@ -864,6 +899,138 @@ function dispatchAction(target: HTMLElement): void {
     }
     case "open-options": {
       store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "options" } } }));
+      break;
+    }
+    // ---- Fleet Sync ---------------------------------------------------
+    case "open-sync": {
+      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "sync" } } }));
+      break;
+    }
+    case "sync-generate": {
+      syncError();
+      syncBusy(true, "Creating your Sync Token…");
+      void FleetSync.start()
+        .then((r) => {
+          store.setState((s) => ({ ...s, lists: loadLists() }));
+          showToast(r.total === 1 ? "1 fleet is now syncing" : `${r.total} fleets are now syncing`);
+        })
+        .catch((e: unknown) => {
+          syncBusy(false);
+          syncError(e instanceof Error ? e.message : "Could not create a Sync Token.");
+        });
+      break;
+    }
+    case "sync-join": {
+      const input = document.getElementById("sync-input") as HTMLInputElement | null;
+      if (!input) return;
+      const raw = input.value;
+      syncError();
+      if (!FleetSync.looksLikeToken(raw)) {
+        syncError("That does not look like a Sync Token. It should be six words.");
+        return;
+      }
+      syncBusy(true, "Looking up that token…");
+      void FleetSync.preview(raw)
+        .then((info) => {
+          store.setState((s) => ({
+            ...s,
+            ui: { ...s.ui, modal: { kind: "sync", pendingJoin: info } },
+          }));
+        })
+        .catch((e: unknown) => {
+          syncBusy(false);
+          syncError(e instanceof Error ? e.message : "Could not reach the sync service.");
+        });
+      break;
+    }
+    case "sync-join-cancel": {
+      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "sync" } } }));
+      break;
+    }
+    case "sync-join-confirmed": {
+      const tok = target.dataset["token"];
+      if (!tok) return;
+      syncError();
+      syncBusy(true, "Loading fleets…");
+      void FleetSync.join(tok)
+        .then((r) => {
+          store.setState((s) => ({ ...s, lists: loadLists(), ui: { ...s.ui, modal: { kind: "sync" } } }));
+          showToast(`${r.total} fleet${r.total === 1 ? "" : "s"} now syncing`);
+        })
+        .catch((e: unknown) => {
+          syncBusy(false);
+          syncError(e instanceof Error ? e.message : "Could not load that token.");
+        });
+      break;
+    }
+    case "sync-now": {
+      syncError();
+      syncBusy(true, "Syncing…");
+      void FleetSync.sync()
+        .then((r) => {
+          store.setState((s) => ({ ...s, lists: loadLists() }));
+          showToast(r?.changed ? "Fleets updated" : "Already up to date");
+        })
+        .catch((e: unknown) => {
+          syncBusy(false);
+          syncError(e instanceof Error ? e.message : "Sync failed.");
+        });
+      break;
+    }
+    case "sync-copy": {
+      const tok = FleetSync.token() ?? "";
+      void navigator.clipboard.writeText(tok).then(
+        () => showToast("Sync Token copied"),
+        () => {
+          // Clipboard can be blocked; select the text so it can be copied by hand.
+          const el = document.getElementById("sync-token-text");
+          if (el) {
+            const r = document.createRange();
+            r.selectNodeContents(el);
+            const sel = window.getSelection();
+            sel?.removeAllRanges();
+            sel?.addRange(r);
+          }
+          showToast("Select and copy the token");
+        },
+      );
+      break;
+    }
+    case "sync-stop": {
+      if (
+        needsConfirm(target, {
+          title: "Stop syncing on this device?",
+          body: "Your fleets stay on this device, and the online copy is left alone. You can rejoin any time with the same token.",
+          confirmLabel: "Stop syncing",
+        })
+      )
+        return;
+      FleetSync.stop();
+      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "sync" } } }));
+      showToast("Syncing stopped on this device");
+      break;
+    }
+    case "sync-delete": {
+      if (
+        needsConfirm(target, {
+          title: "Delete the online copy?",
+          body: "This removes the synced fleets from the server. Your fleets on THIS device are kept. Other devices still holding the token keep their own copies.",
+          confirmLabel: "Delete online copy",
+          danger: true,
+        })
+      )
+        return;
+      syncError();
+      syncBusy(true, "Deleting…");
+      void FleetSync.deleteRemote()
+        .then(() => {
+          store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "sync" } } }));
+          showToast("Online copy deleted");
+        })
+        .catch((e: unknown) => {
+          syncBusy(false);
+          syncError(e instanceof Error ? e.message : "Could not delete the online copy.");
+        });
       break;
     }
     case "export-data": {

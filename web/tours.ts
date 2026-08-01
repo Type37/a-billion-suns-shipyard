@@ -1,4 +1,5 @@
 import type { AppState, Route } from "./state.ts";
+import { FleetSync } from "./fleet-sync.ts";
 
 // First-visit coachmarks: small popovers anchored to a live DOM element,
 // shown once per tour until dismissed or completed. Each tour is scoped to
@@ -129,6 +130,25 @@ export const TOURS: TourDef[] = [
         // is exactly the doubling they threw out.
         selector: ".hvp-name-input|.sy-hvp-count",
         body: "Anything in a box like this can be renamed. Mike gave them generic titles but you are encouraged to name them; try “Chief Engineer Sadie Hyatt” instead of just “Chief Engineer.” It’s fun!",
+      },
+    ],
+  },
+  {
+    /**
+     * Fleet Sync, from the 5th visit on.
+     *
+     * By now someone has a fleet worth keeping in step across a phone and a
+     * computer, or has at least hit the "wait, is this only on this one
+     * browser?" question. Silent once syncing is already on: they have found
+     * it.
+     */
+    id: "fleet-sync",
+    view: "home",
+    when: (s) => s.onboarding.visits >= 5 && !FleetSync.enabled(),
+    steps: [
+      {
+        selector: '.topnav-btn[data-action="open-options"]|.nav-fold-btn',
+        body: "Want the same fleets on your phone and your computer? Options has a Sync Fleets Online button now, no account needed, just a phrase you copy between devices.",
       },
     ],
   },

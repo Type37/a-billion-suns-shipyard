@@ -29,6 +29,7 @@ import { FACTION_LORE } from "./faction-lore.ts";
 import type { AppState } from "./state.ts";
 import { activeList, activeOutfit, DEFAULT_PRINT, PAPER } from "./state.ts";
 import type { SavedList, UnitPosition } from "./storage.ts";
+import { FleetSync } from "./fleet-sync.ts";
 import { soloListView, soloOutfitView, newOutfitModal } from "./solo.ts";
 import { activeTour } from "./tours.ts";
 
@@ -3660,6 +3661,15 @@ function optionsModal(state: AppState): string {
           </div>
         </section>
         <section class="opt-section">
+          <h3 class="opt-h">Sync</h3>
+          <p class="opt-note">${
+            FleetSync.enabled() ? "Syncing is on for this device." : "Keep the same fleets on your phone and your computer."
+          }</p>
+          <div class="opt-actions">
+            <button class="bar-btn" data-action="open-sync">${icon("sync", 15)} Sync Fleets Online</button>
+          </div>
+        </section>
+        <section class="opt-section">
           <h3 class="opt-h">About</h3>
           <!-- The rulebook, the Quick Reference and the feedback address are
                all in the footer, which is on every page including this one, so
@@ -3668,6 +3678,129 @@ function optionsModal(state: AppState): string {
           <p class="opt-version">Version ${escapeHtml(v)}</p>
         </section>
       </div>
+    </div>
+  </div>`;
+}
+
+// ---------------------------------------------------------------------------
+// Fleet Sync: opt-in cross-device sync of the saved-list registry. Engine and
+// merge rules live in fleet-sync.ts; this is just the dialog. Busy/error text
+// and the join token field are deliberately NOT in AppState - see actions.ts's
+// sync-* handlers, which write those two spans directly so an in-flight fetch
+// never fights a re-render for the input the user is still typing into. The
+// one genuinely stateful step, "you're about to combine N + M fleets, go
+// ahead?", DOES live in ui.modal (pendingJoin) because it has to survive a
+// render like any other decision the user is asked to make.
+// ---------------------------------------------------------------------------
+
+function syncNoteHTML(): string {
+  return `<p class="sync-note"><strong>Note:</strong> this is not an account, there is no password.
+    The token is the only key. Anyone you give it to can read and change your fleets.</p>`;
+}
+
+function syncOffHTML(): string {
+  return `
+    <section class="opt-section">
+      <p>You can sync your fleets across devices. (Your fleets stay on this device as well.)
+        Opting in gives you a <strong>Sync Token</strong>.</p>
+      <p>Put this phrase into any device and it will load and sync your current fleets.</p>
+      ${syncNoteHTML()}
+      <div class="opt-actions">
+        <button class="cta-btn" id="sync-generate" data-action="sync-generate">${icon("sync", 15)} Generate a Sync Token</button>
+      </div>
+    </section>
+    <section class="opt-section sync-existing">
+      <h3 class="opt-h">Already have one?</h3>
+      <div class="sync-join-row">
+        <input type="text" id="sync-input" class="sync-input" placeholder="Enter your Sync Token…"
+               autocapitalize="none" autocorrect="off" spellcheck="false" aria-label="Sync Token" />
+        <button class="bar-btn" id="sync-join" data-action="sync-join">${icon("check", 14)} Confirm</button>
+      </div>
+      <p class="sync-status" id="sync-busy" hidden></p>
+      <p class="sync-error" id="sync-error" hidden></p>
+    </section>`;
+}
+
+function syncOnHTML(state: AppState): string {
+  const last = FleetSync.lastSync();
+  const when = last ? new Date(last).toLocaleString() : "not yet";
+  const n = state.lists.length;
+  return `
+    <section class="opt-section">
+      <p class="sync-on-state"><strong>Syncing is on for this device.</strong>
+        ${n} fleet${n === 1 ? "" : "s"}, last synced ${escapeHtml(when)}.</p>
+      <h3 class="opt-h">Your Sync Token</h3>
+      <div class="sync-token-row">
+        <code class="sync-token" id="sync-token-text">${escapeHtml(FleetSync.token() ?? "")}</code>
+        <button class="bar-btn" id="sync-copy" data-action="sync-copy">${icon("duplicate", 14)} Copy</button>
+      </div>
+      <p class="sync-hint">Put this phrase into any device and it will load and sync your current fleets.</p>
+      ${syncNoteHTML()}
+    </section>
+    <section class="opt-section">
+      <div class="opt-actions">
+        <button class="cta-btn" id="sync-now" data-action="sync-now">${icon("sync", 15)} Sync now</button>
+        <button class="bar-btn" id="sync-stop" data-action="sync-stop"
+          title="Keeps your fleets on this device and leaves the online copy alone">Stop syncing here</button>
+        <button class="bar-btn danger" id="sync-delete" data-action="sync-delete"
+          title="Removes the online copy. Your fleets on this device are kept">${icon("trash", 14)} Delete online copy</button>
+      </div>
+      <p class="sync-status" id="sync-busy" hidden></p>
+      <p class="sync-error" id="sync-error" hidden></p>
+    </section>`;
+}
+
+/** The one moment this dialog IS state-driven: counts are back from
+ *  preview() and the user has to say yes before anything is written. */
+function syncPendingJoinHTML(p: { token: string; remoteCount: number; localCount: number; exists: boolean }): string {
+  const body = !p.exists
+    ? `That token has no fleets saved against it yet. Your ${p.localCount} fleet${p.localCount === 1 ? "" : "s"}
+       on this device will be uploaded to it.`
+    : `That token has ${p.remoteCount} fleet${p.remoteCount === 1 ? "" : "s"}. This device has ${p.localCount}.
+       Both sets are kept, giving you ${p.remoteCount + p.localCount} at most (fleets already shared between them
+       are not duplicated).`;
+  return `
+    <section class="opt-section">
+      <p>${body}</p>
+      ${syncNoteHTML()}
+      <p class="sync-status" id="sync-busy" hidden></p>
+      <p class="sync-error" id="sync-error" hidden></p>
+    </section>`;
+}
+
+/** The pendingJoin footer, a sibling of .modal-body like confirmModal's -
+ *  nesting it INSIDE the body (which already has its own 20px padding) would
+ *  double the inset and put the border-top in the wrong place. */
+function syncPendingJoinFooter(p: { token: string; exists: boolean }): string {
+  return `
+  <footer class="modal-footer">
+    <button class="bar-btn" data-action="sync-join-cancel">Cancel</button>
+    <button class="cta-btn" data-action="sync-join-confirmed" data-token="${escapeHtml(p.token)}" autofocus>
+      ${icon("check", 16)} ${p.exists ? "Combine fleets" : "Start syncing"}</button>
+  </footer>`;
+}
+
+function syncModal(state: AppState): string {
+  const m = state.ui.modal;
+  if (!m || m.kind !== "sync") return "";
+  const body = !FleetSync.supported()
+    ? `<p class="opt-note">This browser cannot sync fleets online.</p>`
+    : m.pendingJoin
+      ? syncPendingJoinHTML(m.pendingJoin)
+      : FleetSync.enabled()
+        ? syncOnHTML(state)
+        : syncOffHTML();
+  const footer = m.pendingJoin && FleetSync.supported() ? syncPendingJoinFooter(m.pendingJoin) : "";
+  return `
+  <div class="modal-root">
+    <div class="modal-backdrop" data-action="close-modal"></div>
+    <div class="modal-panel opt-modal" role="dialog" aria-modal="true" aria-label="Sync Your Fleets Online">
+      <header class="modal-header">
+        <h2 class="modal-title">Sync Your Fleets Online</h2>
+        <button class="modal-close" data-action="close-modal" aria-label="Close">${icon("close", 18)}</button>
+      </header>
+      <div class="modal-body opt-body">${body}</div>
+      ${footer}
     </div>
   </div>`;
 }
@@ -4180,5 +4313,5 @@ export function render(state: AppState): string {
         return learnView(state);
     }
   })();
-  return `${body}${optionsModal(state)}${emblemModal(state)}${newOutfitModal(state)}${confirmModal(state)}${tourPopover(state)}`;
+  return `${body}${optionsModal(state)}${syncModal(state)}${emblemModal(state)}${newOutfitModal(state)}${confirmModal(state)}${tourPopover(state)}`;
 }

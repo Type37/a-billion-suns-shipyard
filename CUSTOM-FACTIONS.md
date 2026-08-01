@@ -101,7 +101,7 @@ Ten hulls, not nine. The base roster has no dedicated bomber, so one was added
 | **Gigas-class Bomber Wing** | *(new)* | 0 | 4 | 3 | 1 | Ion Torpedoes 2×D8 · 6–12" | Blasters 2×D6 · 0–6" | 16 |
 | Attack Ship\* | Epistle-Class Gunship | 1 | 6 | 4 | 1 | Blasters 4×D6 · 0–6" | Turbo Blasters 4×D6 · 0–6" | 15 |
 | Missionary Ship | Missionary Vessel | 1 | 6 | 5 | 2 | **Utility Bays** | Auto Blasters 3×D6 · 0–6" | 10 |
-| Au'zur-pattern Frigate | Clerestory-Class Monitor | 2 | 3 | 6 | 3 | Particle Beams 1×D10 · 12–24" | — | 20 |
+| Au'zur Armored Frigate | Clerestory-Class Monitor | 2 | 3 | 6 | 3 | Particle Beams 1×D10 · 12–24" | — | 20 |
 | Ceudar-pattern Heavy Corvette | Penance-Class Escort Frigate | 2 | 6 | 7 | 4 | Ion Torpedoes 2×D8 · 6–12" | Ion Torpedoes 2×D8 · 6–12" | 30 |
 | Sinaris-pattern Heavy Destroyer | Transept-Class Strike Cruiser | 3 | 4 | 8 | 5 | Laser Cannon 2×D8 · 0–9" | Laser Cannon 2×D8 · 0–9" | 35 |
 | Ket-pattern Battlecruiser | Oracle-Class Gun Carrier | 3 | 4 | 8 | 5 | **Utility Bays** | Light Railguns 4×D8 · 9–18" | 40 |
@@ -197,7 +197,7 @@ hulls owned in quantity instead of leaning on the three capitals.
 
 | Unit | Count | Cost each | Cost |
 |---|---|---|---|
-| Au'zur-pattern Frigate — one carries **Sangheili Helmsmaster** | 6 | 20 | 120 |
+| Au'zur Armored Frigate — one carries **Sangheili Helmsmaster** | 6 | 20 | 120 |
 | Ceudar-pattern Heavy Corvette — one carries **San'Shyuum Prelate** | 3 | 30 | 90 |
 | Attack Ship | 4 | 15 | 60 |
 | Missionary Ship — one carries **Huragok Shield Technician** | 3 | 10 | 30 |

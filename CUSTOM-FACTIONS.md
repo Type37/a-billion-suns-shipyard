@@ -188,21 +188,22 @@ carry the required 3 HVP.
 
 ### Covenant, ¢300
 
+No Varric, Ket or Sinaris here on purpose — an escort swarm built from the
+hulls owned in quantity instead of leaning on the three capitals.
+
 | Unit | Count | Cost each | Cost |
 |---|---|---|---|
-| Varric-pattern Assault Carrier — carries **San'Shyuum Prelate** | 1 | 80 | 80 |
-| Ket-pattern Battlecruiser — carries **Sangheili Helmsmaster** | 1 | 40 | 40 |
-| Sinaris-pattern Heavy Destroyer | 1 | 35 | 35 |
-| Ceudar-pattern Heavy Corvette | 2 | 30 | 60 |
-| Au'zur-pattern Frigate | 2 | 20 | 40 |
-| Missionary Ship — one carries **Huragok Shield Technician** | 2 | 10 | 20 |
-| Zanar-pattern Storm Cutter | 1 | 15 | 15 |
-| Seraph Wing | 1 | 10 | 10 |
+| Au'zur-pattern Frigate — one carries **Sangheili Helmsmaster** | 6 | 20 | 120 |
+| Ceudar-pattern Heavy Corvette — one carries **San'Shyuum Prelate** | 3 | 30 | 90 |
+| Zanar-pattern Storm Cutter | 4 | 15 | 60 |
+| Missionary Ship — one carries **Huragok Shield Technician** | 3 | 10 | 30 |
 | **Total** | | | **300** |
 
-Leans on the collection as described: both heavy corvettes, a couple each of
-the Au'zur and Missionary hulls, one Zanar, one wing, and the three capitals
-(Varric/Ket/Sinaris) fielded together rather than spread across separate lists.
+Uses the full 6 Au'zur and lands right in the middle of the 2-3(-5) Ceudar
+range, plus Zanar and Missionary numbers within what's owned. Note the unit
+sizes: Mass 1/2 units cap at 3 ships, so 6 Au'zur is 2 units of 3, and the
+4 Zanar splits into a unit of 3 plus a single. No Mass 0 wings in this one -
+add a Seraph or two in place of a Zanar unit if you want fighter cover.
 
 ### UNSC, ¢300
 

@@ -38,6 +38,7 @@ import {
 import type { AppState, LastRoll, PrintOpts, ShipFilter } from "./state.ts";
 import { RANDOM_BEHAVIOUR, GLITCH_BLIP, type RollRow } from "../src/data/junkspace-solo.ts";
 import { STARTER_OUTFITS } from "../src/data/starter-outfits.ts";
+import { renderMarkdown } from "./richtext.ts";
 import { LIB_PAGE, libraryIcon, randomIconId } from "./emblems.ts";
 import { EMBLEM_IDS } from "./icons.ts";
 import { randomCorpName } from "../src/corp-names.ts";
@@ -2168,6 +2169,46 @@ function handleChange(e: Event): void {
     }
 
     // ---- Foundry ----------------------------------------------------------
+    case "md-wrap": {
+      // A Markdown toolbar button: wrap or prefix the sibling textarea's current
+      // selection. No state change here - the textarea commits on blur like any
+      // other field; this just edits its text and refreshes the live preview.
+      const editor = target.closest(".rt-editor");
+      const ta = editor?.querySelector<HTMLTextAreaElement>("textarea.rt-input");
+      if (!ta) return;
+      const kind = target.dataset["md"];
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      const sel = ta.value.slice(start, end);
+      if (kind === "bold" || kind === "italic") {
+        const marks = kind === "bold" ? "**" : "*";
+        const inner = sel || (kind === "bold" ? "bold text" : "italic text");
+        ta.setRangeText(`${marks}${inner}${marks}`, start, end, "select");
+      } else if (kind === "link") {
+        const url = prompt("Link URL (https://…)", "https://") ?? "";
+        if (!/^https?:\/\//i.test(url)) return;
+        ta.setRangeText(`[${sel || "link"}](${url})`, start, end, "select");
+      } else if (kind === "h" || kind === "ul" || kind === "ol") {
+        // Line-wise: prefix each line of the selection (or the current line).
+        const lineStart = ta.value.lastIndexOf("\n", start - 1) + 1;
+        const lineEnd = ta.value.indexOf("\n", end);
+        const blockEnd = lineEnd === -1 ? ta.value.length : lineEnd;
+        const block = ta.value.slice(lineStart, blockEnd);
+        const prefix = kind === "h" ? "## " : kind === "ul" ? "- " : "1. ";
+        const prefixed = block
+          .split("\n")
+          .map((l) => (l.trim() ? prefix + l.replace(/^(#{1,3}\s+|[-*]\s+|\d+\.\s+)/, "") : l))
+          .join("\n");
+        ta.setRangeText(prefixed, lineStart, blockEnd, "select");
+      } else {
+        return;
+      }
+      ta.focus();
+      // Refresh the preview without a state round-trip (main.ts wires the same on input).
+      const preview = editor?.querySelector<HTMLElement>("[data-rt-preview]");
+      if (preview) preview.innerHTML = renderMarkdown(ta.value);
+      break;
+    }
     case "cf-field": {
       const fid = currentFoundryId();
       const field = target.dataset["field"];

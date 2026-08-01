@@ -9,6 +9,7 @@ import { deriveCommandEffects, effectiveCost } from "../src/command-effects.ts";
 import type { CommandCostChange, CommandEffects, RuleSource } from "../src/command-effects.ts";
 import { allFactions, factionsByEra, findFaction, makeCatalog, ERA_ORDER } from "./catalog.ts";
 import { auxSlotText, credits, escapeHtml, formatDate, formatWeapon, pluralise, primarySlotText, ruleText } from "./format.ts";
+import { markdownEditor, renderMarkdown } from "./richtext.ts";
 import {
   commandRow,
   diceRow,
@@ -384,11 +385,7 @@ function factionRuleBlock(f: Faction, size: "full" | "compact" = "full", showIni
   // as paragraph breaks so the notes read the way they were typed.
   const backstory =
     size === "full" && f.backstory?.trim()
-      ? `<div class="frule-backstory">${f.backstory
-          .trim()
-          .split(/\n{2,}/)
-          .map((p) => `<p>${escapeHtml(p.trim()).replace(/\n/g, "<br>")}</p>`)
-          .join("")}</div>`
+      ? `<div class="frule-backstory rt-content">${renderMarkdown(f.backstory)}</div>`
       : "";
   return `
   <div class="frule frule-${size}">
@@ -2623,8 +2620,8 @@ function foundryEditView(state: AppState, factionId: string): string {
           <input type="text" value="${escapeHtml(f.rule.name)}" data-action="cf-field" data-field="ruleName" /></label>
         <label class="field-block wide">Faction rule, written in full
           <textarea rows="3" data-action="cf-field" data-field="ruleText">${escapeHtml(f.rule.text)}</textarea></label>
-        <label class="field-block wide">Backstory / notes
-          <textarea rows="5" placeholder="Lore, tactics, origin, anything you want to remember about this faction…" data-action="cf-field" data-field="backstory">${escapeHtml(f.backstory ?? "")}</textarea></label>
+        <div class="field-block wide">Backstory / notes
+          ${markdownEditor(f.backstory ?? "", "cf-field", "backstory")}</div>
       </div>
     </section>
 

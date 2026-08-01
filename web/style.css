@@ -4508,6 +4508,33 @@ a .icon,
 .frule-backstory { margin-top: 8px; padding-top: 8px; border-top: 1px dotted var(--hair-soft); }
 .frule-backstory p { font-family: var(--serif); font-style: italic; font-size: 13px; line-height: 1.5; color: var(--ink-3); margin: 0 0 6px; }
 .frule-backstory p:last-child { margin-bottom: 0; }
+
+/* Markdown notes editor: toolbar, textarea, live preview, and the shared styles
+   for rendered Markdown (rt-content) wherever it is shown. */
+.rt-editor { display: flex; flex-direction: column; text-transform: none; letter-spacing: 0; }
+.rt-toolbar { display: flex; gap: 2px; padding: 4px; border: 1px solid var(--hair); border-bottom: none; background: var(--blue-wash); }
+.rt-btn { min-width: 30px; height: 28px; padding: 0 7px; border: 1px solid transparent; background: none; cursor: pointer; font-family: var(--sans); font-size: 13px; color: var(--ink-2); display: inline-flex; align-items: center; justify-content: center; }
+.rt-btn:hover { background: var(--paper); border-color: var(--hair-soft); color: var(--ink); }
+.rt-btn:active { background: var(--blue); color: #fff; }
+.rt-input { width: 100%; min-height: 96px; padding: 9px 11px; border: 1px solid var(--hair); background: var(--paper); font-family: var(--mono); font-size: 13px; line-height: 1.5; color: var(--ink); resize: vertical; }
+.rt-input:focus { outline: none; border-color: var(--blue); }
+.rt-preview { margin-top: 6px; padding: 9px 11px; border: 1px dashed var(--hair-soft); background: #fbfcfe; min-height: 20px; }
+.rt-preview:empty::before { content: "Preview"; font-family: var(--sans); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--placeholder); }
+
+.rt-content { font-family: var(--serif); font-size: 13px; line-height: 1.55; color: var(--ink-2); }
+.rt-content > :first-child { margin-top: 0; }
+.rt-content > :last-child { margin-bottom: 0; }
+.rt-content p { margin: 0 0 7px; }
+.rt-content h3.rt-h { font-family: var(--display); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink); margin: 10px 0 5px; }
+.rt-content h4.rt-h { font-family: var(--display); font-weight: 800; font-size: 12.5px; color: var(--ink); margin: 9px 0 4px; }
+.rt-content h5.rt-h { font-family: var(--display); font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--ink-2); margin: 8px 0 4px; }
+.rt-content ul, .rt-content ol { margin: 0 0 7px; padding-left: 20px; }
+.rt-content li { margin: 0 0 2px; }
+.rt-content a { color: var(--blue); }
+.rt-content code { font-family: var(--mono); font-size: 0.92em; background: var(--blue-wash); padding: 0 4px; }
+.rt-content strong { color: var(--ink); }
+/* The builder's backstory keeps its italic-flavour tone even when Markdown-rendered. */
+.frule-backstory.rt-content, .frule-backstory.rt-content p { font-style: italic; color: var(--ink-3); }
 .frule-full .frv-label { font-size: 10px; }
 .frule-full .frv-value { font-size: 22px; }
 .frule-full .frule-vitals { min-width: 132px; }

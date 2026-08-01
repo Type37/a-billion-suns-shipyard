@@ -7,7 +7,25 @@ import { decodeShare, decodeSharePayload, sharePayloadFromHash, type DecodedShar
 import { persistCustomFactions, persistLists } from "./storage.ts";
 import { runDecode, DIGIT_POOL } from "./write-on.ts";
 import { visibleAnchor } from "./tours.ts";
+import { renderMarkdown } from "./richtext.ts";
 import "./style.css";
+
+// Keep every Markdown notes editor's preview in step with its textarea as the
+// user types. Uncontrolled on purpose (see richtext.ts): typing must not go
+// through the store, so this updates the preview node directly. Idempotent - a
+// data-wired flag stops a second listener being added on the next repaint.
+function wireMarkdownPreviews(): void {
+  for (const ed of document.querySelectorAll<HTMLElement>(".rt-editor")) {
+    if (ed.dataset["wired"]) continue;
+    ed.dataset["wired"] = "1";
+    const ta = ed.querySelector<HTMLTextAreaElement>("textarea.rt-input");
+    const preview = ed.querySelector<HTMLElement>("[data-rt-preview]");
+    if (!ta || !preview) continue;
+    ta.addEventListener("input", () => {
+      preview.innerHTML = renderMarkdown(ta.value);
+    });
+  }
+}
 
 // The app is a hash-routed, single-store, full-re-render SPA. state.ts holds the
 // store, render.ts turns state into HTML, actions.ts owns all event handling.
@@ -180,6 +198,7 @@ function paint(): void {
 
   measureStickyHeader();
   observeEmblemLibrary();
+  wireMarkdownPreviews();
   markJustPickedFaction();
   animateFactionTitle();
   animateNewRosterRows();

@@ -63,14 +63,16 @@ export const BUILT_IN_FACTIONS: Faction[] = discovered.sort(
 // with one keeps working, and it stays visible/manageable in the Foundry list
 // (which reads state.customFactions directly, not this function).
 const HIDDEN_FACTION_IDS = new Set<string>(["cf-covenant"]);
-// Enemy fleets (pirates and the like) are opponents, not player factions: they
-// are built and edited in the Foundry but never appear in a fleet-building
-// picker under any mode. Marked with `enemyOnly`, which is also how the retired
-// "Pirate Raiders" name-hide is now expressed - anything so flagged is filtered.
-// The Foundry list itself reads state.customFactions directly, so an enemy
-// faction stays visible and manageable there.
+// "Pirate Raiders" was a starter template (now removed): a raider fleet meant to
+// fight against, not to play. Any that were already created from it are hidden
+// too, by name, so they cannot be picked or played under any mode. A clone that
+// was renamed (the template's whole point) is unaffected.
+const HIDDEN_FACTION_NAMES = new Set<string>(["Pirate Raiders"]);
+
 export function allFactions(customs: Faction[]): Faction[] {
-  return [...BUILT_IN_FACTIONS, ...customs].filter((f) => !HIDDEN_FACTION_IDS.has(f.id) && !f.enemyOnly);
+  return [...BUILT_IN_FACTIONS, ...customs].filter(
+    (f) => !HIDDEN_FACTION_IDS.has(f.id) && !HIDDEN_FACTION_NAMES.has(f.name),
+  );
 }
 
 function allFactionsUnfiltered(customs: Faction[]): Faction[] {

@@ -1754,41 +1754,22 @@ function dispatchAction(target: HTMLElement): void {
       break;
     }
     case "new-faction-template": {
-      // Themed starter factions you rename and edit - a friendlier entry than a
-      // blank sheet. The pirate template is flagged enemyOnly: buildable and
-      // editable here, but an opponent, so it never enters a fleet-building
-      // picker (see allFactions).
-      const kind = target.dataset["template"];
-      const faction: Faction =
-        kind === "pirate"
-          ? {
-              id: newId("cf"),
-              name: "Pirate Raiders",
-              era: "Armageddon",
-              initiative: "3D6",
-              cmdTokens: "5",
-              enemyOnly: true,
-              rule: { name: "Scavengers", text: "Raiders who fight dirty and run fast. An enemy fleet - rename this and edit its rule, ships, and personnel to taste." },
-              ships: [
-                { id: "raider", name: "Raider", mass: 1, thrust: 8, silhouette: 4, shields: 1, primary: [w("Scrap Cannons", 3, "D6", 0, 6)], auxiliary: [], utilityBays: false, cost: 10 },
-                { id: "marauder", name: "Marauder", mass: 2, thrust: 6, silhouette: 5, shields: 2, primary: [w("Boarding Guns", 2, "D8", 0, 9)], auxiliary: [w("Scrap Cannons", 2, "D6", 0, 6)], utilityBays: false, cost: 16 },
-                { id: "corsair", name: "Corsair Flagship", mass: 3, thrust: 6, silhouette: 8, shields: 4, primary: [w("Salvaged Railguns", 2, "D12", 9, 18)], auxiliary: [w("Point Defence", 4, "D6", 0, 6)], utilityBays: false, cost: 48 },
-              ],
-              hvp: [],
-            }
-          : {
-              id: newId("cf"),
-              name: "My Fleet",
-              era: "Armageddon",
-              initiative: "3D6",
-              cmdTokens: "5",
-              rule: { name: "House rule", text: "Your own fleet. Rename it and edit its rule, ships, and personnel however you like." },
-              ships: [
-                { id: "scout", name: "Scout", mass: 1, thrust: 8, silhouette: 4, shields: 1, primary: [w("Light Blasters", 2, "D6", 0, 6)], auxiliary: [], utilityBays: false, cost: 10 },
-                { id: "cruiser", name: "Cruiser", mass: 2, thrust: 6, silhouette: 6, shields: 3, primary: [w("Railguns", 2, "D8", 9, 18)], auxiliary: [w("Blasters", 2, "D6", 0, 6)], utilityBays: false, cost: 22 },
-              ],
-              hvp: [],
-            };
+      // A starter fleet you rename and edit - a friendlier entry than a blank
+      // sheet. (The pirate-raider enemy template was removed: raiders are an
+      // opponent, not a playable/pickable faction.)
+      const faction: Faction = {
+        id: newId("cf"),
+        name: "My Fleet",
+        era: "Armageddon",
+        initiative: "3D6",
+        cmdTokens: "5",
+        rule: { name: "House rule", text: "Your own fleet. Rename it and edit its rule, ships, and personnel however you like." },
+        ships: [
+          { id: "scout", name: "Scout", mass: 1, thrust: 8, silhouette: 4, shields: 1, primary: [w("Light Blasters", 2, "D6", 0, 6)], auxiliary: [], utilityBays: false, cost: 10 },
+          { id: "cruiser", name: "Cruiser", mass: 2, thrust: 6, silhouette: 6, shields: 3, primary: [w("Railguns", 2, "D8", 9, 18)], auxiliary: [w("Blasters", 2, "D6", 0, 6)], utilityBays: false, cost: 22 },
+        ],
+        hvp: [],
+      };
       store.setState((s) => {
         const customFactions = [...s.customFactions, faction];
         persistCustomFactions(customFactions);
@@ -2181,8 +2162,6 @@ function handleChange(e: Event): void {
             return { ...f, rule: { ...f.rule, text: inputValue } };
           case "backstory":
             return { ...f, backstory: inputValue };
-          case "enemyOnly":
-            return { ...f, enemyOnly: target instanceof HTMLInputElement ? target.checked : !f.enemyOnly };
           default:
             return f;
         }

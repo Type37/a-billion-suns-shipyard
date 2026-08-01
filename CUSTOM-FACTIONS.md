@@ -99,13 +99,17 @@ Ten hulls, not nine. The base roster has no dedicated bomber, so one was added
 | Space Banshee Wing | Light Fighter Wing | 0 | 8 | 2 | 0 | — | Blasters 2×D6 · 0–6" | 5 |
 | Seraph Wing | Advanced Fighter Wing | 0 | 4 | 4 | 1 | — | Turbo Blasters 4×D6 · 0–6" | 10 |
 | **Gigas-class Bomber Wing** | *(new)* | 0 | 4 | 3 | 1 | Ion Torpedoes 2×D8 · 6–12" | Blasters 2×D6 · 0–6" | 16 |
-| Zanar-pattern Storm Cutter | Epistle-Class Gunship | 1 | 6 | 4 | 1 | Blasters 4×D6 · 0–6" | Turbo Blasters 4×D6 · 0–6" | 15 |
+| Attack Ship\* | Epistle-Class Gunship | 1 | 6 | 4 | 1 | Blasters 4×D6 · 0–6" | Turbo Blasters 4×D6 · 0–6" | 15 |
 | Missionary Ship | Missionary Vessel | 1 | 6 | 5 | 2 | **Utility Bays** | Auto Blasters 3×D6 · 0–6" | 10 |
 | Au'zur-pattern Frigate | Clerestory-Class Monitor | 2 | 3 | 6 | 3 | Particle Beams 1×D10 · 12–24" | — | 20 |
 | Ceudar-pattern Heavy Corvette | Penance-Class Escort Frigate | 2 | 6 | 7 | 4 | Ion Torpedoes 2×D8 · 6–12" | Ion Torpedoes 2×D8 · 6–12" | 30 |
 | Sinaris-pattern Heavy Destroyer | Transept-Class Strike Cruiser | 3 | 4 | 8 | 5 | Laser Cannon 2×D8 · 0–9" | Laser Cannon 2×D8 · 0–9" | 35 |
 | Ket-pattern Battlecruiser | Oracle-Class Gun Carrier | 3 | 4 | 8 | 5 | **Utility Bays** | Light Railguns 4×D8 · 9–18" | 40 |
 | Varric-pattern Assault Carrier | Hierophant Cathedral Ship | 3 | 4 | 10 | 6 | Micro Missiles 10×D6 · 12–24" | Defence Grid 4×D8 · 0–9" | 80 |
+
+\* **Attack Ship** is a class, not one name. Zanar, Storm Cutter and Rothen
+are all individual patterns fielded under this stat line - same hull, same
+15cr cost, different name on the ship depending which one you're flying.
 
 #### The added bomber
 
@@ -195,15 +199,19 @@ hulls owned in quantity instead of leaning on the three capitals.
 |---|---|---|---|
 | Au'zur-pattern Frigate — one carries **Sangheili Helmsmaster** | 6 | 20 | 120 |
 | Ceudar-pattern Heavy Corvette — one carries **San'Shyuum Prelate** | 3 | 30 | 90 |
-| Zanar-pattern Storm Cutter | 4 | 15 | 60 |
+| Attack Ship | 4 | 15 | 60 |
 | Missionary Ship — one carries **Huragok Shield Technician** | 3 | 10 | 30 |
 | **Total** | | | **300** |
 
 Uses the full 6 Au'zur and lands right in the middle of the 2-3(-5) Ceudar
-range, plus Zanar and Missionary numbers within what's owned. Note the unit
-sizes: Mass 1/2 units cap at 3 ships, so 6 Au'zur is 2 units of 3, and the
-4 Zanar splits into a unit of 3 plus a single. No Mass 0 wings in this one -
-add a Seraph or two in place of a Zanar unit if you want fighter cover.
+range, plus Attack Ship and Missionary numbers within what's owned. Note the
+unit sizes: Mass 1/2 units cap at 3 ships, so 6 Au'zur is 2 units of 3, and
+the 4 Attack Ships split into a unit of 3 plus a single. No Mass 0 wings in
+this one - add a Seraph or two in place of an Attack Ship unit for fighter
+cover.
+
+*(Superseded below by the actual owned/wanted tally worked out with the
+user - kept here as the first illustrative pass.)*
 
 ### UNSC, ¢300
 

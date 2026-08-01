@@ -45,7 +45,7 @@ export const THE_ORDINATE: Faction = {
       rule: "When a friendly unit attacks an enemy unit with an Activated token, they subtract 1 from the result of each of their attack dice, to a minimum of 1. This increases the chance of critical hits but doesn't prevent duds. (Activated tokens are placed at the end of a unit's activation.)" },
     { id: "technocratic-cabal", name: "Technocratic Cabal",
       rule: "The units in the first battlegroup in this fleet to activate each round double their Thrust value (for this activation only)." },
-    { id: "the-blessed-lambda", name: "Blessed Lambda",
+    { id: "the-blessed-lambda", name: "The Blessed Lambda",
       rule: "If a ship in this fleet attacks from outside of its target's Auxiliary arc of fire, it can re-roll any misses once." },
   ],
   playstyle: "Devilish at close range with unparalleled passive fire, but weaker at range. Predictive Algorithms means that wherever your enemy moves, you are already there to counter them. Plan ahead: several HVPs reward activating units early, but don't get left outmanoeuvred and unable to bring your passive fire to bear.",

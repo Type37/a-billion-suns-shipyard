@@ -12,11 +12,11 @@ export const ALLIANCE: Faction = {
   requiresSpecies: true,
   rule: {
     name: "Fractious Coalition",
-    text: "When adding a unit to your fleet, you must state if it is from the Rannari, Yynnx or Gorgronti species. You cannot form Battlegroups containing units from multiple species. Also gains: Alliance of Necessity (1 CMD): Select a friendly unit. Count this unit as being of another species until the end of the round.",
+    text: "When adding a unit to your fleet, you must state if it is from the Rannari, Yynnx or Gorgronti species. You cannot form Battlegroups containing units from multiple species. This fleet gains access to the following command: Alliance of Necessity (1 CMD): Select a friendly unit. Count this unit as being of another species until the end of the round.",
   },
   ships: [
     { id: "recon-wing", name: "Recon Wing", mass: 0, thrust: 8, silhouette: 2, shields: 0,
-      primary: [w("Blasters", 2, "D6", 0, 6)], auxiliary: [], utilityBays: false, cost: 3 },
+      primary: [], auxiliary: [w("Blasters", 2, "D6", 0, 6)], utilityBays: false, cost: 3 },
     { id: "patrol-wing", name: "Patrol Wing", mass: 0, thrust: 6, silhouette: 3, shields: 0,
       primary: [w("Blasters", 1, "D6", 0, 6)], auxiliary: [w("Auto Blasters", 3, "D6", 0, 6)], utilityBays: false, cost: 6 },
     { id: "bomber-wing", name: "Bomber Wing", mass: 0, thrust: 4, silhouette: 3, shields: 0,
@@ -36,7 +36,7 @@ export const ALLIANCE: Faction = {
   ],
   hvp: [
     { id: "gorgronti-magtech-overseer", name: "Gorgronti Magtech Overseer",
-      rule: "Gorgronti units in this fleet gain: Tractor Beam Locked On (1 CMD): After damaging an enemy unit with a lower Mass, spend 1 CMD to give the target a 'Trapped' token (Thrust reduced to 2\" until the end of its next activation)." },
+      rule: "Gorgronti units in this fleet have access to the following command: Tractor Beam Locked On (1 CMD): After damaging an enemy unit with a lower Mass, spend 1 CMD to give the target unit a 'Trapped' token. A unit with a Trapped token reduces its Thrust value to 2\" until the end of its next activation." },
     { id: "gorgronti-safety-inspector", name: "Gorgronti Safety Inspector",
       rule: "Gorgronti units in this fleet may re-roll failed Shields saving throws once per salvo." },
     { id: "rannari-hunt-mistress", name: "Rannari Hunt-Mistress",
@@ -44,10 +44,10 @@ export const ALLIANCE: Faction = {
     { id: "rannari-void-stalker", name: "Rannari Void Stalker",
       rule: "Rannari units in this fleet roll a D6 at the start of their activation: increase their Thrust by that many inches for the rest of this activation." },
     { id: "yynnx-cipher-warden", name: "Yynnx Cipher Warden",
-      rule: "Yynnx units in this fleet can Jump In and Jump Hop using enemy Jump Points. When they do, all in-play Jump Points count as connected." },
+      rule: "Yynnx units in this fleet can Jump In and Jump Hop using enemy Jump Points. When they do: all in-play Jump Points count as connected." },
     { id: "yynnx-data-wraith", name: "Yynnx Data Wraith",
       rule: "Units in this unit's battlegroup cannot be targeted by passive attacks." },
-    { id: "the-council-of-heth-memnah", name: "Council of Heth-Memnah",
+    { id: "the-council-of-heth-memnah", name: "The Council of Heth-Memnah",
       rule: "In the Command Phase, you gain an additional 3 CMD tokens (e.g. D12+3 in total)." },
   ],
 };

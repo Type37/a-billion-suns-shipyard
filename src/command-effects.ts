@@ -76,10 +76,12 @@ function coreCommand(raw: string): string | undefined {
 }
 
 // "gains access to the following command: Surprise Audit (2 CMD): Select one..."
-// Also covers "has access to", "have access to", "gains the command",
-// "Also gains:", "gain:" - every introduction used in the published factions.
+// Also covers "has access to", "have access to", "gains access to this
+// command:" (the Vyke's Molt-Priest, singular rather than "the following"),
+// "gains the command", "Also gains:", "gain:" - every introduction used in
+// the published factions.
 const GRANT_INTRO =
-  /(?:gains?|have|has)\s+(?:access\s+to\s+)?the\s+following\s+[Cc]ommands?:\s*|gains?\s+the\s+command\s+|(?:Also\s+)?gains?:\s*|gain:\s*/g;
+  /(?:gains?|have|has)\s+(?:access\s+to\s+)?(?:the\s+following|this)\s+[Cc]ommands?:\s*|gains?\s+the\s+command\s+|(?:Also\s+)?gains?:\s*|gain:\s*/g;
 
 /**
  * Pull "Name (N CMD): body" out of the text following a grant introduction. The

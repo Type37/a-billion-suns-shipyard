@@ -141,6 +141,13 @@ export interface Faction {
   playstyle?: string;
   /** Freeform backstory / notes the player writes about this faction. */
   backstory?: string;
+  /**
+   * An opponent, not one of your own factions. Buildable and editable in the
+   * Foundry, but hidden from the fleet-building pickers under every mode - you
+   * field it as an enemy (e.g. a solo pirate fleet), you do not play it. Custom
+   * factions only. See allFactions() in web/catalog.ts.
+   */
+  enemyOnly?: boolean;
 }
 
 // ---------------------------------------------------------------------------

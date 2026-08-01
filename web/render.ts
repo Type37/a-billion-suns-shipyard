@@ -2396,7 +2396,7 @@ function foundryListView(state: AppState): string {
     .map(
       (f) => `
       <tr>
-        <td class="cell-name"><a href="#/foundry/${f.id}">${escapeHtml(f.name)}</a></td>
+        <td class="cell-name"><a href="#/foundry/${f.id}">${escapeHtml(f.name)}</a>${f.enemyOnly ? '<span class="cf-enemy-badge">Enemy</span>' : ""}</td>
         <!-- data-label carries the column name into the mobile card layout, where
              the real <thead> is off-screen and "9" / "7" alone mean nothing. -->
         <td data-label="Era">${f.era}</td>
@@ -2443,6 +2443,10 @@ function foundryListView(state: AppState): string {
             <button class="faction-plaque" data-action="new-faction-template" data-template="solo">
               <span class="faction-plaque-name">${icon("book", 15)} Solo Fleet</span>
               <span class="faction-plaque-rule">A starter outfit of your own to build out</span>
+            </button>
+            <button class="faction-plaque" data-action="new-faction-template" data-template="pirate">
+              <span class="faction-plaque-name">${icon("flag", 15)} Enemy Pirate Fleet</span>
+              <span class="faction-plaque-rule">An opponent to fight &mdash; hidden from fleet building</span>
             </button>
           </div>
           <p class="cf-new-heading">Or clone an existing faction</p>
@@ -2581,7 +2585,7 @@ function foundryEditView(state: AppState, factionId: string): string {
         that did nothing the other two do not.
       -->
       ${
-        f.ships.length
+        f.ships.length && !f.enemyOnly
           ? `<button class="bar-btn" data-action="open-new-fleet-with-faction" data-faction="${f.id}">${icon("flag", 14)} Build a fleet with this faction</button>`
           : ""
       }
@@ -2612,6 +2616,11 @@ function foundryEditView(state: AppState, factionId: string): string {
           <textarea rows="3" data-action="cf-field" data-field="ruleText">${escapeHtml(f.rule.text)}</textarea></label>
         <label class="field-block wide">Backstory / notes
           <textarea rows="5" placeholder="Lore, tactics, origin, anything you want to remember about this faction…" data-action="cf-field" data-field="backstory">${escapeHtml(f.backstory ?? "")}</textarea></label>
+        <label class="cf-enemy-toggle wide">
+          <input type="checkbox" ${f.enemyOnly ? "checked" : ""} data-action="cf-field" data-field="enemyOnly" />
+          <span class="cf-enemy-box">${icon("check", 13)}</span>
+          <span class="cf-enemy-text"><b>Enemy fleet</b> &mdash; an opponent, not one of your own. Buildable and editable here, but hidden from every fleet-building picker. Use it as a solo/pirate enemy.</span>
+        </label>
       </div>
     </section>
 

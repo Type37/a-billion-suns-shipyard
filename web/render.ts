@@ -378,11 +378,24 @@ function factionRuleBlock(f: Faction, size: "full" | "compact" = "full", showIni
         <span class="frv-figure"><span class="frv-value">${escapeHtml(f.initiative)}</span>${diceRow(f.initiative, glyph)}</span>
       </div>`
     : "";
+  // Backstory rides the rule block at full size, so a custom faction's own
+  // writing shows up where the fleet is actually used - the builder and the
+  // picker - not only buried in the Foundry editor. Blank line breaks are kept
+  // as paragraph breaks so the notes read the way they were typed.
+  const backstory =
+    size === "full" && f.backstory?.trim()
+      ? `<div class="frule-backstory">${f.backstory
+          .trim()
+          .split(/\n{2,}/)
+          .map((p) => `<p>${escapeHtml(p.trim()).replace(/\n/g, "<br>")}</p>`)
+          .join("")}</div>`
+      : "";
   return `
   <div class="frule frule-${size}">
     <div class="frule-main">
       <h4 class="frule-name">${escapeHtml(f.rule.name)}</h4>
       <p class="frule-text">${ruleText(f.rule.text)}</p>
+      ${backstory}
     </div>
     <div class="frule-vitals">
       ${initiative}

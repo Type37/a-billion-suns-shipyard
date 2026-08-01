@@ -4503,6 +4503,11 @@ a .icon,
 .frule-full { padding: 14px 0 0; border-top: 1px solid var(--hair); margin-top: 16px; }
 .frule-full .frule-name { font-size: 16px; margin-bottom: 5px; }
 .frule-full .frule-text { font-size: 14px; line-height: 1.5; }
+/* A faction's own notes, shown under its rule where the fleet is used. Quiet
+   and set off, so it reads as flavour beside the rule, not as more rules. */
+.frule-backstory { margin-top: 8px; padding-top: 8px; border-top: 1px dotted var(--hair-soft); }
+.frule-backstory p { font-family: var(--serif); font-style: italic; font-size: 13px; line-height: 1.5; color: var(--ink-3); margin: 0 0 6px; }
+.frule-backstory p:last-child { margin-bottom: 0; }
 .frule-full .frv-label { font-size: 10px; }
 .frule-full .frv-value { font-size: 22px; }
 .frule-full .frule-vitals { min-width: 132px; }

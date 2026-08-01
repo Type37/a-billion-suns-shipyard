@@ -2,8 +2,8 @@ import type { SavedList } from "./storage.ts";
 
 // Seed fleets: five ready-built ¢300bn lists, one per faction, shipped so
 // every new browser has a few worked examples on the Fleets page rather than
-// an empty state. Seeded once per browser (see storage.ts applyListSeeds),
-// same pattern as the Covenant seed faction - deleting one makes it stick.
+// an empty state. Seeded once per browser (see storage.ts applyListSeeds) -
+// deleting one makes it stick.
 //
 // Book order (see catalog.ts BOOK_ORDER): Megamart (Hypergrowth), The Unity
 // and Golem Mega-Systems (Age of Unity), Aegis and Gen Omega (Armageddon).

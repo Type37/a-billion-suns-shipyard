@@ -1,4 +1,3 @@
-import { SEED_FACTIONS } from "./seed-factions.ts";
 import type { AppState, Route } from "./state.ts";
 
 // First-visit coachmarks: small popovers anchored to a live DOM element,
@@ -47,18 +46,13 @@ export const TOURS: TourDef[] = [
      * put MY ships in it", which is the one thing Custom Rules answers and
      * nothing else in the app hints at.
      *
-     * Silent for anyone who has already built one: they have found it. Note
-     * that "has a custom faction" is not the test - every browser is seeded
-     * with the Covenant, so a plain length check is true for everybody and this
-     * would never have shown at all. The test is whether any faction is one the
-     * user made.
+     * Silent for anyone who has already built one: they have found it.
      */
     id: "foundry-tab",
     view: "home",
     when: (s) => {
       if (s.onboarding.visits < 3 || s.onboarding.visits > 4) return false;
-      const seeded = new Set(SEED_FACTIONS.map((f) => f.id));
-      return !s.customFactions.some((f) => !seeded.has(f.id));
+      return s.customFactions.length === 0;
     },
     steps: [
       {

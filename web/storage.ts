@@ -1,5 +1,4 @@
 import type { Faction, Fleet, GameMode, OutfitShip } from "../src/types.ts";
-import { SEED_FACTIONS } from "./seed-factions.ts";
 import { SEED_LISTS } from "./seed-lists.ts";
 
 // localStorage persistence. One key per concern, JSON payloads, versioned so a
@@ -8,7 +7,6 @@ import { SEED_LISTS } from "./seed-lists.ts";
 const LISTS_KEY = "abs2.lists.v1";
 const FACTIONS_KEY = "abs2.customFactions.v1";
 const OUTFITS_KEY = "abs2.outfits.v1";
-const SEEDS_APPLIED_KEY = "abs2.seedsApplied.v1";
 const LIST_SEEDS_APPLIED_KEY = "abs2.listSeedsApplied.v1";
 
 /** Live table-companion state for a fleet list, persisted with it. */
@@ -128,22 +126,17 @@ function applyListSeeds(stored: SavedList[]): SavedList[] {
 
 export function loadCustomFactions(): Faction[] {
   const stored = read<Faction[]>(FACTIONS_KEY, []);
-  return applySeeds(stored);
-}
-
-// Seed factions ship as ready-made custom factions. Each seed is added at most
-// once per browser: we record every seed id we have ever applied, so once a
-// user deletes a seeded faction it does not reappear on the next visit.
-function applySeeds(stored: Faction[]): Faction[] {
-  const applied = new Set(read<string[]>(SEEDS_APPLIED_KEY, []));
-  const additions = SEED_FACTIONS.filter((seed) => !applied.has(seed.id) && !stored.some((f) => f.id === seed.id));
-  if (additions.length === 0) return stored;
-
-  const merged = [...stored, ...additions];
-  write(FACTIONS_KEY, merged);
-  for (const seed of SEED_FACTIONS) applied.add(seed.id);
-  write(SEEDS_APPLIED_KEY, [...applied]);
-  return merged;
+  // One-time cleanup: the Covenant prototype ("cf-covenant") used to be seeded
+  // into every browser (see git history for seed-factions.ts, now removed).
+  // Anyone who already had it seeded still has it sitting in this list even
+  // though nothing writes it anymore - strip it and persist the cut so it
+  // does not come back next load.
+  if (stored.some((f) => f.id === "cf-covenant")) {
+    const cleaned = stored.filter((f) => f.id !== "cf-covenant");
+    write(FACTIONS_KEY, cleaned);
+    return cleaned;
+  }
+  return stored;
 }
 
 export function persistCustomFactions(factions: Faction[]): void {

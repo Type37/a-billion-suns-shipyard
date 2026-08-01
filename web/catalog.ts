@@ -57,12 +57,12 @@ export const BUILT_IN_FACTIONS: Faction[] = discovered.sort(
   (a, b) => bookRank(a.id) - bookRank(b.id) || a.name.localeCompare(b.name),
 );
 
-// Seed factions that ship as ready-made test content (see seed-factions.ts)
-// but shouldn't clutter every faction picker. Hidden from selection, browsing,
-// and cloning - but still resolvable by id, so a fleet someone already built
-// with one keeps working, and it stays visible/manageable in the Foundry list
+// Seed/test factions that ship as ready-made content but shouldn't clutter
+// every faction picker go here by id. Hidden from selection, browsing, and
+// cloning - but still resolvable by id, so a fleet someone already built with
+// one keeps working, and it stays visible/manageable in the Foundry list
 // (which reads state.customFactions directly, not this function).
-const HIDDEN_FACTION_IDS = new Set<string>(["cf-covenant"]);
+const HIDDEN_FACTION_IDS = new Set<string>();
 // "Pirate Raiders" was a starter template (now removed): a raider fleet meant to
 // fight against, not to play. Any that were already created from it are hidden
 // too, by name, so they cannot be picked or played under any mode. A clone that

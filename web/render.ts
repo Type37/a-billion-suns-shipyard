@@ -654,8 +654,8 @@ function newFleetModal(state: AppState, customs: Faction[]): string {
   if (!m || m.kind !== "new-fleet") return "";
   const byEra = factionsByEra(customs);
   const customIds = new Set(customs.map((c) => c.id));
-  // The default list shows only this era's *official* factions. Custom/seed
-  // factions (e.g. the Covenant) and every other era live behind "More".
+  // The default list shows only this era's *official* factions. Custom
+  // factions and every other era live behind "More".
   const eraFactions = (byEra.get(m.era) ?? []).filter((f) => !customIds.has(f.id));
   // The rest, sorted: other-era book factions first (by era, then name), then
   // any custom factions last, so the expanded grid reads in a stable order.
@@ -3366,8 +3366,8 @@ function shipsView(state: AppState): string {
     }
   };
   // Official ships from the built-in factions (allFactions([]) is built-ins
-  // only), then every custom faction the user has - including hidden seeds like
-  // the Covenant, which "Show custom" is exactly the way to surface here.
+  // only), then every custom faction the user has - "Show custom" is exactly
+  // the way to surface hidden/seed factions here.
   for (const fac of allFactions([])) pushFaction(fac, false);
   for (const fac of customs) pushFaction(fac, true);
   for (const s of JUNKSPACE_SHIPS) {

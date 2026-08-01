@@ -37,6 +37,7 @@ import {
 } from "./state.ts";
 import type { AppState, LastRoll, PrintOpts, ShipFilter } from "./state.ts";
 import { RANDOM_BEHAVIOUR, GLITCH_BLIP, type RollRow } from "../src/data/junkspace-solo.ts";
+import { STARTER_OUTFITS } from "../src/data/starter-outfits.ts";
 import { LIB_PAGE, libraryIcon, randomIconId } from "./emblems.ts";
 import { EMBLEM_IDS } from "./icons.ts";
 import { randomCorpName } from "../src/corp-names.ts";
@@ -1255,6 +1256,31 @@ function dispatchAction(target: HTMLElement): void {
               emblemColor: draft.emblemColor,
             }
           : {}),
+      };
+      store.setState((s) => {
+        const outfits = [...s.outfits, outfit];
+        persistOutfits(outfits);
+        return { ...s, outfits, ui: { ...s.ui, modal: undefined, newOutfit: undefined, soloTab: "outfit" } };
+      });
+      location.hash = routeHash({ view: "solo-outfit", outfitId: outfit.id });
+      break;
+    }
+    case "solo-new-outfit-preset": {
+      // A ready-made crew: the preset's ships (with fresh instance ids and any
+      // name typed in the dialog still honoured), otherwise a normal new outfit.
+      const preset = STARTER_OUTFITS.find((s2) => s2.key === target.dataset["preset"]);
+      if (!preset) return;
+      const typed = liveOutfitName();
+      const outfit: SavedOutfit = {
+        ...createOutfit(),
+        name: typed || preset.name,
+        ships: preset.ships.map((s2) => ({
+          id: newId("os"),
+          shipClassId: s2.shipClassId,
+          pilotClass: s2.pilotClass,
+          shipName: s2.shipName,
+          pilotName: s2.pilotName,
+        })),
       };
       store.setState((s) => {
         const outfits = [...s.outfits, outfit];

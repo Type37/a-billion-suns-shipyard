@@ -2195,6 +2195,15 @@ button { font-family: inherit; }
   letter-spacing: 0.06em; text-transform: uppercase; color: var(--blue);
 }
 .no-name-field { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+/* Ready-made crews under the blank-outfit fields: each a full-width tile that
+   creates the outfit and opens it. */
+.no-starter { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--hair-soft); display: flex; flex-direction: column; gap: 8px; }
+.no-starter-head { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; font-size: 11px; color: var(--ink-3); margin: 0; }
+.no-starter-opt { text-align: left; border: 1px solid var(--hair-soft); border-left: 3px solid var(--blue); background: var(--paper); padding: 10px 12px; cursor: pointer; display: flex; flex-direction: column; gap: 3px; }
+.no-starter-opt:hover { background: var(--blue-wash); border-left-color: var(--blue-deep); }
+.no-starter-name { font-family: var(--display); font-weight: 800; font-size: 15px; color: var(--ink); }
+.no-starter-count { font-family: var(--sans); font-weight: 600; font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.03em; margin-left: 6px; }
+.no-starter-blurb { font-size: 12.5px; color: var(--ink-2); line-height: 1.4; }
 /* An unstyled input rendered at 21px tall - under the 24px floor, and nothing
    about it said "type here". It is a box with a real edge and a real height,
    set in the display face it will be wearing on the card a moment later. */

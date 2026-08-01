@@ -3,6 +3,7 @@
 // of the app; actions.ts owns the event handling.
 
 import { PILOT_CLASSES, type PilotClass, type ShipClass } from "../src/types.ts";
+import { STARTER_OUTFITS } from "../src/data/starter-outfits.ts";
 import {
   JUNKSPACE_SHIPS,
   OUTFIT_BUDGET_K,
@@ -96,10 +97,20 @@ export function newOutfitModal(state: AppState): string {
             <input class="new-outfit-name" type="text" placeholder="Unnamed outfit" value="${escapeHtml(draft.name ?? "")}" autocomplete="off" autofocus />
           </label>
         </div>
+        <div class="no-starter">
+          <p class="no-starter-head">Or start with a ready-made crew</p>
+          ${STARTER_OUTFITS.map(
+            (s) => `
+            <button class="no-starter-opt" data-action="solo-new-outfit-preset" data-preset="${s.key}">
+              <span class="no-starter-name">${escapeHtml(s.name)} <span class="no-starter-count">${s.ships.length} ships</span></span>
+              <span class="no-starter-blurb">${escapeHtml(s.blurb)}</span>
+            </button>`,
+          ).join("")}
+        </div>
       </div>
       <footer class="modal-footer">
         <button class="bar-btn" data-action="close-modal">Cancel</button>
-        <button class="cta-btn" data-action="solo-new-outfit-create">${icon("plus", 15)} Start</button>
+        <button class="cta-btn" data-action="solo-new-outfit-create">${icon("plus", 15)} Start blank</button>
       </footer>
     </div>
   </div>`;

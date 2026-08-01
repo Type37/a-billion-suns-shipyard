@@ -79,7 +79,9 @@ function jumpDiagram(): string {
     ${SHIP(160, 128, 0, "dg-ship dg-arrive dg-arrive-3")}
     <g class="dg-measure" transform="translate(160 95)">
       <line x1="0" y1="0" x2="52" y2="0"/>
-      ${LABEL(26, -6, '6"', "dg-measure-text")}
+      <!-- Below the line, not above it: at -6 the label sat on the arriving ship
+           at (196,78). The space under the radius line is empty. -->
+      ${LABEL(26, 14, '6"', "dg-measure-text")}
     </g>
   </svg>`;
 }
@@ -250,7 +252,12 @@ function movementDiagram(): string {
 
     <!-- Travel: one straight line, nothing curved. -->
     <line class="dg-straight" x1="${START}" y1="${Y}" x2="${END}" y2="${Y}"/>
-    <g class="dg-mover">${SHIP(0, 0, 90, "dg-ship")}</g>
+    <!-- The static transform is the animation's END frame (translate(250,92) in
+         dg-pivot-then-run). A running CSS animation overrides this attribute, so
+         the mover still animates; but under prefers-reduced-motion the animation
+         is disabled and this attribute is what keeps the ship at the Thrust mark
+         instead of collapsing onto the SVG origin. -->
+    <g class="dg-mover" transform="translate(${END} ${Y})">${SHIP(0, 0, 90, "dg-ship")}</g>
 
     <g class="dg-measure dg-measure-late" transform="translate(${START} ${Y + 22})">
       <line x1="0" y1="0" x2="${END - START}" y2="0"/>
@@ -275,7 +282,11 @@ function doubleMoveDiagram(): string {
     ${LABEL(160, 15, "Power to Engines — move twice", "dg-title")}
     <line class="dg-straight" x1="${A}" y1="${Y}" x2="${B}" y2="${Y}"/>
     <line class="dg-straight dg-straight-2" x1="${B}" y1="${Y}" x2="${C}" y2="${Y}"/>
-    <g class="dg-dbl-mover">${SHIP(0, 0, 90, "dg-ship")}</g>
+    <!-- Static transform = the animation's END frame (translate(250,96) in
+         dg-double-run), so the reduced-motion still-frame rests at the end of the
+         second move rather than collapsing onto the SVG origin. The running
+         animation overrides this attribute. -->
+    <g class="dg-dbl-mover" transform="translate(${C} ${Y})">${SHIP(0, 0, 90, "dg-ship")}</g>
     <g class="dg-measure" transform="translate(${A} ${Y + 24})">
       <line x1="0" y1="0" x2="${B - A}" y2="0"/>
       <line x1="0" y1="-5" x2="0" y2="5"/>

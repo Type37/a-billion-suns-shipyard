@@ -44,15 +44,15 @@ rule or HVP keys off Mass 0, so nothing pushes you toward them.
 
 | Ship | Base name | ⓜ | Thrust | Sil | Shields | Primary | Auxiliary | Cost |
 |---|---|---|---|---|---|---|---|---|
-| Harpocrates-class Scout | Recon Drone | 0 | 8 | 2 | 0 | Light Blasters 1×D6 · 0–3" | — | 4 |
-| Ikarus-class Fighter Wing | Defence Drone | 0 | 4 | 4 | 1 | — | Laser Cannon 1×D8 · 0–9" | 6 |
-| Daedalus-class Bomber Wing | Assault Drone | 0 | 6 | 3 | 1 | Torpedoes 1×D10 · 6–12" | — | 12 |
-| Echo-class Corvette | Repair Drone | 1 | 6 | 4 | 1 | Blasters 2×D6 · 0–6" | **Utility Bays** | 10 |
+| Fighter Wing | Recon Drone | 0 | 8 | 2 | 0 | Light Blasters 1×D6 · 0–3" | — | 4 |
+| Interceptor Wing | Defence Drone | 0 | 4 | 4 | 1 | — | Laser Cannon 1×D8 · 0–9" | 6 |
+| Bomber Wing | Assault Drone | 0 | 6 | 3 | 1 | Torpedoes 1×D10 · 6–12" | — | 12 |
+| Cutter | Repair Drone | 1 | 6 | 4 | 1 | Blasters 2×D6 · 0–6" | **Utility Bays** | 10 |
 | Medea-class Support Cruiser | Warden | 2 | 8 | 5 | 2 | **Utility Bays** | Turbo Blasters 4×D6 · 0–6" | 20 |
-| Bellerophon-class Destroyer | Bastion | 2 | 5 | 6 | 3 | Heavy Railguns 2×D12 · 9–18" | Turbo Blasters 8×D6 · 0–6" | 45 |
-| Perseus-class Cruiser | Sentinel | 3 | 6 | 7 | 4 | Cyclone Array 12×D6 · 12–24" | Defence Grid 4×D8 · 0–9" | 55 |
-| Agamemnon-class Battlecruiser | Citadel | 3 | 3 | 8 | 5 | Cruise Missiles 4×D10 · 18–36" | Turbo Blasters 8×D6 · 0–6" | 65 |
-| Achilles-class Battleship | Imperator | 3 | 5 | 9 | 6 | Planet Smasher 2×D12 · 12–24" | Defence Grid 4×D8 · 0–9" | 75 |
+| Destroyer | Bastion | 2 | 5 | 6 | 3 | Heavy Railguns 2×D12 · 9–18" | Turbo Blasters 8×D6 · 0–6" | 45 |
+| Cruiser | Sentinel | 3 | 6 | 7 | 4 | Cyclone Array 12×D6 · 12–24" | Defence Grid 4×D8 · 0–9" | 55 |
+| Battlecruiser | Citadel | 3 | 3 | 8 | 5 | Cruise Missiles 4×D10 · 18–36" | Turbo Blasters 8×D6 · 0–6" | 65 |
+| Battleship | Imperator | 3 | 5 | 9 | 6 | Planet Smasher 2×D12 · 12–24" | Defence Grid 4×D8 · 0–9" | 75 |
 
 ### HVP (Familiars)
 
@@ -177,6 +177,49 @@ document.
 | ODST Boarding Team | Righteous Saboteurs | When an enemy ship within 6" of a ship in this fleet is reduced to 0HP it automatically explodes, during which it counts its Mass as D3 higher. |
 | Longsword Ace | The Nameless Punk | *(May be carried by a Mass 0 unit.)* When units in this unit's battlegroup make attacks, they count their targets' Shields values as 2 lower than the listed value. |
 | Chief of the Boat | Unhinged Live-Streamer | Ships in this fleet can use the 'Red Alert' command for 0 CMD tokens. |
+
+---
+
+## Sample ¢300 lists
+
+Illustrative only — built from the ship names above, sized to a small game
+rather than to either collection in full. Both hit the limit exactly and
+carry the required 3 HVP.
+
+### Covenant, ¢300
+
+| Unit | Count | Cost each | Cost |
+|---|---|---|---|
+| Varric-pattern Assault Carrier — carries **San'Shyuum Prelate** | 1 | 80 | 80 |
+| Ket-pattern Battlecruiser — carries **Sangheili Helmsmaster** | 1 | 40 | 40 |
+| Sinaris-pattern Heavy Destroyer | 1 | 35 | 35 |
+| Ceudar-pattern Heavy Corvette | 2 | 30 | 60 |
+| Au'zur-pattern Frigate | 2 | 20 | 40 |
+| Missionary Ship — one carries **Huragok Shield Technician** | 2 | 10 | 20 |
+| Zanar-pattern Storm Cutter | 1 | 15 | 15 |
+| Seraph Wing | 1 | 10 | 10 |
+| **Total** | | | **300** |
+
+Leans on the collection as described: both heavy corvettes, a couple each of
+the Au'zur and Missionary hulls, one Zanar, one wing, and the three capitals
+(Varric/Ket/Sinaris) fielded together rather than spread across separate lists.
+
+### UNSC, ¢300
+
+| Unit | Count | Cost each | Cost |
+|---|---|---|---|
+| Carrier — carries **Veteran Battlegroup Admiral** | 1 | 70 | 70 |
+| Cruiser — carries **Overcharge Gunnery Chief** | 1 | 45 | 45 |
+| Heavy Frigate — one carries **ODST Boarding Team** | 2 | 30 | 60 |
+| Light Frigate | 3 | 20 | 60 |
+| Control Ship | 1 | 30 | 30 |
+| Gladius-class Corvette | 2 | 10 | 20 |
+| Sabre Wing | 1 | 15 | 15 |
+| **Total** | | | **300** |
+
+Built around what you already have in hand (Light and Heavy Frigates as the
+core of the fleet) plus one each of the ship types your "want" list hadn't
+gotten to yet, so this doubles as a shopping-priority guide, not just a list.
 
 ---
 

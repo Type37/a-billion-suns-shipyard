@@ -1852,8 +1852,8 @@ button { font-family: inherit; }
    seven personnel on one screen, so the air between them was costing a screen
    and a half of scrolling on its own. Everything below tightens the page
    furniture - section rules, headings, notes - without touching the controls. */
-.cf-section { margin-bottom: 18px; border-top: 2px solid var(--hair); padding-top: 10px; }
-.cf-section .panel-title { margin-bottom: 8px; }
+.cf-section { margin-bottom: 12px; border-top: 2px solid var(--hair); padding-top: 8px; }
+.cf-section .panel-title { margin-bottom: 6px; }
 .foundry-main { padding-top: clamp(14px, 2vw, 22px); }
 .foundry-main .page-title { margin-bottom: 6px; }
 .foundry-main .panel-note { margin-bottom: 12px; }
@@ -4127,8 +4127,8 @@ button { font-family: inherit; }
 .emblem-edit-cue { color: var(--ink-3); margin-left: 4px; }
 .mf-emblem .emblem-current-btn:hover .emblem-edit-cue { color: var(--blue); }
 .emblem-choose-btn {
-  display: inline-flex; align-items: center; gap: 12px; margin-top: 6px; cursor: pointer;
-  border: 1px solid var(--hair); background: var(--paper); padding: 8px 14px 8px 8px; text-align: left;
+  display: inline-flex; align-self: flex-start; align-items: center; gap: 10px; margin-top: 6px; cursor: pointer;
+  border: 1px solid var(--hair); background: var(--paper); padding: 6px 12px 6px 6px; text-align: left;
 }
 .emblem-choose-btn:hover { border-color: var(--ink); }
 .emblem-choose-preview { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; border: 1px solid var(--hair-soft); border-radius: 50%; color: var(--blue); flex-shrink: 0; }

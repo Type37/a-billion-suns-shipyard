@@ -2605,7 +2605,7 @@ function foundryEditView(state: AppState, factionId: string): string {
       <div class="cf-grid">
         <label class="field-block wide">Faction name
           <input type="text" value="${escapeHtml(f.name)}" data-action="cf-field" data-field="name" /></label>
-        <div class="field-block wide">Emblem
+        <div class="field-block">Emblem
           <button class="emblem-choose-btn" data-action="open-emblem-modal" data-target="faction">
             <span class="emblem-choose-preview">${emblemView({ emblem: "delta", ...f }, 40)}</span>
             <span class="emblem-choose-label">${icon("image", 15)} Choose emblem</span>

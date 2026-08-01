@@ -2440,10 +2440,6 @@ function foundryListView(state: AppState): string {
           </button>
           <p class="cf-new-heading">Or start from a template you can rename and change</p>
           <div class="faction-plaques">
-            <button class="faction-plaque" data-action="new-faction-template" data-template="pirate">
-              <span class="faction-plaque-name">${icon("flag", 15)} Enemy Pirate Fleet</span>
-              <span class="faction-plaque-rule">A scrappy raider fleet to fight against</span>
-            </button>
             <button class="faction-plaque" data-action="new-faction-template" data-template="solo">
               <span class="faction-plaque-name">${icon("book", 15)} Solo Fleet</span>
               <span class="faction-plaque-rule">A starter outfit of your own to build out</span>

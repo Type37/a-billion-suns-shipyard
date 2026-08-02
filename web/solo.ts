@@ -533,7 +533,6 @@ export function soloOutfitView(state: AppState): string {
   <section class="setup-band solo-band">
     <div class="setup-head">
       <div class="setup-identity">
-        <p class="band-eyebrow"><a href="#/solo">Junkspace</a></p>
         <input class="fleet-name-input" type="text" value="${escapeHtml(o.name ?? "")}" placeholder="Name this outfit" aria-label="Outfit name" data-action="outfit-name" />
       </div>
       <div class="control-group control-group-emblem">

@@ -342,7 +342,7 @@ summary { outline-offset: 2px; }
 .emblem { display: inline-block; vertical-align: middle; }
 
 /* Uppercase micro-labels: the NASA/Swiss data-label voice. */
-.hero-eyebrow, .band-eyebrow, .readout-label, .slot-label, .stat-sep,
+.readout-label, .slot-label, .stat-sep,
 .era-title, .catalog-title, .roster-section, .sheet-section, .panel-title,
 .freeplay-badge, .breadcrumb, .dock-table th, .print-stats th,
 .print-score th {
@@ -649,8 +649,6 @@ button { font-family: inherit; }
   max-width: var(--shell); margin: 0 auto;
   padding: clamp(40px, 7vw, 88px) clamp(16px, 4vw, 40px) clamp(36px, 5vw, 64px);
 }
-.hero-eyebrow { font-size: 12px; font-weight: 600; color: var(--red); margin-bottom: 14px; }
-.hero-eyebrow::before { content: ""; display: inline-block; width: 30px; height: 3px; background: var(--red); vertical-align: middle; margin-right: 12px; }
 .hero-title {
   font-family: var(--display); font-weight: 900;
   font-size: clamp(52px, 12vw, 132px); line-height: 0.86; letter-spacing: -0.03em;
@@ -973,8 +971,6 @@ button { font-family: inherit; }
 .setup-band.over { border-bottom-color: var(--red); }
 .setup-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
 .setup-identity { min-width: 0; flex: 1; }
-.band-eyebrow { font-size: 11px; font-weight: 600; color: var(--blue); margin-bottom: 8px; }
-.setup-band.over .band-eyebrow { color: var(--red-deep); }
 
 /* One grouped control row: emblem, limit, faction sit together, each labelled. */
 .setup-controls {
@@ -4061,7 +4057,6 @@ button { font-family: inherit; }
 .learn-dot:hover .learn-dot-l { color: var(--ink); }
 .learn-dot-sep { display: none; }
 
-.learn-eyebrow { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; font-size: 11px; color: var(--red); margin: 0 0 8px; }
 .learn-title { font-family: var(--display); font-weight: 900; font-size: clamp(28px, 4.4vw, 44px); line-height: 1.04; letter-spacing: -0.01em; margin: 0 0 14px; color: var(--ink); }
 .learn-lede { font-family: var(--serif); font-size: 17px; line-height: 1.6; color: var(--ink-2); max-width: 64ch; margin: 0 0 26px; }
 
@@ -4795,7 +4790,6 @@ a .icon,
 .learn-lede { font-size: 16px !important; margin-bottom: 14px !important; }
 .learn-screen > * + * { margin-top: 0; }
 .learn-sub { margin: 18px 0 3px !important; font-size: 16px !important; }
-.learn-eyebrow { margin-bottom: 4px !important; }
 .learn-progress { margin-bottom: 14px !important; }
 .learn-actions { margin-top: 20px !important; padding-top: 14px !important; }
 .learn-accs { margin-top: 12px; gap: 6px; }
@@ -5504,7 +5498,6 @@ main.play-body .roster-section::before { content: none; }
   .emblem-choose-btn { border: none; padding: 0; }
   .emblem-choose-btn .emblem-choose-label { display: none; }
   .emblem-choose-preview .emblem, .emblem-choose-preview .emblem-img { width: 34px; height: 34px; }
-  .band-eyebrow { margin-bottom: 2px; font-size: 10px; }
   .fleet-name-input { font-size: 18px; width: 100%; }
 }
 

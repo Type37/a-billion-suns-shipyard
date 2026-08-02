@@ -13,7 +13,7 @@ The **A Billion Suns 2e Shipyard**, a fleet builder for ABS 2E. Framework-free T
 
 Nothing is mid-flight. Known deferred items, in rough priority order:
 
-- **All-caps / wide letter-spacing restyle.** ~79 CSS rules use `text-transform: uppercase` + `letter-spacing` (the house "label" style: `.control-label`, `.sheet-section`, `.nfd-*`, `.learn-*`, print headers…). The user asked for the full list, then said to leave it for now. If revisited, decide once: drop the letter-spacing, sentence-case everything but tiny eyebrow labels, or keep.
+- **All-caps / wide letter-spacing restyle.** ~79 CSS rules use `text-transform: uppercase` + `letter-spacing` (the house "label" style: `.control-label`, `.sheet-section`, `.nfd-*`, `.learn-*`, print headers…). The user asked for the full list, then said to leave it for now. If revisited, decide once: drop the letter-spacing, sentence-case everything but tiny micro-labels, or keep.
 - **The "General" emblem bucket.** 88 of 153 library sigils are loose files at `web/emblems/` root, so they all land in the catch-all "General" folder. The other 11 folders are tidy. Filing those into folders is a content decision for the user, not code.
 - **Play Mode depth.** Research (see below) suggests the biggest wins would be: phase-filtered command list (show only commands legal in the current phase), per-ship damage/shield tracking, and an activation-order tracker. Currently Play Mode is a phase/round/CMD/VP tracker only.
 

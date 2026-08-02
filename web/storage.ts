@@ -242,6 +242,14 @@ export interface Onboarding {
   visits: number;
   /** True once the tutorial suggestion has been dismissed or acted on. */
   tutorialsDismissed: boolean;
+  /**
+   * True once the "want to see some examples?" offer on the Foundry page has
+   * been answered either way. It retires the big callout, not the examples
+   * themselves - a quiet button stays in the Foundry's action row so someone
+   * who said no, or who loaded them and later deleted them, can still get
+   * them (see foundryListView).
+   */
+  examplesDismissed: boolean;
   /** Ids of first-visit coachmark tours the user has finished or closed. */
   toursSeen: string[];
 }
@@ -251,6 +259,7 @@ export function loadOnboarding(): Onboarding {
   return {
     visits: o.visits ?? 0,
     tutorialsDismissed: o.tutorialsDismissed ?? false,
+    examplesDismissed: o.examplesDismissed ?? false,
     toursSeen: Array.isArray(o.toursSeen) ? o.toursSeen : [],
   };
 }

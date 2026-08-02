@@ -135,6 +135,34 @@ export const TOURS: TourDef[] = [
   },
   {
     /**
+     * The worked examples, from the 5th visit on.
+     *
+     * The offer itself lives on the Foundry page (examplesCallout in
+     * render.ts) because that is where the three factions land and where they
+     * make sense. This is the only thing that tells you it is there: nobody
+     * opens Custom Rules on a hunch that something new appeared inside it.
+     *
+     * Ahead of "fleet-sync" in this array deliberately. Both are eligible from
+     * visit 5 and activeTour takes the first, so this gets visit 5 and sync
+     * gets visit 6 - one nudge per visit instead of two stacked on one screen.
+     *
+     * Silent once the offer has been answered either way, and silent for
+     * anyone already building their own factions: they do not need the example.
+     */
+    id: "example-factions",
+    view: "home",
+    when: (s) =>
+      s.onboarding.visits >= 5 && !s.onboarding.examplesDismissed && s.customFactions.length === 0,
+    steps: [
+      {
+        selector: '.topnav a[href="#/foundry"]|.nav-fold-btn',
+        go: "#/foundry",
+        body: "Want to see some examples? There are three finished custom factions waiting under CUSTOM - the Covenant, the UNSC and the Posthuman Republic. Each one is a book faction with new names on everything, so you can see exactly how a faction of your own gets made.",
+      },
+    ],
+  },
+  {
+    /**
      * Fleet Sync, from the 5th visit on.
      *
      * By now someone has a fleet worth keeping in step across a phone and a

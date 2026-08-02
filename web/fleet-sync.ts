@@ -31,12 +31,31 @@ import {
  *   framework-free app does not otherwise have. `fetch` costs nothing extra.
  *
  * - Reuses the `dropfleet-builder` Firebase project (same author, same free
- *   Firestore instance) under its OWN top-level collection, `abs-sync`, so
- *   this app's documents never collide with Dropfleet Commander's `sync`
- *   collection even if two tokens happened to match. The API key below is
- *   not a secret - Firebase web keys ship in client JS by design, they
- *   identify the project rather than authorise anything. Access control is
- *   entirely in firestore.rules (see that file in this repo).
+ *   Firestore instance), in Dropfleet Commander's own `sync` collection, with
+ *   every document id carrying an `abs2-` prefix. The API key below is not a
+ *   secret - Firebase web keys ship in client JS by design, they identify the
+ *   project rather than authorise anything. Access control is entirely in
+ *   firestore.rules (see that file in this repo).
+ *
+ *   This started life in a separate `abs-sync` collection, which is the
+ *   tidier arrangement and did not work: Firestore has ONE published ruleset
+ *   per project, the live one is Dropfleet Commander's, and it says nothing
+ *   about `abs-sync`. Every read and write came back 403 "Missing or
+ *   insufficient permissions" and Fleet Sync was dead on arrival for anyone
+ *   who tried it. Fixing that meant somebody hand-merging two rules files in
+ *   the Firebase console and remembering to re-merge them every time either
+ *   app's rules changed - a manual step with a silent failure mode, which is
+ *   exactly the thing that had already failed once.
+ *
+ *   The prefix removes the step entirely. `match /sync/{token}` is already
+ *   live and already allows any document id of 24-200 characters, so an
+ *   `abs2-`-prefixed id is covered by rules that are published today and will
+ *   stay published as long as Dropfleet's own sync works. Collision with a
+ *   real Dropfleet token is not merely unlikely but impossible: their tokens
+ *   normalise to letters and hyphens only (`[^a-z]+` is stripped), so no
+ *   Dropfleet id can ever contain the "2". The cost is that both apps'
+ *   documents sit in one collection, which nothing in either app can observe
+ *   - `allow list: if false` means neither can enumerate it.
  *
  * - The whole list registry travels as ONE JSON string in a single `payload`
  *   field, exactly like Dropfleet's. Firestore's REST format otherwise
@@ -58,8 +77,19 @@ import {
 
 const PROJECT = "dropfleet-builder";
 const API_KEY = "AIzaSyCuVs19-E131IHSZ_smWcLLl52djAZuJ60";
-const COLLECTION = "abs-sync";
+const COLLECTION = "sync";
+/* Namespaces this app's documents inside a collection Dropfleet Commander also
+ * uses. See the header: the "2" is what makes a collision impossible. */
+const DOC_PREFIX = "abs2-";
 const BASE = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents/${COLLECTION}/`;
+
+/* The document URL for a Sync Token. The user's token is the six-word phrase;
+ * the prefix and the API key are plumbing they never see or type. Every
+ * request goes through here so no call site can forget either - remoteDelete
+ * used to omit the key, which would have been a 403 the moment it was used. */
+function docUrl(tok: string): string {
+  return `${BASE}${encodeURIComponent(DOC_PREFIX + tok)}?key=${API_KEY}`;
+}
 
 const WORDS_PER_TOKEN = 6;
 
@@ -194,7 +224,7 @@ async function failure(res: Response): Promise<Error> {
 }
 
 async function remoteGet(tok: string): Promise<SyncPayload | null> {
-  const res = await fetch(`${BASE}${encodeURIComponent(tok)}?key=${API_KEY}`, { cache: "no-store" });
+  const res = await fetch(docUrl(tok), { cache: "no-store" });
   if (res.status === 404) return null; // token has never been used
   if (!res.ok) throw await failure(res);
   const doc = (await res.json()) as { fields?: { payload?: { stringValue?: string } } };
@@ -220,7 +250,7 @@ async function remotePut(tok: string, payload: SyncPayload): Promise<void> {
     },
   };
   // PATCH upserts in the Firestore REST API, so this both creates and updates.
-  const res = await fetch(`${BASE}${encodeURIComponent(tok)}?key=${API_KEY}`, {
+  const res = await fetch(docUrl(tok), {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -229,7 +259,7 @@ async function remotePut(tok: string, payload: SyncPayload): Promise<void> {
 }
 
 async function remoteDelete(tok: string): Promise<void> {
-  const res = await fetch(`${BASE}${encodeURIComponent(tok)}?key=${API_KEY}`, { method: "DELETE" });
+  const res = await fetch(docUrl(tok), { method: "DELETE" });
   if (!res.ok && res.status !== 404) throw await failure(res);
 }
 

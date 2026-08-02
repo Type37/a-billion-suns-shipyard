@@ -1,35 +1,52 @@
 // Firestore security rules for this app's Fleet Sync feature (web/fleet-sync.ts).
 //
-// This app reuses the `dropfleet-builder` Firebase project (same author,
-// same free Firestore instance) rather than standing up a second one, under
-// its OWN top-level collection, `abs-sync`, so a document here can never
-// collide with Dropfleet Commander's `sync` collection even if two tokens
-// happened to match.
+// NOTHING NEEDS PUBLISHING FOR THIS APP. This file is a copy of what is
+// already live on the `dropfleet-builder` project, kept here so the rules
+// this app depends on are reviewable and restorable from this repo too. Read
+// it; do not paste it anywhere unless the live ruleset has been lost.
 //
-// IMPORTANT: Firestore has ONE rules document per project. This file is only
-// the `abs-sync` block - it must be merged with whatever Dropfleet Commander's
-// own firestore.rules already has for `match /sync/{token}` before publishing,
-// or publishing this file alone would take Dropfleet Commander's sync offline.
-// Paste the MERGED result into: Firebase console > Firestore Database >
-// Rules > Publish, for the dropfleet-builder project. Kept in this repo too
-// (not just Dropfleet Commander's) so the abs-sync half is reviewable and
-// restorable from here as well.
+// This app reuses the `dropfleet-builder` Firebase project (same author, same
+// free Firestore instance) rather than standing up a second one, and shares
+// Dropfleet Commander's `sync` collection, writing document ids prefixed
+// `abs2-`.
+//
+// It used to have a collection of its own, `abs-sync`, which is tidier and
+// did not work. Firestore has ONE published ruleset per project; the live one
+// is Dropfleet Commander's and it has never mentioned `abs-sync`, so every
+// read and write from this app came back 403 and Fleet Sync was dead for
+// everyone who turned it on. The fix that arrangement needed was a person
+// hand-merging two rules files in the Firebase console, and re-merging them
+// whenever either app changed - a manual step whose failure mode is a silent
+// 403 in the other app. It had already failed once.
+//
+// Sharing the collection deletes that step. The `/sync/{token}` block below
+// is live today and allows any id of 24-200 characters, so `abs2-`-prefixed
+// ids are covered by rules that stay published for as long as Dropfleet's own
+// sync works. The two apps cannot collide: Dropfleet normalises its tokens to
+// letters and hyphens only, so no Dropfleet id can ever contain the "2".
 //
 // The model is "the token IS the key" (a capability, not an account). There
 // is no Firebase Auth here on purpose: a user's Sync Token is a six-word
-// phrase that doubles as the document id. Knowing it grants read and write to
-// that one document and nothing else.
+// phrase that (with the prefix) doubles as the document id. Knowing it grants
+// read and write to that one document and nothing else.
 //
-// The single most important line below is `allow list: if false`. Without
-// it, anyone could ask Firestore to enumerate the /abs-sync collection and
-// walk every user's fleets without guessing a single token. Denying `list`
-// means a token can only be fetched by naming it exactly.
+// The single most important line below is `allow list: if false`. Without it,
+// anyone could ask Firestore to enumerate /sync and walk every user's fleets,
+// from either app, without guessing a single token. Denying `list` means a
+// token can only be fetched by naming it exactly - and it is also what keeps
+// the two apps' documents invisible to each other despite sharing a
+// collection.
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    match /abs-sync/{token} {
+    // Shared by Dropfleet Commander (bare six-word ids) and this app
+    // (`abs2-` + six words). Keep this block's shape identical to Dropfleet
+    // Commander's firestore.rules; if that file changes, mirror the change
+    // here too, and check the change does not narrow what an `abs2-` id is
+    // allowed to do.
+    match /sync/{token} {
       // Length floor: blocks probing for short/obvious ids like "test" or "a".
       // Six hyphenated words always clear this comfortably.
       function sane() {
@@ -60,31 +77,7 @@ service cloud.firestore {
       allow list: if false;
     }
 
-    // Dropfleet Commander's own collection. Copied here, not re-derived, so
-    // this file shows the FULL ruleset that must be live at once - see the
-    // header note above. Keep this block's shape identical to Dropfleet
-    // Commander's firestore.rules; if that file changes, mirror the change
-    // here too.
-    match /sync/{token} {
-      function sane() {
-        return token.size() >= 24 && token.size() <= 200;
-      }
-
-      allow get: if sane();
-
-      allow create, update: if sane()
-        && request.resource.data.keys().hasOnly(['payload', 'updatedAt', 'version'])
-        && request.resource.data.payload is string
-        && request.resource.data.payload.size() <= 900000
-        && request.resource.data.updatedAt is int
-        && request.resource.data.version is int;
-
-      allow delete: if sane();
-
-      allow list: if false;
-    }
-
-    // Everything outside /abs-sync and /sync stays closed.
+    // Everything outside /sync stays closed.
     match /{document=**} {
       allow read, write: if false;
     }

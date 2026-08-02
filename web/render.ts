@@ -2417,6 +2417,12 @@ function printView(state: AppState): string {
  * Never seeded. This asks, and only writes if the answer is yes. The old
  * `cf-covenant` seed (removed in 52c1f03) arrived uninvited in every browser
  * and had to be cleaned back out of everyone's storage afterwards.
+ *
+ * Asked ONCE, and once only. There is deliberately no standing "Load example
+ * factions" button anywhere: a question you answered should not keep sitting
+ * on the screen as a button, and the examples were only ever a way in. Anyone
+ * who says no still has Forge a faction, the templates and the clone-any-
+ * faction list, which is the same road with more steps.
  */
 const EXAMPLES_FROM_VISIT = 5;
 
@@ -2424,12 +2430,9 @@ function examplesLoaded(state: AppState): boolean {
   return state.customFactions.some((f) => (EXAMPLE_FACTION_IDS as readonly string[]).includes(f.id));
 }
 
-function examplesOnOffer(state: AppState): boolean {
-  return state.onboarding.visits >= EXAMPLES_FROM_VISIT && !examplesLoaded(state);
-}
-
 function examplesCallout(state: AppState): string {
-  if (!examplesOnOffer(state) || state.onboarding.examplesDismissed) return "";
+  if (state.onboarding.visits < EXAMPLES_FROM_VISIT) return "";
+  if (state.onboarding.examplesDismissed || examplesLoaded(state)) return "";
   // Somebody who arrived by pressing "Check it out now!" has just read the
   // pitch on the coachmark. Repeating it here, two seconds later and in
   // different words, reads as not having been listened to - so the question
@@ -2453,7 +2456,7 @@ function examplesCallout(state: AppState): string {
         </button>
         <button class="onboard-opt" data-action="dismiss-examples">
           <span class="oo-name">${icon("close", 15)} No thanks</span>
-          <span class="oo-desc">This goes away. A Load examples button stays in the row above if you change your mind.</span>
+          <span class="oo-desc">This goes away and does not come back. Forge a faction still starts you from a blank sheet, a template, or a copy of any faction in the book.</span>
         </button>
       </div>
     </div>
@@ -2522,14 +2525,6 @@ function foundryListView(state: AppState): string {
         <input type="file" accept="application/json" data-action="import-faction" hidden />
       </label>
       <button class="bar-btn" data-action="paste-faction">${icon("duplicate", 16)} Paste from clipboard</button>
-      ${
-        // Only once the callout has been answered, so the two are never on
-        // screen saying the same thing. This is the path back for anyone who
-        // said no, or who loaded the examples and later deleted them.
-        examplesOnOffer(state) && state.onboarding.examplesDismissed
-          ? `<button class="bar-btn" data-action="load-example-factions">${icon("book", 16)} Load example factions</button>`
-          : ""
-      }
     </div>
     ${examplesCallout(state)}
     ${

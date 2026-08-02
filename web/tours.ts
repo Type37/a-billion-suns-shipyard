@@ -35,34 +35,28 @@ export interface TourDef {
   when?: (state: AppState) => boolean;
 }
 
+/**
+ * THE HOME-PAGE SCHEDULE
+ *
+ *   visits 1-2   "New to A Billion Suns?" (an inline card, not a tour - see
+ *                tutorialCallout in render.ts)
+ *   visits 3+    Fleet Sync, pointing at Options
+ *   visits 5+    the example factions, pointing at Custom Rules
+ *
+ * One nudge per visit. Only one coachmark can be on screen at a time and
+ * activeTour takes the FIRST eligible entry in this array, so the home-view
+ * tours are listed in the order they are meant to fire and the gates are
+ * open-ended (">= 3", not "3 to 4"). Open-ended matters: a hard window drops
+ * the nudge on the floor for anyone who skips a session, and these are shown
+ * once each in a lifetime.
+ *
+ * There used to be a third home nudge, "foundry-tab", asking on visits 3-4
+ * whether you wanted your own faction, and then "example-factions" asked much
+ * the same thing again from visit 5. Asking twice is worse than not asking:
+ * the second time reads as not having been listened to the first time. One
+ * ask, at visit 5, is the whole of it now.
+ */
 export const TOURS: TourDef[] = [
-  {
-    /**
-     * The Foundry nudge, on the third and fourth visit.
-     *
-     * The tutorial callout owns the first two visits, so this waits until that
-     * has had its turn - two suggestions stacked on the screen you land on
-     * would be a wall. By visit three you have built something and the
-     * interesting question stops being "how do I play" and starts being "can I
-     * put MY ships in it", which is the one thing Custom Rules answers and
-     * nothing else in the app hints at.
-     *
-     * Silent for anyone who has already built one: they have found it.
-     */
-    id: "foundry-tab",
-    view: "home",
-    when: (s) => {
-      if (s.onboarding.visits < 3 || s.onboarding.visits > 4) return false;
-      return s.customFactions.length === 0;
-    },
-    steps: [
-      {
-        selector: '.topnav a[href="#/foundry"]|.nav-fold-btn',
-        go: "#/foundry",
-        body: "Do you want your own faction? Or maybe you just want to re-theme an existing one? Click up here on the CUSTOM tab and you can make your own Empire or Corporation or fleet of funny little guys!",
-      },
-    ],
-  },
   {
     id: "compendium-search",
     view: "ships",
@@ -135,16 +129,39 @@ export const TOURS: TourDef[] = [
   },
   {
     /**
-     * The worked examples, from the 5th visit on.
+     * Fleet Sync, from the 3rd visit on.
+     *
+     * The tutorial card owns the first two visits, so this is the first thing
+     * the home page says once that is done. Third rather than fifth because by
+     * now there are saved fleets on this browser and nowhere else, and the
+     * sooner someone knows that is fixable the less work is stranded when they
+     * pick up their phone.
+     *
+     * Silent once syncing is already on: they have found it.
+     */
+    id: "fleet-sync",
+    view: "home",
+    when: (s) => s.onboarding.visits >= 3 && !FleetSync.enabled(),
+    steps: [
+      {
+        selector: '.topnav-btn[data-action="open-options"]|.nav-fold-btn',
+        body: "Want the same fleets on your phone and your computer? Options has a Sync Fleets Online button now, no account needed, just a phrase you copy between devices.",
+      },
+    ],
+  },
+  {
+    /**
+     * The worked examples, from the 5th visit on. The one and only time the
+     * app asks whether you want a faction of your own.
      *
      * The offer itself lives on the Foundry page (examplesCallout in
      * render.ts) because that is where the three factions land and where they
      * make sense. This is the only thing that tells you it is there: nobody
      * opens Custom Rules on a hunch that something new appeared inside it.
      *
-     * Ahead of "fleet-sync" in this array deliberately. Both are eligible from
-     * visit 5 and activeTour takes the first, so this gets visit 5 and sync
-     * gets visit 6 - one nudge per visit instead of two stacked on one screen.
+     * After "fleet-sync" in this array, so on the visit where both are
+     * eligible sync goes first and this waits for the next one. Neither is
+     * lost and neither shares a screen.
      *
      * Silent once the offer has been answered either way, and silent for
      * anyone already building their own factions: they do not need the example.
@@ -158,25 +175,6 @@ export const TOURS: TourDef[] = [
         selector: '.topnav a[href="#/foundry"]|.nav-fold-btn',
         go: "#/foundry",
         body: "Do you want to make your *OWN* faction? There are some examples of rethemes waiting in the “Custom Rules.” Each is a faction from the book with some slight tweaks and rethemes, so you can see the easiest way to make your own.",
-      },
-    ],
-  },
-  {
-    /**
-     * Fleet Sync, from the 5th visit on.
-     *
-     * By now someone has a fleet worth keeping in step across a phone and a
-     * computer, or has at least hit the "wait, is this only on this one
-     * browser?" question. Silent once syncing is already on: they have found
-     * it.
-     */
-    id: "fleet-sync",
-    view: "home",
-    when: (s) => s.onboarding.visits >= 5 && !FleetSync.enabled(),
-    steps: [
-      {
-        selector: '.topnav-btn[data-action="open-options"]|.nav-fold-btn',
-        body: "Want the same fleets on your phone and your computer? Options has a Sync Fleets Online button now, no account needed, just a phrase you copy between devices.",
       },
     ],
   },

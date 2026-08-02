@@ -5650,7 +5650,10 @@ main.play-body .roster-section::before { content: none; }
   .sy-hvp-name > summary, .ru-carry .hvp-pop > summary,
   /* Chrome and catalogue. */
   .nav-fold-btn, .onboard-close, .comp-view-btn, .comp-filters select,
-  .comp-search, .limit-input, .print-toggle {
+  .comp-search, .limit-input, .print-toggle,
+  /* Remove-unit is the single most-tapped control in the whole builder and
+     measured a 24px box; modal-close and the rich-text toolbar were 28-30px. */
+  .ru-remove, .modal-close, .rt-btn {
     min-height: var(--tap);
     box-sizing: border-box;
   }
@@ -5660,13 +5663,14 @@ main.play-body .roster-section::before { content: none; }
      is no label holding the box open. */
   .mf-name-gen, .emblem-current-btn, .sy-hvp-check, .onboard-close, .card-act,
   .learn-dot.is-sub, .sy-ref-btn, .play-bar-print, .play-bar-reset,
-  .foundry-main .ghost-btn {
+  .foundry-main .ghost-btn, .ru-remove, .modal-close, .rt-btn {
     min-width: var(--tap);
   }
   /* Icon-only buttons centre their glyph in the grown box rather than pinning
      it to the top-left corner the padding used to put it in. */
   .mf-name-gen, .sy-hvp-check, .onboard-close, .emblem-current-btn,
-  .comp-view-btn, .sy-req-btn, .sy-ledger-btn, .print-toggle {
+  .comp-view-btn, .sy-req-btn, .sy-ledger-btn, .print-toggle,
+  .ru-remove, .modal-close {
     display: inline-flex; align-items: center; justify-content: center;
   }
   .print-toggle { justify-content: flex-start; }

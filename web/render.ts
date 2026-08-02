@@ -1070,7 +1070,7 @@ function hvpAssignPanel(list: SavedList, faction: Faction | undefined, customs: 
         <span class="hvp-assign-name">${escapeHtml(who)}</span>
         <details class="hvp-pick">
           <summary class="hvp-pick-btn ${assigned ? "is-set" : ""}">
-            ${icon("personnel", 15)}
+            ${icon("commander", 15)}
             <span class="hvp-pick-current">${assigned ? escapeHtml(assignedName) : "Choose a carrier"}</span>
             ${icon("chevronDown", 13, "hvp-pick-caret")}
           </summary>
@@ -1508,7 +1508,7 @@ function builderView(state: AppState): string {
       // size stepper at all - just a remove control in its place.
       const noStepper = !list.freePlay && r?.ship.mass === 3;
       const carryMarkup = carried.length
-        ? `<span class="ru-carry">${icon("personnel", 12)}${carried
+        ? `<span class="ru-carry">${icon("commander", 12)}${carried
             .map(
               (c) => `<details class="hvp-pop"><summary title="What does ${escapeHtml(c.name)} do?">${escapeHtml(c.name)}</summary><span class="hvp-pop-panel"><span class="hvp-pop-name">${escapeHtml(c.name)}</span><span class="hvp-pop-rule">${ruleText(c.rule)}</span></span></details>`,
             )

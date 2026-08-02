@@ -96,7 +96,11 @@ const PATHS: Record<string, string> = {
   scroll: '<path d="M7 3 H19 V17 A2 2 0 0 1 17 19 H7"/><path d="M7 3 A2 2 0 0 0 5 5 V19 A2 2 0 0 0 7 21 H17"/><line x1="9.5" y1="8" x2="16" y2="8"/><line x1="9.5" y1="12" x2="16" y2="12"/>',
   upload: '<path d="M12 15 V4"/><polyline points="7 8.5 12 3.5 17 8.5"/><path d="M4 15 V20 H20 V15"/>',
   download: '<path d="M12 4 V15"/><polyline points="7 10.5 12 15.5 17 10.5"/><path d="M4 15 V20 H20 V15"/>',
-  personnel: '<circle cx="12" cy="8" r="4"/><path d="M4 21 C4 16.5 7.5 14 12 14 C16.5 14 20 16.5 20 21"/>',
+  // HVP carrier picker. A command hierarchy - nodes and reporting lines -
+  // reads as "who's in charge here" more directly than a lone head-and-
+  // shoulders silhouette did.
+  commander:
+    '<path d="M10 5a2 2 0 1 0 4 0a2 2 0 1 0-4 0m-4 7a2 2 0 1 0 4 0a2 2 0 1 0-4 0m4 7a2 2 0 1 0 4 0a2 2 0 1 0-4 0m8 0a2 2 0 1 0 4 0a2 2 0 1 0-4 0M2 19a2 2 0 1 0 4 0a2 2 0 1 0-4 0m12-7a2 2 0 1 0 4 0a2 2 0 1 0-4 0m-9 5l2-3m2-4l2-3m2 0l2 3m2 4l2 3m-4-3l-2 3m-4-3l2 3"/>',
   filter: '<path d="M3 5 H21 L14 13 V20 L10 18 V13 Z"/>',
   shuffle: '<path d="M3 6 H7 L17 18 H21"/><polyline points="18 3 21 6 18 9"/><path d="M3 18 H7 L10.5 14"/><path d="M13.5 10 L17 6 H21"/><polyline points="18 15 21 18 18 21"/>',
   grid: '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>',

@@ -1234,7 +1234,7 @@ button { font-family: inherit; }
    out in the middle of the row where the stats should be. Art, where a row has
    it, adds its own track back. */
 .ship-row {
-  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 14px;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 7px 10px;
   border-bottom: 1px solid var(--hair-soft); border-left: 3px solid transparent; background: var(--paper);
   transition: border-color 0.12s ease, background 0.12s ease;
 }
@@ -1265,14 +1265,17 @@ button { font-family: inherit; }
 .ship-name { flex: 1 1 auto; min-width: 0; font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: -0.01em; white-space: normal; }
 .ship-cost { margin-left: auto; padding-left: 4px; font-family: var(--display); font-weight: 800; font-size: 14px; font-variant-numeric: tabular-nums; color: var(--blue); white-space: nowrap; }
 .ship-row-details {
-  display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px 22px; margin-top: 5px;
+  display: flex; flex-wrap: wrap; align-items: flex-start; gap: 4px 14px; margin-top: 3px;
 }
 .ship-row-details .stat-chips { flex: 0 0 auto; }
 .ship-row-details .weap-table { flex: 0 1 auto; margin-top: 0; }
 /* Weapons sit to the RIGHT of the four stat chips, not stacked under them. The
-   260px flex-basis lets the row wrap the weapons below only when the container
-   is genuinely too narrow (small phones), so desktop reads stats | guns. */
-.ship-row-details .weap-lines { flex: 1 1 260px; margin-top: 0; min-width: 0; }
+   flex-basis is the width below which the row gives up and stacks; 200px, not
+   the 260px it was, because the solo catalogue column is narrower than the
+   builder's and was wrapping on a desktop - which is the stacked layout this
+   rule exists to prevent. Two lines of guns beside two rows of chips is half
+   the height of the two blocks stacked, and height is the whole point. */
+.ship-row-details .weap-lines { flex: 1 1 200px; margin-top: 0; min-width: 0; }
 
 /* Weapons table: one row per weapon system, aligned columns for arc, dice,
    range and damage. Used in the catalog and the roster so weapons read the
@@ -1429,7 +1432,14 @@ button { font-family: inherit; }
 /* Solo roster: the ship's stats + weapons, so you can see what each pick does.
    .roster-unit is a 4-column grid in the roster sheet, so these span the whole
    row rather than being squeezed into an auto column (which overflowed). */
-.roster-unit-stats { margin-bottom: 6px; }
+.roster-unit-stats { margin-bottom: 0; }
+/* Guns to the RIGHT of the stats, same as the catalogue row above. Stacked,
+   this block was four lines tall (two rows of chips, two of weapons) in a card
+   that is mostly this block; beside each other it is two. Wraps back to stacked
+   below 190px of spec column, which only happens on a phone. */
+.ru-spec { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 4px 14px; }
+.ru-spec > .roster-unit-stats { flex: 0 0 auto; }
+.ru-spec > .weap-lines { flex: 1 1 190px; margin-top: 0; min-width: 0; }
 .roster-unit-sub { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; }
 .roster-unit-class { font-size: 12px; font-weight: 600; color: var(--ink-2); }
 .roster-unit-class .muted { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; }
@@ -2175,7 +2185,14 @@ button { font-family: inherit; }
 .pilot-opt.on .pilot-ico-img { filter: brightness(0) invert(1); }
 .pilot-name { font-family: var(--display); font-weight: 800; font-size: 12px; letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink); }
 .pilot-opt.on .pilot-name { color: #fff; }
-.pilot-ability { margin: 8px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+/* All three class abilities stacked in ONE grid cell, only the chosen one
+   visible. The cell is as tall as the longest of them no matter which is
+   showing, so pressing a class button cannot move the field and the button
+   underneath. See the note beside `abilities` in solo.ts. */
+.pilot-abilities { display: grid; margin-top: 5px; }
+.pilot-abilities > .pilot-ability { grid-area: 1 / 1; visibility: hidden; }
+.pilot-abilities > .pilot-ability.is-on { visibility: visible; }
+.pilot-ability { margin: 0; font-size: 12.5px; line-height: 1.4; color: var(--ink-2); }
 .pilot-ability b { color: var(--ink); }
 .solo-primer { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; font-size: 14px; color: var(--ink-2); }
 .solo-primer strong { color: var(--ink); }

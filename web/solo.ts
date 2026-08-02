@@ -223,7 +223,23 @@ function outfitTab(o: SavedOutfit): string {
           <span class="pilot-name">${p}</span>
         </button>`;
       }).join("");
-      const activePerk = BASE_PERK[s.pilotClass];
+      /*
+       * Every class's ability is rendered, and only the chosen one is visible.
+       *
+       * Rendering just the active one meant the paragraph under the picker
+       * changed length every time you pressed a class button, and the pilot
+       * name field and Remove button under it jumped up or down by a line -
+       * pressing a button must never move what is around it. The three sit in
+       * one grid cell (see .pilot-abilities), so the cell is as tall as the
+       * longest of them whichever is showing, and nothing below it can move.
+       * `visibility`, not `display`, is what keeps the box: it also takes the
+       * hidden two out of the accessibility tree.
+       */
+      const abilities = PILOT_CLASSES.map((p) => {
+        const perk = BASE_PERK[p];
+        if (!perk) return "";
+        return `<p class="pilot-ability ${s.pilotClass === p ? "is-on" : ""}"><b>${escapeHtml(perk.perkName)}.</b> ${ruleText(perk.text)}</p>`;
+      }).join("");
       return `
       <article class="roster-unit" data-roster-key="${s.id}">
         <div class="roster-unit-head">
@@ -242,7 +258,7 @@ function outfitTab(o: SavedOutfit): string {
           <div class="pilot-field">
             <span class="pilot-field-label">Pilot class</span>
             <div class="pilot-picker" role="group" aria-label="Pilot class">${pilotPicker}</div>
-            ${activePerk ? `<p class="pilot-ability"><b>${escapeHtml(activePerk.perkName)}.</b> ${ruleText(activePerk.text)}</p>` : ""}
+            <div class="pilot-abilities">${abilities}</div>
           </div>
           <label class="inline-field">Pilot name
             <input class="ship-name-input" type="text" value="${escapeHtml(s.pilotName ?? "")}" placeholder="Call sign" data-action="outfit-pilot-name" data-ship="${s.id}" />
@@ -309,13 +325,18 @@ function rollerPanel(state: AppState): string {
   // out from under your finger every time you rolled.
   return `
   <section class="solo-card solo-card-primary roller-card">
-    <h3 class="roster-section">The roller <span class="muted">the automated enemy, and setup</span></h3>
+    <h3 class="roster-section">The roller</h3>
+    <!--
+      Two buttons, not five. The initiative die, the setup scatter and the perk
+      D12 were all here and all removed: they are a plain D6/D10/D12 with the
+      result read straight off the die, so pressing a button in the app to be
+      told the number you would have read anyway is a worse version of picking
+      up a die. What is left is the pair that DO something a die cannot - look
+      a roll up on a table you would otherwise have to find in the book.
+    -->
     <div class="roller-buttons">
       ${btn("behaviour", "Hostile behaviour (D6)")}
       ${btn("glitch", "Glitch a Blip (D6)")}
-      ${btn("initiative", "Initiative die (D6)")}
-      ${btn("scatter", "Setup scatter (D10)")}
-      ${btn("perk", "Perk (D12)")}
     </div>
     <div class="roll-slot">
       ${
@@ -394,7 +415,7 @@ function playTab(state: AppState, o: SavedOutfit): string {
     ${rollerPanel(state)}
     <div class="solo-ref">
       <section class="solo-card solo-card-quiet">
-        <h3 class="roster-section">The round <span class="muted">in solo play</span></h3>
+        <h3 class="roster-section">The round</h3>
         <ul class="rule-list small">${phases}</ul>
       </section>
       <section class="solo-card solo-card-quiet">

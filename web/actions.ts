@@ -100,29 +100,10 @@ function rollTable(table: string): LastRoll {
       const row = rowFor(GLITCH_BLIP, v);
       return { table: "Glitch a Blip (D6)", value: v, result: row?.result ?? "", detail: row?.detail };
     }
-    case "initiative": {
-      const v = d(6);
-      const result = v === 1 ? "Two successes" : v === 2 || v === 3 ? "One success" : "No success";
-      return { table: "Initiative die (D6)", value: v, result, detail: "A 2 or 3 is one success; a 1 is two successes." };
-    }
-    case "scatter": {
-      const v = d(10);
-      return {
-        table: "Setup scatter (D10)",
-        value: v,
-        result: `Scatter ${v}"`,
-        detail: "Push the object that many inches in the direction of the D10's pointed top. Stop within 2\" of a table edge.",
-      };
-    }
-    case "perk": {
-      const v = d(12);
-      return {
-        table: "Perk (D12)",
-        value: v,
-        result: `Perk ${v}`,
-        detail: "Take that numbered perk from the pilot's class list. If you already have it, pick another from the list.",
-      };
-    }
+    // No "initiative", "scatter" or "perk" cases. Those three were a D6, a D10
+    // and a D12 whose result was the number itself, so the button only told you
+    // what the die in your hand already says. The two above earn their place by
+    // looking a roll up on a table.
     default:
       return { table, value: d(6), result: "" };
   }
@@ -1449,11 +1430,13 @@ function dispatchAction(target: HTMLElement): void {
       const outfit: SavedOutfit = {
         ...createOutfit(),
         name: typed || preset.name,
+        // No shipName: the presets do not carry one (see starter-outfits.ts).
+        // An unnamed ship shows its class in the field, which says what it is
+        // and leaves the naming available.
         ships: preset.ships.map((s2) => ({
           id: newId("os"),
           shipClassId: s2.shipClassId,
           pilotClass: s2.pilotClass,
-          shipName: s2.shipName,
           pilotName: s2.pilotName,
         })),
       };

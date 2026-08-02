@@ -305,6 +305,18 @@ export interface AppState {
     };
     /** In-progress first-visit coachmark tour, once the user has advanced past step 0. */
     tour?: { tourId: string; step: number };
+    /**
+     * True for the rest of this session once the "example-factions" coachmark
+     * has handed off to the Foundry. The coachmark already asked whether you
+     * want to make your own faction, so the offer waiting on that page drops
+     * its own version of the question and shows only the answer buttons -
+     * asking twice in two seconds reads as not having been listened to.
+     *
+     * Deliberately not persisted. It describes one handoff, not a setting: on
+     * a later visit, arriving at Custom Rules cold, the question is worth
+     * asking again because nothing on that screen has asked it.
+     */
+    examplesIntroduced?: boolean;
     /** Print-setup options. Persisted (abs2.print.v1) so reprinting after an
      * edit is one click. `rules` prints the faction rule + commands reference;
      * on by default so a first-time printer gets it. */

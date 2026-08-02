@@ -1089,6 +1089,12 @@ function dispatchAction(target: HTMLElement): void {
       // Close first. That repaints the page, so the element resolved below is
       // the live one and not a node the re-render is about to throw away.
       finishTour(tourId);
+      // The examples coachmark has just asked the question the Foundry's own
+      // offer asks. Tell that page it has been asked already (see
+      // examplesCallout), so the two do not say the same sentence in a row.
+      if (tourId === "example-factions") {
+        store.setState((s) => ({ ...s, ui: { ...s.ui, examplesIntroduced: true } }));
+      }
       if (href) {
         location.hash = href;
         break;

@@ -2430,11 +2430,22 @@ function examplesOnOffer(state: AppState): boolean {
 
 function examplesCallout(state: AppState): string {
   if (!examplesOnOffer(state) || state.onboarding.examplesDismissed) return "";
+  // Somebody who arrived by pressing "Check it out now!" has just read the
+  // pitch on the coachmark. Repeating it here, two seconds later and in
+  // different words, reads as not having been listened to - so the question
+  // and its standfirst drop and only the answer stays. Arriving cold, on a
+  // later visit or by clicking Custom Rules directly, still gets both: nothing
+  // on this screen has asked anything yet.
+  const asked = state.ui.examplesIntroduced === true;
   return `
   <aside class="onboard">
     <div class="onboard-main">
-      <p class="onboard-title">Want to see some examples?</p>
-      <p class="onboard-note">Three finished custom factions, each one a book faction with new names on everything &ndash; so their stats are already balanced, and the whole trick is visible.</p>
+      ${
+        asked
+          ? ""
+          : `<p class="onboard-title">Want to see some examples?</p>
+      <p class="onboard-note">Three finished custom factions, each one a book faction with new names on everything &ndash; so their stats are already balanced, and the whole trick is visible.</p>`
+      }
       <div class="onboard-options">
         <button class="onboard-opt" data-action="load-example-factions">
           <span class="oo-name">${icon("plus", 15)} Yes, load the examples</span>
@@ -3634,22 +3645,36 @@ function tourPopover(state: AppState): string {
    */
   const tourEmphasis = (body: string): string =>
     escapeHtml(body).replace(/\*([^*]+)\*/g, "<em>$1</em>");
-  // Every feature tooltip ends in the same pair: dismiss on the left, go and see
-  // it on the right. There is no Skip - "Got it" already closes the thing for
-  // good, and two words for one outcome only made the reader choose between
-  // them. A multi-step tour keeps Next in the primary slot until its last step.
+  /**
+   * One button in the footer, and a way out in the corner.
+   *
+   * This used to be a pair - "Got it" beside "Check it out now!" - which put
+   * two buttons of similar weight side by side and made the reader choose
+   * between them, when only one of the two is the thing the coachmark exists
+   * to say. The close moved to the corner, where a dismissal belongs and where
+   * nobody has to read it to get past it. A multi-step tour keeps Next in the
+   * one footer slot until its last step.
+   *
+   * Icon-only, against the house rule that every button pairs an icon with a
+   * label: a corner close is the one control whose meaning is carried entirely
+   * by its position, and the label would be louder than the thing it closes.
+   * It carries a title and an aria-label so it is still named to anyone who
+   * hovers it or hears it.
+   */
   const primary = isLast
     ? `<button class="tour-go" data-action="tour-go" data-tour="${tour.id}" data-target="${escapeHtml(s.selector)}" ${s.go ? `data-href="${escapeHtml(s.go)}"` : ""}>${icon("chevronRight", 15)} Check it out now!</button>`
     : `<button class="tour-next" data-action="tour-next" data-tour="${tour.id}" data-step="${step}" data-len="${tour.steps.length}">${icon("chevronRight", 15)} Next</button>`;
   return `
   <div class="tour-pop" data-target="${escapeHtml(s.selector)}">
     <div class="tour-pop-arrow"></div>
-    ${s.title ? `<div class="tour-head"><h4 class="tour-title">${escapeHtml(s.title)}</h4></div>` : ""}
+    <div class="tour-head">
+      ${s.title ? `<h4 class="tour-title">${escapeHtml(s.title)}</h4>` : ""}
+      <button class="tour-close" data-action="tour-dismiss" data-tour="${tour.id}" title="Dismiss" aria-label="Dismiss">${icon("close", 15)}</button>
+    </div>
     <p class="tour-body">${tourEmphasis(s.body)}</p>
     <div class="tour-foot">
       <span class="tour-dots">${dots}</span>
       <span class="tour-btns">
-        <button class="tour-got" data-action="tour-dismiss" data-tour="${tour.id}">${icon("check", 15)} Got it</button>
         ${primary}
       </span>
     </div>

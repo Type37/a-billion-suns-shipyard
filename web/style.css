@@ -563,10 +563,13 @@ button { font-family: inherit; }
   .bar-btn, .ghost-btn, .cta-btn, .stepper-btn, .nf-opt, .card-act,
   .mf-menu-btn, .mf-tally-cap, .nf-custom-btn, .switcher-opt, .learn-btn,
   .cg-build, .comp-groupcheck, .control-group, .add-cue,
-  .learn-dot, .tour-got, .tour-go, .tour-next, .play-bar-id a {
+  .learn-dot, .tour-close, .tour-go, .tour-next, .play-bar-id a {
     min-height: 44px;
   }
-  .learn-dot, .tour-got, .tour-go, .tour-next { display: inline-flex; align-items: center; }
+  .learn-dot, .tour-go, .tour-next { display: inline-flex; align-items: center; }
+  /* A real target in both directions. It owns its own row, so growing it
+     pushes nothing sideways. */
+  .tour-close { min-width: 44px; }
   /* The faction name is the way into the editor, so it is a control, not prose. */
   .cell-name a { display: inline-flex; align-items: center; min-height: 44px; }
   .play-bar-id a { display: inline-flex; align-items: center; }
@@ -3952,11 +3955,25 @@ button { font-family: inherit; }
   border-bottom: 2px solid var(--color-line);
   border-right: 2px solid var(--color-line);
 }
-.tour-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px 0; }
+/* The way out, in the corner. Red because it is the only destructive-feeling
+   thing in the box and because it has to read as "close" at 15px with no label
+   beside it.
+   In normal flow, NOT absolutely positioned: a coachmark step often has no
+   title, and an absolute close would sit on top of the first line of the body
+   in exactly those cases. Owning a row costs 28px of height and cannot overlap
+   anything. */
+.tour-close {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  margin-left: auto;
+  padding: 0;
+  background: transparent; border: none; cursor: pointer;
+  color: var(--red-deep);
+}
+.tour-close:hover { color: var(--red); }
+.tour-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 6px 0 14px; }
 .tour-title { font-family: var(--display); font-weight: 800; font-size: 15px; letter-spacing: -0.01em; color: var(--color-ink); }
 .tour-body { font-family: var(--sans); font-size: 13px; line-height: 1.45; color: var(--ink-2); padding: 8px 14px 14px; }
-/* A titleless step has no head above it, so the body carries the top padding. */
-.tour-pop-arrow + .tour-body { padding-top: 14px; }
 .tour-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 14px 14px; }
 /* Dismiss then go, always in that order. They wrap rather than shrink: "Check
    it out now!" is the button's whole meaning and must never be clipped. */

@@ -157,7 +157,7 @@ export const TOURS: TourDef[] = [
       {
         selector: '.topnav a[href="#/foundry"]|.nav-fold-btn',
         go: "#/foundry",
-        body: "Want to see some examples? There are three finished custom factions waiting under CUSTOM - the Covenant, the UNSC and the Posthuman Republic. Each one is a book faction with new names on everything, so you can see exactly how a faction of your own gets made.",
+        body: "Do you want to make your *OWN* faction? There are some examples of rethemes waiting in the “Custom Rules.” Each is a faction from the book with some slight tweaks and rethemes, so you can see the easiest way to make your own.",
       },
     ],
   },

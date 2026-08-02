@@ -154,7 +154,10 @@ const COVENANT: Faction = reskin(THE_ORDINATE, {
   id: "cf-example-covenant",
   name: "The Covenant",
   prefix: "cov",
-  emblemLib: "nonhuman/CovenantEye.svg",
+  // The Halo 1 symbol, not the "eye" glyph also in the library: it is the mark
+  // that reads as Covenant at 46px, which is the size an emblem is actually
+  // drawn at everywhere in the app.
+  emblemLib: "nonhuman/Halo1_-_Covenant_Symbol.webp",
   playstyle:
     "Fastest to act in the game and brutal at close range, weaker at long. Get the first word in, then let passive fire punish anything that closes.",
   backstory:

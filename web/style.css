@@ -1009,29 +1009,36 @@ button { font-family: inherit; }
 /* EMBLEMS ARE ROUND. Raster art is clipped to a disc wherever it appears - the
    picker, the header button, the roster, the printed sheet.
 
-   This is also what got rid of the backgrounds. Most of the library arrives as
-   circular badge art painted onto a square canvas, so the corners were a block
-   of flat colour around the mark - the thing that made these read as stickers
-   rather than insignia. Clipping to the disc removes exactly those corners and
-   leaves the artwork's own ground as the fill, which is how the art was drawn to
-   be seen. Nothing is painted behind a mark any more; the shape does the
-   separating that a coloured tile used to.
+   SQUARE, NOT A DISC, and `contain`, not `cover`. This reverses what used to be
+   here, and the reasoning it reverses is worth keeping because it was right
+   about a real thing and wrong about how general it was.
 
-   `cover`, not `contain`, and that reverses an earlier decision worth stating.
-   `contain` was here because a non-square mark lost its ends to `cover` - a wide
-   wordmark lost both. The library no longer holds any: the marks that were not
-   square (three 2:1 stickers, a wordmark, four odd crops) are gone, and every
-   one that remains is square within 2%, where the two are identical. What can
-   still be non-square is an UPLOAD, and inside a round frame `cover` is the
-   right answer for those too - a centre crop fills the disc, where `contain`
-   would letterbox a wide image into a thin band and then clip its ends off with
-   the curve anyway.
+   The disc existed to delete backgrounds. A lot of the library is circular badge
+   art painted onto a square canvas, so the corners were a block of flat colour
+   around the mark - the thing that made those read as stickers rather than
+   insignia - and clipping to the disc removed exactly those corners and nothing
+   else. For that art it works perfectly, and it still does: a round mark inside
+   a square box looks identical whether or not you clip the corners off an empty
+   canvas.
 
-   Built-in vector glyphs are NOT clipped: they are free-standing shapes on
-   nothing, with no ground to remove, and the delta's bottom corners sit in the
-   corners of its box - a disc would slice them off to fix a problem they do not
-   have. */
-.emblem-img { object-fit: cover; display: block; border-radius: 50%; }
+   It only works for that art. The library also holds marks drawn as SQUARES -
+   rounded-square tiles with the glyph inset, and full-bleed pictures where the
+   image runs to all four edges. The disc took a bite out of every one of them:
+   it cut the corners off tiles that were designed to have corners, and it
+   cropped scenes down to a porthole. That is content clipping to fix a problem
+   those files do not have, and no rule can tell the two kinds apart from the
+   pixels - a black field is a chroma background on one file and the design
+   itself on the next.
+
+   So the frame stops having an opinion about the artwork's shape. Every mark is
+   drawn whole, in its own silhouette, and the ones with a coloured canvas show
+   their canvas. `contain` follows from the same principle: a non-square upload
+   letterboxes rather than losing its ends to a centre crop.
+
+   Built-in vector glyphs were never clipped, for the same reason now applied to
+   everything: they are free-standing shapes on nothing, and the delta's bottom
+   corners sit in the corners of its box. */
+.emblem-img { object-fit: contain; display: block; }
 /* Emblem art renders in full colour, in the picker and everywhere it lands. */
 .emblem-img, .lib-icon img { filter: none; }
 /* Per-ship-class art upload in the Foundry ship editor. */
@@ -1090,7 +1097,7 @@ button { font-family: inherit; }
    mark is without painting anything behind it, and a white mark on white now
    reads by its own edge against that ring. Square tiles around round marks were
    also the last place the grid still looked like a sticker sheet. */
-.lib-icon { padding: 5px; border: 1px solid var(--hair-soft); border-radius: 50%; aspect-ratio: 1; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--paper); }
+.lib-icon { padding: 5px; border: 1px solid var(--hair-soft); aspect-ratio: 1; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--paper); }
 /* No content-visibility here, despite the 250-tile grid looking like the textbook
    case for it. Measured on this grid it saved about 1ms of a 14ms keystroke: the
    cost was never tile layout, it was image weight, and downscaled thumbnails
@@ -1098,7 +1105,7 @@ button { font-family: inherit; }
    extra moving part for 1ms. */
 .lib-icon:hover { border-color: var(--ink); }
 .lib-icon.selected { border-color: var(--blue); box-shadow: 0 0 0 2px var(--blue); }
-.lib-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; min-height: 0; }
+.lib-icon img { width: 100%; height: 100%; object-fit: contain; min-height: 0; }
 /* No .lib-icon-name rules: the caption under each tile is gone (see
    iconLibraryGrid in emblems.ts). The name lives on title/aria-label now. */
 
@@ -4183,7 +4190,7 @@ button { font-family: inherit; }
   border: 1px solid var(--hair); background: var(--paper); padding: 6px 12px 6px 6px; text-align: left;
 }
 .emblem-choose-btn:hover { border-color: var(--ink); }
-.emblem-choose-preview { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; border: 1px solid var(--hair-soft); border-radius: 50%; color: var(--blue); flex-shrink: 0; }
+.emblem-choose-preview { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; border: 1px solid var(--hair-soft); color: var(--blue); flex-shrink: 0; }
 .emblem-choose-preview .emblem, .emblem-choose-preview .emblem-img { width: 34px; height: 34px; }
 .emblem-choose-label { display: inline-flex; align-items: center; gap: 7px; font-family: var(--sans); font-weight: 700; font-size: 14px; color: var(--ink); }
 
@@ -4192,10 +4199,10 @@ button { font-family: inherit; }
 .em-modal .modal-header, .em-modal .em-tabs, .em-modal .em-foot { flex: none; }
 .em-modal .em-body { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
 .em-head { display: flex; align-items: center; gap: 12px; }
-/* Round, like every other emblem frame. The wash behind it stays: this one sits
+/* Square, like every other emblem frame. The wash behind it stays: this one sits
    on the modal's blue header band, where it is a well for the preview rather
    than a ground painted behind a mark out in the page. */
-.em-preview { display: inline-flex; width: 56px; height: 56px; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,0.14); color: #fff; flex-shrink: 0; }
+.em-preview { display: inline-flex; width: 56px; height: 56px; align-items: center; justify-content: center; background: rgba(255,255,255,0.14); color: #fff; flex-shrink: 0; }
 .em-preview .emblem, .em-preview .emblem-img { width: 44px; height: 44px; }
 .em-tabs { display: flex; border-bottom: 1px solid var(--hair); }
 .em-tab { flex: 1; padding: 12px 8px; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-family: var(--sans); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3); }

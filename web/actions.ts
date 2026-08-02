@@ -40,6 +40,7 @@ import {
 import type { AppState, LastRoll, PrintOpts, ShipFilter } from "./state.ts";
 import { RANDOM_BEHAVIOUR, GLITCH_BLIP, type RollRow } from "../src/data/junkspace-solo.ts";
 import { STARTER_OUTFITS } from "../src/data/starter-outfits.ts";
+import { EXAMPLE_FACTIONS } from "./example-factions.ts";
 import { renderMarkdown } from "./richtext.ts";
 import { LIB_PAGE, libraryIcon, randomIconId } from "./emblems.ts";
 import { EMBLEM_IDS } from "./icons.ts";
@@ -1970,6 +1971,41 @@ function dispatchAction(target: HTMLElement): void {
         return { ...s, customFactions };
       });
       location.hash = routeHash({ view: "foundry", factionId: faction.id });
+      break;
+    }
+    case "load-example-factions": {
+      // The three worked examples (example-factions.ts), written into the
+      // user's own custom-faction store as ordinary factions they own.
+      //
+      // structuredClone matters: EXAMPLE_FACTIONS are module constants, and
+      // the Foundry editor mutates what it is given. Without the copy, editing
+      // a loaded example would reach back and edit the template every other
+      // browser tab in this session renders from.
+      //
+      // Re-loading skips whatever is already there rather than duplicating it,
+      // so someone who deleted one of the three and pressed the button again
+      // gets that one back and no second copy of the other two.
+      const have = new Set(state.customFactions.map((f) => f.id));
+      const additions = EXAMPLE_FACTIONS.filter((f) => !have.has(f.id)).map((f) => structuredClone(f));
+      store.setState((s) => {
+        const customFactions = [...s.customFactions, ...additions];
+        persistCustomFactions(customFactions);
+        const onboarding = { ...s.onboarding, examplesDismissed: true };
+        persistOnboarding(onboarding);
+        return { ...s, customFactions, onboarding };
+      });
+      showToast(
+        additions.length === 1 ? `Loaded "${additions[0]?.name}".` : `Loaded ${additions.length} example factions.`,
+        { icon: "check" },
+      );
+      break;
+    }
+    case "dismiss-examples": {
+      store.setState((s) => {
+        const onboarding = { ...s.onboarding, examplesDismissed: true };
+        persistOnboarding(onboarding);
+        return { ...s, onboarding };
+      });
       break;
     }
     case "clone-faction": {

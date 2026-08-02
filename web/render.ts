@@ -26,6 +26,7 @@ import {
 import pkg from "../package.json";
 import { learnDiagram } from "./diagrams.ts";
 import { FACTION_LORE } from "./faction-lore.ts";
+import { EXAMPLE_FACTION_IDS } from "./example-factions.ts";
 import type { AppState } from "./state.ts";
 import { activeList, activeOutfit, DEFAULT_PRINT, PAPER } from "./state.ts";
 import type { SavedList, UnitPosition } from "./storage.ts";
@@ -2402,6 +2403,52 @@ function printView(state: AppState): string {
 // Foundry (custom factions)
 // ---------------------------------------------------------------------------
 
+/**
+ * "Want to see some examples?" - the offer that puts the three worked-example
+ * factions (see example-factions.ts) into someone's browser.
+ *
+ * Held back until the fifth visit on purpose. The first two belong to the
+ * tutorial callout, the Foundry coachmark takes the third and fourth, and by
+ * the fifth you have built fleets and the interesting question has moved on
+ * from "how do I play" to "how would I make one of my own" - which is the
+ * question three finished factions answer better than any explanation. Landing
+ * them on day one would just be three fleets in the way.
+ *
+ * Never seeded. This asks, and only writes if the answer is yes. The old
+ * `cf-covenant` seed (removed in 52c1f03) arrived uninvited in every browser
+ * and had to be cleaned back out of everyone's storage afterwards.
+ */
+const EXAMPLES_FROM_VISIT = 5;
+
+function examplesLoaded(state: AppState): boolean {
+  return state.customFactions.some((f) => (EXAMPLE_FACTION_IDS as readonly string[]).includes(f.id));
+}
+
+function examplesOnOffer(state: AppState): boolean {
+  return state.onboarding.visits >= EXAMPLES_FROM_VISIT && !examplesLoaded(state);
+}
+
+function examplesCallout(state: AppState): string {
+  if (!examplesOnOffer(state) || state.onboarding.examplesDismissed) return "";
+  return `
+  <aside class="onboard">
+    <div class="onboard-main">
+      <p class="onboard-title">Want to see some examples?</p>
+      <p class="onboard-note">Three finished custom factions, each one a book faction with new names on everything &ndash; so their stats are already balanced, and the whole trick is visible.</p>
+      <div class="onboard-options">
+        <button class="onboard-opt" data-action="load-example-factions">
+          <span class="oo-name">${icon("plus", 15)} Yes, load the examples</span>
+          <span class="oo-desc">The Covenant, the UNSC and the Posthuman Republic land in your list below. They are yours: edit, rename or delete any of them.</span>
+        </button>
+        <button class="onboard-opt" data-action="dismiss-examples">
+          <span class="oo-name">${icon("close", 15)} No thanks</span>
+          <span class="oo-desc">This goes away. A Load examples button stays in the row above if you change your mind.</span>
+        </button>
+      </div>
+    </div>
+  </aside>`;
+}
+
 function foundryListView(state: AppState): string {
   const rows = state.customFactions
     .map(
@@ -2464,7 +2511,16 @@ function foundryListView(state: AppState): string {
         <input type="file" accept="application/json" data-action="import-faction" hidden />
       </label>
       <button class="bar-btn" data-action="paste-faction">${icon("duplicate", 16)} Paste from clipboard</button>
+      ${
+        // Only once the callout has been answered, so the two are never on
+        // screen saying the same thing. This is the path back for anyone who
+        // said no, or who loaded the examples and later deleted them.
+        examplesOnOffer(state) && state.onboarding.examplesDismissed
+          ? `<button class="bar-btn" data-action="load-example-factions">${icon("book", 16)} Load example factions</button>`
+          : ""
+      }
     </div>
+    ${examplesCallout(state)}
     ${
       state.customFactions.length === 0
         ? '<p class="muted">No custom factions yet.</p>'

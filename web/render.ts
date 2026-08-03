@@ -31,6 +31,7 @@ import { activeList, activeOutfit, DEFAULT_PRINT, PAPER } from "./state.ts";
 import type { SavedList, UnitPosition } from "./storage.ts";
 import { FleetSync } from "./fleet-sync.ts";
 import { soloListView, soloOutfitView, newOutfitModal } from "./solo.ts";
+import { learnView } from "./learn.ts";
 import { activeTour } from "./tours.ts";
 
 // The whole app renders from state into #app. Interactive elements carry
@@ -478,8 +479,14 @@ function toast(state: AppState): string {
 }
 
 
-// A first-run nudge toward the tutorials, shown only on the first two visits
-// (or until dismissed / a tutorial is taken). Stored in localStorage.
+// A first-run nudge, shown only on the first two visits (or until dismissed / a
+// tutorial is taken). Stored in localStorage.
+//
+// This card used to offer the two Basic Training scenarios directly, which
+// answered "which tutorial game shall I set up" for someone who had not yet been
+// told what the game is. It points at Learn to Play now, and so does the
+// permanent home row: there is one front door for a new player, not two that
+// lead to different places.
 function tutorialCallout(state: AppState): string {
   const o = state.onboarding;
   if (o.tutorialsDismissed || o.visits > 2) return "";
@@ -487,16 +494,12 @@ function tutorialCallout(state: AppState): string {
   <aside class="onboard">
     <div class="onboard-main">
       <p class="onboard-title">New to A Billion Suns?</p>
-      <p class="onboard-note">Start with the Combat Simulator.</p>
+      <p class="onboard-note">Start here. What the game is, what you need, and a full round of play.</p>
       <div class="onboard-options">
-        <button class="onboard-opt" data-action="new-training" data-mode="combat-simulator">
-          <span class="oo-name">${icon("book", 15)} Combat Simulator</span>
-          <span class="oo-desc">Learn the core game. A quick skirmish with a ready-made fleet: move, shoot, and activate your battlegroups.</span>
-        </button>
-        <button class="onboard-opt" data-action="new-training" data-mode="management-training">
-          <span class="oo-name">${icon("book", 15)} Management Training</span>
-          <span class="oo-desc">Learn the economy. Buy a Shipyard, then requisition and jump ships into play as the game unfolds.</span>
-        </button>
+        <a class="onboard-opt" href="#/learn">
+          <span class="oo-name">${icon("book", 15)} Learn to Play</span>
+          <span class="oo-desc">Pick an era, get your table ready, and walk the four phases of a round &mdash; then set up your first battle from the end of it.</span>
+        </a>
       </div>
     </div>
     <button class="onboard-close" data-action="dismiss-tutorials" aria-label="Dismiss">${icon("close", 16)}</button>
@@ -543,7 +546,7 @@ function homeView(state: AppState): string {
         ${row("#/fleets", "Fleets", "Build, save, print, and share fleet lists and shipyards for any faction and era.")}
         ${row("#/solo", "Solo Play", "Play the Junkspace in solo/campaign mode.")}
         ${row("#/ships", "Ship Compendium", "Compare all ships and stats.")}
-        ${row("#/learn", "Learn to Play", "A guided walkthrough of the rules.")}
+        ${row("#/learn", "Learn to Play", "New here? What the game is, what you need, and how a round works.")}
         ${row("#/foundry", "Custom Rules", "Design your own factions, ship classes, and personnel.")}
       </nav>
     </div>
@@ -3967,9 +3970,9 @@ function learnActivationDemo(): string {
   </svg>`;
 }
 
-function learnView(state: AppState): string {
-  const step = state.route.view === "learn" ? state.route.step : 0;
-  const anchor = state.route.view === "learn" ? state.route.anchor : undefined;
+function learnClassicView(state: AppState): string {
+  const step = state.route.view === "learn-classic" ? state.route.step : 0;
+  const anchor = state.route.view === "learn-classic" ? state.route.anchor : undefined;
 
   // Two rows, not one. The phase links used to live inside step 4's chip, which
   // made that one chip as wide as four links and shoved "Battle" out to the far
@@ -3977,7 +3980,7 @@ function learnView(state: AppState): string {
   // track of five steps on top, the four phases of step 4 underneath it.
   const chips = LEARN_STEPS.map(
     (s2, i) =>
-      `<a class="learn-dot ${i === step ? "on" : ""} ${i < step ? "done" : ""}" href="#/learn${i > 0 ? "/" + i : ""}"><span class="learn-dot-n">${i + 1}</span><span class="learn-dot-l">${escapeHtml(s2.label)}</span></a>`,
+      `<a class="learn-dot ${i === step ? "on" : ""} ${i < step ? "done" : ""}" href="#/learn-classic${i > 0 ? "/" + i : ""}"><span class="learn-dot-n">${i + 1}</span><span class="learn-dot-l">${escapeHtml(s2.label)}</span></a>`,
   )
     .concat([
       `<button class="learn-dot learn-dot-go" data-action="learn-launch"><span class="learn-dot-n">${LEARN_STEPS.length + 1}</span><span class="learn-dot-l">Battle</span></button>`,
@@ -3988,7 +3991,7 @@ function learnView(state: AppState): string {
   const subs = ROUND_PHASES.map((p2) => {
     const slug = phaseSlug(p2.name);
     const on = phaseStep === step && anchor === slug;
-    return `<a class="learn-dot is-sub ${on ? "on" : ""}" href="#/learn/${phaseStep}/${slug}"><span class="learn-dot-l">${escapeHtml(p2.name.replace(" Phase", ""))}</span></a>`;
+    return `<a class="learn-dot is-sub ${on ? "on" : ""}" href="#/learn-classic/${phaseStep}/${slug}"><span class="learn-dot-l">${escapeHtml(p2.name.replace(" Phase", ""))}</span></a>`;
   }).join("");
   // The phase row belongs to step 4, so it starts under step 4. Invisible copies
   // of the chips before it reserve exactly their width (same markup, same font),
@@ -4035,7 +4038,7 @@ function learnView(state: AppState): string {
 
   // One phase, stated once. The name and the Quick Reference summary live in the
   // header, the detail in the body, and nothing repeats either of them. Opening
-  // is driven by the URL, so #/learn/3/tactical is a real, shareable link to the
+  // is driven by the URL, so #/learn-classic/3/tactical is a real, shareable link to the
   // Tactical Phase rather than a scroll position.
   const phaseAccordion = (i: number, body: string) => {
     const ph = ROUND_PHASES[i]!;
@@ -4183,7 +4186,7 @@ function learnView(state: AppState): string {
   ];
 
   const atEnd = step >= LEARN_STEPS.length - 1;
-  const backHref = step > 0 ? `#/learn${step - 1 > 0 ? "/" + (step - 1) : ""}` : "#/";
+  const backHref = step > 0 ? `#/learn-classic${step - 1 > 0 ? "/" + (step - 1) : ""}` : "#/";
   const backLabel = step > 0 ? `${icon("chevronRight", 16, "flip-x")} Back` : `${icon("home", 16)} Home`;
   // At the end, Next becomes the launch itself rather than a link to a page whose
   // only job was to hold the same button.
@@ -4194,7 +4197,7 @@ function learnView(state: AppState): string {
       ${
         atEnd
           ? `<button class="learn-btn learn-btn-next" data-action="learn-launch">${icon("flag", 16)} Start the battle</button>`
-          : `<a class="learn-btn learn-btn-next" href="#/learn/${step + 1}">Next ${icon("chevronRight", 16)}</a>`
+          : `<a class="learn-btn learn-btn-next" href="#/learn-classic/${step + 1}">Next ${icon("chevronRight", 16)}</a>`
       }
     </div>`;
 
@@ -4362,7 +4365,11 @@ export function render(state: AppState): string {
       case "play":
         return playView(state);
       case "learn":
-        return learnView(state);
+        return `${topbar()}${learnView(state)}${toast(state)}${footer()}`;
+      // Archived. Unlinked from the app since the Learn to Play rewrite, but
+      // still routed so that old shared links keep working. See state.ts.
+      case "learn-classic":
+        return learnClassicView(state);
     }
   })();
   return `${body}${optionsModal(state)}${syncModal(state)}${emblemModal(state)}${newOutfitModal(state)}${confirmModal(state)}${tourPopover(state)}`;

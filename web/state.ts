@@ -56,7 +56,8 @@ export type Route =
   | { view: "solo-outfit"; outfitId: string }
   | { view: "ships" }
   | { view: "play"; listId: string }
-  | { view: "learn"; step: number; anchor?: string };
+  | { view: "learn"; tab?: string }
+  | { view: "learn-classic"; step: number; anchor?: string };
 
 // Kept as a literal rather than derived from ROUND_PHASES: the router must not
 // depend on the rules data, and these four strings are URL surface now, so they
@@ -65,6 +66,17 @@ const PHASE_SLUGS = ["command", "jump", "tactical", "end"] as const;
 const phaseSlugFor = (i: number): string => PHASE_SLUGS[i] ?? "command";
 /** 0 Mission, 1 Your fleet, 2 The table, 3 The round. Battle is an action, not a page. */
 const LEARN_LAST_STEP = 3;
+
+/**
+ * The tabs of the current Learn to Play page, as URL surface.
+ *
+ * Named, not numbered, and that is what keeps the archived walkthrough alive at
+ * the same root: `#/learn/tactical` is the new page, `#/learn/3` is a link from
+ * the old one, and the two can never be confused for each other because one is
+ * a word and the other is a digit. Old numbered links are redirected into
+ * `#/learn-classic`, which is unlinked from the app but still resolves.
+ */
+const LEARN_TAB_IDS = ["eras", "prepare", "command", "jump", "tactical", "end"] as const;
 
 export function parseRoute(hash: string): Route {
   const h = hash.replace(/^#/, "");
@@ -76,9 +88,21 @@ export function parseRoute(hash: string): Route {
   if (parts[0] === "solo") return parts[1] ? { view: "solo-outfit", outfitId: parts[1] } : { view: "solo" };
   if (parts[0] === "ships") return { view: "ships" };
   if (parts[0] === "play" && parts[1]) return { view: "play", listId: parts[1] };
-  if (parts[0] === "learn") {
+  if (parts[0] === "learn" && !/^\d+$/.test(parts[1] ?? "")) {
+    // The current Learn to Play: one long page, six named tabs. An unknown tab
+    // name lands on the first section rather than 404ing, because the tab is a
+    // scroll position on a page that is entirely present either way.
+    const tab = LEARN_TAB_IDS.find((t) => t === parts[1]);
+    return tab ? { view: "learn", tab } : { view: "learn" };
+  }
+  if (parts[0] === "learn" || parts[0] === "learn-classic") {
+    // The archived five-page walkthrough. Unlinked from the app since the
+    // rewrite, but every URL anyone ever shared still resolves - including the
+    // numbered `#/learn/3/tactical` form, which is why a numeric first segment
+    // under `learn` falls through to here.
+    //
     // 0 Mission, 1 Fleet, 2 Table, 3 Round, 4 Launch. The four phases are
-    // accordions inside step 3, addressed as #/learn/3/command and so on.
+    // accordions inside step 3, addressed as #/learn-classic/3/command and so on.
     let step = parts[1] ? Math.max(0, parseInt(parts[1], 10) || 0) : 0;
     // Legacy links from when each phase was its own page: 4-7 were Command,
     // Jump, Tactical and End, and 8 was the launch screen.
@@ -94,7 +118,7 @@ export function parseRoute(hash: string): Route {
       step = 3;
     }
     step = Math.min(LEARN_LAST_STEP, step);
-    return anchor ? { view: "learn", step, anchor } : { view: "learn", step };
+    return anchor ? { view: "learn-classic", step, anchor } : { view: "learn-classic", step };
   }
   return { view: "home" };
 }
@@ -119,9 +143,11 @@ export function routeHash(route: Route): string {
       return "#/ships";
     case "play":
       return `#/play/${route.listId}`;
-    case "learn": {
-      if (route.anchor) return `#/learn/${route.step}/${route.anchor}`;
-      return route.step > 0 ? `#/learn/${route.step}` : "#/learn";
+    case "learn":
+      return route.tab ? `#/learn/${route.tab}` : "#/learn";
+    case "learn-classic": {
+      if (route.anchor) return `#/learn-classic/${route.step}/${route.anchor}`;
+      return route.step > 0 ? `#/learn-classic/${route.step}` : "#/learn-classic";
     }
   }
 }

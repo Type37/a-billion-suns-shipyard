@@ -9,6 +9,7 @@ import { runDecode, DIGIT_POOL } from "./write-on.ts";
 import { visibleAnchor } from "./tours.ts";
 import { renderMarkdown } from "./richtext.ts";
 import { FleetSync } from "./fleet-sync.ts";
+import { LEARN_TABS } from "./learn.ts";
 import "./style.css";
 
 // Keep every Markdown notes editor's preview in step with its textarea as the
@@ -67,6 +68,7 @@ const VIEW_TITLE: Record<string, string> = {
   ships: "Ship Compendium",
   play: "Play Mode",
   learn: "Learn to Play",
+  "learn-classic": "Learn to Play (archived)",
 };
 
 // Scroll a phase accordion into view when the route names one (#/learn/3/jump).
@@ -76,12 +78,140 @@ const VIEW_TITLE: Record<string, string> = {
 let lastLearnAnchor: string | null = null;
 function syncLearnAnchor(): void {
   const r = store.getState().route;
-  const key = r.view === "learn" && r.anchor ? `${r.step}/${r.anchor}` : null;
+  const key = r.view === "learn-classic" && r.anchor ? `${r.step}/${r.anchor}` : null;
   if (key === lastLearnAnchor) return;
   lastLearnAnchor = key;
-  if (!key || r.view !== "learn" || !r.anchor) return;
+  if (!key || r.view !== "learn-classic" || !r.anchor) return;
   const el = document.getElementById(`phase-${r.anchor}`);
   if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// ---------------------------------------------------------------------------
+// Learn to Play: one long page, six sections, a progress bar and two tab bars.
+// ---------------------------------------------------------------------------
+
+/** The tab whose section is currently under the header, so we do not re-write the DOM every scroll frame. */
+let lastLearnTab: string | null = null;
+/** The tab the URL last asked for, so an explicit tab click scrolls exactly once. */
+let lastLearnTarget: string | null = null;
+
+/**
+ * Where the top of the reading area is, in px from the top of the viewport.
+ *
+ * The sticky header covers the first slice of the page, so "which section am I
+ * looking at" has to be asked below it, not at y=0 - otherwise the answer flips
+ * to the next section while its heading is still hidden behind the header.
+ */
+function learnHeaderBottom(main: HTMLElement): number {
+  const head = main.querySelector<HTMLElement>(".ltp-head");
+  return head ? head.getBoundingClientRect().bottom : 0;
+}
+
+/**
+ * Scroll-spy and progress, driven off scroll rather than IntersectionObserver.
+ *
+ * IO reports crossings, and what this needs is "which section owns the top of
+ * the reading area right now", which is a question about the current position -
+ * a state, not an event. With six sections of wildly different lengths (Tactical
+ * is longer than the other five together) the crossing-based version left the
+ * bar on the wrong tab for whole screenfuls at a time.
+ */
+function syncLearnScroll(): void {
+  const main = document.querySelector<HTMLElement>(".ltp");
+  if (!main) {
+    lastLearnTab = null;
+    lastLearnTarget = null;
+    return;
+  }
+  const secs = [...main.querySelectorAll<HTMLElement>("[data-ltp-sec]")];
+  if (!secs.length) return;
+
+  const line = learnHeaderBottom(main) + 8;
+  // The last section whose top is at or above the reading line. Falls back to
+  // the first, which is the honest answer while the page is scrolled to the top.
+  let current = secs[0]!;
+  for (const s of secs) {
+    if (s.getBoundingClientRect().top <= line) current = s;
+  }
+  const id = current.dataset["ltpSec"] ?? "";
+
+  // Progress across the whole document, not across the sections: the reader's
+  // sense of "how much is left" is about the scrollbar, and the bar sits next
+  // to a tab strip that already says which section they are in.
+  const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = scrollable > 0 ? Math.min(100, Math.max(0, (window.scrollY / scrollable) * 100)) : 0;
+  const bar = main.querySelector<HTMLElement>(".ltp-prog");
+  const fill = main.querySelector<HTMLElement>(".ltp-prog-fill");
+  if (fill) fill.style.width = `${pct.toFixed(1)}%`;
+  if (bar) bar.setAttribute("aria-valuenow", String(Math.round(pct)));
+
+  if (id === lastLearnTab) return;
+  lastLearnTab = id;
+  for (const t of main.querySelectorAll<HTMLElement>("[data-ltp-tab]")) {
+    const on = t.dataset["ltpTab"] === id;
+    t.classList.toggle("on", on);
+    if (on) t.setAttribute("aria-current", "true");
+    else t.removeAttribute("aria-current");
+    // Keep the active tab visible in a strip that scrolls sideways on a phone.
+    if (on && t.parentElement && t.parentElement.scrollWidth > t.parentElement.clientWidth + 4) {
+      const pr = t.parentElement.getBoundingClientRect();
+      const tr = t.getBoundingClientRect();
+      if (tr.left < pr.left || tr.right > pr.right) t.scrollIntoView({ block: "nearest", inline: "center" });
+    }
+  }
+  const now = main.querySelector<HTMLElement>(".ltp-head-now");
+  const tab = LEARN_TABS.find((t) => t.id === id);
+  if (now && tab) now.textContent = tab.label;
+}
+
+/**
+ * Scroll to the section the URL names.
+ *
+ * Only when the URL changes to a new tab, never on an ordinary repaint, or a
+ * repaint from anything else on the page would yank the reader back to the top
+ * of whichever section the address bar happens to name.
+ *
+ * Scrolling deliberately does NOT write the tab back into the hash. It would
+ * make every section boundary a history entry, so Back would walk you up the
+ * page one heading at a time instead of leaving the page.
+ */
+function syncLearnTarget(): void {
+  const r = store.getState().route;
+  const key = r.view === "learn" ? (r.tab ?? "") : null;
+  if (key === lastLearnTarget) return;
+  const first = lastLearnTarget === null;
+  lastLearnTarget = key;
+  if (key === null || key === "") return;
+  const el = document.getElementById(`ltp-${key}`);
+  if (!el) return;
+  // A deep link arriving cold jumps; a tab press while reading glides.
+  el.scrollIntoView({ behavior: first ? "auto" : "smooth", block: "start" });
+}
+
+/**
+ * Era titles inside the accordions, using the faction picker's animations.
+ *
+ * Opening a <details> is native and does not repaint the app, so this hangs off
+ * the toggle event (captured, because toggle does not bubble) as well as being
+ * called from paint() for whichever accordion renders open. Each title animates
+ * once per opening: closing and reopening plays it again, which is the point.
+ */
+function animateEraTitle(el: HTMLElement): void {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const era = el.dataset["era"] ?? "arma";
+  const title = el.dataset["title"] ?? el.textContent ?? "";
+  if (era === "hyper") decodeTitle(el, title);
+  else if (era === "arma") slamTitle(el, title);
+  else wipeTitle(el, title);
+}
+
+function animateOpenEraTitles(): void {
+  for (const d of document.querySelectorAll<HTMLDetailsElement>(".ltp-era[open]")) {
+    const el = d.querySelector<HTMLElement>(".ltp-era-title[data-anim-title]");
+    if (!el || el.dataset["animDone"] === "1") continue;
+    el.dataset["animDone"] = "1";
+    animateEraTitle(el);
+  }
 }
 
 // The hash router repaints the whole page without touching the title, so every
@@ -251,6 +381,9 @@ function paint(): void {
   syncModalFocus();
   revealSelectedSigil();
   syncLearnAnchor();
+  animateOpenEraTitles();
+  syncLearnScroll();
+  syncLearnTarget();
 }
 
 // A share link carries the whole list (and any custom faction) in the hash. Import
@@ -861,7 +994,11 @@ function markJustPickedFaction(): void {
 }
 
 function animateFactionTitle(): void {
-  const el = document.querySelector<HTMLElement>(".nfd-title[data-anim-title]");
+  // Learn to Play's era headings borrow .nfd-title for its resting styles and
+  // its underline, but they are driven by their own accordion toggle (see
+  // animateOpenEraTitles) - so they are excluded here, or opening the page
+  // would animate one of them a second time and claim the key.
+  const el = document.querySelector<HTMLElement>(".nfd-title[data-anim-title]:not(.ltp-era-title)");
   if (!el) {
     lastTitleKey = null; // panel gone - reopening it should animate afresh
     return;
@@ -1018,6 +1155,43 @@ window.addEventListener(
   { passive: true, capture: true },
 );
 
+// Learn to Play's progress bar and tab highlight. Same one-frame throttle as the
+// coachmark above, and a no-op on every other view (syncLearnScroll bails when
+// there is no .ltp on the page).
+let learnFrame = 0;
+window.addEventListener(
+  "scroll",
+  () => {
+    if (learnFrame) return;
+    learnFrame = requestAnimationFrame(() => {
+      learnFrame = 0;
+      syncLearnScroll();
+    });
+  },
+  { passive: true },
+);
+
+// Opening an era accordion is a native <details> toggle: it changes nothing in
+// the store, so paint() never runs and the title would never animate. Captured,
+// because the toggle event does not bubble.
+document.addEventListener(
+  "toggle",
+  (e) => {
+    const d = e.target;
+    if (!(d instanceof HTMLDetailsElement) || !d.classList.contains("ltp-era")) return;
+    const el = d.querySelector<HTMLElement>(".ltp-era-title[data-anim-title]");
+    if (!el) return;
+    if (d.open) {
+      el.dataset["animDone"] = "1";
+      animateEraTitle(el);
+    } else {
+      // Closed: let it play again next time it is opened.
+      delete el.dataset["animDone"];
+    }
+  },
+  true,
+);
+
 window.addEventListener("hashchange", () => {
   // Dismiss any open dialog on navigation. render() appends the modals after the
   // view regardless of route, so an emblem picker left open followed the player
@@ -1029,7 +1203,12 @@ window.addEventListener("hashchange", () => {
   // middle of the next one. The exception is a route that names a target
   // (#/learn/3/jump) - syncLearnAnchor scrolls to it after this paint, and
   // fighting it here would show the page snapping twice.
-  if (!(next.view === "learn" && next.anchor)) window.scrollTo(0, 0);
+  const keepsScroll =
+    (next.view === "learn-classic" && !!next.anchor) ||
+    // Learn to Play is one page: its tabs are scroll positions on the page you
+    // are already on, so jumping to the top first would show it snap twice.
+    (next.view === "learn" && store.getState().route.view === "learn");
+  if (!keepsScroll) window.scrollTo(0, 0);
   store.setState((s) => ({ ...s, route: next, ui: { ...s.ui, modal: undefined } }));
 });
 

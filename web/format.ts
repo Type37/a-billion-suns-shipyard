@@ -115,6 +115,26 @@ export function ruleText(s: string): string {
     .replace(/[ⓜⓂ]/g, mass);
 }
 
+/**
+ * The Mass glyph swap ONLY, with no escaping.
+ *
+ * ruleText() escapes first, which is correct for every string that came from
+ * data or from a person - but wrong for prose written as an HTML literal in
+ * source, where the `<b>` around a rule's name and the `&rdquo;` after a
+ * measurement are deliberate and would otherwise be printed as text. Learn to
+ * Play's transcriptions are that case: they are long enough that marking up
+ * emphasis matters, and they live in a .ts file where nothing user-supplied can
+ * reach them.
+ *
+ * NEVER call this on anything a user typed, anything loaded from storage, or
+ * anything from a custom faction. That is what ruleText is for.
+ */
+export function massGlyphs(html: string): string {
+  const mass =
+    '<svg class="mass-inline" viewBox="0 0 24 24" role="img" aria-label="Mass">' + MASS_MARK + "</svg>";
+  return html.replace(/[ⓜⓂ]/g, mass);
+}
+
 export function formatDate(iso: string): string {
   const d = new Date(iso);
   return d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });

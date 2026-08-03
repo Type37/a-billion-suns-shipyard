@@ -691,9 +691,12 @@ button { font-family: inherit; }
 .onboard-title { font-family: var(--display); font-weight: 800; font-size: 18px; }
 .onboard-note { font-size: 14px; color: var(--ink-2); margin-top: 4px; max-width: 62ch; }
 .onboard-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-.onboard-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
-@media (max-width: 620px) { .onboard-options { grid-template-columns: 1fr; } }
-.onboard-opt { text-align: left; cursor: pointer; background: var(--paper); border: 1px solid var(--hair); border-left: 3px solid var(--color-action); padding: 12px 14px; display: flex; flex-direction: column; gap: 5px; transition: background 0.12s ease, border-color 0.12s ease; }
+/* One card per row. This was a two-up grid when the callout offered the two
+   Basic Training scenarios side by side; it offers one route now (Learn to
+   Play), and a single card in a two-column grid sat in the left half with a
+   dead column beside it. */
+.onboard-options { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
+.onboard-opt { text-align: left; color: var(--ink); text-decoration: none; cursor: pointer; background: var(--paper); border: 1px solid var(--hair); border-left: 3px solid var(--color-action); padding: 12px 14px; display: flex; flex-direction: column; gap: 5px; transition: background 0.12s ease, border-color 0.12s ease; }
 .onboard-opt:hover { background: var(--blue-wash); border-left-color: var(--color-accent); }
 .oo-name { display: inline-flex; align-items: center; gap: 7px; font-family: var(--display); font-weight: 700; font-size: 14px; color: var(--color-ink); }
 .oo-desc { font-size: 12.5px; line-height: 1.4; color: var(--ink-2); }
@@ -5788,3 +5791,393 @@ main.play-body .roster-section::before { content: none; }
 .hvp-req-why { font-size: 12.5px; line-height: 1.45; color: var(--ink-2); margin: 0 0 10px; }
 .hvp-req-why strong { color: var(--ink); }
 
+
+/* ===========================================================================
+   LEARN TO PLAY
+   One long scrollable page: a sticky progress header, six sections, and a tab
+   strip that lives in the header on a pointer screen and in a bar fixed to the
+   bottom of the viewport on a phone.
+
+   The strip is rendered twice and hidden by media query rather than moved,
+   because the header's height is what the section scroll offsets are measured
+   against, and that height has to be a fact of the stylesheet at each width
+   rather than something JS discovers after the fact.
+
+   Placed at the end of the file on purpose: style.css is unlayered, so a
+   narrow-screen override only wins if it is authored after the rule it
+   overrides. Every @media block in this section sits below its own base rules.
+   =========================================================================== */
+
+/* #app > * { max-width: 100% } carries ID specificity, so the reading measure
+   has to be set at ID specificity too or it silently loses. See the same note
+   at the print sheet and the solo shell. */
+#app > .ltp {
+  max-width: 780px;                  /* a reading measure, not the app shell */
+  margin: 0 auto;
+}
+.ltp { padding: 0 20px 80px; }
+
+/* ------------------------------------------------------------------ header */
+.ltp-head {
+  position: sticky; top: 0; z-index: 40;
+  background: var(--paper);
+  border-bottom: 2px solid var(--hair);
+  /* Bleeds to the page edges while the content stays on the reading measure,
+     so the rule under the header runs the full width of the column. */
+  margin: 0 -20px;
+  padding: 0 20px;
+}
+.ltp-head-in {
+  display: flex; align-items: baseline; gap: 16px;
+  padding: 12px 0 8px;
+}
+.ltp-head-id { min-width: 0; }
+.ltp-head-title {
+  font-family: var(--display); font-weight: 800; font-size: 17px;
+  letter-spacing: -0.01em; margin: 0; color: var(--ink);
+}
+.ltp-head-sub {
+  font-family: var(--sans); font-size: 11.5px; font-weight: 700;
+  letter-spacing: 0.07em; text-transform: uppercase; color: var(--blue);
+  margin: 2px 0 0;
+}
+.ltp-prog {
+  flex: 1; height: 4px; background: var(--hair-soft); position: relative;
+  align-self: center; min-width: 60px;
+}
+.ltp-prog-fill {
+  position: absolute; inset: 0 auto 0 0; width: 0;
+  background: var(--blue); transition: width 120ms linear;
+}
+@media (prefers-reduced-motion: reduce) { .ltp-prog-fill { transition: none; } }
+
+/* -------------------------------------------------------------------- tabs */
+.ltp-tabs {
+  display: flex; gap: 0;
+  overflow-x: auto; scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.ltp-tabs::-webkit-scrollbar { display: none; }
+.ltp-tab {
+  flex: 1 1 0; min-width: 0;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: var(--tap);
+  padding: 8px 10px;
+  font-family: var(--sans); font-size: 12.5px; font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink-2); text-decoration: none;
+  border-bottom: 3px solid transparent;
+  transition: color 120ms var(--ease), border-color 120ms var(--ease);
+}
+.ltp-tab:hover { color: var(--ink); }
+.ltp-tab.on { color: var(--blue); border-bottom-color: var(--blue); }
+.ltp-tab-ico { flex: none; }
+/* Never clipped: the label is the whole point of the tab. */
+.ltp-tab-l { white-space: nowrap; }
+/* The step number is for the landscape-phone bar, where the icon alone is
+   ambiguous and there is no vertical room for the word. */
+.ltp-tab-n { display: none; }
+.ltp-tabs--bottom { display: none; }
+
+/* ------------------------------------------------------------------ layout */
+.ltp-body { padding-top: 8px; }
+.ltp-sec { padding: 28px 0 8px; scroll-margin-top: 112px; }
+.ltp-sec + .ltp-sec { border-top: 1px solid var(--hair-soft); }
+.ltp-sec-head { margin-bottom: 14px; }
+.ltp-sec-kicker {
+  font-family: var(--sans); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-off);
+  margin: 0 0 4px;
+}
+.ltp-sec-title {
+  font-family: var(--display); font-weight: 800; font-size: 30px; line-height: 1.1;
+  letter-spacing: -0.02em; margin: 0; color: var(--ink);
+}
+
+.ltp-h3 {
+  font-family: var(--display); font-weight: 800; font-size: 19px; line-height: 1.2;
+  letter-spacing: -0.01em; margin: 30px 0 8px; color: var(--ink);
+  padding-top: 10px; border-top: 1px solid var(--hair-soft);
+}
+.ltp-h4 {
+  font-family: var(--sans); font-weight: 800; font-size: 14px;
+  letter-spacing: 0.02em; margin: 22px 0 6px; color: var(--blue);
+}
+.ltp-lede {
+  font-family: var(--sans); font-size: 16.5px; line-height: 1.5; font-weight: 500;
+  color: var(--ink); margin: 0 0 16px;
+}
+.ltp-p { font-size: 15px; line-height: 1.62; color: var(--ink); margin: 0 0 11px; }
+.ltp-p-note { font-size: 13.5px; color: var(--ink-2); }
+.ltp-list { margin: 0 0 11px; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--ink); }
+.ltp-list li { margin-bottom: 5px; }
+.ltp-list-num { list-style: decimal; }
+
+/* -------------------------------------------------------- quoted rules text
+   Everything inside one of these is transcribed from the rulebook. The left
+   keyline and the tinted ground are the only signal that the voice changed;
+   the type stays the interface face, because this is the rule you will be
+   reading off the screen mid-game and it has to be the most legible thing on
+   the page. */
+.ltp-quote {
+  margin: 0 0 16px; padding: 12px 14px 10px;
+  background: var(--blue-wash); border-left: 3px solid var(--blue);
+}
+.ltp-quote > :last-child { margin-bottom: 0; }
+.ltp-cite {
+  display: block; margin-top: 8px;
+  font-family: var(--sans); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--blue-deep);
+  font-style: normal;
+}
+.ltp-cite svg { vertical-align: -2px; margin-right: 4px; }
+
+/* --------------------------------------------------------- why this is cool
+   Our voice, and the only italic serif on the page. Same treatment faction
+   taglines get elsewhere in the app, so serif italic already reads as "someone
+   is talking to you" rather than "this is a rule". */
+.ltp-cool {
+  margin: 0 0 18px; padding: 12px 14px;
+  border: 1px solid var(--hair); border-left: 3px solid var(--red);
+  background: var(--paper);
+}
+.ltp-cool-tag {
+  font-family: var(--sans); font-size: 10.5px; font-weight: 800;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--red-deep);
+  margin: 0 0 6px; display: flex; align-items: center; gap: 5px;
+}
+.ltp-cool-tag svg { flex: none; }
+.ltp-cool-star { fill: currentColor; }
+.ltp-cool-body p {
+  font-family: var(--serif); font-style: italic; font-weight: 400;
+  font-size: 15.5px; line-height: 1.55; color: var(--ink);
+  margin: 0 0 8px;
+}
+.ltp-cool-body p:last-child { margin-bottom: 0; }
+/* Emphasis inside an all-italic block has to go the other way to register. */
+.ltp-cool-body em { font-style: normal; font-weight: 600; }
+
+/* ------------------------------------------------------------- round strip */
+.ltp-round {
+  list-style: none; margin: 0 0 20px; padding: 0;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+  background: var(--hair); border: 1px solid var(--hair);
+}
+.ltp-round-stop {
+  background: var(--paper); padding: 10px 11px 11px;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.ltp-round-n {
+  font-family: var(--display); font-weight: 800; font-size: 13px; color: var(--red);
+}
+.ltp-round-name {
+  font-family: var(--sans); font-weight: 800; font-size: 13px; color: var(--ink);
+}
+.ltp-round-what { font-size: 12.5px; line-height: 1.4; color: var(--ink-2); }
+
+/* ---------------------------------------------------------- era accordions */
+.ltp-eras { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.ltp-era { border: 1px solid var(--hair); background: var(--paper); }
+.ltp-era-head {
+  list-style: none; cursor: pointer;
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 14px; min-height: var(--tap);
+}
+.ltp-era-head::-webkit-details-marker { display: none; }
+.ltp-era-head:hover { background: var(--ground); }
+.ltp-era-head-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ltp-era-name {
+  font-family: var(--display); font-weight: 800; font-size: 18px;
+  letter-spacing: -0.01em; color: var(--ink);
+}
+.ltp-era-meta {
+  font-family: var(--sans); font-size: 11.5px; font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-2);
+}
+.ltp-dot { color: var(--ink-off); }
+.ltp-era-chev { flex: none; color: var(--blue); transition: transform 200ms var(--ease); }
+.ltp-era[open] .ltp-era-chev { transform: rotate(180deg); }
+.ltp-era-body { padding: 4px 14px 16px; border-top: 1px solid var(--hair-soft); }
+.ltp-era[open] > .ltp-era-body { animation: ltp-era-in 240ms var(--ease) both; }
+@keyframes ltp-era-in {
+  from { opacity: 0; transform: translateY(-5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ltp-era[open] > .ltp-era-body { animation: none; }
+  .ltp-era-chev { transition: none; }
+}
+/* The heading inside the body is the animated one: it carries .nfd-title too,
+   so it inherits the faction picker's resting styles, its per-character spans
+   and its red underline, and main.ts runs that era's entrance animation on it
+   (decode / wipe / slam). It repeats the era name from the summary above
+   deliberately - the summary is a control, this is the title card. */
+.ltp-era-title { font-size: 27px; margin: 14px 0 4px; }
+.ltp-era-tagline {
+  font-family: var(--serif); font-style: italic; font-weight: 400;
+  font-size: 17px; line-height: 1.45; color: var(--ink);
+  margin: 0 0 12px;
+}
+.ltp-era-builds {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--sans); font-size: 11.5px; font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase; color: var(--blue);
+  margin: 12px 0; padding-top: 10px; border-top: 1px solid var(--hair-soft);
+}
+.ltp-era-builds svg { flex: none; }
+
+/* ------------------------------------------------------------ the commands */
+.ltp-cmds {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px;
+  background: var(--hair); border: 1px solid var(--hair); margin-bottom: 16px;
+}
+.ltp-cmd { background: var(--paper); padding: 11px 13px 12px; }
+.ltp-cmd-name {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  font-family: var(--sans); font-weight: 800; font-size: 14px; color: var(--ink);
+  margin: 0 0 5px;
+}
+.ltp-cmd-ico { flex: none; color: var(--blue); }
+.ltp-cmd-cost {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.08em;
+  color: var(--paper); background: var(--blue); padding: 2px 5px;
+}
+.ltp-cmd-text { font-size: 13.5px; line-height: 1.5; color: var(--ink); margin: 0; }
+
+/* ------------------------------------------------------- miniature sources */
+.ltp-src-group { margin-bottom: 18px; }
+.ltp-src-note { font-size: 13px; line-height: 1.5; color: var(--ink-2); margin: 0 0 8px; }
+.ltp-src-list {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: 1px;
+  background: var(--hair-soft); border: 1px solid var(--hair-soft);
+}
+.ltp-src {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 9px 11px; background: var(--paper); text-decoration: none;
+  min-height: var(--tap); justify-content: center;
+}
+.ltp-src:hover { background: var(--blue-wash); }
+.ltp-src-name {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--sans); font-weight: 700; font-size: 14px; color: var(--blue);
+}
+.ltp-src-name svg { flex: none; }
+.ltp-src-what { font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+
+/* -------------------------------------------------------------- the tables */
+.ltp-fig { margin: 0 0 16px; }
+.ltp-table { border-collapse: collapse; border: 1px solid var(--hair); font-size: 14px; }
+.ltp-table caption {
+  text-align: left; font-family: var(--sans); font-size: 10.5px; font-weight: 800;
+  letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-off);
+  padding-bottom: 5px;
+}
+.ltp-table th, .ltp-table td {
+  padding: 6px 16px 6px 11px; text-align: left; border-bottom: 1px solid var(--hair-soft);
+}
+.ltp-table th {
+  font-family: var(--sans); font-size: 11px; font-weight: 800; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--ink-2); background: var(--ground);
+}
+.ltp-table tr:last-child td { border-bottom: 0; }
+.ltp-fig figcaption { font-size: 12.5px; line-height: 1.5; color: var(--ink-2); margin-top: 6px; }
+.ltp-fig-cite { color: var(--ink-off); }
+
+/* -------------------------------------------------------------------- CTAs */
+.ltp-launch { margin: 16px 0 8px; }
+.ltp-launch-note { font-size: 12.5px; line-height: 1.45; color: var(--ink-2); margin: 7px 0 0; }
+.ltp-cta { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 6px; }
+.ltp-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: var(--tap); padding: 11px 18px;
+  font-family: var(--sans); font-weight: 800; font-size: 14.5px;
+  letter-spacing: 0.01em; text-decoration: none; cursor: pointer;
+  border: 1px solid var(--hair); background: var(--paper); color: var(--ink);
+}
+.ltp-btn svg { flex: none; }
+.ltp-btn:hover { background: var(--ground); }
+.ltp-btn-go, .ltp-btn-buy { background: var(--blue); border-color: var(--blue); color: #fff; }
+.ltp-btn-go:hover, .ltp-btn-buy:hover { background: var(--blue-deep); border-color: var(--blue-deep); }
+.ltp-btn-buy { font-size: 16px; padding: 13px 22px; }
+
+/* The diagrams are shared with the archived walkthrough and are sized for its
+   narrower column, so they get room to breathe here. */
+.ltp .learn-dg, .ltp .learn-demo { display: block; width: 100%; margin: 0 0 16px; }
+
+/* ============================================================ narrow screens
+   Everything below overrides the rules above and must stay below them. */
+
+/* Two-up grids stop being grids before their cells get too narrow to read. */
+@media (max-width: 720px) {
+  .ltp-round { grid-template-columns: repeat(2, 1fr); }
+  .ltp-cmds { grid-template-columns: 1fr; }
+}
+
+/* The tab bar moves to the bottom, into the thumb zone.
+   Above this width the pointer is a mouse and the strip belongs in the header
+   with the rest of the chapter furniture. Below it, roughly half of readers are
+   holding the phone one-handed, and the bottom third of the screen is the only
+   part their thumb reaches without changing grip - a reach that gets worse, not
+   better, as phones grow. */
+@media (max-width: 900px) {
+  .ltp-tabs--top { display: none; }
+  .ltp-tabs--bottom {
+    display: flex;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    background: var(--paper);
+    border-top: 2px solid var(--hair);
+    box-shadow: var(--shadow16);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .ltp-tabs--bottom .ltp-tab {
+    flex-direction: column; gap: 2px;
+    padding: 7px 4px; font-size: 10.5px; letter-spacing: 0;
+    border-bottom: 0; border-top: 3px solid transparent;
+    min-height: 54px;
+  }
+  .ltp-tabs--bottom .ltp-tab.on { border-top-color: var(--blue); border-bottom-color: transparent; }
+  /* Clear of the fixed bar plus its safe-area inset, so nothing ends up sitting
+     under it. The clearance goes on the site footer, not on .ltp, because the
+     footer is what actually comes last on the page - putting it on .ltp left the
+     bottom third of the footer covered while opening a dead gap above it. */
+  .ltp { padding-bottom: 26px; }
+  .ltp ~ .game-info-footer { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0)); }
+  /* The header is one row shorter without the strip, so the offset drops. */
+  .ltp-sec { scroll-margin-top: 74px; }
+}
+
+@media (max-width: 560px) {
+  .ltp { padding-left: 14px; padding-right: 14px; }
+  .ltp-head { margin: 0 -14px; padding: 0 14px; }
+  .ltp-sec-title { font-size: 25px; }
+  .ltp-h3 { font-size: 17.5px; }
+  .ltp-era-title { font-size: 23px; }
+  .ltp-era-tagline { font-size: 16px; }
+  .ltp-era-name { font-size: 16.5px; }
+  .ltp-round { grid-template-columns: 1fr; }
+  .ltp-head-in { gap: 12px; }
+  .ltp-head-title { font-size: 15.5px; }
+  .ltp-lede { font-size: 15.5px; }
+  /* Six tabs across 375px. The label is shrunk, never truncated - if it ever
+     stops fitting it is dropped whole (see the landscape rule below), because a
+     tab reading "Tacti..." is worse than a tab reading nothing. */
+  .ltp-tabs--bottom .ltp-tab-l { font-size: 9.5px; }
+  .ltp-cta { flex-direction: column; align-items: stretch; }
+  .ltp-btn { width: 100%; }
+}
+
+/* Landscape phones (844-932px wide, 390-430 tall): a sticky header and a fixed
+   bottom bar together can eat a third of the viewport. Shrink both, and trade
+   the tab words for their numbers. */
+@media (max-width: 960px) and (max-height: 460px) {
+  .ltp-head-in { padding: 7px 0 5px; }
+  .ltp-head-sub { display: none; }
+  .ltp-tabs--bottom .ltp-tab { min-height: 42px; padding: 4px; }
+  .ltp-tabs--bottom .ltp-tab-l { display: none; }
+  .ltp-tabs--bottom .ltp-tab-n {
+    display: block; font-family: var(--display); font-weight: 800; font-size: 10px;
+  }
+  .ltp ~ .game-info-footer { padding-bottom: calc(58px + env(safe-area-inset-bottom, 0)); }
+  .ltp-sec { scroll-margin-top: 60px; }
+}

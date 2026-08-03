@@ -26,7 +26,6 @@ import {
 import pkg from "../package.json";
 import { learnDiagram } from "./diagrams.ts";
 import { FACTION_LORE } from "./faction-lore.ts";
-import { EXAMPLE_FACTION_IDS } from "./example-factions.ts";
 import type { AppState } from "./state.ts";
 import { activeList, activeOutfit, DEFAULT_PRINT, PAPER } from "./state.ts";
 import type { SavedList, UnitPosition } from "./storage.ts";
@@ -2403,65 +2402,21 @@ function printView(state: AppState): string {
 // Foundry (custom factions)
 // ---------------------------------------------------------------------------
 
-/**
- * "Want to see some examples?" - the offer that puts the three worked-example
- * factions (see example-factions.ts) into someone's browser.
+/*
+ * The worked-example custom factions (example-factions.ts) are content this
+ * page RENDERS but never asks about.
  *
- * Held back until the fifth visit on purpose. The first two belong to the
- * tutorial callout, the Foundry coachmark takes the third and fourth, and by
- * the fifth you have built fleets and the interesting question has moved on
- * from "how do I play" to "how would I make one of my own" - which is the
- * question three finished factions answer better than any explanation. Landing
- * them on day one would just be three fleets in the way.
+ * There is exactly one prompt for them in the whole app: the coachmark on the
+ * fifth visit (TOURS "example-factions"). Take it and they load; close it and
+ * they do not, ever. This page used to ask a second time with its own callout,
+ * which meant being asked the same question twice inside ten seconds - the
+ * second one reads as not having been listened to the first time.
  *
- * Never seeded. This asks, and only writes if the answer is yes. The old
- * `cf-covenant` seed (removed in 52c1f03) arrived uninvited in every browser
- * and had to be cleaned back out of everyone's storage afterwards.
- *
- * Asked ONCE, and once only. There is deliberately no standing "Load example
- * factions" button anywhere: a question you answered should not keep sitting
- * on the screen as a button, and the examples were only ever a way in. Anyone
- * who says no still has Forge a faction, the templates and the clone-any-
- * faction list, which is the same road with more steps.
+ * The way back, and the way out, is Options > Display > Show sample custom
+ * factions, which is off by default. A switch in the settings is where you look
+ * for a thing you turned off; a button sitting on this page forever is a
+ * question that never stops being asked.
  */
-const EXAMPLES_FROM_VISIT = 5;
-
-function examplesLoaded(state: AppState): boolean {
-  return state.customFactions.some((f) => (EXAMPLE_FACTION_IDS as readonly string[]).includes(f.id));
-}
-
-function examplesCallout(state: AppState): string {
-  if (state.onboarding.visits < EXAMPLES_FROM_VISIT) return "";
-  if (state.onboarding.examplesDismissed || examplesLoaded(state)) return "";
-  // Somebody who arrived by pressing "Check it out now!" has just read the
-  // pitch on the coachmark. Repeating it here, two seconds later and in
-  // different words, reads as not having been listened to - so the question
-  // and its standfirst drop and only the answer stays. Arriving cold, on a
-  // later visit or by clicking Custom Rules directly, still gets both: nothing
-  // on this screen has asked anything yet.
-  const asked = state.ui.examplesIntroduced === true;
-  return `
-  <aside class="onboard">
-    <div class="onboard-main">
-      ${
-        asked
-          ? ""
-          : `<p class="onboard-title">Want to see some examples?</p>
-      <p class="onboard-note">Three finished custom factions, each one a book faction with new names on everything &ndash; so their stats are already balanced, and the whole trick is visible.</p>`
-      }
-      <div class="onboard-options">
-        <button class="onboard-opt" data-action="load-example-factions">
-          <span class="oo-name">${icon("plus", 15)} Yes, load the examples</span>
-          <span class="oo-desc">The Covenant, the UNSC and the Posthuman Republic land in your list below. They are yours: edit, rename or delete any of them.</span>
-        </button>
-        <button class="onboard-opt" data-action="dismiss-examples">
-          <span class="oo-name">${icon("close", 15)} No thanks</span>
-          <span class="oo-desc">This goes away and does not come back. Forge a faction still starts you from a blank sheet, a template, or a copy of any faction in the book.</span>
-        </button>
-      </div>
-    </div>
-  </aside>`;
-}
 
 function foundryListView(state: AppState): string {
   const rows = state.customFactions
@@ -2526,7 +2481,6 @@ function foundryListView(state: AppState): string {
       </label>
       <button class="bar-btn" data-action="paste-faction">${icon("duplicate", 16)} Paste from clipboard</button>
     </div>
-    ${examplesCallout(state)}
     ${
       state.customFactions.length === 0
         ? '<p class="muted">No custom factions yet.</p>'
@@ -3735,6 +3689,28 @@ function optionsModal(state: AppState): string {
               <input type="file" accept="application/json,.json" data-action="import-data" hidden /></label>
             <button class="bar-btn danger" data-action="clear-data">${icon("trash", 15)} Clear all data</button>
           </div>
+        </section>
+        <section class="opt-section">
+          <h3 class="opt-h">Display</h3>
+          <!-- Two switches, both about things no rule can decide for you.
+               Sample factions are content you may or may not want in your list;
+               the disc is right for circular badge art and wrong for the marks
+               drawn as squares, and the artwork itself cannot tell you which
+               is which. -->
+          <label class="opt-toggle">
+            <input type="checkbox" data-action="toggle-example-factions" ${state.settings.exampleFactions ? "checked" : ""} />
+            <span class="opt-toggle-main">
+              <span class="opt-toggle-name">Show sample custom factions</span>
+              <span class="opt-toggle-desc">Puts the Covenant, the UNSC and the Posthuman Republic in Custom Rules &ndash; three book factions renamed, to show how a faction of your own gets made. Turning this off removes them again.</span>
+            </span>
+          </label>
+          <label class="opt-toggle">
+            <input type="checkbox" data-action="toggle-disc-crop" ${state.settings.discCrop ? "checked" : ""} />
+            <span class="opt-toggle-main">
+              <span class="opt-toggle-name">Round emblems</span>
+              <span class="opt-toggle-desc">Crops emblem artwork to a circle, which trims the flat corners off badge art. Turn it off to see every mark whole, including the ones drawn as squares.</span>
+            </span>
+          </label>
         </section>
         <section class="opt-section">
           <h3 class="opt-h">Sync</h3>

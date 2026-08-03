@@ -16,6 +16,7 @@ import {
   persistCustomFactions,
   persistLists,
   persistOnboarding,
+  persistSettings,
   persistPrintOpts,
   persistOutfits,
 } from "./storage.ts";
@@ -40,7 +41,7 @@ import {
 import type { AppState, LastRoll, PrintOpts, ShipFilter } from "./state.ts";
 import { RANDOM_BEHAVIOUR, GLITCH_BLIP, type RollRow } from "../src/data/junkspace-solo.ts";
 import { STARTER_OUTFITS } from "../src/data/starter-outfits.ts";
-import { EXAMPLE_FACTIONS } from "./example-factions.ts";
+import { EXAMPLE_FACTIONS, EXAMPLE_FACTION_IDS } from "./example-factions.ts";
 import { renderMarkdown } from "./richtext.ts";
 import { LIB_PAGE, libraryIcon, randomIconId } from "./emblems.ts";
 import { EMBLEM_IDS } from "./icons.ts";
@@ -206,6 +207,31 @@ function floorScore(mode: GameMode, value: number): number {
 function currentListId(): string | null {
   const r = store.getState().route;
   return r.view === "builder" || r.view === "print" || r.view === "play" ? r.listId : null;
+}
+
+/**
+ * Put the three worked examples in, or take them back out.
+ *
+ * On: adds only the ones that are missing, so someone who deleted one of the
+ * three and switched this back on gets that one back rather than a second copy
+ * of the other two. Off: removes them by id, which also takes any edits made to
+ * them - they are a sample, and the switch says so.
+ *
+ * structuredClone matters. EXAMPLE_FACTIONS are module constants and the
+ * Foundry editor mutates what it is handed; without the copy, editing a loaded
+ * example would reach back and edit the template itself.
+ */
+function setExampleFactions(on: boolean): void {
+  const ids = new Set<string>(EXAMPLE_FACTION_IDS);
+  store.setState((s) => {
+    const kept = s.customFactions.filter((f) => !ids.has(f.id));
+    const missing = on ? EXAMPLE_FACTIONS.filter((f) => !s.customFactions.some((x) => x.id === f.id)) : [];
+    const customFactions = on ? [...s.customFactions, ...missing.map((f) => structuredClone(f))] : kept;
+    persistCustomFactions(customFactions);
+    const settings = { ...s.settings, exampleFactions: on };
+    persistSettings(settings);
+    return { ...s, customFactions, settings };
+  });
 }
 
 function editFaction(factionId: string, fn: (f: Faction) => Faction): void {
@@ -1070,12 +1096,12 @@ function dispatchAction(target: HTMLElement): void {
       // Close first. That repaints the page, so the element resolved below is
       // the live one and not a node the re-render is about to throw away.
       finishTour(tourId);
-      // The examples coachmark has just asked the question the Foundry's own
-      // offer asks. Tell that page it has been asked already (see
-      // examplesCallout), so the two do not say the same sentence in a row.
-      if (tourId === "example-factions") {
-        store.setState((s) => ({ ...s, ui: { ...s.ui, examplesIntroduced: true } }));
-      }
+      // "Check it out now!" on the examples coachmark IS the yes. It loads the
+      // three factions and then walks you to the page they landed on, because
+      // arriving at Custom Rules to be asked the same question a second time is
+      // not a confirmation, it is a stutter. Closing the coachmark is the no,
+      // and it is silent: nothing loads and nothing is asked again.
+      if (tourId === "example-factions") setExampleFactions(true);
       if (href) {
         location.hash = href;
         break;
@@ -1962,41 +1988,6 @@ function dispatchAction(target: HTMLElement): void {
       location.hash = routeHash({ view: "foundry", factionId: faction.id });
       break;
     }
-    case "load-example-factions": {
-      // The three worked examples (example-factions.ts), written into the
-      // user's own custom-faction store as ordinary factions they own.
-      //
-      // structuredClone matters: EXAMPLE_FACTIONS are module constants, and
-      // the Foundry editor mutates what it is given. Without the copy, editing
-      // a loaded example would reach back and edit the template every other
-      // browser tab in this session renders from.
-      //
-      // Re-loading skips whatever is already there rather than duplicating it,
-      // so someone who deleted one of the three and pressed the button again
-      // gets that one back and no second copy of the other two.
-      const have = new Set(state.customFactions.map((f) => f.id));
-      const additions = EXAMPLE_FACTIONS.filter((f) => !have.has(f.id)).map((f) => structuredClone(f));
-      store.setState((s) => {
-        const customFactions = [...s.customFactions, ...additions];
-        persistCustomFactions(customFactions);
-        const onboarding = { ...s.onboarding, examplesDismissed: true };
-        persistOnboarding(onboarding);
-        return { ...s, customFactions, onboarding };
-      });
-      showToast(
-        additions.length === 1 ? `Loaded "${additions[0]?.name}".` : `Loaded ${additions.length} example factions.`,
-        { icon: "check" },
-      );
-      break;
-    }
-    case "dismiss-examples": {
-      store.setState((s) => {
-        const onboarding = { ...s.onboarding, examplesDismissed: true };
-        persistOnboarding(onboarding);
-        return { ...s, onboarding };
-      });
-      break;
-    }
     case "clone-faction": {
       // Starting from an existing faction (official or custom) is offered
       // alongside a blank slate in the same picker, so cloning-then-renaming
@@ -2142,6 +2133,22 @@ function handleChange(e: Event): void {
   const inputValue = target.value ?? "";
 
   switch (action) {
+    // Settings switches. In handleChange, not handleClick: `change` is the
+    // event that means "the box is now in this state", and it is also what a
+    // keyboard toggle fires.
+    case "toggle-example-factions": {
+      setExampleFactions(target.checked);
+      break;
+    }
+    case "toggle-disc-crop": {
+      const on = target.checked;
+      store.setState((s) => {
+        const settings = { ...s.settings, discCrop: on };
+        persistSettings(settings);
+        return { ...s, settings };
+      });
+      break;
+    }
     case "fleet-name": {
       if (!listId) return;
       store.setState((s) => updateFleet(s, listId, (f) => ({ ...f, name: inputValue })));

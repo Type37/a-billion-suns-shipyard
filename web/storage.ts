@@ -243,11 +243,10 @@ export interface Onboarding {
   /** True once the tutorial suggestion has been dismissed or acted on. */
   tutorialsDismissed: boolean;
   /**
-   * True once the "want to see some examples?" offer on the Foundry page has
-   * been answered either way. It retires the big callout, not the examples
-   * themselves - a quiet button stays in the Foundry's action row so someone
-   * who said no, or who loaded them and later deleted them, can still get
-   * them (see foundryListView).
+   * True once the visit-5 examples coachmark has been answered either way, so
+   * it is never shown twice. Whether the examples are actually IN this browser
+   * is a separate thing and lives in Settings.exampleFactions - closing the
+   * coachmark declines them now, and Options is where you change your mind.
    */
   examplesDismissed: boolean;
   /** Ids of first-visit coachmark tours the user has finished or closed. */
@@ -262,6 +261,44 @@ export function loadOnboarding(): Onboarding {
     examplesDismissed: o.examplesDismissed ?? false,
     toursSeen: Array.isArray(o.toursSeen) ? o.toursSeen : [],
   };
+}
+
+// --- Display / content settings (the Options dialog) ------------------------
+
+const SETTINGS_KEY = "abs2.settings.v1";
+
+export interface Settings {
+  /**
+   * Whether the three worked-example custom factions are in this browser.
+   * OFF by default - nothing arrives unasked. The visit-5 coachmark turns it
+   * on if you take it, and this is the switch for turning them on later or
+   * getting rid of them again.
+   */
+  exampleFactions: boolean;
+  /**
+   * Crop emblem artwork to a circle. ON by default.
+   *
+   * Most of the library is circular badge art painted onto a square canvas,
+   * where the corners are flat colour around the mark and the disc removes
+   * exactly those and nothing else. It is wrong for the minority drawn AS
+   * squares, and no rule can tell the two apart from the pixels, so it is a
+   * switch rather than a guess.
+   */
+  discCrop: boolean;
+}
+
+const DEFAULT_SETTINGS: Settings = { exampleFactions: false, discCrop: true };
+
+export function loadSettings(): Settings {
+  const s = read<Partial<Settings>>(SETTINGS_KEY, {});
+  return {
+    exampleFactions: s.exampleFactions ?? DEFAULT_SETTINGS.exampleFactions,
+    discCrop: s.discCrop ?? DEFAULT_SETTINGS.discCrop,
+  };
+}
+
+export function persistSettings(s: Settings): void {
+  write(SETTINGS_KEY, s);
 }
 
 const PRINT_KEY = "abs2.print.v1";

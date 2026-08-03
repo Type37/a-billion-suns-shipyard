@@ -2,6 +2,7 @@ import type { Era, Faction, Fleet, GameMode } from "../src/types.ts";
 import { STARTING_DEBT_K, ALERT_START } from "../src/data/junkspace.ts";
 import {
   loadCustomFactions,
+  loadSettings,
   loadLists,
   loadOnboarding,
   loadPrintOpts,
@@ -12,7 +13,7 @@ import {
   persistOnboarding,
   persistOutfits,
 } from "./storage.ts";
-import type { Onboarding, SavedList, SavedOutfit } from "./storage.ts";
+import type { Onboarding, SavedList, SavedOutfit, Settings } from "./storage.ts";
 
 // A minimal store: state + subscribers, no framework. The whole app re-renders
 // on every change (main.ts).
@@ -206,6 +207,8 @@ export interface AppState {
   customFactions: Faction[];
   outfits: SavedOutfit[];
   onboarding: Onboarding;
+  /** Display and content switches from the Options dialog (abs2.settings.v1). */
+  settings: Settings;
   /** Monotonic counter for generating unit instance ids within the active list. */
   nextUnitSeq: number;
   /** Transient UI state, never persisted. */
@@ -305,18 +308,6 @@ export interface AppState {
     };
     /** In-progress first-visit coachmark tour, once the user has advanced past step 0. */
     tour?: { tourId: string; step: number };
-    /**
-     * True for the rest of this session once the "example-factions" coachmark
-     * has handed off to the Foundry. The coachmark already asked whether you
-     * want to make your own faction, so the offer waiting on that page drops
-     * its own version of the question and shows only the answer buttons -
-     * asking twice in two seconds reads as not having been listened to.
-     *
-     * Deliberately not persisted. It describes one handoff, not a setting: on
-     * a later visit, arriving at Custom Rules cold, the question is worth
-     * asking again because nothing on that screen has asked it.
-     */
-    examplesIntroduced?: boolean;
     /** Print-setup options. Persisted (abs2.print.v1) so reprinting after an
      * edit is one click. `rules` prints the faction rule + commands reference;
      * on by default so a first-time printer gets it. */
@@ -344,6 +335,7 @@ export function initialState(): AppState {
     lists: loadLists().filter((l) => l.mode !== "combat-simulator" && l.mode !== "management-training"),
     customFactions: loadCustomFactions(),
     outfits: loadOutfits(),
+    settings: loadSettings(),
     onboarding,
     nextUnitSeq: 1,
     ui: { showAllFactions: false, soloTab: "outfit", print: loadPrintOpts(DEFAULT_PRINT) },

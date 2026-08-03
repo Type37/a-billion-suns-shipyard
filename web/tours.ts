@@ -154,22 +154,27 @@ export const TOURS: TourDef[] = [
      * The worked examples, from the 5th visit on. The one and only time the
      * app asks whether you want a faction of your own.
      *
-     * The offer itself lives on the Foundry page (examplesCallout in
-     * render.ts) because that is where the three factions land and where they
-     * make sense. This is the only thing that tells you it is there: nobody
-     * opens Custom Rules on a hunch that something new appeared inside it.
+     * This IS the offer, not a pointer at one. "Check it out now!" loads the
+     * three factions and then walks you to the page they landed on; closing it
+     * declines them and is silent about it. Nothing on the Foundry page asks
+     * again - being asked the same question twice in ten seconds reads as not
+     * having been listened to the first time.
+     *
+     * Options > Display > Show sample custom factions is the way back in, and
+     * the way out. A settings switch is where you look for a thing you turned
+     * off; a button on the page is a question that never stops being asked.
      *
      * After "fleet-sync" in this array, so on the visit where both are
      * eligible sync goes first and this waits for the next one. Neither is
      * lost and neither shares a screen.
      *
-     * Silent once the offer has been answered either way, and silent for
-     * anyone already building their own factions: they do not need the example.
+     * Silent once it has been answered either way, and silent if the switch is
+     * already on.
      */
     id: "example-factions",
     view: "home",
     when: (s) =>
-      s.onboarding.visits >= 5 && !s.onboarding.examplesDismissed && s.customFactions.length === 0,
+      s.onboarding.visits >= 5 && !s.onboarding.examplesDismissed && !s.settings.exampleFactions,
     steps: [
       {
         selector: '.topnav a[href="#/foundry"]|.nav-fold-btn',

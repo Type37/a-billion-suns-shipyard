@@ -254,15 +254,21 @@ function outfitTab(o: SavedOutfit): string {
           // instead of stacking under a half-empty row.
           def ? `<div class="ru-spec"><div class="roster-unit-stats">${statChips(def, true)}</div>${weaponsTable(def)}</div>` : ""
         }
+        <!--
+          The pilot's name sits with the pilot's class, on the same line, above
+          the ability the class grants. It used to be a separate field UNDER the
+          ability paragraph, which put four lines of rules text between "who is
+          flying this" and "what are they called" and read as a different
+          subject entirely. Same person, same row.
+        -->
         <div class="roster-unit-tools">
           <div class="pilot-field">
-            <span class="pilot-field-label">Pilot class</span>
-            <div class="pilot-picker" role="group" aria-label="Pilot class">${pilotPicker}</div>
+            <div class="pilot-row">
+              <div class="pilot-picker" role="group" aria-label="Pilot class">${pilotPicker}</div>
+              <input class="pilot-name-input" type="text" value="${escapeHtml(s.pilotName ?? "")}" placeholder="Call sign" aria-label="Pilot name" data-action="outfit-pilot-name" data-ship="${s.id}" />
+            </div>
             <div class="pilot-abilities">${abilities}</div>
           </div>
-          <label class="inline-field">Pilot name
-            <input class="ship-name-input" type="text" value="${escapeHtml(s.pilotName ?? "")}" placeholder="Call sign" data-action="outfit-pilot-name" data-ship="${s.id}" />
-          </label>
           <button class="ghost-btn danger" data-action="outfit-remove-ship" data-ship="${s.id}">${icon("trash", 14)} Remove</button>
         </div>
       </article>`;

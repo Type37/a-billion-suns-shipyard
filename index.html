@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- viewport-fit=cover lets the page use the full screen on notched iPhones
+         instead of being letterboxed; the safe-area padding in style.css then
+         keeps content out from under the Dynamic Island and the home indicator.
+         One without the other is worse than neither. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#0b3d91" />
+    <!-- The ABS delta logo: a rounded-triangle outline with the diagonal corner
+         cut, white on teal. Rebuilt from siomple ABS2 lgoo.svg (paths baked out
+         of its nested transforms); the cut is a teal quad painted over the white
+         stroke, so the slash shows the teal ground through. SVG favicon so it
+         stays crisp at every tab size. -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-79 -61 770 770'><rect x='-79' y='-61' width='770' height='770' fill='%23008b8b'/><path d='M 319.61 14.03 L 604.97 614.56 C 607.84 620.58 607.41 627.65 603.85 633.28 C 600.29 638.92 594.09 642.33 587.42 642.33 L 25.39 642.33 C 18.73 642.33 12.52 638.92 8.96 633.28 C 5.4 627.65 4.98 620.58 7.84 614.56 L 293.21 14.03 C 295.63 8.94 300.77 5.69 306.41 5.69 C 312.05 5.69 317.18 8.94 319.61 14.03 Z' fill='none' stroke='%23ffffff' stroke-width='111' stroke-linejoin='round'/><path d='M 256.71 422.6 L 101.53 748.2 L -9.35 779.55 L 145.83 453.94 Z' fill='%23008b8b'/></svg>" />
+
+    <title>A Billion Suns 2e Shipyard</title>
+    <!-- Social / link-unfurl metadata. The fleet a share link carries lives
+         entirely in the URL hash (#s=/#z=), which never reaches a server or a
+         link scraper, so a per-fleet card is impossible without a prerender
+         service. Every shared link therefore unfurls to this one branded card -
+         which is the right outcome: a titled, described, illustrated card
+         instead of the blank one an empty <head> produced. -->
+    <!-- "fleet builder" appears here, lowercase, and nowhere else in the app:
+         it is the category a stranger searches for, not a name for anything on
+         screen. What you build is a Fleet List or a Shipyard; what the app is
+         called is the Shipyard. -->
+    <meta name="description" content="Build, save, print, and share A Billion Suns 2E fleet lists and shipyards for any faction and era. A fleet builder, ship compendium, solo-play tracker, and custom-faction forge for the tabletop game." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="A Billion Suns 2e Shipyard" />
+    <meta property="og:title" content="A Billion Suns 2e Shipyard" />
+    <meta property="og:description" content="Build, save, print, and share A Billion Suns 2E fleet lists and shipyards for any faction and era." />
+    <meta property="og:url" content="https://type37.github.io/a-billion-suns-shipyard/" />
+    <meta property="og:image" content="https://type37.github.io/a-billion-suns-shipyard/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="A Billion Suns — Second Edition. Interstellar Fleet Battles. The A Billion Suns 2e Shipyard." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="A Billion Suns 2e Shipyard" />
+    <meta name="twitter:description" content="Build, save, print, and share A Billion Suns 2E fleet lists and shipyards for any faction and era." />
+    <meta name="twitter:image" content="https://type37.github.io/a-billion-suns-shipyard/og-image.png" />
+
+    <script type="module" crossorigin src="./assets/index-B-WvZ1J0.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DD-ePsaJ.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <div id="app"></div>
+    <!--
+      Announcements for screen readers. This lives OUTSIDE #app on purpose: the
+      app replaces #app wholesale on every state change, and a live region that
+      is created in the same breath as its own text is not announced - the
+      region has to already exist, and empty, for the insertion to register.
+    -->
+    <div id="sr-status" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+  </body>
+</html>

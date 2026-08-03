@@ -177,7 +177,14 @@
      for a 1-to-10 counter - and the rest of the page went on gutters. This is
      what the builder already measures at a 1280px window, which is the width
      the whole thing was designed against. */
-  --shell-solo: 1040px;
+  /* Raised from 1040 when the guns moved beside the stats on the catalogue
+     rows. At 1040 the catalogue column left 349px for a row's body, and four
+     labelled stat chips (168px, and they cannot shrink - the labels are the
+     point) plus a weapon line (216px at its longest, "Aux: Turbo Blasters
+     [4D6, 0-6"]") do not fit in that. Ten of fourteen weapon lines wrapped.
+     At 1160 the body is 407px, nothing wraps, and the catalogue is 651px tall
+     instead of 795 - so the wider shell is the SHORTER page. */
+  --shell-solo: 1160px;
   --tap: 44px;
 
   /* ------------------------------------------------------------- elevation
@@ -1009,36 +1016,45 @@ button { font-family: inherit; }
 /* EMBLEMS ARE ROUND. Raster art is clipped to a disc wherever it appears - the
    picker, the header button, the roster, the printed sheet.
 
-   SQUARE, NOT A DISC, and `contain`, not `cover`. This reverses what used to be
-   here, and the reasoning it reverses is worth keeping because it was right
-   about a real thing and wrong about how general it was.
+   A DISC BY DEFAULT, and a switch in Options for when it is wrong.
 
-   The disc existed to delete backgrounds. A lot of the library is circular badge
-   art painted onto a square canvas, so the corners were a block of flat colour
-   around the mark - the thing that made those read as stickers rather than
-   insignia - and clipping to the disc removed exactly those corners and nothing
-   else. For that art it works perfectly, and it still does: a round mark inside
-   a square box looks identical whether or not you clip the corners off an empty
-   canvas.
+   The disc exists to delete backgrounds. Most of the library is circular badge
+   art painted onto a square canvas, so the corners are a block of flat colour
+   around the mark - the thing that made these read as stickers rather than
+   insignia - and clipping to the disc removes exactly those corners and leaves
+   the artwork's own ground as the fill, which is how the art was drawn to be
+   seen. Nothing is painted behind a mark; the shape does the separating that a
+   coloured tile used to.
 
-   It only works for that art. The library also holds marks drawn as SQUARES -
-   rounded-square tiles with the glyph inset, and full-bleed pictures where the
-   image runs to all four edges. The disc took a bite out of every one of them:
-   it cut the corners off tiles that were designed to have corners, and it
-   cropped scenes down to a porthole. That is content clipping to fix a problem
-   those files do not have, and no rule can tell the two kinds apart from the
-   pixels - a black field is a chroma background on one file and the design
-   itself on the next.
+   How big a disc: the full inscribed circle of the square, edge to edge.
+   Measured against misc-p98, which is a mark drawn as a black ring on a green
+   field - exactly the case this has to land on. Its ring's outer stroke spans
+   90 of the image's 92 pixels, 97.8%, so a disc at the box's own width sits on
+   that stroke with about half a pixel to spare at a 46px render. Anything
+   smaller would eat the ring.
 
-   So the frame stops having an opinion about the artwork's shape. Every mark is
-   drawn whole, in its own silhouette, and the ones with a coloured canvas show
-   their canvas. `contain` follows from the same principle: a non-square upload
-   letterboxes rather than losing its ends to a centre crop.
+   It is a switch and not a rule because the library also holds marks drawn AS
+   squares - rounded-square tiles with an inset glyph, whole pictures running
+   to all four edges - which the disc takes a bite out of. Nothing in the pixels
+   separates the two kinds: basic-p3 and misc-s25 carry the same blue in the
+   same corner, design on one and placeholder field on the other. So it is
+   asked rather than guessed (Options > Display > Round emblems).
 
-   Built-in vector glyphs were never clipped, for the same reason now applied to
-   everything: they are free-standing shapes on nothing, and the delta's bottom
-   corners sit in the corners of its box. */
-.emblem-img { object-fit: contain; display: block; }
+   `cover`, not `contain`: inside a round frame a centre crop fills the disc,
+   where `contain` would letterboss a wide upload into a thin band and then clip
+   its ends off with the curve anyway. With the disc off, `contain` is right
+   again - nothing is being clipped, so nothing should be.
+
+   Built-in vector glyphs are NOT clipped either way: they are free-standing
+   shapes on nothing, with no ground to remove, and the delta's bottom corners
+   sit in the corners of its box. */
+.emblem-img { object-fit: cover; display: block; border-radius: 50%; }
+.no-disc-crop .emblem-img { object-fit: contain; border-radius: 0; }
+/* The frames follow the mark: a square inside a round well pokes past the ring. */
+.no-disc-crop .emblem-choose-preview,
+.no-disc-crop .em-preview,
+.no-disc-crop .lib-icon,
+.no-disc-crop .lib-icon img { border-radius: 0; }
 /* Emblem art renders in full colour, in the picker and everywhere it lands. */
 .emblem-img, .lib-icon img { filter: none; }
 /* Per-ship-class art upload in the Foundry ship editor. */
@@ -1097,7 +1113,7 @@ button { font-family: inherit; }
    mark is without painting anything behind it, and a white mark on white now
    reads by its own edge against that ring. Square tiles around round marks were
    also the last place the grid still looked like a sticker sheet. */
-.lib-icon { padding: 5px; border: 1px solid var(--hair-soft); aspect-ratio: 1; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--paper); }
+.lib-icon { padding: 5px; border: 1px solid var(--hair-soft); border-radius: 50%; aspect-ratio: 1; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--paper); }
 /* No content-visibility here, despite the 250-tile grid looking like the textbook
    case for it. Measured on this grid it saved about 1ms of a 14ms keystroke: the
    cost was never tile layout, it was image weight, and downscaled thumbnails
@@ -1105,7 +1121,7 @@ button { font-family: inherit; }
    extra moving part for 1ms. */
 .lib-icon:hover { border-color: var(--ink); }
 .lib-icon.selected { border-color: var(--blue); box-shadow: 0 0 0 2px var(--blue); }
-.lib-icon img { width: 100%; height: 100%; object-fit: contain; min-height: 0; }
+.lib-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; min-height: 0; }
 /* No .lib-icon-name rules: the caption under each tile is gone (see
    iconLibraryGrid in emblems.ts). The name lives on title/aria-label now. */
 
@@ -1267,7 +1283,10 @@ button { font-family: inherit; }
 .ship-row-details {
   display: flex; flex-wrap: wrap; align-items: flex-start; gap: 4px 14px; margin-top: 3px;
 }
-.ship-row-details .stat-chips { flex: 0 0 auto; }
+.ship-row-details .stat-chips { flex: 0 0 auto; gap: 3px 6px; }
+/* Dense rows: the chips give back what they can without touching the labels,
+   which stay at full length everywhere (a bare icon and a number is a puzzle). */
+.ship-row-details .stat-chip, .ru-spec .stat-chip { padding: 1px 5px 1px 4px; font-size: 12px; column-gap: 4px; }
 .ship-row-details .weap-table { flex: 0 1 auto; margin-top: 0; }
 /* Weapons sit to the RIGHT of the four stat chips, not stacked under them. The
    flex-basis is the width below which the row gives up and stacks; 200px, not
@@ -1275,7 +1294,7 @@ button { font-family: inherit; }
    builder's and was wrapping on a desktop - which is the stacked layout this
    rule exists to prevent. Two lines of guns beside two rows of chips is half
    the height of the two blocks stacked, and height is the whole point. */
-.ship-row-details .weap-lines { flex: 1 1 200px; margin-top: 0; min-width: 0; }
+.ship-row-details .weap-lines { flex: 1 1 130px; margin-top: 0; min-width: 0; }
 
 /* Weapons table: one row per weapon system, aligned columns for arc, dice,
    range and damage. Used in the catalog and the roster so weapons read the
@@ -1439,7 +1458,7 @@ button { font-family: inherit; }
    below 190px of spec column, which only happens on a phone. */
 .ru-spec { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 4px 14px; }
 .ru-spec > .roster-unit-stats { flex: 0 0 auto; }
-.ru-spec > .weap-lines { flex: 1 1 190px; margin-top: 0; min-width: 0; }
+.ru-spec > .weap-lines { flex: 1 1 130px; margin-top: 0; min-width: 0; }
 .roster-unit-sub { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; }
 .roster-unit-class { font-size: 12px; font-weight: 600; color: var(--ink-2); }
 .roster-unit-class .muted { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; }
@@ -1456,7 +1475,7 @@ button { font-family: inherit; }
 /* At count 1 the (-) deletes the unit: warn in red on hover. */
 .stepper button.will-remove:hover { background: var(--red); color: #fff; }
 .stepper-count { padding: 0 12px; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; border-left: 1px solid var(--hair); border-right: 1px solid var(--hair); line-height: 28px; }
-.roster-unit-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; align-items: center; }
+.roster-unit-tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; align-items: center; }
 .inline-field select { font-family: var(--sans); font-size: 13px; padding: 7px 9px; border: 1px solid var(--hair-soft); background: var(--paper); color: var(--ink); }
 
 /* inspection report */
@@ -2163,9 +2182,20 @@ button { font-family: inherit; }
 /* Pilot class: a prominent three-way icon picker, not a dropdown. The class
    art is white (drawn for dark grounds), so each icon sits on a dark chip that
    stays dark even when its option is selected, keeping the art legible. */
-.pilot-field { display: flex; flex-direction: column; gap: 6px; }
+.pilot-field { display: flex; flex-direction: column; gap: 4px; }
+/* Class buttons and the pilot's name on one line. The name takes what is left
+   and never drops below 90px, so on a narrow card it wraps to its own line
+   rather than squeezing the three class buttons out of shape. */
+.pilot-row { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 8px; }
+.pilot-name-input {
+  flex: 1 1 90px; min-width: 0; height: 28px; padding: 0 8px;
+  border: 1px solid var(--hair-soft); background: var(--paper); color: var(--ink);
+  font-family: var(--sans); font-size: 13px; font-weight: 600;
+}
+.pilot-name-input::placeholder { color: var(--placeholder); font-weight: 500; }
+.pilot-name-input:focus { border-color: var(--blue); outline: none; }
 .pilot-field-label { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
-.pilot-picker { display: flex; gap: 6px; flex-wrap: wrap; }
+.pilot-picker { display: flex; gap: 4px; flex-wrap: wrap; }
 /* Compact segmented chips: a small icon + the class name, side by side. Much
    tighter than the old 80px cards; the selected class's ability shows below. */
 .pilot-opt {
@@ -2189,7 +2219,7 @@ button { font-family: inherit; }
    visible. The cell is as tall as the longest of them no matter which is
    showing, so pressing a class button cannot move the field and the button
    underneath. See the note beside `abilities` in solo.ts. */
-.pilot-abilities { display: grid; margin-top: 5px; }
+.pilot-abilities { display: grid; margin-top: 2px; }
 .pilot-abilities > .pilot-ability { grid-area: 1 / 1; visibility: hidden; }
 .pilot-abilities > .pilot-ability.is-on { visibility: visible; }
 .pilot-ability { margin: 0; font-size: 12.5px; line-height: 1.4; color: var(--ink-2); }
@@ -2762,10 +2792,17 @@ button { font-family: inherit; }
    container query further down stacks them before either gets silly. */
 .roster-sheet .roster-unit {
   background: var(--paper);
-  display: grid; grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr);
-  grid-template-areas: "head head" "spec tools";
-  align-items: start; gap: 10px 18px;
-  padding: 9px 14px 9px 16px; border-bottom: 1px solid var(--hair-soft);
+  /* ONE column: head, then spec, then the pilot controls.
+     It used to be two, spec beside tools, which fit when the spec block was
+     chips-over-weapons and stopped fitting the moment the guns moved beside the
+     stats. Side by side, spec gets about 250px of a 538px card and the weapons
+     drop back under the chips - the exact layout the move was undoing. Full
+     width, spec is 394px of chips-then-guns on one line, and the pilot row
+     underneath gets the whole card as well. */
+  display: grid; grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "head" "spec" "tools";
+  align-items: start; gap: 6px 14px;
+  padding: 6px 10px 6px 12px; border-bottom: 1px solid var(--hair-soft);
   border-left: 3px solid transparent; color: var(--color-ink);
   transition: background 0.12s ease, border-color 0.12s ease;
 }
@@ -3667,6 +3704,19 @@ button { font-family: inherit; }
 .opt-section { display: flex; flex-direction: column; gap: 10px; }
 .opt-h { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); border-bottom: 1px solid var(--hair-soft); padding-bottom: 6px; }
 .opt-note { font-size: 13px; color: var(--ink-2); line-height: 1.45; }
+/* A settings switch: the whole row is the label, so the checkbox and the words
+   are one target. The description is not a tooltip - what a switch does to your
+   data has to be readable before you flip it, not after. */
+.opt-toggle {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 9px 11px; border: 1px solid var(--hair-soft); cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.opt-toggle:hover { border-color: var(--blue); background: var(--blue-wash); }
+.opt-toggle input { flex: 0 0 auto; width: 16px; height: 16px; margin-top: 2px; accent-color: var(--blue); cursor: pointer; }
+.opt-toggle-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.opt-toggle-name { font-family: var(--sans); font-size: 14px; font-weight: 700; color: var(--ink); }
+.opt-toggle-desc { font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
 .opt-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .opt-version { font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-3); margin: 0; font-variant-numeric: tabular-nums; }
 .opt-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
@@ -4207,7 +4257,7 @@ button { font-family: inherit; }
   border: 1px solid var(--hair); background: var(--paper); padding: 6px 12px 6px 6px; text-align: left;
 }
 .emblem-choose-btn:hover { border-color: var(--ink); }
-.emblem-choose-preview { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; border: 1px solid var(--hair-soft); color: var(--blue); flex-shrink: 0; }
+.emblem-choose-preview { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; border: 1px solid var(--hair-soft); border-radius: 50%; color: var(--blue); flex-shrink: 0; }
 .emblem-choose-preview .emblem, .emblem-choose-preview .emblem-img { width: 34px; height: 34px; }
 .emblem-choose-label { display: inline-flex; align-items: center; gap: 7px; font-family: var(--sans); font-weight: 700; font-size: 14px; color: var(--ink); }
 
@@ -4216,10 +4266,10 @@ button { font-family: inherit; }
 .em-modal .modal-header, .em-modal .em-tabs, .em-modal .em-foot { flex: none; }
 .em-modal .em-body { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
 .em-head { display: flex; align-items: center; gap: 12px; }
-/* Square, like every other emblem frame. The wash behind it stays: this one sits
+/* Round, like every other emblem frame. The wash behind it stays: this one sits
    on the modal's blue header band, where it is a well for the preview rather
    than a ground painted behind a mark out in the page. */
-.em-preview { display: inline-flex; width: 56px; height: 56px; align-items: center; justify-content: center; background: rgba(255,255,255,0.14); color: #fff; flex-shrink: 0; }
+.em-preview { display: inline-flex; width: 56px; height: 56px; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,0.14); color: #fff; flex-shrink: 0; }
 .em-preview .emblem, .em-preview .emblem-img { width: 44px; height: 44px; }
 .em-tabs { display: flex; border-bottom: 1px solid var(--hair); }
 .em-tab { flex: 1; padding: 12px 8px; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-family: var(--sans); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3); }
@@ -4442,24 +4492,12 @@ button { font-family: inherit; }
 .mf-yard .mf-h:first-child { margin-top: 0; }
 
 /* Solo roster row areas (see .roster-sheet .roster-unit above). */
-.roster-sheet .roster-unit > .roster-unit-head { grid-area: head; display: flex; align-items: center; gap: 10px; }
+.roster-sheet .roster-unit > .roster-unit-head { grid-area: head; display: flex; align-items: center; gap: 8px; }
 .roster-sheet .roster-unit > .ru-spec { grid-area: spec; min-width: 0; }
-.roster-sheet .roster-unit > .roster-unit-tools { grid-area: tools; margin-top: 0; align-items: flex-start; flex-direction: column; gap: 8px; }
-.roster-sheet .roster-unit > .roster-unit-tools .pilot-field { width: 100%; }
-.roster-sheet .roster-unit .pilot-ability { max-width: 34ch; }
-.roster-sheet .roster-unit > .roster-unit-tools .ship-name-input { width: 100%; min-width: 0; }
-/* Spec beside pilot controls needs about 500px of row. Below that the two halves
-   stack, and it is the ROSTER COLUMN's width that decides - not the window's.
-   The old @media (max-width: 900px) missed the case this actually breaks on: a
-   wide monitor where the shell is capped and the roster column is narrow
-   anyway. The container is the sheet, because a container cannot query itself
-   and .roster-unit is already one (for its weapons table). */
-.roster-sheet { container: soloroster / inline-size; }
-@container soloroster (max-width: 500px) {
-  .roster-sheet .roster-unit { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "spec" "tools"; }
-  .roster-sheet .roster-unit > .roster-unit-tools { flex-direction: row; flex-wrap: wrap; align-items: flex-end; gap: 10px 16px; }
-  .roster-sheet .roster-unit > .roster-unit-tools .pilot-field { width: auto; }
-}
+.roster-sheet .roster-unit > .roster-unit-tools { grid-area: tools; margin-top: 0; align-items: flex-end; flex-direction: row; flex-wrap: wrap; gap: 5px 12px; }
+.roster-sheet .roster-unit > .roster-unit-tools .pilot-field { flex: 1 1 260px; min-width: 0; }
+.roster-sheet .roster-unit .pilot-ability { max-width: 60ch; }
+
 
 /* Foot of the emblem library: both the "there is more" cue and the sentinel the
    scroll observer watches to render the next page of tiles. */

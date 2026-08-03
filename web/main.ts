@@ -182,6 +182,12 @@ function paint(): void {
   // save/restore hooks around this call are kept as a safety net for the cases
   // morphing genuinely does replace a node (a changed tag, a keyless list that
   // reordered), but on an ordinary click they now have nothing to restore.
+  // Emblem shape is one switch that has to reach every emblem in every view, so
+  // it rides the root element rather than being threaded into the dozen call
+  // sites that draw one. Set before the morph so the first paint is already
+  // right and no emblem is ever seen changing shape.
+  document.documentElement.classList.toggle("no-disc-crop", !store.getState().settings.discCrop);
+
   morphInto(root, render(store.getState()));
   // Every view builds its own <main>; tagging the first one here rather than in
   // eighteen templates keeps the skip link's target correct on all of them.

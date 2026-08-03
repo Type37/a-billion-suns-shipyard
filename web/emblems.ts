@@ -11,17 +11,23 @@ const urls = import.meta.glob("./emblems/**/*.{png,jpg,jpeg,svg,webp,PNG,JPG,JPE
   import: "default",
 }) as Record<string, string>;
 
-// Small WebP copies of the raster emblems, built by scripts/make-emblem-thumbs.py
-// and keyed by the same relative path with a .webp extension. The originals are
-// full-size artwork (1024px is typical, 2000px happens) and the picker draws
-// them in a ~95px tile, so browsing the library used to pull megabytes of image
-// data to render thumbnails. The grid uses these; the original is still what a
-// chosen emblem renders from.
-const thumbUrls = import.meta.glob("./emblem-thumbs/**/*.webp", {
-  eager: true,
-  query: "?url",
-  import: "default",
-}) as Record<string, string>;
+// NO THUMBNAILS. The picker grid draws the full-size original, same as every
+// other place an emblem lands.
+//
+// There was a parallel web/emblem-thumbs/ tree of downscaled WebP copies here,
+// built by scripts/make-emblem-thumbs.py, and on paper it was the right call:
+// the originals are full-size artwork (1024px is typical, 2000px happens), the
+// grid draws them in a ~95px tile, and the thumbnails took the library modal
+// from 9.7MB of image data to 1.3MB.
+//
+// It was rejected on how it looked. A downscaled-then-upscaled WebP of a hard-
+// edged vector-style mark is mush on a 2x display: the picker is where you
+// choose between 240 marks, so it is the one place the art has to be legible,
+// and it was the one place showing the worst copy of it. Weight is a cost worth
+// paying for that; a soft, artefacty grid is not. The tiles stay lazy-loaded
+// below the fold, which is what actually keeps the modal quick to open.
+//
+// scripts/make-emblem-thumbs.py and web/emblem-thumbs/ are deleted with this.
 
 // Nothing measures a mark's lightness any more. The light list existed to give
 // near-white cut-outs a black tile so they did not vanish on white paper - that
@@ -29,17 +35,11 @@ const thumbUrls = import.meta.glob("./emblem-thumbs/**/*.webp", {
 // the round frame's hairline ring is what tells you where a white mark is now.
 // scripts/find-light-emblems.py and emblem-thumbs/light.json are dead with it.
 
-const THUMB_BY_REL = new Map<string, string>(
-  Object.entries(thumbUrls).map(([path, url]) => [path.replace(/^\.\/emblem-thumbs\//, "").replace(/\.webp$/i, ""), url]),
-);
-
 export interface LibraryIcon {
   /** Stable id: the path relative to web/emblems, e.g. "vg/WF/foo.png". */
   id: string;
   /** Hashed, build-safe URL to the asset. */
   url: string;
-  /** Small copy for the picker grid. Falls back to `url` for vector marks. */
-  thumb: string;
   category: string;
   label: string;
   /** Extra search terms describing what the mark depicts. */
@@ -155,9 +155,7 @@ export const ICON_LIBRARY: LibraryIcon[] = Object.entries(urls)
     const category = parts.length > 1 ? (parts[0] ?? "General") : "General";
     const file = parts[parts.length - 1] ?? rel;
     const label = cleanLabel(file.replace(/\.[^.]+$/, ""));
-    // SVGs have no thumbnail (and need none) - they fall back to the original.
-    const thumb = THUMB_BY_REL.get(rel.replace(/\.[^.]+$/, "")) ?? url;
-    return { id: rel, url, thumb, category, label, keywords: keywordsFor(file, category, label) };
+    return { id: rel, url, category, label, keywords: keywordsFor(file, category, label) };
   })
   .sort((a, b) => a.category.localeCompare(b.category) || a.label.localeCompare(b.label));
 
@@ -243,9 +241,9 @@ export function iconLibraryGrid(
   // The first rows load eagerly. `loading="lazy"` only fetches what is near the
   // viewport, and the grid can legitimately open below the fold (a short window,
   // or the colour rows pushing it down), in which case nothing loads at all and
-  // the picker shows an empty checkerboard until you scroll. These few are
-  // cheap - a thumbnail averages about 5KB - and they guarantee the picker
-  // always opens onto actual sigils.
+  // the picker shows an empty checkerboard until you scroll. Twenty-four
+  // full-size marks is the price of the picker always opening onto actual
+  // sigils; everything past them waits for the scroll.
   const EAGER = 24;
   const items = matches
     .slice(0, shown)
@@ -258,7 +256,7 @@ export function iconLibraryGrid(
       // every tile. Intrinsic width/height plus lazy/async decoding keep the
       // grid from reflowing as images arrive.
       (i, n) =>
-        `<button class="lib-icon ${currentLib === i.id ? "selected" : ""}" data-cat="${escapeHtml(i.category)}" data-action="${actLib}" data-lib="${escapeHtml(i.id)}" title="${escapeHtml(i.label)}" aria-pressed="${currentLib === i.id}" aria-label="${escapeHtml(i.label)}"><img loading="${n < EAGER ? "eager" : "lazy"}" decoding="async" width="64" height="64" src="${i.thumb}" alt="" /></button>`,
+        `<button class="lib-icon ${currentLib === i.id ? "selected" : ""}" data-cat="${escapeHtml(i.category)}" data-action="${actLib}" data-lib="${escapeHtml(i.id)}" title="${escapeHtml(i.label)}" aria-pressed="${currentLib === i.id}" aria-label="${escapeHtml(i.label)}"><img loading="${n < EAGER ? "eager" : "lazy"}" decoding="async" width="64" height="64" src="${i.url}" alt="" /></button>`,
     )
     .join("");
   // With no folder filter there is only one way to miss, so there is only one

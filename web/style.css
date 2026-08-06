@@ -1036,28 +1036,22 @@ button { font-family: inherit; }
    that stroke with about half a pixel to spare at a 46px render. Anything
    smaller would eat the ring.
 
-   It is a switch and not a rule because the library also holds marks drawn AS
-   squares - rounded-square tiles with an inset glyph, whole pictures running
-   to all four edges - which the disc takes a bite out of. Nothing in the pixels
-   separates the two kinds: basic-p3 and misc-s25 carry the same blue in the
-   same corner, design on one and placeholder field on the other. So it is
-   asked rather than guessed (Options > Display > Round emblems).
+   This was a switch for a while (Options > Display > Round emblems), because
+   the library also holds marks drawn AS squares - rounded-square tiles with an
+   inset glyph, whole pictures running to all four edges - which the disc takes
+   a bite out of, and nothing in the pixels separates the two kinds: basic-p3
+   and misc-s25 carry the same blue in the same corner, design on one and
+   placeholder field on the other. Nobody ever turned it off, so the disc is now
+   simply how emblems look and the option is gone.
 
    `cover`, not `contain`: inside a round frame a centre crop fills the disc,
-   where `contain` would letterboss a wide upload into a thin band and then clip
-   its ends off with the curve anyway. With the disc off, `contain` is right
-   again - nothing is being clipped, so nothing should be.
+   where `contain` would letterbox a wide upload into a thin band and then clip
+   its ends off with the curve anyway.
 
-   Built-in vector glyphs are NOT clipped either way: they are free-standing
-   shapes on nothing, with no ground to remove, and the delta's bottom corners
-   sit in the corners of its box. */
+   Built-in vector glyphs are NOT clipped: they are free-standing shapes on
+   nothing, with no ground to remove, and the delta's bottom corners sit in the
+   corners of its box. */
 .emblem-img { object-fit: cover; display: block; border-radius: 50%; }
-.no-disc-crop .emblem-img { object-fit: contain; border-radius: 0; }
-/* The frames follow the mark: a square inside a round well pokes past the ring. */
-.no-disc-crop .emblem-choose-preview,
-.no-disc-crop .em-preview,
-.no-disc-crop .lib-icon,
-.no-disc-crop .lib-icon img { border-radius: 0; }
 /* Emblem art renders in full colour, in the picker and everywhere it lands. */
 .emblem-img, .lib-icon img { filter: none; }
 /* Per-ship-class art upload in the Foundry ship editor. */
@@ -3837,33 +3831,6 @@ button { font-family: inherit; }
    changes. */
 .nf-detail { overflow-x: clip; }
 .nf-detail-empty { display: flex; align-items: center; justify-content: center; min-height: 220px; text-align: center; }
-/* The ready-made starter list, shown in the detail column until a faction is
-   picked.
-
-   Fixed height with an internal scroll, exactly like .nf-faction-scroll above,
-   and for the same reason: the three eras' blurbs are different lengths, so
-   letting the box size to its content means pressing Hypergrowth after
-   Armageddon walks the modal's footer up or down under the cursor. A min-height
-   does not fix that - it only sets the floor, and these cards clear it. The
-   height is under the controls column's, so the panel is always sized by the
-   left side and this column never drives it. Nothing is clipped: what does not
-   fit scrolls, which is the house answer to variable content in a fixed frame. */
-.nf-starter { height: 340px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-.nf-starter-head {
-  font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em;
-  font-size: 11px; color: var(--ink-3); margin: 0; display: flex; align-items: center; gap: 6px;
-}
-.nf-starter-card {
-  border: 1px solid var(--hair-soft); border-left: 3px solid var(--blue); background: var(--paper);
-  padding: 14px 16px; display: flex; flex-direction: column; gap: 7px;
-}
-.nf-starter-name { font-family: var(--display); font-weight: 800; font-size: 19px; color: var(--ink); margin: 0; }
-.nf-starter-meta {
-  font-family: var(--sans); font-weight: 600; font-size: 11px; letter-spacing: 0.03em;
-  text-transform: uppercase; color: var(--ink-3); margin: 0;
-}
-.nf-starter-blurb { font-size: 13px; line-height: 1.45; color: var(--ink-2); margin: 0; }
-.nf-starter-go { align-self: flex-start; margin-top: 3px; }
 /* The title carries an era-keyed desktop entrance (main.ts). inline-block so the
    underline and the wipe clip hug the text; the era class sets the resting
    colour and, for Armageddon, shows the underline. */
@@ -3967,12 +3934,6 @@ button { font-family: inherit; }
      scrolled as well. There are only four factions in an era, so at this width
      the list runs at its natural height and the panel is the sole scroller. */
   .nf-faction-scroll { height: auto; overflow: visible; padding-right: 0; }
-  /* One column here, so the modal itself is the scroller - a 340px scroll box
-     nested inside a scrolling sheet is a trap on a phone. The starter card
-     opens out to its full height and the page carries it.
-     The empty "pick a faction" hint below is hidden at this width; the starter
-     is NOT, because it is a whole fleet you can load in one press. */
-  .nf-starter { height: auto; overflow: visible; }
   /* Tighter plaques so all four factions of an era are on screen together. */
   .modal-body .faction-plaques { gap: 5px; }
   .modal-body .faction-plaque { height: auto; padding: 8px 10px; gap: 1px; }
@@ -5866,20 +5827,6 @@ main.play-body .roster-section::before { content: none; }
   font-family: var(--display); font-weight: 800; font-size: 17px;
   letter-spacing: -0.01em; margin: 0; color: var(--ink);
 }
-.ltp-head-sub {
-  font-family: var(--sans); font-size: 11.5px; font-weight: 700;
-  letter-spacing: 0.07em; text-transform: uppercase; color: var(--blue);
-  margin: 2px 0 0;
-}
-.ltp-prog {
-  flex: 1; height: 4px; background: var(--hair-soft); position: relative;
-  align-self: center; min-width: 60px;
-}
-.ltp-prog-fill {
-  position: absolute; inset: 0 auto 0 0; width: 0;
-  background: var(--blue); transition: width 120ms linear;
-}
-@media (prefers-reduced-motion: reduce) { .ltp-prog-fill { transition: none; } }
 
 /* -------------------------------------------------------------------- tabs */
 .ltp-tabs {
@@ -5911,14 +5858,8 @@ main.play-body .roster-section::before { content: none; }
 
 /* ------------------------------------------------------------------ layout */
 .ltp-body { padding-top: 8px; }
-.ltp-sec { padding: 28px 0 8px; scroll-margin-top: 112px; }
-.ltp-sec + .ltp-sec { border-top: 1px solid var(--hair-soft); }
+.ltp-sec { padding: 28px 0 8px; }
 .ltp-sec-head { margin-bottom: 14px; }
-.ltp-sec-kicker {
-  font-family: var(--sans); font-size: 10.5px; font-weight: 700;
-  letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-off);
-  margin: 0 0 4px;
-}
 .ltp-sec-title {
   font-family: var(--display); font-weight: 800; font-size: 30px; line-height: 1.1;
   letter-spacing: -0.02em; margin: 0; color: var(--ink);
@@ -6048,14 +5989,6 @@ main.play-body .roster-section::before { content: none; }
   font-size: 17px; line-height: 1.45; color: var(--ink);
   margin: 0 0 12px;
 }
-.ltp-era-builds {
-  display: flex; align-items: center; gap: 6px;
-  font-family: var(--sans); font-size: 11.5px; font-weight: 700;
-  letter-spacing: 0.05em; text-transform: uppercase; color: var(--blue);
-  margin: 12px 0; padding-top: 10px; border-top: 1px solid var(--hair-soft);
-}
-.ltp-era-builds svg { flex: none; }
-
 /* ------------------------------------------------------------ the commands */
 .ltp-cmds {
   display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px;
@@ -6075,6 +6008,56 @@ main.play-body .roster-section::before { content: none; }
 .ltp-cmd-text { font-size: 13.5px; line-height: 1.5; color: var(--ink); margin: 0; }
 
 /* ------------------------------------------------------- miniature sources */
+/* The whole list lives behind one closed <details>: about forty links is the
+   right length for somebody shopping and completely the wrong length to sit
+   open in the middle of "what you need to play". */
+.ltp-src-acc { border: 1px solid var(--hair); background: var(--paper); margin: 14px 0 18px; }
+.ltp-src-summary {
+  display: flex; align-items: center; gap: 9px;
+  min-height: var(--tap); padding: 11px 14px; cursor: pointer;
+  font-family: var(--sans); font-weight: 800; font-size: 14px; color: var(--ink);
+  list-style: none; user-select: none;
+}
+.ltp-src-summary::-webkit-details-marker { display: none; }
+.ltp-src-summary:hover { background: var(--blue-wash); }
+.ltp-src-summary > svg:first-of-type { flex: none; color: var(--blue); }
+.ltp-src-summary-l { flex: 1 1 auto; min-width: 0; }
+.ltp-src-summary-n {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--ink-3); white-space: nowrap;
+}
+.ltp-src-chev { flex: none; color: var(--ink-3); transition: transform 140ms var(--ease); }
+.ltp-src-acc[open] .ltp-src-chev { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) { .ltp-src-chev { transition: none; } }
+.ltp-src-acc-body { padding: 4px 14px 14px; border-top: 1px solid var(--hair-soft); }
+.ltp-src-acc-body .ltp-h4:first-child { margin-top: 14px; }
+
+/* --------------------------------------------------------------- the pager */
+/* One page per tab now, so each one ends with the way on to the next. Fixed
+   two-column grid with an empty cell at each end, so Next sits in the same
+   place on every page instead of sliding to the left on the first one. */
+.ltp-pager {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  margin: 34px 0 8px; padding-top: 18px; border-top: 1px solid var(--hair);
+}
+.ltp-pager-gap { display: block; }
+.ltp-pager-btn {
+  display: flex; align-items: center; gap: 10px;
+  min-height: var(--tap); padding: 12px 14px;
+  border: 1px solid var(--hair); background: var(--paper);
+  text-decoration: none; color: var(--ink);
+  transition: background 120ms var(--ease), border-color 120ms var(--ease);
+}
+.ltp-pager-btn:hover { background: var(--blue-wash); border-color: var(--blue); }
+.ltp-pager-btn > svg { flex: none; color: var(--blue); }
+.ltp-pager-next { grid-column: 2; justify-content: flex-end; text-align: right; }
+.ltp-pager-txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.ltp-pager-dir {
+  font-family: var(--sans); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3);
+}
+.ltp-pager-name { font-family: var(--display); font-weight: 800; font-size: 15px; line-height: 1.2; }
+
 .ltp-src-group { margin-bottom: 18px; }
 .ltp-src-note { font-size: 13px; line-height: 1.5; color: var(--ink-2); margin: 0 0 8px; }
 .ltp-src-list {

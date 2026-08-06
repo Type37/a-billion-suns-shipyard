@@ -1,11 +1,10 @@
 import type { Era, Faction, FleetHvp, FleetUnit, GameMode, Hvp, ShipClass, Weapon } from "../src/types.ts";
 import { ALLIANCE_SPECIES, MODE_BUILDER_SHAPE } from "../src/types.ts";
-import { fleetCost, validateFleet, type ValidationIssue } from "../src/validation.ts";
+import { validateFleet, type ValidationIssue } from "../src/validation.ts";
 import { GENERIC_HVP } from "../src/data/index.ts";
 import { JUNKSPACE_SHIPS } from "../src/data/junkspace.ts";
 import { TRAINING_FLEET } from "../src/data/training-fleet.ts";
 import { ACTIVATION_STEPS, CORE_ACTIONS, CORE_COMMANDS, ROUND_PHASES } from "../src/data/commands.ts";
-import { PREMADE_LISTS } from "../src/data/premade-lists.ts";
 import { deriveCommandEffects, effectiveCost } from "../src/command-effects.ts";
 import type { CommandCostChange, CommandEffects, RuleSource } from "../src/command-effects.ts";
 import { allFactions, factionsByEra, findFaction, makeCatalog, ERA_ORDER } from "./catalog.ts";
@@ -655,49 +654,6 @@ function factionDetailPane(f: Faction): string {
     </div>`;
 }
 
-/*
- * The ready-made list on offer for an era, or nothing if that era has none.
- *
- * This sits in the detail column's empty state - the moment before you have
- * picked a faction, which is exactly the moment "I do not know any of these
- * yet" bites. Once you pick one, the pane becomes that faction's detail and the
- * offer goes away: you have answered the question it was asking.
- *
- * It deliberately is NOT the `nf-detail-empty` element it replaces. That one is
- * display:none under 900px, on the reasoning that a "pick a faction" hint is
- * noise on a phone. A whole fleet you can load in one press is not noise, so it
- * carries its own class and stays visible at every width.
- */
-function starterOffer(era: Era, customs: Faction[]): string {
-  const p = PREMADE_LISTS.find((x) => x.era === era);
-  if (!p) return "";
-  const faction = findFaction(p.factionId, customs);
-  if (!faction) return "";
-  const cost = fleetCost(
-    {
-      factionId: p.factionId,
-      creditsLimit: p.creditsLimit,
-      units: p.units.map((u, i) => ({ id: `u${i + 1}`, shipClassId: u.shipClassId, count: u.count })),
-      hvp: [],
-    },
-    makeCatalog(customs),
-  );
-  const ships = p.units.reduce((n, u) => n + u.count, 0);
-  const shape = era === "Hypergrowth" ? "Shipyard" : "Fleet List";
-  return `
-    <div class="nf-starter">
-      <p class="nf-starter-head">${icon("flag", 13)} New to ${escapeHtml(era)}?</p>
-      <div class="nf-starter-card">
-        <p class="nf-starter-name">${escapeHtml(p.name)}</p>
-        <p class="nf-starter-meta">${escapeHtml(faction.name)} · ${p.units.length} units · ${ships} ships · ${credits(cost)}</p>
-        <p class="nf-starter-blurb">${ruleText(p.blurb)}</p>
-        <button class="cta-btn nf-starter-go" data-action="nf-starter" data-premade="${p.id}">
-          ${icon("plus", 15)} Load this ${escapeHtml(shape)}
-        </button>
-      </div>
-    </div>`;
-}
-
 function newFleetModal(state: AppState, customs: Faction[]): string {
   const m = state.ui.modal;
   if (!m || m.kind !== "new-fleet") return "";
@@ -784,12 +740,7 @@ function newFleetModal(state: AppState, customs: Faction[]): string {
           </div>
         </div>
         <div class="nf-detail-col">
-          ${
-            selected
-              ? factionDetailPane(selected)
-              : starterOffer(m.era, customs) ||
-                '<div class="nf-detail nf-detail-empty"><p class="muted">Pick a faction to see its ships, rule, and personnel.</p></div>'
-          }
+          ${selected ? factionDetailPane(selected) : '<div class="nf-detail nf-detail-empty"><p class="muted">Pick a faction to see its ships, rule, and personnel.</p></div>'}
         </div>
       </div>
       <footer class="modal-footer">
@@ -3745,23 +3696,15 @@ function optionsModal(state: AppState): string {
         </section>
         <section class="opt-section">
           <h3 class="opt-h">Display</h3>
-          <!-- Two switches, both about things no rule can decide for you.
-               Sample factions are content you may or may not want in your list;
-               the disc is right for circular badge art and wrong for the marks
-               drawn as squares, and the artwork itself cannot tell you which
-               is which. -->
+          <!-- One switch: sample factions are content you may or may not want
+               in your list. "Round emblems" used to sit beside it, on the
+               reasoning that the disc is right for circular badge art and wrong
+               for the marks drawn as squares. In practice it was never turned
+               off, so the crop is simply always on now and the choice is gone. -->
           <label class="opt-toggle">
             <input type="checkbox" data-action="toggle-example-factions" ${state.settings.exampleFactions ? "checked" : ""} />
             <span class="opt-toggle-main">
               <span class="opt-toggle-name">Show sample custom factions</span>
-              <span class="opt-toggle-desc">Puts the Covenant, the UNSC and the Posthuman Republic in Custom Rules &ndash; three book factions renamed, to show how a faction of your own gets made. Turning this off removes them again.</span>
-            </span>
-          </label>
-          <label class="opt-toggle">
-            <input type="checkbox" data-action="toggle-disc-crop" ${state.settings.discCrop ? "checked" : ""} />
-            <span class="opt-toggle-main">
-              <span class="opt-toggle-name">Round emblems</span>
-              <span class="opt-toggle-desc">Crops emblem artwork to a circle, which trims the flat corners off badge art. Turn it off to see every mark whole, including the ones drawn as squares.</span>
             </span>
           </label>
         </section>

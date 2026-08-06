@@ -1,12 +1,16 @@
 // Learn to Play.
 //
-// One long scrollable page, six sections, a progress header and a tab bar. It
-// replaced a five-page click-through walkthrough (still online, unlinked, at
-// #/learn-classic) because the paged version answered "what do I do next" and
-// never answered "what is this game". A person deciding whether to buy in wants
-// to read, and reading wants scrolling; a person mid-game wants to jump, and
-// jumping wants tabs. This page is both: everything is always on the page, and
-// the tabs are scroll positions rather than screens.
+// Six pages, one per tab, reached at #/learn/<tab>. Only the current one is
+// rendered.
+//
+// This was briefly built the other way - all six on one long scrolling page,
+// with the tabs as scroll positions and a reading-progress bar across the top.
+// That is a good shape for an article somebody reads start to finish, and the
+// wrong one for this: each tab is a self-contained part of the rules that
+// people arrive at directly and leave from directly, and stitching them
+// together meant every visit began by scrolling past parts you were not asking
+// about. Separate pages, so a tab is a place rather than a position. The pager
+// at the foot of each one keeps the read-it-in-order path.
 //
 // Where the tab bar sits is decided by viewport, not by taste. On a phone the
 // reliable one-thumb zone is the bottom third of the screen, and it shrinks as
@@ -62,12 +66,17 @@ const cool = (body: string): string => `
     <div class="ltp-cool-body">${body}</div>
   </aside>`;
 
-/** A block of rulebook text, marked as quoted and credited to its page. */
-const quote = (body: string, cite: string): string => `
-  <blockquote class="ltp-quote">
-    ${body}
-    <cite class="ltp-cite">${icon("book", 12)} A Billion Suns 2E, ${escapeHtml(cite)}</cite>
-  </blockquote>`;
+/**
+ * A block of rulebook text, marked as quoted.
+ *
+ * It used to print "A Billion Suns 2E, p.12" under every block. Thirty-odd of
+ * those down one page read as a bibliography rather than a rulebook, and the
+ * reader already knows what they are reading. The page number still matters to
+ * whoever maintains this file, so it stays as the `// p.12, verbatim.` comment
+ * above each call - which is where it was always written anyway.
+ */
+const quote = (body: string): string => `
+  <blockquote class="ltp-quote">${body}</blockquote>`;
 
 const h = (level: 2 | 3 | 4, text: string, cls = ""): string =>
   `<h${level} class="ltp-h${level} ${cls}">${text}</h${level}>`;
@@ -91,7 +100,6 @@ interface EraCard {
   tagline: string;
   players: string;
   complexity: string;
-  builds: string;
   body: string[];
   /** Optional "why this is cool" copy, where the author gave us one. */
   cool?: string;
@@ -107,7 +115,6 @@ const ERA_CARDS: EraCard[] = [
     tagline: "The future belongs to the ruthless.",
     players: "2&ndash;4 players",
     complexity: "High complexity",
-    builds: "Shipyard, requisition and credits",
     body: [
       "Hypergrowth is the most complex game mode. You command a ruthless corporation bent on profits at any cost. You have an entire shipyard&rsquo;s worth of vessels at your beck and call, but the shareholders are always watching. This is the original mode from ABS 1e. Complexity is high, and the focus is on completing missions. It&rsquo;s a puzzle solved with missiles, for 2 to 4 players.",
     ],
@@ -119,7 +126,6 @@ const ERA_CARDS: EraCard[] = [
     tagline: "Turmoil has engulfed the galaxy. The taxation of trade routes to outlying star systems is in dispute.",
     players: "2 players",
     complexity: "Medium complexity",
-    builds: "Fleet list and narrative missions",
     body: [
       "This is an age of heroic resistance against fascism and dogma. This mode has traditional listbuilding and missions about operatic sci-fi tales of heroism and daring; of rebellion, of war in the stars. By default, it always uses two tables, is only for two players, and victory is attained via an equal mix of objectives and winning battles.",
     ],
@@ -130,7 +136,6 @@ const ERA_CARDS: EraCard[] = [
     tagline: "The galaxy is in flames.",
     players: "2&ndash;4 players",
     complexity: "Low complexity",
-    builds: "Fleet list and straightforward objectives",
     body: [
       "This is an era of desperate, total war. Battlefleets engage in titanic engagements deep in space as our own protectors become our inhuman captors.",
       "This is the simplest way to play A Billion Suns 2e. It has overtly militaristic factions, listbuilding, and straightforward objectives; it works great at 2-4 players. Victory comes through winning battle, first and foremost.",
@@ -167,7 +172,6 @@ function eraAccordion(e: EraCard, first: boolean): string {
       <h3 class="nfd-title nfd-title--${e.key} ltp-era-title" data-anim-title data-era="${e.key}" data-title="${escapeHtml(e.name)}">${escapeHtml(e.name)}</h3>
       <p class="ltp-era-tagline">${e.tagline}</p>
       ${e.body.map((b) => `<p class="ltp-p">${b}</p>`).join("")}
-      <p class="ltp-era-builds">${icon("fleets", 14)} In this app: ${escapeHtml(e.builds)}</p>
       ${e.cool ? cool(`<p>${e.cool}</p>`) : ""}
     </div>
   </details>`;
@@ -175,16 +179,8 @@ function eraAccordion(e: EraCard, first: boolean): string {
 
 function sectionEras(): string {
   return `
-    <p class="ltp-lede">A Billion Suns is an alternating activations space wargame. It&rsquo;s miniature-agnostic.</p>
-    ${cool(`
-      <p>Alternating activations means you are never sitting out a turn. You move a few ships, then your opponent moves a few of theirs, then it is back to you &mdash; all the way around the table until everything has gone. Nobody watches somebody else play their whole army, and every ship you have not moved yet is a card still in your hand.</p>`)}
-    ${h(3, "The four phases of a round")}
-    <p class="ltp-p">Every game of A Billion Suns, in every era, runs the same four phases in the same order. The rest of this page is those four phases, in order, one section each.</p>
     ${roundStrip()}
-    ${h(3, "Three eras, three games")}
-    <p class="ltp-p">All three eras share the core rules on this page. What changes is how you build your fleet, how you set up, and how you win. Open one and see which sounds like your kind of evening.</p>
-    <div class="ltp-eras">${ERA_CARDS.map((e, i) => eraAccordion(e, i === 0)).join("")}</div>
-    <p class="ltp-p ltp-p-note">Not sure? Armageddon is the simplest way in, and the one the rulebook points new players at once they have played the two Basic Training scenarios.</p>`;
+    <div class="ltp-eras">${ERA_CARDS.map((e, i) => eraAccordion(e, i === 0)).join("")}</div>`;
 }
 
 /**
@@ -312,35 +308,56 @@ const MINI_SOURCES: { group: string; note: string; items: MiniSource[] }[] = [
   },
 ];
 
+/*
+ * Every source, behind one closed accordion.
+ *
+ * The list runs to about forty entries across six groups, which is the right
+ * length for the question it answers and completely the wrong length to have
+ * sitting open in the middle of "what you need to play". Somebody reading the
+ * page wants one line about miniatures and to move on; somebody shopping wants
+ * all forty. One <details> serves both, and it is closed by default because the
+ * reading case is the common one.
+ */
 function sourceList(): string {
-  return MINI_SOURCES.filter((g) => g.items.length)
-    .map(
-      (g) => `
-      <div class="ltp-src-group">
-        <h4 class="ltp-h4">${g.group}</h4>
-        <p class="ltp-src-note">${g.note}</p>
-        <ul class="ltp-src-list">
-          ${g.items
-            .map(
-              // name and what are authored constants above and carry their own
-              // entities (curly quotes, dashes); only the URL is escaped, which
-              // is also what turns a query string's & into &amp;.
-              (s) => `<li><a class="ltp-src" href="${escapeHtml(s.url)}" target="_blank" rel="noopener">
-                <span class="ltp-src-name">${icon("link", 13)} ${s.name}</span>
-                <span class="ltp-src-what">${s.what}</span>
-              </a></li>`,
-            )
-            .join("")}
-        </ul>
-      </div>`,
-    )
-    .join("");
+  const groups = MINI_SOURCES.filter((g) => g.items.length);
+  const total = groups.reduce((n, g) => n + g.items.length, 0);
+  return `
+  <details class="ltp-src-acc">
+    <summary class="ltp-src-summary">
+      ${icon("link", 15)}
+      <span class="ltp-src-summary-l">Where to get spaceships</span>
+      <span class="ltp-src-summary-n">${total} sources</span>
+      ${icon("chevronDown", 18, "ltp-src-chev")}
+    </summary>
+    <div class="ltp-src-acc-body">
+      ${groups
+        .map(
+          (g) => `
+        <div class="ltp-src-group">
+          <h4 class="ltp-h4">${g.group}</h4>
+          <p class="ltp-src-note">${g.note}</p>
+          <ul class="ltp-src-list">
+            ${g.items
+              .map(
+                // name and what are authored constants above and carry their own
+                // entities (curly quotes, dashes); only the URL is escaped, which
+                // is also what turns a query string's & into &amp;.
+                (s) => `<li><a class="ltp-src" href="${escapeHtml(s.url)}" target="_blank" rel="noopener">
+                  <span class="ltp-src-name">${icon("link", 13)} ${s.name}</span>
+                  <span class="ltp-src-what">${s.what}</span>
+                </a></li>`,
+              )
+              .join("")}
+          </ul>
+        </div>`,
+        )
+        .join("")}
+    </div>
+  </details>`;
 }
 
 function sectionPrepare(): string {
   return `
-    <p class="ltp-lede">You need less than you think. Here is the full list, and then the honest version of it.</p>
-
     ${h(3, "What you will need to play")}
     ${quote(
       // p.12, verbatim.
@@ -353,17 +370,12 @@ function sectionPrepare(): string {
          "A selection of tokens, gaming gems or spare dice.",
          "A measuring tape in inches.",
        ])}`,
-      "p.12",
     )}
-    ${cool(`
-      <p>Note what is not on that list: a board, a starter set, an army, or a single specific miniature. A Billion Suns is a set of rules that gets played with whatever spaceships are already in the house. Two players can turn up with fleets from two different games at two different scales and the game does not care.</p>`)}
 
     ${h(3, "Miniatures")}
     ${quote(
       // p.12, verbatim.
-      `${p("A Billion Suns is designed to be played with spaceship miniatures of any scale, from any manufacturer, mounted on any shape or size of base. During play, ship bases are ignored for the purposes of measuring.")}
-       ${p("If you don&rsquo;t have any spaceship miniatures, check out the official range of A Billion Suns miniatures from Taiga Creative Studios.")}`,
-      "p.12",
+      `${p("A Billion Suns is designed to be played with spaceship miniatures of any scale, from any manufacturer, mounted on any shape or size of base. During play, ship bases are ignored for the purposes of measuring.")}`,
     )}
     ${sourceList()}
 
@@ -373,7 +385,6 @@ function sectionPrepare(): string {
       `<p>You will need a selection of scavenged tokens, gaming gems or spare dice to represent the following:</p>
        ${ul(["CMD tokens.", "Damage tokens.", "Jump points (you can also use small jump gate or navigation buoy miniatures for these).", "Activated tokens", "Easy Target tokens", "Assorted other tokens for the missions."])}
        ${p("Missions sometimes need a variety of different token types. Don&rsquo;t stress about having a matching token design for every variety of token. You can just use different coloured gems, dice or tokens scavenged from other games. As long as everyone knows which tokens represent what during a particular game, you&rsquo;ll be fine.")}`,
-      "p.12",
     )}
 
     ${h(3, "Other miniatures")}
@@ -390,10 +401,7 @@ function sectionPrepare(): string {
        ])}
        ${p("You might also choose to make terrain or tokens for the following, but they are not required")}
        ${ul(["3 Gas Clouds", "3 Debris Fields"])}`,
-      "p.13",
     )}
-    ${cool(`
-      <p>Every single item on that list can be a circle of card with a word written on it, and the game plays exactly the same. A planetoid is a dinner plate. A facility is a bottle cap. Nobody is checking. Build the pretty version later, once you know you like the game.</p>`)}
 
     ${h(3, "The play area")}
     ${quote(
@@ -402,12 +410,9 @@ function sectionPrepare(): string {
        ${p("You always start with a single sector. Some missions may instruct you to add additional sectors.")}
        ${p("When setting up a game, your mission may instruct you to &ldquo;Add 1 Sector&rdquo; or &ldquo;Set up 2 Sectors&rdquo;. Simply agree on another flat playable surface to count as the new sector or divide your current play area in two with tape or string to create the additional sector.")}
        ${p("You don&rsquo;t have to divide your table up evenly, and sectors don&rsquo;t even have to be regular shapes. You could even use a nearby side table or counter-top as a sector. Sectors can be as small as 16&rdquo; by 16&rdquo; and still be playable. A Billion Suns is designed to be flexible to the size and shape of each play area &ndash; there is no &lsquo;standard&rsquo; size for any of the sectors. The game works perfectly on any size or shape of table.")}`,
-      "p.29",
     )}
-    ${p("Your first game, the Combat Simulator, asks for a play area roughly 4 feet by 3 feet with three jump points a side. That is a suggestion with numbers attached, not a requirement: it is one sector, and one sector can be as small as 16&rdquo; square.")}
     ${learnDiagram("deployment")}
-    ${cool(`
-      <p>Playing across several tables at once is the strangest and best idea in this game. Your battleship can be on the kitchen counter while your corvettes are on the dining table, and a jump point is how they visit each other. The rulebook is quite firm that you should not house-rule this out.</p>`)}`;
+`;
 }
 
 // ---------------------------------------------------------------------------
@@ -435,14 +440,12 @@ const CORE_COMMANDS: [string, string][] = [
 
 function sectionCommand(): string {
   return `
-    <p class="ltp-lede">The first phase of every round. You collect the currency of the game, and you find out who goes first.</p>
     ${learnDiagram("command")}
 
     ${h(3, "Gain CMD tokens")}
     ${quote(
       // p.30, verbatim.
       p("You gain a number of CMD tokens determined by your faction (if you are using the Training Fleet, you gain 7 CMD tokens). Unspent CMD tokens are discarded at the end of the round."),
-      "p.30",
     )}
 
     ${h(3, "Seize Initiative")}
@@ -451,7 +454,6 @@ function sectionCommand(): string {
       `${p("All players make an Initiative Check. Roll a number of D6 equal to your faction&rsquo;s Initiative value. Each roll of a 2 or 3 counts as one success; each roll of a 1 counts as two successes. (This is equivalent to rolling to hit against a unit with Silhouette 3, if that helps you remember this mechanic.)")}
        ${p("The player that rolls the most successes wins the Initiative Check and chooses which player has the Initiative for this round. If two or more players are tied, the tied players sum their dice values: the player with the lowest sum wins the Initiative Check. If still tied, the tied player clockwise from the last player to have Initiative wins the Initiative Check.")}
        ${p("The player(s) that didn&rsquo;t win the Initiative Check receive 1 additional CMD token each.")}`,
-      "p.30",
     )}
     ${cool(`
       <p>Two things are quietly excellent here. Winning the Initiative Check lets you <em>choose</em> who has the Initiative, which is not always yourself &mdash; going first means committing first, and sometimes you would much rather watch. And losing pays: everyone who did not win gets an extra CMD token, so a bad roll hands you more to spend for the rest of the round.</p>`)}
@@ -463,7 +465,6 @@ function sectionCommand(): string {
        ${p("Each CMD token represents an amount of influence that the fleet commander, admiral or CEO can exert on their fleet. You start the game with zero CMD tokens. During each Command Phase, you receive fresh CMD tokens. Use gaming gems, beads or coins to represent them.")}
        ${p("To use a Command, spend the listed number of CMD tokens. Each Command says when it can be used, and how many CMD tokens are needed to use it. When a CMD token is spent, discard it.")}
        ${p("Unspent CMD tokens are discarded in the End Phase.")}`,
-      "p.49",
     )}
 
     ${h(3, "The Core Commands")}
@@ -502,7 +503,6 @@ function sectionJump(): string {
          "<b>Pass:</b> You take no further turns during this Jump Phase.",
        ])}
        ${p("Once all players have passed, the Jump Phase ends.")}`,
-      "p.30",
     )}
     ${cool(`
       <p>There is no deployment zone. There is no table edge you have to trudge in from. You put a token down and your ships appear around it, which means the shape of the battle is something you are still writing in round three. Holding half your fleet back is not cowardice, it is a plan.</p>`)}
@@ -512,7 +512,6 @@ function sectionJump(): string {
       // p.32, verbatim.
       `${p("A Jump Point is represented on the tabletop by a token approximately 1&rdquo; in diameter. You could use a gaming gem, a coin or a token. All measurements to and from jump points are from its centrepoint, so the exact size isn&rsquo;t important.")}
        ${p("The number of Jump Points you start the game with is determined by the era of play, and sometimes by the mission.")}`,
-      "p.32",
     )}
 
     ${h(3, "Opening a jump point")}
@@ -520,7 +519,6 @@ function sectionJump(): string {
       // p.32, verbatim.
       `${p("During the Jump Phase, you can use your turn to open a new Jump Point, if you have any remaining in your supply. Take a Jump Point from your supply, and place it into play, anywhere outside of 9&rdquo; from a planetoid.")}
        ${p("<b>Gravity Well:</b> Jump Points cannot be placed within 9&rdquo; of a planetoid. Units cannot Jump into a position within 9&rdquo; of a planetoid. A unit cannot Jump Hop or Jump Out if a ship in that unit is within 9&rdquo; of a planetoid.")}`,
-      "p.32",
     )}
 
     ${h(3, "Jumping in")}
@@ -528,7 +526,6 @@ function sectionJump(): string {
       // p.33, verbatim.
       `${p("During the Jump Phase, you can use your turn to Jump In a single unit from your Reserves area.")}
        ${p("To Jump In a unit, deploy all ships from that unit within 6&rdquo; of a friendly Jump Point.")}`,
-      "p.33",
     )}
     ${p("Then check cohesion: after a unit jumps in, and at the end of its movement step, all the ships in the unit must be within 6&rdquo; of all other ships in that unit.")}
 
@@ -536,7 +533,6 @@ function sectionJump(): string {
     ${quote(
       // p.32, verbatim.
       p("Due to gravitational strains, the complexities of &micro;-space calculations, and the time required to recharge the &micro;-fold drives: each unit can only &lsquo;jump&rsquo; once per round. This means that, for example, a unit that Jumped In this round cannot Jump Hop or Jump Out later in the same round."),
-      "p.32",
     )}
 
     ${h(3, "Leaving by jump")}
@@ -545,7 +541,6 @@ function sectionJump(): string {
       `${p("<b>Jump Hop.</b> A unit can use the Jump Hop action during their activation to teleport between two sectors. If all the ships in this unit are within 6&rdquo; of a friendly Jump Point, take the Jump Hop action to remove all the ships in this unit from play and set them up within 6&rdquo; of a friendly Jump Point in another Sector.")}
        ${p("Jump Hop is exclusively for Jumping between sectors. In a game with only a single Sector (such as Combat Training), the Jump Hop action is of no use.")}
        ${p("<b>Jump Out.</b> A unit can use the Jump Out action during their activation to leave play and go into your Reserves area. When a unit Jumps Out into reserve, it keeps all its tokens, both game tokens and asset tokens. At the end of the game, asset tokens carried by ships in your reserves area will count towards revenue and victory conditions: they are safely returned to base.")}`,
-      "p.33",
     )}
     ${cool(`
       <p>Jumping out with the loot still in the hold and calling that a win is entirely legal, and in Hypergrowth it is often the correct play. A ship that runs away carrying the objective has done its job better than a ship that died gloriously next to it.</p>`)}
@@ -559,18 +554,15 @@ function sectionJump(): string {
        ${p("When it is your turn to Jump In a unit, if you have nothing in your reserves, use the Requisition command to form a unit from ships in your Shipyard, and then move it to your Reserves. From there, you Jump the unit into play.")}
        ${p("When you requisition a unit, you can additionally requisition Squadron units, without spending additional CMD tokens, if they can all be carried by the first unit.")}
        ${p("Once you have requisitioned a particular ship, strike it off your Shipyard Roster &ndash; you cannot requisition it again.")}`,
-      "p.122",
     )}
     ${quote(
       // p.50, verbatim.
       p("<b>Requisition (1 CMD).</b> (Hypergrowth Game Mode only) When it is your turn to Jump In a unit, you can spend 1 CMD token to form a new unit using the ships in your Shipyard. Pay their cost in credits. Gather the appropriate miniatures and jump them into play as if they were in your Reserves area."),
-      "p.50",
     )}
     ${quote(
       // p.121-122, verbatim.
       `${p("In Hypergrowth games, deploying ships costs you the very victory points you are seeking to capture and defend, represented by Credits (&cent;).")}
        ${p("In the first round of a game of Hypergrowth, you will move your Credit Tracker into deficit, because an upfront investment of Credits is needed to requisition the ships required to earn revenue from the missions.")}`,
-      "p.121&ndash;122",
     )}
     ${cool(`
       <p>This is the puzzle the whole era is built on. The ships are the cost <em>and</em> the score is measured in the same currency, so every hull you requisition is a point you have spent to try and win two. You open every game of Hypergrowth in the red on purpose, and you spend the next four rounds arguing your way out of it.</p>`)}`;
@@ -588,7 +580,6 @@ function sectionTactical(): string {
       // p.31, verbatim.
       `${p("In the Tactical Phase, players take turns to activate battlegroups, clockwise from the player with Initiative.")}
        ${p("On your turn, you Drag to Select a battlegroup and activate the units in that battlegroup.")}`,
-      "p.31",
     )}
     ${cool(`
       <p>This is the alternating activation engine, and it is why the game stays tense for all four rounds. You do not get to move your fleet; you get to move <em>some</em> of it, and then you have to hand the table over and watch what that decision cost you. Everything you have not activated yet is still a threat, and so is everything they have not activated yet.</p>`)}
@@ -603,7 +594,6 @@ function sectionTactical(): string {
          "Activate the units in that battlegroup.",
        ])}
        ${p("After a unit activates, give it an &lsquo;Activated&rsquo; token. Once you have finished activating all the units in that battlegroup, the battlegroup is deselected, and you pass play to the next player clockwise.")}`,
-      "p.34",
     )}
     ${learnDiagram("drag-select")}
 
@@ -612,7 +602,6 @@ function sectionTactical(): string {
       // p.20 and p.26, verbatim.
       `${p("Mass is a broad measure of the size and bulk of a ship. Throughout the rules, when you see the icon ⓜ, replace it with the numerical value of the Mass of the unit&rsquo;s ship class. If a rule refers to the Combined Mass of ships, sum the ⓜ of all the related individual ships to form a total.")}
        ${p("Occasionally, when encountering the ⓜ icon, it may be unclear which ship&rsquo;s mass to apply. As a general rule, use the mass of the ship that is actively doing the thing, rather than the ship having the thing done to them.")}`,
-      "p.20, p.26",
     )}
     ${p("Mass is the budget on that 10-point drag: a Mass 3 battleship and a couple of escorts fill it, or seven Mass 0 squadrons do. It also sets how big a unit can be &mdash; units cap at 3 ships, except Mass 3 units, which are always a single ship.")}
     ${cool(`
@@ -628,7 +617,6 @@ function sectionTactical(): string {
          "<b>Action Step:</b> Choose one action for each unit in the battlegroup. (You can choose different actions for different units.) Each ship in the unit takes that action. Resolve all the actions from one unit before starting the next unit.",
        ])}
        ${p("After activating a unit, give it an Activated token.")}`,
-      "p.35",
     )}
 
     ${h(4, "1 &middot; Movement Step")}
@@ -639,7 +627,6 @@ function sectionTactical(): string {
        ${p("<b>Pivot.</b> To pivot a ship: rotate the ship about its centrepoint by any amount, without changing its position.")}
        ${p("<b>Inertial Strain.</b> If a ship pivots more than 90 degrees in a single pivot, it cannot attack with its primary weapon systems during this activation.")}
        ${p("<b>Unit Cohesion.</b> After a unit jumps in, and at the end of its movement step, all the ships in the unit must be within 6&rdquo; of all other ships in that unit.")}`,
-      "p.36",
     )}
     ${learnDiagram("movement")}
     ${quote(
@@ -648,7 +635,6 @@ function sectionTactical(): string {
        ${p("At the start of a unit&rsquo;s activation, discard any Easy Target tokens on it. If a unit Jump Hops or Jumps Out, discard any Easy Target tokens on it.")}
        ${p("<b>Table Edges.</b> If a ship moves into contact with the edge of a Sector, it immediately stops moving.")}
        ${p("<b>Overlapping Bases.</b> When moving, ships ignore other ships. Ships can end their movement in a position that results in the bases of two models overlapping, as long as the miniatures are stable in their final placement. No two ships can share the same position.")}`,
-      "p.37",
     )}
     ${p("Spend 1 CMD on <b>Power to Engines</b> and the whole step happens twice &mdash; pivot and move, then pivot and move again. It is the only way a ship covers more than its Thrust in one activation.")}
     ${learnDiagram("double-move")}
@@ -661,7 +647,6 @@ function sectionTactical(): string {
       `${p("After moving the units in the battlegroup, there is a Passive Attacks step. Every passive enemy unit that has one or more active units in range and arc of fire of their auxiliary weapons may attack once with their auxiliary weapons, targeting only active units.")}
        ${p("A unit can only make passive attacks once during this battlegroup&rsquo;s activation. It can make further passive attacks in later activations.")}
        ${p("If you have three or more players, the passive players make attacks in turns in a clockwise direction, beginning with the player to the left of the active player.")}`,
-      "p.38",
     )}
     ${learnDiagram("passive")}
     ${cool(`
@@ -672,7 +657,6 @@ function sectionTactical(): string {
       // p.38, verbatim.
       `${p("After moving and potentially suffering passive attacks, each unit in the battlegroup takes one Action.")}
        ${p("All the ships in a unit take the same action, but different units in the battlegroup can choose different actions. The basic actions are listed below, but factions, ships or scenario rules can provide additional options.")}`,
-      "p.38",
     )}
     ${learnDiagram("action")}
     ${p("Spend 1 CMD on <b>All Hands</b> after a unit&rsquo;s first action and it takes a second, different one.")}
@@ -688,7 +672,6 @@ function sectionTactical(): string {
        ${p("<b>Shields.</b> Most larger ships are equipped with kinetic field generators, used to absorb and disperse the energy of incoming attacks. A ship&rsquo;s Shields value indicates the strength and sophistication of the defensive shields it possesses.")}
        ${p("A ship&rsquo;s Shields value determines the highest die roll that counts as a successful saving throw when defending against attacks.")}
        ${p("<b>Thrust</b> is the maximum number of inches this ship can travel in a single move.")}`,
-      "p.27",
     )}
     ${cool(`
       <p>Silhouette is one of the neatest stats in wargaming. It is how easy you are to hit <em>and</em> how much damage you can soak, in a single number, because both come from being enormous. A battleship is not hard to shoot &mdash; it is trivially easy to shoot, and simply does not care. Meanwhile a fighter wing is nearly impossible to hit and evaporates the moment you do.</p>`)}
@@ -702,7 +685,6 @@ function sectionTactical(): string {
        ${p("<b>Damage.</b> A weapon system&rsquo;s Damage value is the number of damage tokens the target receives for each unsaved hit. The Damage value always relates to the Attack Die type.")}
        ${p("<b>Arc of Fire.</b> To attack something, it must lie within that weapon system&rsquo;s arc of fire. Primary Arc of Fire is a 45-degree arc to the front of a ship. Auxiliary Arc of Fire is a 180-degree arc to the front of a ship.")}
        ${p("<b>Line of Sight.</b> To attack something, the target must lie within that ship&rsquo;s line of sight. To check if a ship has line of sight to a target unit or object, draw a straight line between their two positions: if it crosses obscuring terrain, line of sight is blocked; otherwise they have line of sight to each other.")}`,
-      "p.41&ndash;43",
     )}
     ${damageTable()}
 
@@ -714,7 +696,6 @@ function sectionTactical(): string {
        ${p("For a unit to be selected as a target, at least one ship from the target unit must lie within range, line of sight and arc of fire of the attacking ship. You can only target neutral or enemy ships.")}
        ${p("<b>Primary Target.</b> When a ship attacks with a primary weapon system, you select a single Primary Target. You attack this primary target with all of your primary attack dice.")}
        ${p("<b>Auxiliary Targets.</b> When a ship attacks with an auxiliary weapon system, you can select any number of Auxiliary Targets. You can divide your auxiliary attack dice as you wish between these Auxiliary Targets, but must declare which dice will attack which target before rolling any attacks.")}`,
-      "p.43&ndash;44",
     )}
 
     ${h(4, "Resolve attacks")}
@@ -725,7 +706,6 @@ function sectionTactical(): string {
        <p>To resolve a Salvo, follow this sequence:</p>
        ${ol(["Roll attack dice", "Roll saving throws", "Assign hits", "Apply damage"])}
        ${p("When attacking, all ships in the attacking unit must declare all targets before rolling any attack dice. Commands such as Power to Weapons and Power to Shields apply only to the dice in a given Salvo.")}`,
-      "p.44",
     )}
 
     ${h(4, "Roll attack dice")}
@@ -739,7 +719,6 @@ function sectionTactical(): string {
        ${p("<b>Critical Hits.</b> Any attack dice that results in a (natural or modified) 1 is a Critical Hit and adds a bonus hit from the same weapon system. This affects the number of saving throws that must be made, so add another dice of the same type to the pool of hits.")}
        ${p("If Power to Weapons was used, dice rolls of both 1 and 2 cause critical hits. Duds are still duds.")}
        ${p("<b>Duds.</b> You discard attack dice that rolled a dud (which is a die that rolled the maximum value possible on that die type), even if that die would otherwise have scored a hit.")}`,
-      "p.45",
     )}
     ${cool(`
       <p>Low is good, and the highest face on any die is always a total failure. Roll a 6 on a D6 and it is a &lsquo;dud&rsquo; &mdash; discarded, no matter what it would otherwise have hit. So every single die you throw has a natural triumph and a natural disaster on opposite faces, and the fleets that are easiest to hit are the ones you are most likely to embarrass yourself against.</p>`)}
@@ -753,7 +732,6 @@ function sectionTactical(): string {
          "The target&rsquo;s controller makes one saving throw for each hit. Each saving throw must use the same type of dice as the weapon system that caused the hit (making it harder to deflect more powerful weapons).",
          "Any saving throw that rolls equal to or under the target&rsquo;s Shields value deflects one hit. Duds do not deflect hits.",
        ])}`,
-      "p.46",
     )}
 
     ${h(4, "Assign hits and apply damage")}
@@ -767,7 +745,6 @@ function sectionTactical(): string {
          "You cannot assign hits to ships that have 0HP remaining.",
          "If all the ships in the unit have already been reduced to 0HP, discard the hit.",
        ])}`,
-      "p.46",
     )}
 
     ${h(4, "Destroyed ships and explosions")}
@@ -781,7 +758,6 @@ function sectionTactical(): string {
          "Remove the ship from play.",
        ])}
        ${p("<b>Explosion.</b> When a ship explodes, each other unit (friend or foe) within 3&rdquo; suffers a ⓜD6 attack, causing 1 damage per hit.")}`,
-      "p.47",
     )}
 
     ${h(4, "Mother&rsquo;s Wing")}
@@ -790,7 +766,6 @@ function sectionTactical(): string {
       `${p("Large ships can offer protection to their smaller fleet-mates in the form of heavy shielding, point defence coverage, and pure physical bulk. Ships benefitting from such protection are referred to as being &lsquo;Under Mother&rsquo;s Wing&rsquo;.")}
        ${p("Every ship has a Mother&rsquo;s Wing Zone of radius 2ⓜ&rdquo; which can protect friendly units of a lower mass. If every ship in a friendly unit is within the Mother&rsquo;s Wing Zone of a friendly unit of a higher mass, the lower mass unit can use the Shields value of the higher mass unit in place of its own (and may further boost this with Power to Shields).")}
        ${p("<b>Protecting Objectives.</b> When an objective (such as a neutral ship or a facility) is attacked by a player, another player may use the Mother&rsquo;s Wing effect from one of their nearby units to protect that objective (if that objective has a lighter mass).")}`,
-      "p.48",
     )}
     ${cool(`
       <p>Fighters have no shields worth the name, so they hide under a battleship and borrow its. The picture of a swarm of tiny craft flying in the lee of a capital ship, alive purely because it is there, is the sort of thing rules almost never manage to say out loud. This one says it in two sentences.</p>`)}
@@ -806,7 +781,6 @@ function sectionTactical(): string {
         "<b>Jump Out (action):</b> If all the ships in this unit are within 6&rdquo; of a friendly Jump Point, remove all the ships in this unit from play and place them into your Reserves area.",
       ])}
        ${p("<b>Scan.</b> Scanning requires no arc of fire; it can target any object or ship within range in any direction. Scan has no built-in effect but might be required to fulfil a contract or some other special rule. When scanning, you must declare a single purpose for that scan.")}`,
-      "p.38&ndash;39",
     )}
 
     ${h(3, "Carrying fighters")}
@@ -817,7 +791,6 @@ function sectionTactical(): string {
        ${p("A unit can carry a number of Squadrons up to twice its Combined Mass. (E.g. a unit of one Mass 2 ship can carry up to 4 Squadrons, a single Mass 3 ship can carry up to 6 Squadrons, and a unit of three Mass 2 ships can carry up to 12.) Those carried Squadrons can be arranged into any number of units.")}
        ${p("For reasons of abstraction and simplicity, Squadrons are carried by &rsquo;the unit&lsquo;, not by an individual ship, and are always considered to be carried by the last surviving ship in the unit. You don&rsquo;t have to destroy the carried Squadrons until the last ship in the carrying unit is destroyed.")}
        ${p("A unit that is carrying Squadrons can take the Scramble Squadrons action to deploy a unit of Squadrons.")}`,
-      "p.28",
     )}
     ${cool(`
       <p>Any ship can be a carrier. There is no carrier ship class to buy &mdash; every hull with Mass to spare has room for fighters, so a cruiser can turn up carrying four squadrons and unfold into a small air force the moment it gets where it is going.</p>`)}`;
@@ -861,7 +834,6 @@ function sectionEnd(): string {
          "Discard all unused CMD tokens.",
          "Begin a new Round.",
        ])}`,
-      "p.31",
     )}
     ${cool(`
       <p>Scoring is checked <em>every</em> round, not at the end of the game. Holding an objective for one round in the middle of a four-round game is worth something real, so there is no last-turn rush where everything that happened before it stops mattering. And every unspent CMD token you were saving is binned in step four, which is the game reminding you, once a round, that caution has a price.</p>`)}
@@ -880,7 +852,6 @@ function sectionEnd(): string {
       // p.11 and p.60, verbatim.
       `${p("To get started with A Billion Suns, read the Core Rules section, gather some miniatures to represent the Training Fleets then play the two Basic Training missions: Combat Simulator and Management Training.")}
        ${p("I recommend you play the Combat Simulator scenario first, to learn the basics of moving and shooting, then play the Management Training scenario next, to learn how to manage jumping in and reinforcing your fleet.")}`,
-      "p.11, p.60",
     )}
     ${p("Combat Simulator operates in basically the same way as Armageddon, and Management Training operates very similarly to Hypergrowth &mdash; so playing the two tutorials is also how you try both halves of the game before choosing an era.")}
     <div class="ltp-launch">
@@ -934,34 +905,52 @@ function tabStrip(active: string, place: "top" | "bottom"): string {
 }
 
 export function learnView(state: AppState): string {
-  const active = (state.route.view === "learn" ? state.route.tab : undefined) ?? LEARN_TABS[0]!.id;
+  const routeTab = state.route.view === "learn" ? state.route.tab : undefined;
+  const tab = LEARN_TABS.find((t) => t.id === routeTab) ?? LEARN_TABS[0]!;
 
-  const sections = LEARN_TABS.map(
-    (t, i) => `
-    <section class="ltp-sec" id="ltp-${t.id}" data-ltp-sec="${t.id}" aria-labelledby="ltp-h-${t.id}">
-      <header class="ltp-sec-head">
-        <p class="ltp-sec-kicker">Section ${i + 1} of ${LEARN_TABS.length}</p>
-        <h2 class="ltp-sec-title" id="ltp-h-${t.id}">${escapeHtml(t.label)}</h2>
-      </header>
-      ${SECTIONS[t.id]!()}
-    </section>`,
-  ).join("");
+  // The previous and next pages, so the reader can walk the six in order
+  // without going back up to the tabs. Absent at each end rather than disabled:
+  // a control that cannot do anything is worse than no control.
+  const at = LEARN_TABS.indexOf(tab);
+  const prev = LEARN_TABS[at - 1];
+  const next = LEARN_TABS[at + 1];
 
   return `
-  <main class="ltp" data-ltp-active="${escapeHtml(active)}">
+  <main class="ltp" data-ltp-active="${escapeHtml(tab.id)}">
     <header class="ltp-head">
       <div class="ltp-head-in">
         <div class="ltp-head-id">
           <p class="ltp-head-title">Learn to Play</p>
-          <p class="ltp-head-sub"><span class="ltp-head-now">${escapeHtml(LEARN_TABS[0]!.label)}</span></p>
-        </div>
-        <div class="ltp-prog" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-          <div class="ltp-prog-fill"></div>
         </div>
       </div>
-      ${tabStrip(active, "top")}
+      ${tabStrip(tab.id, "top")}
     </header>
-    <div class="ltp-body">${sections}</div>
-    ${tabStrip(active, "bottom")}
+    <div class="ltp-body">
+      <section class="ltp-sec" id="ltp-${tab.id}" aria-labelledby="ltp-h-${tab.id}">
+        <header class="ltp-sec-head">
+          <h2 class="ltp-sec-title" id="ltp-h-${tab.id}">${escapeHtml(tab.label)}</h2>
+        </header>
+        ${SECTIONS[tab.id]!()}
+      </section>
+      <nav class="ltp-pager" aria-label="Learn to Play pages">
+        ${
+          prev
+            ? `<a class="ltp-pager-btn ltp-pager-prev" href="#/learn/${prev.id}">
+                 ${icon("chevronLeft", 16)}
+                 <span class="ltp-pager-txt"><span class="ltp-pager-dir">Previous</span><span class="ltp-pager-name">${escapeHtml(prev.label)}</span></span>
+               </a>`
+            : `<span class="ltp-pager-gap"></span>`
+        }
+        ${
+          next
+            ? `<a class="ltp-pager-btn ltp-pager-next" href="#/learn/${next.id}">
+                 <span class="ltp-pager-txt"><span class="ltp-pager-dir">Next</span><span class="ltp-pager-name">${escapeHtml(next.label)}</span></span>
+                 ${icon("chevronRight", 16)}
+               </a>`
+            : `<span class="ltp-pager-gap"></span>`
+        }
+      </nav>
+    </div>
+    ${tabStrip(tab.id, "bottom")}
   </main>`;
 }

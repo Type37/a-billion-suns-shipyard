@@ -86,13 +86,16 @@ export const PREMADE_LISTS: PremadeList[] = [
     mode: "armageddon",
     factionId: "vyke",
     creditsLimit: 300,
-    // 52+35 + 75+45 + 27+18 + 15+9+6 = ¢282bn
+    // 52+35 + 75+45 + 27+18+18 + 15+9+6 = ¢300bn
     units: [
       { shipClassId: "leviathan", count: 1 }, // Mass 3, 52
       { shipClassId: "king-crab", count: 1 }, // Mass 3, 35
       { shipClassId: "dragonfish", count: 3 }, // Mass 2, 25 x3 = 75
       { shipClassId: "latchweaver", count: 3 }, // Mass 2, 15 x3 = 45
       { shipClassId: "needlespitter", count: 3 }, // Mass 1, 9 x3 = 27
+      { shipClassId: "snarefang", count: 3 }, // Mass 1, 6 x3 = 18
+      // A second Snarefang unit, not a bigger one: Mass 1 caps a unit at 3.
+      // These three are what take the list from 282 to exactly 300.
       { shipClassId: "snarefang", count: 3 }, // Mass 1, 6 x3 = 18
       { shipClassId: "orbspinner", count: 3 }, // Mass 0, 5 x3 = 15
       { shipClassId: "needlefin", count: 3 }, // Mass 0, 3 x3 = 9
@@ -109,7 +112,7 @@ export const PREMADE_LISTS: PremadeList[] = [
     mode: "age-of-unity",
     factionId: "the-ordinate",
     creditsLimit: 300,
-    // 80+35 + 60+40 + 30+10 + 20+15 = ¢290bn
+    // 80+35 + 60+40 + 30+10 + 30+15 = ¢300bn
     units: [
       { shipClassId: "hierophant-cathedral-ship", count: 1 }, // Mass 3, 80
       { shipClassId: "transept-class-strike-cruiser", count: 1 }, // Mass 3, 35
@@ -117,7 +120,7 @@ export const PREMADE_LISTS: PremadeList[] = [
       { shipClassId: "clerestory-class-monitor", count: 2 }, // Mass 2, 20 x2 = 40
       { shipClassId: "epistle-class-gunship", count: 2 }, // Mass 1, 15 x2 = 30
       { shipClassId: "missionary-vessel", count: 1 }, // Mass 1, 10
-      { shipClassId: "advanced-fighter-wing", count: 2 }, // Mass 0, 10 x2 = 20
+      { shipClassId: "advanced-fighter-wing", count: 3 }, // Mass 0, 10 x3 = 30
       { shipClassId: "light-fighter-wing", count: 3 }, // Mass 0, 5 x3 = 15
     ],
     hvpIds: ["liturgical-archivist", "relic-keeper", "the-blessed-lambda"],
@@ -131,7 +134,11 @@ export const PREMADE_LISTS: PremadeList[] = [
     mode: "hypergrowth",
     factionId: "heavy-industries",
     creditsLimit: 300,
-    // 75+40 + 50+25+45 + 20 + 21+14+6 = ¢296bn
+    // 75+40 + 50+25+45 + 20 + 21+14+10 = ¢300bn
+    // A shipyard stocks ship CLASSES, so the Mass-0 cap of 3 per unit does not
+    // apply here (the Megamart seed carries 5 Fighter Wings in one entry for
+    // the same reason). Five Pegasus wings rather than three is what closes the
+    // last ¢4bn without adding a second entry for a class already stocked.
     units: [
       { shipClassId: "andromeda-battlecruiser", count: 1 }, // Mass 3, 75
       { shipClassId: "orion-heavy-freighter", count: 1 }, // Mass 3, 40
@@ -141,7 +148,7 @@ export const PREMADE_LISTS: PremadeList[] = [
       { shipClassId: "lyra-light-mining-tug", count: 2 }, // Mass 1, 10 x2 = 20
       { shipClassId: "taurus-assault-wing", count: 3 }, // Mass 0, 7 x3 = 21
       { shipClassId: "ursus-bomber-wing", count: 2 }, // Mass 0, 7 x2 = 14
-      { shipClassId: "pegasus-recon-wing", count: 3 }, // Mass 0, 2 x3 = 6
+      { shipClassId: "pegasus-recon-wing", count: 5 }, // Mass 0, 2 x5 = 10
     ],
     hvpIds: ["demolition-chief", "penal-crew-overseer", "survey-director"],
     blurb:

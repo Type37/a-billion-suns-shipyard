@@ -275,25 +275,19 @@ export interface Settings {
    * getting rid of them again.
    */
   exampleFactions: boolean;
-  /**
-   * Crop emblem artwork to a circle. ON by default.
-   *
-   * Most of the library is circular badge art painted onto a square canvas,
-   * where the corners are flat colour around the mark and the disc removes
-   * exactly those and nothing else. It is wrong for the minority drawn AS
-   * squares, and no rule can tell the two apart from the pixels, so it is a
-   * switch rather than a guess.
-   */
-  discCrop: boolean;
+  // `discCrop` used to live here: emblem art cropped to a circle, on by
+  // default, off for the handful of marks drawn as squares. It is unconditional
+  // now (see .emblem-img in style.css), so the setting is gone. A stored value
+  // from an older build is simply ignored - nothing reads it, and dropping it
+  // needs no migration.
 }
 
-const DEFAULT_SETTINGS: Settings = { exampleFactions: false, discCrop: true };
+const DEFAULT_SETTINGS: Settings = { exampleFactions: false };
 
 export function loadSettings(): Settings {
   const s = read<Partial<Settings>>(SETTINGS_KEY, {});
   return {
     exampleFactions: s.exampleFactions ?? DEFAULT_SETTINGS.exampleFactions,
-    discCrop: s.discCrop ?? DEFAULT_SETTINGS.discCrop,
   };
 }
 

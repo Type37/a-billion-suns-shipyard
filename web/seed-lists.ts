@@ -1,12 +1,19 @@
 import type { SavedList } from "./storage.ts";
+import { PREMADE_LISTS } from "../src/data/premade-lists.ts";
 
-// Seed fleets: five ready-built ¢300bn lists, one per faction, shipped so
-// every new browser has a few worked examples on the Fleets page rather than
-// an empty state. Seeded once per browser (see storage.ts applyListSeeds) -
-// deleting one makes it stick.
+// Seed fleets: eight ready-built lists, shipped so every new browser has a set
+// of worked examples on the Fleets page rather than an empty state. Seeded once
+// per browser (see storage.ts applyListSeeds) - deleting one makes it stick.
+//
+// Every one of them costs exactly ¢300bn. Not "under the limit": exactly on it,
+// because a starter list is also a worked example of what a full fleet at the
+// standard limit looks like, and one that stops at ¢282bn quietly teaches that
+// leaving ¢18bn on the table is normal. Where hitting 300 exactly forced a
+// change of shape, the reason is written above the list it changed.
 //
 // Book order (see catalog.ts BOOK_ORDER): Megamart (Hypergrowth), The Unity
-// and Golem Mega-Systems (Age of Unity), Aegis and Gen Omega (Armageddon).
+// and Golem Mega-Systems (Age of Unity), Aegis and Gen Omega (Armageddon),
+// plus the three per-era starters mapped in at the bottom of this file.
 
 const CREATED = "2026-01-01T00:00:00.000Z";
 
@@ -132,16 +139,22 @@ const AEGIS_LIST: SavedList = {
     name: "Aegis Starter Fleet",
     factionId: "aegis",
     creditsLimit: 300,
+    // Landing on exactly ¢300bn forces the shape of this one. Aegis prices its
+    // four heavies at 75/65/55/45 and everything else at 4/6/10/12/20, so the
+    // total is odd whenever an odd NUMBER of heavies is fielded. The old list
+    // ran three (Imperator, Citadel, Bastion) and could only ever reach 299 or
+    // 301. A fourth heavy fixes the parity, and the Sentinel is the one that
+    // was missing, so the screen thins to one of each drone to pay for it.
     units: [
       u("u1", "imperator", 1),
       u("u2", "citadel", 1),
       u("u3", "bastion", 1),
-      u("u4", "warden", 1),
-      u("u5", "repair-drone", 2),
-      u("u6", "assault-drone", 3),
-      u("u7", "defence-drone", 3),
-      u("u8", "recon-drone", 3),
-      u("u9", "recon-drone", 2),
+      u("u4", "sentinel", 1),
+      u("u5", "warden", 1),
+      u("u6", "repair-drone", 1),
+      u("u7", "assault-drone", 1),
+      u("u8", "defence-drone", 1),
+      u("u9", "recon-drone", 3),
     ],
     hvp: [
       { hvpId: "power-management-protocols", assignedUnitId: "u1" },
@@ -149,7 +162,7 @@ const AEGIS_LIST: SavedList = {
       { hvpId: "threat-assessment-protocols", assignedUnitId: "u4" },
     ],
     notes:
-      "Three D10/D12-armed heavies (Imperator, Citadel, Bastion) plus a Warden and a drone screen, built to stay clustered within 6\" so Protocol Shards shares all three HVP across the whole task force.",
+      "All four D10/D12-armed heavies (Imperator, Citadel, Sentinel, Bastion) plus a Warden and one of every drone, built to stay clustered within 6\" so Protocol Shards shares all three HVP across the whole task force.",
   },
   createdAt: CREATED,
   updatedAt: CREATED,
@@ -171,8 +184,12 @@ const GEN_OMEGA_LIST: SavedList = {
       u("u3", "ghost-hunter-assault-frigate", 2),
       u("u4", "werewolf-stealth-frigate", 2),
       u("u5", "eidolon-yynnx-stealth-bomber", 3),
-      u("u6", "void-dancer-scout-marauder", 2),
+      u("u6", "void-dancer-scout-marauder", 1),
       u("u7", "warcry-fighter-wing", 3),
+      // A second Warcry unit rather than a bigger one: Mass 0 caps a unit at 3.
+      // These two wings and the scout dropped from the old list are what take
+      // this from 298 to exactly 300.
+      u("u8", "warcry-fighter-wing", 2),
     ],
     hvp: [
       { hvpId: "the-nameless-punk", assignedUnitId: "u5" },
@@ -186,7 +203,39 @@ const GEN_OMEGA_LIST: SavedList = {
   updatedAt: CREATED,
 };
 
+/*
+ * The three per-era starter lists (src/data/premade-lists.ts) ship the same
+ * way: as fleets that are simply already there.
+ *
+ * They were briefly offered instead - a card in the New Fleet modal with a
+ * "load this list" button - which is one more thing to read and dismiss on the
+ * way to the screen you opened. A ready-made fleet does not need to be pitched.
+ * It needs to be sitting on the Fleets page when you arrive, so you can open it,
+ * play it, edit it or delete it without anybody having asked you anything.
+ *
+ * Kept as a mapping rather than eight hand-written SavedLists because
+ * premade-lists.ts also carries the reasoning for which faction each era got,
+ * and test/premade-lists.test.ts validates those three against the catalogue.
+ */
+const PREMADE_SEEDS: SavedList[] = PREMADE_LISTS.map((p) => ({
+  id: `seed-${p.id}`,
+  mode: p.mode,
+  freePlay: false,
+  emblem: "delta",
+  fleet: {
+    name: p.name,
+    factionId: p.factionId,
+    creditsLimit: p.creditsLimit,
+    units: p.units.map((unit, i) => u(`u${i + 1}`, unit.shipClassId, unit.count)),
+    hvp: p.hvpIds.map((hvpId) => ({ hvpId })),
+    notes: p.blurb,
+  },
+  createdAt: CREATED,
+  updatedAt: CREATED,
+}));
+
 export const SEED_LISTS: SavedList[] = [
+  ...PREMADE_SEEDS,
   MEGAMART_LIST,
   THE_UNITY_LIST,
   GOLEM_LIST,

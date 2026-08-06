@@ -41,7 +41,6 @@ import {
 import type { AppState, LastRoll, PrintOpts, ShipFilter } from "./state.ts";
 import { RANDOM_BEHAVIOUR, GLITCH_BLIP, type RollRow } from "../src/data/junkspace-solo.ts";
 import { STARTER_OUTFITS } from "../src/data/starter-outfits.ts";
-import { PREMADE_LISTS } from "../src/data/premade-lists.ts";
 import { EXAMPLE_FACTIONS, EXAMPLE_FACTION_IDS } from "./example-factions.ts";
 import { renderMarkdown } from "./richtext.ts";
 import { LIB_PAGE, libraryIcon, randomIconId } from "./emblems.ts";
@@ -1707,44 +1706,6 @@ function dispatchAction(target: HTMLElement): void {
       );
       break;
     }
-    /*
-     * Load a ready-made starter list (src/data/premade-lists.ts): one legal
-     * ~¢300bn fleet per era, built around that era's most forgiving faction.
-     *
-     * It skips the modal's own era/credits/faction choices rather than filling
-     * them in, because the list IS those three answers - offering it and then
-     * making you press GET BUILDING as well would be asking a question that has
-     * already been answered. Straight to the builder, same as nf-create.
-     *
-     * The units are copied, not referenced: PREMADE_LISTS entries are module
-     * constants, and a fleet you can edit must not share objects with them.
-     */
-    case "nf-starter": {
-      const premadeId = target.dataset["premade"];
-      const p = PREMADE_LISTS.find((x) => x.id === premadeId);
-      if (!p) return;
-      const list = createList(p.mode, p.factionId, false);
-      list.fleet.name = p.name;
-      list.fleet.creditsLimit = p.creditsLimit;
-      list.fleet.units = p.units.map((u, i) => ({
-        id: `u${i + 1}`,
-        shipClassId: u.shipClassId,
-        count: u.count,
-      }));
-      list.fleet.hvp = p.hvpIds.map((hvpId) => ({ hvpId }));
-      const starterFaction = findFaction(p.factionId, state.customFactions);
-      if (starterFaction?.emblemImage) list.emblemImage = starterFaction.emblemImage;
-      else if (starterFaction?.emblemLib) list.emblemLib = starterFaction.emblemLib;
-      store.setState((s) => {
-        const lists = [...s.lists, list];
-        persistLists(lists);
-        return { ...s, lists, ui: { ...s.ui, modal: undefined } };
-      });
-      showToast(`${p.name} is ready to field`, { icon: "check", loud: true });
-      location.hash = routeHash({ view: "builder", listId: list.id });
-      break;
-    }
-
     case "nf-create": {
       const m = state.ui.modal;
       if (m?.kind !== "new-fleet" || !m.factionId) return;
@@ -2177,15 +2138,6 @@ function handleChange(e: Event): void {
     // keyboard toggle fires.
     case "toggle-example-factions": {
       setExampleFactions(target.checked);
-      break;
-    }
-    case "toggle-disc-crop": {
-      const on = target.checked;
-      store.setState((s) => {
-        const settings = { ...s.settings, discCrop: on };
-        persistSettings(settings);
-        return { ...s, settings };
-      });
       break;
     }
     case "fleet-name": {

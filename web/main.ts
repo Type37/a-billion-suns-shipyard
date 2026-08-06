@@ -9,7 +9,6 @@ import { runDecode, DIGIT_POOL } from "./write-on.ts";
 import { visibleAnchor } from "./tours.ts";
 import { renderMarkdown } from "./richtext.ts";
 import { FleetSync } from "./fleet-sync.ts";
-import { LEARN_TABS } from "./learn.ts";
 import "./style.css";
 
 // Keep every Markdown notes editor's preview in step with its textarea as the
@@ -87,105 +86,39 @@ function syncLearnAnchor(): void {
 }
 
 // ---------------------------------------------------------------------------
-// Learn to Play: one long page, six sections, a progress bar and two tab bars.
+// Learn to Play: six pages, one per tab.
 // ---------------------------------------------------------------------------
 
-/** The tab whose section is currently under the header, so we do not re-write the DOM every scroll frame. */
-let lastLearnTab: string | null = null;
-/** The tab the URL last asked for, so an explicit tab click scrolls exactly once. */
+/** The tab the URL last asked for, so arriving on a new page scrolls exactly once. */
 let lastLearnTarget: string | null = null;
 
-/**
- * Where the top of the reading area is, in px from the top of the viewport.
+/*
+ * Start a newly-opened Learn page at the top.
  *
- * The sticky header covers the first slice of the page, so "which section am I
- * looking at" has to be asked below it, not at y=0 - otherwise the answer flips
- * to the next section while its heading is still hidden behind the header.
- */
-function learnHeaderBottom(main: HTMLElement): number {
-  const head = main.querySelector<HTMLElement>(".ltp-head");
-  return head ? head.getBoundingClientRect().bottom : 0;
-}
-
-/**
- * Scroll-spy and progress, driven off scroll rather than IntersectionObserver.
+ * What used to be here was a scroll-spy: all six sections lived on one page, so
+ * a scroll listener worked out which one owned the reading line, moved the tab
+ * highlight, and drove a progress bar. None of that exists now - the active tab
+ * is rendered by learnView, and there is no progress to report across a single
+ * page. What is left is the one thing a page change still needs: if you were
+ * halfway down Tactical and press Scoring, you should arrive at the top of
+ * Scoring rather than halfway down it.
  *
- * IO reports crossings, and what this needs is "which section owns the top of
- * the reading area right now", which is a question about the current position -
- * a state, not an event. With six sections of wildly different lengths (Tactical
- * is longer than the other five together) the crossing-based version left the
- * bar on the wrong tab for whole screenfuls at a time.
- */
-function syncLearnScroll(): void {
-  const main = document.querySelector<HTMLElement>(".ltp");
-  if (!main) {
-    lastLearnTab = null;
-    lastLearnTarget = null;
-    return;
-  }
-  const secs = [...main.querySelectorAll<HTMLElement>("[data-ltp-sec]")];
-  if (!secs.length) return;
-
-  const line = learnHeaderBottom(main) + 8;
-  // The last section whose top is at or above the reading line. Falls back to
-  // the first, which is the honest answer while the page is scrolled to the top.
-  let current = secs[0]!;
-  for (const s of secs) {
-    if (s.getBoundingClientRect().top <= line) current = s;
-  }
-  const id = current.dataset["ltpSec"] ?? "";
-
-  // Progress across the whole document, not across the sections: the reader's
-  // sense of "how much is left" is about the scrollbar, and the bar sits next
-  // to a tab strip that already says which section they are in.
-  const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-  const pct = scrollable > 0 ? Math.min(100, Math.max(0, (window.scrollY / scrollable) * 100)) : 0;
-  const bar = main.querySelector<HTMLElement>(".ltp-prog");
-  const fill = main.querySelector<HTMLElement>(".ltp-prog-fill");
-  if (fill) fill.style.width = `${pct.toFixed(1)}%`;
-  if (bar) bar.setAttribute("aria-valuenow", String(Math.round(pct)));
-
-  if (id === lastLearnTab) return;
-  lastLearnTab = id;
-  for (const t of main.querySelectorAll<HTMLElement>("[data-ltp-tab]")) {
-    const on = t.dataset["ltpTab"] === id;
-    t.classList.toggle("on", on);
-    if (on) t.setAttribute("aria-current", "true");
-    else t.removeAttribute("aria-current");
-    // Keep the active tab visible in a strip that scrolls sideways on a phone.
-    if (on && t.parentElement && t.parentElement.scrollWidth > t.parentElement.clientWidth + 4) {
-      const pr = t.parentElement.getBoundingClientRect();
-      const tr = t.getBoundingClientRect();
-      if (tr.left < pr.left || tr.right > pr.right) t.scrollIntoView({ block: "nearest", inline: "center" });
-    }
-  }
-  const now = main.querySelector<HTMLElement>(".ltp-head-now");
-  const tab = LEARN_TABS.find((t) => t.id === id);
-  if (now && tab) now.textContent = tab.label;
-}
-
-/**
- * Scroll to the section the URL names.
- *
- * Only when the URL changes to a new tab, never on an ordinary repaint, or a
- * repaint from anything else on the page would yank the reader back to the top
- * of whichever section the address bar happens to name.
- *
- * Scrolling deliberately does NOT write the tab back into the hash. It would
- * make every section boundary a history entry, so Back would walk you up the
- * page one heading at a time instead of leaving the page.
+ * Nothing happens on an ordinary repaint, only when the tab in the URL actually
+ * changes, or any state change on the page would yank the reader back up.
  */
 function syncLearnTarget(): void {
   const r = store.getState().route;
   const key = r.view === "learn" ? (r.tab ?? "") : null;
+  if (key === null) {
+    lastLearnTarget = null;
+    return;
+  }
   if (key === lastLearnTarget) return;
   const first = lastLearnTarget === null;
   lastLearnTarget = key;
-  if (key === null || key === "") return;
-  const el = document.getElementById(`ltp-${key}`);
-  if (!el) return;
-  // A deep link arriving cold jumps; a tab press while reading glides.
-  el.scrollIntoView({ behavior: first ? "auto" : "smooth", block: "start" });
+  // A deep link arriving cold is already at the top; only a tab press mid-read
+  // has anywhere to travel from.
+  if (!first) window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 /**
@@ -312,12 +245,6 @@ function paint(): void {
   // save/restore hooks around this call are kept as a safety net for the cases
   // morphing genuinely does replace a node (a changed tag, a keyless list that
   // reordered), but on an ordinary click they now have nothing to restore.
-  // Emblem shape is one switch that has to reach every emblem in every view, so
-  // it rides the root element rather than being threaded into the dozen call
-  // sites that draw one. Set before the morph so the first paint is already
-  // right and no emblem is ever seen changing shape.
-  document.documentElement.classList.toggle("no-disc-crop", !store.getState().settings.discCrop);
-
   morphInto(root, render(store.getState()));
   // Every view builds its own <main>; tagging the first one here rather than in
   // eighteen templates keeps the skip link's target correct on all of them.
@@ -382,7 +309,6 @@ function paint(): void {
   revealSelectedSigil();
   syncLearnAnchor();
   animateOpenEraTitles();
-  syncLearnScroll();
   syncLearnTarget();
 }
 
@@ -1153,22 +1079,6 @@ window.addEventListener(
     });
   },
   { passive: true, capture: true },
-);
-
-// Learn to Play's progress bar and tab highlight. Same one-frame throttle as the
-// coachmark above, and a no-op on every other view (syncLearnScroll bails when
-// there is no .ltp on the page).
-let learnFrame = 0;
-window.addEventListener(
-  "scroll",
-  () => {
-    if (learnFrame) return;
-    learnFrame = requestAnimationFrame(() => {
-      learnFrame = 0;
-      syncLearnScroll();
-    });
-  },
-  { passive: true },
 );
 
 // Opening an era accordion is a native <details> toggle: it changes nothing in

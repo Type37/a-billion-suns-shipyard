@@ -1989,9 +1989,6 @@ button { font-family: inherit; }
   .cf-hvp { grid-template-columns: 1fr; }
 }
 
-/* ------------------------------------------------------------ changelog */
-
-
 /* ------------------------------------------------------------ misc */
 
 .empty-state { max-width: 600px; margin: 80px auto; text-align: center; font-size: 16px; }

@@ -458,7 +458,8 @@ function topbar(): string {
 function footer(): string {
   // The uniform WarLore builder footer: one centered line. No interpunct
   // separators - the items are spaced apart by the flex gap instead. The version
-  // / changelog link lives in the Options dialog now, not here.
+  // lives in the Options dialog now, not here; the changelog it used to link to
+  // is gone entirely (nobody read it, and a version number is enough).
   return `
   <footer class="game-info-footer">
     <div class="gif-inner">

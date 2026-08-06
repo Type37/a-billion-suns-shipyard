@@ -3837,6 +3837,33 @@ button { font-family: inherit; }
    changes. */
 .nf-detail { overflow-x: clip; }
 .nf-detail-empty { display: flex; align-items: center; justify-content: center; min-height: 220px; text-align: center; }
+/* The ready-made starter list, shown in the detail column until a faction is
+   picked.
+
+   Fixed height with an internal scroll, exactly like .nf-faction-scroll above,
+   and for the same reason: the three eras' blurbs are different lengths, so
+   letting the box size to its content means pressing Hypergrowth after
+   Armageddon walks the modal's footer up or down under the cursor. A min-height
+   does not fix that - it only sets the floor, and these cards clear it. The
+   height is under the controls column's, so the panel is always sized by the
+   left side and this column never drives it. Nothing is clipped: what does not
+   fit scrolls, which is the house answer to variable content in a fixed frame. */
+.nf-starter { height: 340px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+.nf-starter-head {
+  font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em;
+  font-size: 11px; color: var(--ink-3); margin: 0; display: flex; align-items: center; gap: 6px;
+}
+.nf-starter-card {
+  border: 1px solid var(--hair-soft); border-left: 3px solid var(--blue); background: var(--paper);
+  padding: 14px 16px; display: flex; flex-direction: column; gap: 7px;
+}
+.nf-starter-name { font-family: var(--display); font-weight: 800; font-size: 19px; color: var(--ink); margin: 0; }
+.nf-starter-meta {
+  font-family: var(--sans); font-weight: 600; font-size: 11px; letter-spacing: 0.03em;
+  text-transform: uppercase; color: var(--ink-3); margin: 0;
+}
+.nf-starter-blurb { font-size: 13px; line-height: 1.45; color: var(--ink-2); margin: 0; }
+.nf-starter-go { align-self: flex-start; margin-top: 3px; }
 /* The title carries an era-keyed desktop entrance (main.ts). inline-block so the
    underline and the wipe clip hug the text; the era class sets the resting
    colour and, for Armageddon, shows the underline. */
@@ -3940,6 +3967,12 @@ button { font-family: inherit; }
      scrolled as well. There are only four factions in an era, so at this width
      the list runs at its natural height and the panel is the sole scroller. */
   .nf-faction-scroll { height: auto; overflow: visible; padding-right: 0; }
+  /* One column here, so the modal itself is the scroller - a 340px scroll box
+     nested inside a scrolling sheet is a trap on a phone. The starter card
+     opens out to its full height and the page carries it.
+     The empty "pick a faction" hint below is hidden at this width; the starter
+     is NOT, because it is a whole fleet you can load in one press. */
+  .nf-starter { height: auto; overflow: visible; }
   /* Tighter plaques so all four factions of an era are on screen together. */
   .modal-body .faction-plaques { gap: 5px; }
   .modal-body .faction-plaque { height: auto; padding: 8px 10px; gap: 1px; }

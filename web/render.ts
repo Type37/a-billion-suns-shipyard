@@ -539,11 +539,11 @@ function homeView(state: AppState): string {
     <div class="index-col">
       ${tutorialCallout(state)}
       <nav class="index">
-        ${row("#/fleets", "Fleets", "Build, save, print, and share fleet lists and shipyards for any faction and era.")}
+        ${row("#/fleets", "Fleets", "Build, save, print, and share fleets.")}
         ${row("#/solo", "Solo Play", "Play the Junkspace in solo/campaign mode.")}
         ${row("#/ships", "Ship Compendium", "Compare all ships and stats.")}
-        ${row("#/learn", "Learn to Play", "New here? What the game is, what you need, and how a round works.")}
-        ${row("#/foundry", "Custom Rules", "Design your own factions, ship classes, and personnel.")}
+        ${row("#/learn", "Learn to Play", "If you&rsquo;re new, come here to learn how the game works.")}
+        ${row("#/foundry", "Custom Rules", "Customize your own factions. Make &rsquo;em Your Guys!")}
       </nav>
     </div>
     <aside class="index-book">

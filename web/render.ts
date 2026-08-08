@@ -488,21 +488,16 @@ function toast(state: AppState): string {
 // told what the game is. It points at Learn to Play now, and so does the
 // permanent home row: there is one front door for a new player, not two that
 // lead to different places.
+//
+// It also used to say all of that at length - a title, a note, and a card with
+// its own description - directly above a home index whose Learn to Play row says
+// the same thing. One sentence pointing at the row is the whole job.
 function tutorialCallout(state: AppState): string {
   const o = state.onboarding;
   if (o.tutorialsDismissed || o.visits > 2) return "";
   return `
   <aside class="onboard">
-    <div class="onboard-main">
-      <p class="onboard-title">New to A Billion Suns?</p>
-      <p class="onboard-note">Start here. What the game is, what you need, and a full round of play.</p>
-      <div class="onboard-options">
-        <a class="onboard-opt" href="#/learn">
-          <span class="oo-name">${icon("book", 15)} Learn to Play</span>
-          <span class="oo-desc">Pick an era, get your table ready, and walk the four phases of a round &mdash; then set up your first battle from the end of it.</span>
-        </a>
-      </div>
-    </div>
+    <p class="onboard-line">Check out the <a href="#/learn">Learn to Play</a> section to learn more about the game.</p>
     <button class="onboard-close" data-action="dismiss-tutorials" aria-label="Dismiss">${icon("close", 16)}</button>
   </aside>`;
 }

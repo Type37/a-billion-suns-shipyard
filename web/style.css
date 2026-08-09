@@ -5944,6 +5944,13 @@ main.play-body .roster-section::before { content: none; }
 /* ------------------------------------------------------------------ layout */
 .ltp-body { padding-top: 8px; }
 .ltp-sec { padding: 28px 0 8px; }
+/* The back-of-the-box pitch, first page only. Set a step above body copy and a
+   step below the section title: it is the first thing read, but it is not the
+   heading, and it should not compete with "Pick an era" sitting under it. */
+.ltp-pitch {
+  font-family: var(--sans); font-size: 17px; line-height: 1.55; font-weight: 500;
+  color: var(--ink-2); margin: 0 0 26px; max-width: 62ch;
+}
 .ltp-sec-head { margin-bottom: 14px; }
 .ltp-sec-title {
   font-family: var(--display); font-weight: 800; font-size: 30px; line-height: 1.1;
@@ -5970,15 +5977,20 @@ main.play-body .roster-section::before { content: none; }
 .ltp-list-num { list-style: decimal; }
 
 /* -------------------------------------------------------- quoted rules text
-   Everything inside one of these is transcribed from the rulebook. The left
-   keyline and the tinted ground are the only signal that the voice changed;
-   the type stays the interface face, because this is the rule you will be
-   reading off the screen mid-game and it has to be the most legible thing on
-   the page. */
-.ltp-quote {
-  margin: 0 0 16px; padding: 12px 14px 10px;
-  background: var(--blue-wash); border-left: 3px solid var(--blue);
-}
+   Everything inside one of these is transcribed from the rulebook.
+
+   It is plain text, and that is the point. This used to be a tinted panel with
+   a 3px blue keyline down the left, on the reasoning that the reader should be
+   able to see where the voice changed. What that missed is the proportion:
+   the rules ARE the page, so nearly every block on it got the panel, and a
+   marker that lands on nearly everything marks nothing - it just made a rules
+   reference look like six stacked callouts and a wall of boxes.
+
+   The voice is still marked, from the other side. Our own writing is italic
+   serif (.ltp-cool, the section ledes), which reads as "someone is talking to
+   you" everywhere else in the app too. So plain sans is the rulebook, italic
+   serif is us, and no furniture is needed to say so. */
+.ltp-quote { margin: 0 0 16px; padding: 0; }
 .ltp-quote > :last-child { margin-bottom: 0; }
 .ltp-cite {
   display: block; margin-top: 8px;

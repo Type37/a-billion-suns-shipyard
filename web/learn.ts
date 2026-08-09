@@ -21,7 +21,10 @@
 //
 // RULES TEXT IS VERBATIM. Everything quoted from the rulebook below is
 // transcribed from "ABS 2E Layouts 7.pdf" with its page number in the comment
-// above it. Do not tighten, summarise or re-order it. Prose that is ours - the
+// above it. Do not tighten, summarise or re-order it. The one thing that may be
+// dropped is a run-in line whose only job in the book was to introduce a list on
+// a page with no heading over it - here there IS a heading saying the same
+// thing, and printing both says it twice. Prose that is ours - the
 // "why this is cool" callouts, the section ledes - is clearly ours, sits in its
 // own elements, and is written in italic serif so a reader can tell at a glance
 // which voice they are hearing.
@@ -179,15 +182,22 @@ function eraAccordion(e: EraCard, first: boolean): string {
 
 function sectionEras(): string {
   return `
-    ${roundStrip()}
-    <div class="ltp-eras">${ERA_CARDS.map((e, i) => eraAccordion(e, i === 0)).join("")}</div>`;
+    <div class="ltp-eras">${ERA_CARDS.map((e, i) => eraAccordion(e, i === 0)).join("")}</div>
+    ${roundStrip()}`;
 }
 
 /**
- * The round, as four labelled stops. It exists on the first section because the
- * reader needs the shape of a round before any single phase means anything -
- * "Jump Phase" is a name, not information, until you know it is the second of
- * four things that happen every round.
+ * The round, as four labelled stops.
+ *
+ * It lives on the first section because the reader needs the shape of a round
+ * before any single phase means anything - "Jump Phase" is a name, not
+ * information, until you know it is the second of four things that happen every
+ * round.
+ *
+ * It sits BELOW the eras, not above them. It used to open the page, which put a
+ * diagram of the turn sequence in front of somebody who did not yet know what
+ * game they were choosing: the first question this page answers is which era
+ * you are playing, and the round only becomes readable once that is settled.
  */
 function roundStrip(): string {
   const stops: [string, string][] = [
@@ -360,9 +370,13 @@ function sectionPrepare(): string {
   return `
     ${h(3, "What you will need to play")}
     ${quote(
-      // p.12, verbatim.
-      `<p>To play A Billion Suns, you will need the following:</p>
-       ${ul([
+      // p.12, verbatim. The rulebook's lead-in ("To play A Billion Suns, you
+      // will need the following:") is dropped: the heading above it is our
+      // wording of the same sentence, and printing both said it twice. See the
+      // verbatim rule at the top of this file - it governs the rules, not a
+      // run-in line that only existed to introduce a list in a book with no
+      // heading over it.
+      `${ul([
          "One or more flat surfaces to play on.",
          "Miniatures or counters to represent your spaceships.",
          "At least a dozen D6 dice.",
@@ -904,6 +918,20 @@ function tabStrip(active: string, place: "top" | "bottom"): string {
   </nav>`;
 }
 
+/**
+ * What the game is, in three lines, above everything else on the first page.
+ *
+ * This is the back-of-the-box pitch and it goes first because the page opened
+ * on "Pick an era" - asking a reader to choose between three versions of a game
+ * nobody had yet told them about. Only on the first tab: the other five are
+ * arrived at by somebody already reading, and repeating the pitch on each would
+ * be furniture.
+ */
+const GAME_PITCH = `
+  <p class="ltp-pitch">A Billion Suns is a tabletop science-fiction miniatures wargame of interstellar
+  combat for 2&ndash;4 players. You command a fleet of mighty battleships, sleek destroyers and agile
+  fighters, and battle for supremacy of the stars.</p>`;
+
 export function learnView(state: AppState): string {
   const routeTab = state.route.view === "learn" ? state.route.tab : undefined;
   const tab = LEARN_TABS.find((t) => t.id === routeTab) ?? LEARN_TABS[0]!;
@@ -927,6 +955,7 @@ export function learnView(state: AppState): string {
     </header>
     <div class="ltp-body">
       <section class="ltp-sec" id="ltp-${tab.id}" aria-labelledby="ltp-h-${tab.id}">
+        ${at === 0 ? GAME_PITCH : ""}
         <header class="ltp-sec-head">
           <h2 class="ltp-sec-title" id="ltp-h-${tab.id}">${escapeHtml(tab.label)}</h2>
         </header>

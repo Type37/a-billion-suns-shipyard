@@ -6156,16 +6156,18 @@ main.play-body .roster-section::before { content: none; }
 .ltp-pager-name { font-family: var(--display); font-weight: 800; font-size: 15px; line-height: 1.2; }
 
 .ltp-src-group { margin-bottom: 18px; }
-.ltp-src-note { font-size: 13px; line-height: 1.5; color: var(--ink-2); margin: 0 0 8px; }
+/* Each row is a name and a link, nothing else. It used to carry a second line
+   describing the range, and all of that was cut - so the row is now a single
+   line and the list can be tighter than it was. */
 .ltp-src-list {
   list-style: none; margin: 0; padding: 0;
   display: flex; flex-direction: column; gap: 1px;
   background: var(--hair-soft); border: 1px solid var(--hair-soft);
 }
 .ltp-src {
-  display: flex; flex-direction: column; gap: 2px;
+  display: flex; align-items: center;
   padding: 9px 11px; background: var(--paper); text-decoration: none;
-  min-height: var(--tap); justify-content: center;
+  min-height: var(--tap);
 }
 .ltp-src:hover { background: var(--blue-wash); }
 .ltp-src-name {
@@ -6173,7 +6175,6 @@ main.play-body .roster-section::before { content: none; }
   font-family: var(--sans); font-weight: 700; font-size: 14px; color: var(--blue);
 }
 .ltp-src-name svg { flex: none; }
-.ltp-src-what { font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
 
 /* -------------------------------------------------------------- the tables */
 .ltp-fig { margin: 0 0 16px; }

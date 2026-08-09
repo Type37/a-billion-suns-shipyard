@@ -224,96 +224,86 @@ function roundStrip(): string {
 
 interface MiniSource {
   name: string;
-  what: string;
   url: string;
 }
 
 /**
  * Where to get spaceships.
  *
- * The game is explicitly manufacturer-agnostic, which is a genuine feature and
- * not a shrug - so this list is deliberately long and deliberately mixes the
+ * The game is explicitly manufacturer-agnostic, so this list mixes the
  * publisher's own partners, other companies' game ranges, STL files and free
- * paper, because the honest answer to "what do I have to buy" is "possibly
- * nothing". Grouped, not ranked; nothing here is a recommendation over
- * anything else in its group.
+ * paper. Grouped, not ranked.
+ *
+ * Names and links only. There used to be a line of description under each
+ * entry - what the range is, what scale, how many fleets - and the whole lot
+ * was cut in August 2026 for reading like marketing copy. A name and a link is
+ * the entire useful content of a row; anything past that is guesswork about
+ * stock that goes stale the week after it is written.
  *
  * Every URL was checked in August 2026. Ranges go out of print and shops
  * close, so if one of these 404s, delete the row rather than guessing a
- * replacement URL. Two known casualties are already noted in the copy: Star
- * Wars: Armada ended development in 2024, and Firestorm Armada is mid-rewrite
- * at Warcradle with no new miniatures out. Both stay listed anyway, because
- * people own them and they play fine.
+ * replacement URL. That audit removed ten rows: EC3D Design's MyMiniFactory
+ * collection (hard 404), and nine that resolved but were not worth linking -
+ * the generic marketplace searches (MyMiniFactory, Cults3D, Printables,
+ * Thangs, Gambody), Game God Terrain, 3D Breed, the Zhodani counter generator
+ * and the BoardGameGeek papercraft thread. Star Wars: Armada and Firestorm
+ * Armada both stay, out of print or not, because people own them and they play
+ * fine.
  */
-const MINI_SOURCES: { group: string; note: string; items: MiniSource[] }[] = [
+const MINI_SOURCES: { group: string; items: MiniSource[] }[] = [
   {
     group: "From the publisher",
-    note: "Planet Smasher Games is Mike Hutchinson&rsquo;s own studio. The free downloads include the 45-degree arc of fire measuring tool, reference cards and printable tokens.",
     items: [
-      { name: "Planet Smasher Games: free downloads", what: "Arc of fire tool, quick reference, tokens and terrain, campaign tracker", url: "https://planetsmashergames.com/a-billion-suns/downloads/" },
-      { name: "Planet Smasher: spaceship miniatures directory", what: "The publisher&rsquo;s own list of ranges. Written in 2020, so some of it has moved on", url: "https://planetsmashergames.com/a-billion-suns-blog/spaceship-miniatures/" },
-      { name: "What size spaceships?", what: "The designer on sizing: Mass 0 on a 25mm base up to Mass 3 on a 60mm one", url: "https://planetsmashergames.com/a-billion-suns-blog/what-size-spaceships/" },
+      { name: "Planet Smasher Games: free downloads", url: "https://planetsmashergames.com/a-billion-suns/downloads/" },
+      { name: "Planet Smasher: spaceship miniatures directory", url: "https://planetsmashergames.com/a-billion-suns-blog/spaceship-miniatures/" },
+      { name: "What size spaceships?", url: "https://planetsmashergames.com/a-billion-suns-blog/what-size-spaceships/" },
     ],
   },
   {
     group: "Spaceship miniature ranges",
-    note: "Metal, resin and plastic fleets you can buy today. Another game&rsquo;s ships work perfectly well as yours, and two players&rsquo; fleets do not have to be the same scale as each other.",
     items: [
-      { name: "Brigade Models", what: "The range players name first. Fifteen-plus fleets at roughly 1/3000, and they publish a PDF mapping the lot onto A Billion Suns ship classes", url: "https://brigademodels.co.uk/product-category/spaceships/" },
-      { name: "Ground Zero Games: Full Thrust", what: "The other perennial pick. Faction starship packs, around 1/3000", url: "https://shop.groundzerogames.co.uk/full-thrust-starships.html" },
-      { name: "em4 Miniatures", what: "The budget answer: cheap plastic spacecraft, including a 60-ship set for the price of a takeaway", url: "https://em4miniatures.com/collections/a-billion-suns" },
-      { name: "Scourge Scenics", what: "Gothic space combat fleets, and the most complete Battlefleet Gothic successor still trading", url: "https://www.scourgescenics.co.uk/shop/product-category/gothic-space-combat-miniatures-and-battlefleets" },
-      { name: "Vanguard Miniatures: Battlegroup Helios", what: "The other gothic starship range, still getting new releases", url: "https://vanguardminiatures.co.uk/product-category/battlegroup-helios/" },
-      { name: "TTCombat: Dropfleet Commander", what: "Big, active plastic and resin range. Runs large for A Billion Suns, which matters not at all if both fleets are Dropfleet", url: "https://ttcombat.com/collections/dropfleet-commander" },
-      { name: "Kallistra: Space Dreadnought 3000", what: "1/3000 pewter ships, six factions plus merchants and pirates, stands included", url: "https://www.kallistra.co.uk/index.php?page=22" },
-      { name: "Studio Bergstrom", what: "Starships in fleet scale and 25mm, across a lot of factions", url: "https://studiobergstrom.com/" },
-      { name: "Laserforge: Grand Fleet Admiral", what: "Two hundred-plus fleet-scale ships printed to order. The answer if you want prints but have no printer", url: "https://www.laserforgeminiatures.com/collections/grand-fleet-admiral" },
-      { name: "Ravenstar Studios: Cold Navy", what: "Resin fleets, and free printable ship tokens on the same site", url: "https://www.ravenstarstudio.com/store/c4/Cold_Navy.html" },
-      { name: "Dream Pod 9: Jovian Wars", what: "Spaceships, exo-armour and fighter squadrons", url: "https://store.dp9.com/index.php?route=product/category&path=127" },
-      { name: "Acheson Creations: Stars Reach", what: "Micro-scale starships across three factions", url: "https://achesoncreations.com/index.php/products/starsreach" },
-      { name: "Amarillo Design Bureau: Starline 2400", what: "Star Fleet Universe ships, singles and fleet boxes, new ones every quarter", url: "https://www.starfleetstore.com/starline-2400-miniatures-c-12/" },
-      { name: "Little Metal Spaceships", what: "Metal ships at 1&rdquo; and 2&rdquo;, and the STL files for them too", url: "https://littlemetalspaceships.com/" },
-      { name: "Krakon Games", what: "Bio-organic fleets rather than ships: sporelings, drones and kraken splinters", url: "https://krakongames.com/product-category/affiliated-games/a-billion-suns/" },
-      { name: "Star Wars: Armada", what: "Out of print since 2024, so secondhand only &mdash; but the designer plays A Billion Suns with his own Armada collection, and there is a lot of it about", url: "https://boardgamegeek.com/boardgame/181834/star-wars-armada" },
-      { name: "Firestorm Armada (Warcradle)", what: "Spartan Games closed in 2017; Warcradle owns it and is rewriting it with a free public beta. No new ships yet, plenty of old ones on shelves", url: "https://blog.warcradle.com/firestorm-armada-news" },
+      { name: "Brigade Models", url: "https://brigademodels.co.uk/product-category/spaceships/" },
+      { name: "Ground Zero Games: Full Thrust", url: "https://shop.groundzerogames.co.uk/full-thrust-starships.html" },
+      { name: "em4 Miniatures", url: "https://em4miniatures.com/collections/a-billion-suns" },
+      { name: "Scourge Scenics", url: "https://www.scourgescenics.co.uk/shop/product-category/gothic-space-combat-miniatures-and-battlefleets" },
+      { name: "Vanguard Miniatures: Battlegroup Helios", url: "https://vanguardminiatures.co.uk/product-category/battlegroup-helios/" },
+      { name: "TTCombat: Dropfleet Commander", url: "https://ttcombat.com/collections/dropfleet-commander" },
+      { name: "Kallistra: Space Dreadnought 3000", url: "https://www.kallistra.co.uk/index.php?page=22" },
+      { name: "Studio Bergstrom", url: "https://studiobergstrom.com/" },
+      { name: "Laserforge: Grand Fleet Admiral", url: "https://www.laserforgeminiatures.com/collections/grand-fleet-admiral" },
+      { name: "Ravenstar Studios: Cold Navy", url: "https://www.ravenstarstudio.com/store/c4/Cold_Navy.html" },
+      { name: "Dream Pod 9: Jovian Wars", url: "https://store.dp9.com/index.php?route=product/category&path=127" },
+      { name: "Acheson Creations: Stars Reach", url: "https://achesoncreations.com/index.php/products/starsreach" },
+      { name: "Amarillo Design Bureau: Starline 2400", url: "https://www.starfleetstore.com/starline-2400-miniatures-c-12/" },
+      { name: "Little Metal Spaceships", url: "https://littlemetalspaceships.com/" },
+      { name: "Krakon Games", url: "https://krakongames.com/product-category/affiliated-games/a-billion-suns/" },
+      { name: "Star Wars: Armada (out of print, secondhand only)", url: "https://boardgamegeek.com/boardgame/181834/star-wars-armada" },
+      { name: "Firestorm Armada (Warcradle, mid-rewrite)", url: "https://blog.warcradle.com/firestorm-armada-news" },
     ],
   },
   {
     group: "STLs and 3D printing",
-    note: "If you own a printer, or know someone who does, this is the cheapest way to a whole fleet. Several of these were designed for this game specifically.",
     items: [
-      { name: "Hardware Studios: Consortium Spacefleet", what: "Sold as fleet scale for A Billion Suns: every ship class from a 5.6&rdquo; battleship down to fighter wings", url: "https://hardwarestudios.co/product/consortium-spacefleet/" },
-      { name: "Skull Forge Studios: Sanhalran Fleet", what: "A full battle-ready fleet made for this game, bases and stands included", url: "https://skullforgestudios.gumroad.com/l/sanhalran" },
-      { name: "Martian Models", what: "STLs and printed models both, pitched at Full Thrust, Starmada and A Billion Suns", url: "https://martianmodels.com/" },
-      { name: "Brander Roullett on MyMiniFactory", what: "The most prolific A Billion Suns designer going: eight-plus complete named fleets, each a full spread of ship classes", url: "https://www.myminifactory.com/object/3d-print-a-billion-suns-the-kiriian-collective-fleet-of-spaceships-169957" },
-      { name: "EC3D Design: Fleet Scale Starships", what: "Five fleets, a dozen ships each, with 3mm flight stand holes", url: "https://www.myminifactory.com/users/EC3D%20Design/collection/fleet-scale-starships-creatures-and-scenics" },
-      { name: "Game God Terrain on Cults3D", what: "A four-item A Billion Suns collection: a 54-file fleet bundle plus three faction fleets", url: "https://cults3d.com/en/design-collections/gamegodterrain/a-billion-suns" },
-      { name: "3D Breed: Space Fleet", what: "Very cheap 1/15000 fleets, battleship down to fighters, turrets and bases included", url: "https://www.3dbreed.com/6mm-stl-category/space-fleet-shogunate-fleet/" },
-      { name: "Gambody", what: "Licensed ships &mdash; Star Trek, Star Wars, Dune, EVE Online &mdash; with fleet-scale options", url: "https://www.gambody.com/premium?q=spaceship" },
-      { name: "MyMiniFactory", what: "The richest marketplace for this game specifically, and now the owner of Thingiverse", url: "https://www.myminifactory.com/search/?query=spaceship" },
-      { name: "Cults3D", what: "Thousands of spaceship models, free and paid", url: "https://cults3d.com/en/tags/spaceship" },
-      { name: "Printables", what: "Prusa&rsquo;s free-first repository", url: "https://www.printables.com/search/models?q=spaceship" },
-      { name: "Thangs", what: "A search index across 24 million models, and where Shapeways ended up", url: "https://thangs.com/" },
+      { name: "Hardware Studios: Consortium Spacefleet", url: "https://hardwarestudios.co/product/consortium-spacefleet/" },
+      { name: "Skull Forge Studios: Sanhalran Fleet", url: "https://skullforgestudios.gumroad.com/l/sanhalran" },
+      { name: "Martian Models", url: "https://martianmodels.com/" },
+      { name: "Brander Roullett on MyMiniFactory", url: "https://www.myminifactory.com/object/3d-print-a-billion-suns-the-kiriian-collective-fleet-of-spaceships-169957" },
     ],
   },
   {
     group: "Free, and free to print at home",
-    note: "Paper counters are a completely legitimate way to play your first game, and nobody at the table will mind.",
     items: [
-      { name: "Thingiverse: the A Billion Suns tag", what: "Free STLs tagged for this game, including Windham Graves&rsquo; capitals, sub-capitals and wings for filament printers", url: "https://www.thingiverse.com/tag:a_billion_suns" },
-      { name: "Tinnut&rsquo;s free A Billion Suns fleets", what: "Three free fleets of thirteen files each &mdash; one per ship class &mdash; with peg holes for flight stands", url: "https://www.printables.com/model/442285-space-ship-fleet-for-a-billion-suns" },
-      { name: "OnePageRules: Warfleets paper minis", what: "Free since 2024. Six paper spaceship fleets and a space terrain pack", url: "https://www.drivethrurpg.com/browse/pub/16079/onepagerules" },
-      { name: "Zhodani ship counter generator", what: "Pick a colour, a ship icon and a size, and it prints you a sheet of counters. Fastest possible route from nothing to a playable fleet", url: "https://zhodani.space/rules/war/ship_counter.html" },
-      { name: "Papercraft fleet options (BoardGameGeek)", what: "A community thread collecting the printable paper fleets people actually use", url: "https://boardgamegeek.com/thread/2819828/papercraft-fleet-options" },
+      { name: "Thingiverse: the A Billion Suns tag", url: "https://www.thingiverse.com/tag:a_billion_suns" },
+      { name: "Tinnut&rsquo;s free A Billion Suns fleets", url: "https://www.printables.com/model/442285-space-ship-fleet-for-a-billion-suns" },
+      { name: "OnePageRules: Warfleets paper minis", url: "https://www.drivethrurpg.com/browse/pub/16079/onepagerules" },
     ],
   },
   {
     group: "Ask somebody",
-    note: "Ranges close and new ones appear. These are the places the answer stays current.",
     items: [
-      { name: "Full Thrust miniatures list", what: "A community-maintained table of around 35 manufacturers, 9 printing services and 13 print-at-home sources. More current than anyone&rsquo;s official list", url: "https://faq.fullthrust.net/miniatures" },
-      { name: "A Billion Suns on BoardGameGeek", what: "Where nearly all the discussion happens, including several &lsquo;what minis do you use&rsquo; threads", url: "https://boardgamegeek.com/boardgame/265304/a-billion-suns-interstellar-fleet-battles" },
-      { name: "The Planet Smasher Discord", what: "The designer is in there", url: "https://planetsmashergames.com/discord/" },
+      { name: "Full Thrust miniatures list", url: "https://faq.fullthrust.net/miniatures" },
+      { name: "A Billion Suns on BoardGameGeek", url: "https://boardgamegeek.com/boardgame/265304/a-billion-suns-interstellar-fleet-battles" },
+      { name: "The Planet Smasher Discord", url: "https://planetsmashergames.com/discord/" },
     ],
   },
 ];
@@ -321,12 +311,12 @@ const MINI_SOURCES: { group: string; note: string; items: MiniSource[] }[] = [
 /*
  * Every source, behind one closed accordion.
  *
- * The list runs to about forty entries across six groups, which is the right
+ * The list runs to thirty entries across five groups, which is the right
  * length for the question it answers and completely the wrong length to have
  * sitting open in the middle of "what you need to play". Somebody reading the
  * page wants one line about miniatures and to move on; somebody shopping wants
- * all forty. One <details> serves both, and it is closed by default because the
- * reading case is the common one.
+ * all thirty. One <details> serves both, and it is closed by default because
+ * the reading case is the common one.
  */
 function sourceList(): string {
   const groups = MINI_SOURCES.filter((g) => g.items.length);
@@ -345,16 +335,14 @@ function sourceList(): string {
           (g) => `
         <div class="ltp-src-group">
           <h4 class="ltp-h4">${g.group}</h4>
-          <p class="ltp-src-note">${g.note}</p>
           <ul class="ltp-src-list">
             ${g.items
               .map(
-                // name and what are authored constants above and carry their own
-                // entities (curly quotes, dashes); only the URL is escaped, which
-                // is also what turns a query string's & into &amp;.
+                // name is an authored constant above and carries its own entities
+                // (curly quotes, dashes); only the URL is escaped, which is also
+                // what turns a query string's & into &amp;.
                 (s) => `<li><a class="ltp-src" href="${escapeHtml(s.url)}" target="_blank" rel="noopener">
                   <span class="ltp-src-name">${icon("link", 13)} ${s.name}</span>
-                  <span class="ltp-src-what">${s.what}</span>
                 </a></li>`,
               )
               .join("")}

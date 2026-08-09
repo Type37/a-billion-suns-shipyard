@@ -25,6 +25,7 @@ import {
 } from "./emblems.ts";
 import pkg from "../package.json";
 import { learnDiagram } from "./diagrams.ts";
+import { imageSrc } from "./image-store.ts";
 import { FACTION_LORE } from "./faction-lore.ts";
 import type { AppState } from "./state.ts";
 import { activeList, activeOutfit, DEFAULT_PRINT, PAPER } from "./state.ts";
@@ -408,7 +409,9 @@ function factionRuleBlock(f: Faction, size: "full" | "compact" = "full", showIni
 }
 
 function renderSigil(e: EmblemFields, size: number, cls = ""): string {
-  return emblemMark(e.emblem ?? "delta", e.emblemImage ?? libraryUrl(e.emblemLib), size, cls);
+  // imageSrc resolves an uploaded picture; a library mark is already a URL and
+  // passes straight through it. See image-store.ts for the reference format.
+  return emblemMark(e.emblem ?? "delta", imageSrc(e.emblemImage) ?? libraryUrl(e.emblemLib), size, cls);
 }
 
 /**
@@ -2554,7 +2557,7 @@ function foundryEditView(state: AppState, factionId: string): string {
         -->
         <span class="cf-shipimg-cell">
           <label class="cf-shipimg-drop ${s.image ? "has-img" : ""}" data-drop title="Choose, drag or drop an image for ${escapeHtml(s.name)}">
-            ${s.image ? `<img src="${s.image}" alt="" />` : `<span class="cf-shipimg-cue">${icon("upload", 18)}<span>Add art</span></span>`}
+            ${s.image ? `<img src="${imageSrc(s.image)}" alt="" />` : `<span class="cf-shipimg-cue">${icon("upload", 18)}<span>Add art</span></span>`}
             <input class="file-cover" type="file" accept="image/*" data-action="cf-ship-image-upload" data-ship="${si}" aria-label="Image for ${escapeHtml(s.name)}" />
           </label>
           ${s.image ? `<button class="cf-shipimg-x" data-action="cf-ship-image-clear" data-ship="${si}" title="Remove this image" aria-label="Remove image">${icon("close", 12)}</button>` : ""}
@@ -3692,14 +3695,19 @@ function optionsModal(state: AppState): string {
           <h3 class="opt-h">Your data</h3>
           <p class="opt-note">Everything you build is saved in this browser only.</p>
           <!--
-            A budget nobody could see until they hit it. The ceiling is the
-            browser's, around 5MB, and text never approaches it - uploaded art
-            is what spends it, so the figure is only worth showing once there
-            is enough stored to be worth knowing about.
+            The figure, once there is enough saved to be worth knowing.
+
+            This used to warn that uploaded art was almost all of it and to
+            export a backup before the ~5MB localStorage ceiling arrived. That
+            was true when pictures were base64 strings in that same store; they
+            are Blobs in IndexedDB now (image-store.ts), whose budget is a share
+            of free disk rather than five megabytes. What is left here is text,
+            and text has never come close - so this is a readout, not a warning,
+            and it no longer tells anyone to go and delete their art.
           -->
           ${
             storageBytes() > 250_000
-              ? `<p class="opt-note opt-usage">Using about ${Math.round(storageBytes() / 1024)}&nbsp;KB of this browser's ~5&nbsp;MB. Uploaded images are almost all of that; export a backup if you are getting close.</p>`
+              ? `<p class="opt-note opt-usage">Fleets, factions and outfits are using about ${Math.round(storageBytes() / 1024)}&nbsp;KB. Uploaded images are stored separately and are not counted here.</p>`
               : ""
           }
           <div class="opt-actions">
@@ -4320,7 +4328,7 @@ function emblemModal(state: AppState): string {
 
   // The uploaded image, if the current mark IS one. Only an upload can be shown
   // back at full size here; a library sigil is a URL the grid already displays.
-  const uploaded = cfg.fields.emblemImage;
+  const uploaded = imageSrc(cfg.fields.emblemImage);
 
   /*
    * The file input, rendered exactly once per open picker.

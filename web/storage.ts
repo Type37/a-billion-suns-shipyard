@@ -1,6 +1,7 @@
 import type { Faction, Fleet, GameMode, OutfitShip } from "../src/types.ts";
 import { SEED_LISTS } from "./seed-lists.ts";
 import { SEED_OUTFITS } from "./seed-outfits.ts";
+import { sweepImages } from "./image-store.ts";
 
 // localStorage persistence. One key per concern, JSON payloads, versioned so a
 // future format change can migrate instead of clobber.
@@ -73,7 +74,8 @@ export interface SavedList {
   freePlay: boolean;
   /** Emblem id from the built-in emblem set. */
   emblem: string;
-  /** Optional uploaded image (downscaled data URL). Takes priority over emblem. */
+  /** Optional uploaded image, as an image-store reference ("img:..."). Takes
+   *  priority over emblem. Resolve with imageSrc() before putting it in an <img>. */
   emblemImage?: string;
   /** Optional icon-library id (see emblems.ts). Used when no upload is set. */
   emblemLib?: string;
@@ -104,15 +106,16 @@ function read<T>(key: string, fallback: T): T {
  * write simply did not happen: you carry on editing, everything on screen looks
  * saved, and the work is gone at the next reload with nothing having said so.
  *
- * Text never got near the ~5MB budget, so this was theoretical. Uploaded images
- * are not: localStorage holds UTF-16, so a base64 data URL costs about two
- * bytes per character, and one 480px emblem can be half a megabyte of quota.
- * Art on nine ship classes reaches the ceiling easily.
- *
- * So a full-storage failure is now reported rather than hidden. Anything else
+ * So a full-storage failure is reported rather than hidden. Anything else
  * (private-mode blocking, a disabled store) still fails quietly, because there
  * is nothing the player can do about those and nothing was going to persist in
  * that session anyway.
+ *
+ * This is now a backstop rather than a live risk. It was written when uploaded
+ * pictures were base64 data URLs sitting in this very string - localStorage is
+ * UTF-16, so one 480px emblem could be half a megabyte of a ~5MB budget, and
+ * art on nine ship classes reached the ceiling. Pictures live in IndexedDB now
+ * (image-store.ts) and what is left here is text, which has never come close.
  */
 let onStorageFull: (() => void) | undefined;
 export function setStorageFullHook(fn: () => void): void {
@@ -170,7 +173,38 @@ export function setListsWrittenHook(fn: () => void): void {
 export function persistLists(lists: SavedList[]): void {
   write(LISTS_KEY, lists);
   onListsWritten?.();
+  sweepOrphanImages();
 }
+/*
+ * Drop stored pictures nothing points at any more.
+ *
+ * Pictures live in IndexedDB (image-store.ts) and the saved state keeps only a
+ * reference to each, so deleting a fleet or clearing a ship class's art no
+ * longer deletes the bytes with it. This runs after every save and asks the
+ * question from the whole of what is saved, rather than trying to catch each
+ * removal at its own call site: there are a dozen of those, they are ordinary
+ * state edits that know nothing about images, and missing one would leak
+ * silently for ever.
+ *
+ * Reading all three registries on each save is cheap - they are already parsed
+ * objects in memory - and being wrong in the safe direction matters more than
+ * being quick: a picture still referenced must never be swept, so every holder
+ * of an image reference has to be listed here. There are four.
+ */
+function sweepOrphanImages(): void {
+  const inUse = new Set<string>();
+  const keep = (v: string | undefined): void => {
+    if (v) inUse.add(v);
+  };
+  for (const l of read<SavedList[]>(LISTS_KEY, [])) keep(l.emblemImage);
+  for (const o of read<SavedOutfit[]>(OUTFITS_KEY, [])) keep(o.emblemImage);
+  for (const f of read<Faction[]>(FACTIONS_KEY, [])) {
+    keep(f.emblemImage);
+    for (const s of f.ships ?? []) keep(s.image);
+  }
+  void sweepImages(inUse);
+}
+
 
 // Seed fleets ship as ready-made starter lists (see seed-lists.ts), one per
 // browser, same rule as applySeeds below: added at most once, tracked by id
@@ -204,6 +238,7 @@ export function loadCustomFactions(): Faction[] {
 
 export function persistCustomFactions(factions: Faction[]): void {
   write(FACTIONS_KEY, factions);
+  sweepOrphanImages();
 }
 
 // --- Junkspace solo outfits -------------------------------------------------
@@ -258,6 +293,7 @@ export function loadOutfits(): SavedOutfit[] {
 
 export function persistOutfits(outfits: SavedOutfit[]): void {
   write(OUTFITS_KEY, outfits);
+  sweepOrphanImages();
 }
 
 export function newId(prefix: string): string {

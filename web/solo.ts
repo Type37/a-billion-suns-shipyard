@@ -3,6 +3,7 @@
 // of the app; actions.ts owns the event handling.
 
 import { PILOT_CLASSES, type PilotClass, type ShipClass } from "../src/types.ts";
+import { imageSrc } from "./image-store.ts";
 import {
   JUNKSPACE_SHIPS,
   OUTFIT_BUDGET_K,
@@ -566,7 +567,7 @@ export function soloOutfitView(state: AppState): string {
 }
 
 function outfitEmblemPicker(o: SavedOutfit): string {
-  const img = o.emblemImage ?? libraryUrl(o.emblemLib);
+  const img = imageSrc(o.emblemImage) ?? libraryUrl(o.emblemLib);
   return `<button class="emblem-choose-btn" data-action="open-emblem-modal" data-target="outfit">
     <span class="emblem-choose-preview">${emblemView(o, 40)}</span>
     <span class="emblem-choose-label">${icon("image", 15)} Choose emblem</span>

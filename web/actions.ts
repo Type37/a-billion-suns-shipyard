@@ -51,6 +51,7 @@ import { writeOnInput } from "./write-on.ts";
 import { shareUrl } from "./share.ts";
 import { visibleAnchor } from "./tours.ts";
 import { activeCropper } from "./cropper.ts";
+import { putImage } from "./image-store.ts";
 import { fleetToMarkdown } from "./export-text.ts";
 
 // --- Solo dice roller -------------------------------------------------------
@@ -411,30 +412,30 @@ function startImageCrop(action: string, data: DOMStringMap, file: File): void {
  * fifteen copies of "put it there", which is what the change handler alone used
  * to hold five of.
  */
-function applyImageUpload(action: string, data: DOMStringMap, dataUrl: string): void {
+function applyImageUpload(action: string, data: DOMStringMap, ref: string): void {
   const done = (): void => showToast("Image added.", { icon: "check" });
   switch (action) {
     case "emblem-upload": {
       const id = currentListId();
       if (!id) return;
-      store.setState((s) => updateList(s, id, (l) => ({ ...l, emblemImage: dataUrl })));
+      store.setState((s) => updateList(s, id, (l) => ({ ...l, emblemImage: ref })));
       done();
       break;
     }
     case "cf-emblem-upload": {
       const fid = currentFoundryId();
       if (!fid) return;
-      editFaction(fid, (f) => ({ ...f, emblemImage: dataUrl }));
+      editFaction(fid, (f) => ({ ...f, emblemImage: ref }));
       done();
       break;
     }
     case "outfit-emblem-upload": {
-      editOutfit((o) => ({ ...o, emblemImage: dataUrl }));
+      editOutfit((o) => ({ ...o, emblemImage: ref }));
       done();
       break;
     }
     case "no-emblem-upload": {
-      editNewOutfit((d) => ({ ...d, emblemImage: dataUrl }));
+      editNewOutfit((d) => ({ ...d, emblemImage: ref }));
       done();
       break;
     }
@@ -444,7 +445,7 @@ function applyImageUpload(action: string, data: DOMStringMap, dataUrl: string): 
       if (!fid || !Number.isInteger(si)) return;
       editFaction(fid, (f) => ({
         ...f,
-        ships: f.ships.map((s, i) => (i === si ? { ...s, image: dataUrl } : s)),
+        ships: f.ships.map((s, i) => (i === si ? { ...s, image: ref } : s)),
       }));
       done();
       break;
@@ -775,22 +776,34 @@ function dispatchAction(target: HTMLElement): void {
         return;
       }
       /*
-       * JPEG, always, and this is a deliberate change from what came before.
+       * JPEG, and as a Blob rather than a data URL.
        *
-       * The old pipeline kept a PNG whenever the SOURCE was a PNG, which is
-       * most uploads - and a 480px PNG is comfortably half a megabyte of a
-       * roughly 5MB store (see storage.ts write). Nothing was gained for it:
-       * the canvas is filled white before the image is drawn, so there is no
-       * transparency in the output to preserve either way, and every emblem is
-       * displayed at 40-60px. The same crop as JPEG is about a tenth the size.
+       * JPEG because the canvas is filled white before the image is drawn, so
+       * there is no transparency in the output to preserve; keeping a PNG
+       * because the SOURCE was a PNG (what the old pipeline did) bought nothing
+       * and cost several times the bytes. Emblems get the higher quality of the
+       * two - they are usually line art or a logo, where hard edges show
+       * ringing first.
        *
-       * Emblems get the higher quality of the two: they are usually line art
-       * or a logo, where hard edges show ringing first.
+       * A Blob because that is what the image store wants (see image-store.ts).
+       * toDataURL would base64 it, which inflates by a third, only for the
+       * store to have to decode it again.
        */
-      const dataUrl = canvas.toDataURL("image/jpeg", c.round ? 0.9 : 0.85);
       const data = { ...(c.ship !== undefined ? { ship: c.ship } : {}) } as DOMStringMap;
-      store.setState((s) => ({ ...s, ui: { ...s.ui, crop: undefined } }));
-      applyImageUpload(c.action, data, dataUrl);
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            showToast(imageFailure("canvas"), { icon: "close" });
+            return;
+          }
+          void putImage(blob).then((ref) => {
+            store.setState((s) => ({ ...s, ui: { ...s.ui, crop: undefined } }));
+            applyImageUpload(c.action, data, ref);
+          });
+        },
+        "image/jpeg",
+        c.round ? 0.9 : 0.85,
+      );
       break;
     }
     case "emblem-lib-more": {

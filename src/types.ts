@@ -82,7 +82,8 @@ export interface ShipClass {
   auxiliaryFitting?: string;
   /** Cost in billions of credits, per single ship of this class. */
   cost: number;
-  /** Optional uploaded ship art (downscaled data URL). Shown in catalog/roster. */
+  /** Optional uploaded ship art, as an image-store reference ("img:..."). Shown
+   *  in catalog/roster; resolve with imageSrc() before putting it in an <img>. */
   image?: string;
 }
 
@@ -111,7 +112,8 @@ export interface Faction {
   rule: FactionRule;
   ships: ShipClass[];
   hvp: Hvp[];
-  /** Optional uploaded emblem image (downscaled data URL). Custom factions only. */
+  /** Optional uploaded emblem, as an image-store reference ("img:..."). Custom
+   *  factions only; resolve with imageSrc() before putting it in an <img>. */
   emblemImage?: string;
   /** Optional icon-library id (see web/emblems.ts). */
   emblemLib?: string;

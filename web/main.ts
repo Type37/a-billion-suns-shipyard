@@ -10,6 +10,7 @@ import { visibleAnchor } from "./tours.ts";
 import { renderMarkdown } from "./richtext.ts";
 import { FleetSync } from "./fleet-sync.ts";
 import { syncCropper } from "./cropper.ts";
+import { hydrateImages } from "./image-store.ts";
 import "./style.css";
 
 // Keep every Markdown notes editor's preview in step with its textarea as the
@@ -1136,6 +1137,22 @@ if (!tryImportShare()) {
   store.setState((s) => ({ ...s, route: parseRoute(location.hash) }));
 }
 paint();
+
+/*
+ * Uploaded pictures live in IndexedDB (see image-store.ts), which is async, and
+ * the first paint above is not going to wait for a disk read.
+ *
+ * So it does not: the page paints immediately with any uploaded art missing,
+ * the blobs are read, and a repaint fills them in. In practice that is one
+ * frame on a warm store and nobody sees the gap - and the alternative, holding
+ * the entire first paint behind an IndexedDB open, would make every page in the
+ * app start later so that emblems on one of them arrive together.
+ *
+ * The repaint is forced rather than driven by a state change, because nothing
+ * in the state changed - the references were always there. What changed is that
+ * imageSrc can now resolve them.
+ */
+void hydrateImages().then(paint);
 
 // Fleet Sync: a merge that lands while the app is already open (another
 // device edited first) has to reach the roster on screen, not just storage.

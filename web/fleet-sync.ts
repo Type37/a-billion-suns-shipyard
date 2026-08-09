@@ -1,4 +1,5 @@
 import type { SavedList } from "./storage.ts";
+import { imageDataUrl, internDataUrl, isImageRef } from "./image-store.ts";
 import {
   loadLists,
   persistLists,
@@ -223,6 +224,50 @@ async function failure(res: Response): Promise<Error> {
   return new Error(detail || `Sync failed (HTTP ${res.status}).`);
 }
 
+/*
+ * Emblems cross the wire as data URLs, and stay that way.
+ *
+ * Locally an uploaded emblem is a short reference into this device's image
+ * store (see image-store.ts) - which is meaningless to the device at the other
+ * end, since IndexedDB is per-origin, per-device and not synced by anything.
+ * So the reference is resolved to bytes on the way out and re-stored on the way
+ * in, and the format ON the wire is unchanged: a data URL, exactly as it was
+ * when that was also how it was stored.
+ *
+ * Doing it in remoteGet/remotePut rather than at each caller means push, pull,
+ * preview and the background poll all get it without a matching call each, and
+ * the merge above goes on comparing plain objects with no idea any of this is
+ * happening.
+ *
+ * A reference that cannot be resolved (the store was cleared, or the browser
+ * refuses IndexedDB) travels as no emblem at all rather than as a broken
+ * reference, so the far end falls back to the fleet's chosen sigil instead of
+ * showing a gap.
+ */
+async function inlineEmblems(lists: SavedList[]): Promise<SavedList[]> {
+  return Promise.all(
+    lists.map(async (l) => {
+      if (!isImageRef(l.emblemImage)) return l;
+      const dataUrl = await imageDataUrl(l.emblemImage!);
+      // Omitted, not set to undefined: exactOptionalPropertyTypes is on, and an
+      // absent emblem is what the far end should read as "use the sigil".
+      const { emblemImage: _drop, ...rest } = l;
+      return dataUrl ? { ...rest, emblemImage: dataUrl } : rest;
+    }),
+  );
+}
+
+async function internEmblems(lists: SavedList[]): Promise<SavedList[]> {
+  return Promise.all(
+    lists.map(async (l) => {
+      if (!l.emblemImage?.startsWith("data:")) return l;
+      const ref = await internDataUrl(l.emblemImage);
+      const { emblemImage: _drop, ...rest } = l;
+      return ref ? { ...rest, emblemImage: ref } : rest;
+    }),
+  );
+}
+
 async function remoteGet(tok: string): Promise<SyncPayload | null> {
   const res = await fetch(docUrl(tok), { cache: "no-store" });
   if (res.status === 404) return null; // token has never been used
@@ -233,7 +278,7 @@ async function remoteGet(tok: string): Promise<SyncPayload | null> {
   try {
     const p = JSON.parse(raw) as Partial<SyncPayload>;
     return {
-      lists: Array.isArray(p.lists) ? p.lists : [],
+      lists: await internEmblems(Array.isArray(p.lists) ? p.lists : []),
       deleted: p.deleted && typeof p.deleted === "object" ? p.deleted : {},
     };
   } catch {
@@ -242,9 +287,10 @@ async function remoteGet(tok: string): Promise<SyncPayload | null> {
 }
 
 async function remotePut(tok: string, payload: SyncPayload): Promise<void> {
+  const wire: SyncPayload = { ...payload, lists: await inlineEmblems(payload.lists) };
   const body = {
     fields: {
-      payload: { stringValue: JSON.stringify(payload) },
+      payload: { stringValue: JSON.stringify(wire) },
       updatedAt: { integerValue: String(Date.now()) },
       version: { integerValue: "1" },
     },

@@ -286,11 +286,41 @@ async function remoteGet(tok: string): Promise<SyncPayload | null> {
   }
 }
 
+/*
+ * Firestore's hard ceiling: a document is at most 1,048,576 bytes, all in.
+ *
+ * The whole registry travels as one JSON string, so that cap is shared by every
+ * fleet at once - and an emblem is by far the biggest thing in it. A 480px JPEG
+ * is roughly 50KB, about 68KB once base64 has inflated it for the wire, so
+ * somewhere around fifteen fleets carrying uploaded emblems will reach a limit
+ * that text alone would never have approached.
+ *
+ * Hitting it uploads nothing and returns a Firestore 400 whose message is about
+ * document size, which reads as "sync is broken" rather than "you have a lot of
+ * emblems". So it is checked here and reported in those terms instead. 900KB
+ * rather than the full megabyte, because the payload is not the whole document
+ * - the other fields and Firestore's own encoding also count against it, and
+ * being turned away by this is far better than being turned away by the API.
+ *
+ * This is a ceiling on SYNC, not on the app: the fleets and the art are already
+ * saved locally and are not at risk. Only the push is refused.
+ */
+const MAX_PAYLOAD_BYTES = 900_000;
+
 async function remotePut(tok: string, payload: SyncPayload): Promise<void> {
   const wire: SyncPayload = { ...payload, lists: await inlineEmblems(payload.lists) };
+  const json = JSON.stringify(wire);
+  if (new Blob([json]).size > MAX_PAYLOAD_BYTES) {
+    const withArt = wire.lists.filter((l) => l.emblemImage?.startsWith("data:")).length;
+    throw new Error(
+      withArt > 0
+        ? `Too much to sync in one go - ${withArt} of your ${wire.lists.length} fleets carry an uploaded emblem, and those are most of the size. Your fleets are still saved on this device. Removing an uploaded emblem from a fleet you do not need to sync will get you under the limit.`
+        : "Too much to sync in one go. Your fleets are still saved on this device.",
+    );
+  }
   const body = {
     fields: {
-      payload: { stringValue: JSON.stringify(wire) },
+      payload: { stringValue: json },
       updatedAt: { integerValue: String(Date.now()) },
       version: { integerValue: "1" },
     },

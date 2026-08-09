@@ -2476,7 +2476,7 @@ function foundryListView(state: AppState): string {
         </div>
       </details>
       <label class="bar-btn file-btn">${icon("upload", 16)} Import from a file
-        <input type="file" accept="application/json" data-action="import-faction" hidden />
+        <input class="file-cover" type="file" accept="application/json" data-action="import-faction" aria-label="Import a faction from a file" />
       </label>
       <button class="bar-btn" data-action="paste-faction">${icon("duplicate", 16)} Paste from clipboard</button>
     </div>
@@ -2545,10 +2545,16 @@ function foundryEditView(state: AppState, factionId: string): string {
       -->
       <button class="cf-ship-x" data-action="cf-ship-remove" data-ship="${si}" title="Remove this ship class" aria-label="Remove ship class ${escapeHtml(s.name)}">${icon("close", 20)}</button>
       <div class="cf-ship-head">
+        <!--
+          A drop target, not just a file picker. The input is stretched
+          invisibly over the whole tile (see .cf-shipimg-drop .file-cover), which
+          keeps it in the tab order without a second button standing in for it,
+          and data-drop lets a hull dragged straight off the desktop land here.
+        -->
         <span class="cf-shipimg-cell">
-          <label class="cf-shipimg-drop ${s.image ? "has-img" : ""}" title="Click to choose an image for this ship class">
-            ${s.image ? `<img src="${s.image}" alt="" />` : `<span class="cf-shipimg-cue">${icon("upload", 16)}<span>Add art</span></span>`}
-            <input type="file" accept="image/*" data-action="cf-ship-image-upload" data-ship="${si}" hidden />
+          <label class="cf-shipimg-drop ${s.image ? "has-img" : ""}" data-drop title="Choose, drag or drop an image for ${escapeHtml(s.name)}">
+            ${s.image ? `<img src="${s.image}" alt="" />` : `<span class="cf-shipimg-cue">${icon("upload", 18)}<span>Add art</span></span>`}
+            <input class="file-cover" type="file" accept="image/*" data-action="cf-ship-image-upload" data-ship="${si}" aria-label="Image for ${escapeHtml(s.name)}" />
           </label>
           ${s.image ? `<button class="cf-shipimg-x" data-action="cf-ship-image-clear" data-ship="${si}" title="Remove this image" aria-label="Remove image">${icon("close", 12)}</button>` : ""}
         </span>
@@ -2618,7 +2624,9 @@ function foundryEditView(state: AppState, factionId: string): string {
       <div class="cf-grid">
         <label class="field-block wide">Faction name
           <input type="text" value="${escapeHtml(f.name)}" data-action="cf-field" data-field="name" /></label>
-        <div class="field-block">Emblem
+        <!-- Two columns wide: at one 190px column the button's own label wrapped
+             to "Choose / emblem" beside a 44px preview. -->
+        <div class="field-block cf-emblem-field">Emblem
           <button class="emblem-choose-btn" data-action="open-emblem-modal" data-target="faction">
             <span class="emblem-choose-preview">${emblemView({ emblem: "delta", ...f }, 40)}</span>
             <span class="emblem-choose-label">${icon("image", 15)} Choose emblem</span>
@@ -3685,7 +3693,7 @@ function optionsModal(state: AppState): string {
           <div class="opt-actions">
             <button class="bar-btn" data-action="export-data">${icon("download", 15)} Export a backup</button>
             <label class="bar-btn file-btn">${icon("upload", 15)} Import a backup
-              <input type="file" accept="application/json,.json" data-action="import-data" hidden /></label>
+              <input class="file-cover" type="file" accept="application/json,.json" data-action="import-data" aria-label="Import a backup file" /></label>
             <button class="bar-btn danger" data-action="clear-data">${icon("trash", 15)} Clear all data</button>
           </div>
         </section>
@@ -4298,24 +4306,57 @@ function emblemModal(state: AppState): string {
   // scrolling - and the search box below already reaches every mark by what it
   // depicts, folder or not. The grid is one list of everything now.
 
+  // The uploaded image, if the current mark IS one. Only an upload can be shown
+  // back at full size here; a library sigil is a URL the grid already displays.
+  const uploaded = cfg.fields.emblemImage;
+
+  /*
+   * The file input, rendered exactly once per open picker.
+   *
+   * It used to be permanently `hidden` with a <button> forwarding clicks to it,
+   * because a hidden input is out of the tab order and there was otherwise no
+   * keyboard route to the file dialog. On the Upload tab it is now a real input
+   * stretched invisibly across the whole drop box instead: the box is clickable
+   * because the input IS the box, and the input keeps its own focus ring, its
+   * own Enter/Space handling and its place in the tab order for free.
+   *
+   * On the Library tab it stays in the markup, hidden. Nothing clicks it there
+   * - it is what a drop or a paste anywhere on the picker is placed through
+   * (see wireImageDrops), so dragging a badge onto the dialog works whichever
+   * tab you happen to have open.
+   */
+  const fileInput = (hidden: boolean): string =>
+    `<input id="emblem-upload-input" class="file-cover" type="file" accept="image/*" data-action="${cfg.upA}" aria-label="Choose an image to upload"${hidden ? " hidden" : ""} />`;
+
   const body =
     tab === "upload"
-      ? // A real button, not a bare <label> wrapping a hidden input: the input is
-        // out of the tab order, so there was no way to open the file dialog
-        // without a mouse. The button forwards the click to the input.
-        `<div class="em-upload">
-           <button class="em-drop" data-action="emblem-upload-pick">
-             <span class="em-drop-cue">${icon("upload", 22)}<span>Choose an image to upload</span></span>
-           </button>
-           <input id="emblem-upload-input" type="file" accept="image/*" data-action="${cfg.upA}" hidden />
+      ? `<div class="em-upload">
+           ${
+             uploaded
+               ? `<figure class="em-current">
+                    <img src="${uploaded}" alt="The image currently in use" />
+                    <figcaption>In use now. Drop another to replace it.</figcaption>
+                  </figure>`
+               : ""
+           }
+           <label class="em-drop" data-drop>
+             ${fileInput(false)}
+             <span class="em-drop-cue">
+               ${icon("upload", 26)}
+               <span class="em-drop-head">Drag an image here</span>
+               <span class="em-drop-sub">or click to browse &mdash; ${/Mac|iPhone|iPad/.test(navigator.platform ?? "") ? "&#8984;V" : "Ctrl&#8239;+&#8239;V"} pastes one straight from the clipboard</span>
+             </span>
+           </label>
+           <p class="em-drop-note">PNG, JPEG, WebP or GIF. Whatever you give it is cropped to a centred square and stored at 480&nbsp;px, so a full-size photo will not bloat your saved fleets.</p>
          </div>`
-      : `<input id="emblem-lib-search" class="em-search" type="search" placeholder="Search sigils: try skull, wings, money" value="${escapeHtml(m.libQuery ?? "")}" data-action="emblem-lib-search" aria-label="Search sigils" />
+      : `${fileInput(true)}
+         <input id="emblem-lib-search" class="em-search" type="search" placeholder="Search sigils: try skull, wings, money" value="${escapeHtml(m.libQuery ?? "")}" data-action="emblem-lib-search" aria-label="Search sigils" />
          <div class="em-scroll">${iconLibraryGrid(cfg.libA, cfg.currentLib, m.libQuery, m.libShown ?? LIB_PAGE)}</div>`;
 
   return `
   <div class="modal-root">
     <div class="modal-backdrop" data-action="close-modal"></div>
-    <div class="modal-panel em-modal" role="dialog" aria-modal="true" aria-label="Choose an emblem">
+    <div class="modal-panel em-modal" role="dialog" aria-modal="true" aria-label="Choose an emblem" data-drop>
       <header class="modal-header">
         <div class="em-head"><span class="em-preview">${emblemView(cfg.fields, 40)}</span><h2 class="modal-title">Choose an emblem</h2></div>
         <button class="modal-close" data-action="close-modal" aria-label="Close">${icon("close", 18)}</button>

@@ -3,7 +3,6 @@
 // of the app; actions.ts owns the event handling.
 
 import { PILOT_CLASSES, type PilotClass, type ShipClass } from "../src/types.ts";
-import { STARTER_OUTFITS } from "../src/data/starter-outfits.ts";
 import {
   JUNKSPACE_SHIPS,
   OUTFIT_BUDGET_K,
@@ -70,6 +69,10 @@ function gameTicks(played: number, total: number): string {
 // a starting hull. Three questions at a door you are trying to walk through.
 // Copying an outfit is still one press of Duplicate on the dock, which is where
 // you are looking when you want it.
+//
+// The ready-made crews used to sit here too, as an "Or start with a ready-made
+// crew" list. They are pre-built outfits now (see seed-outfits.ts): already on
+// the Solo page, not a pitch inside the dialog you opened to skip the pitch.
 export function newOutfitModal(state: AppState): string {
   const m = state.ui.modal;
   if (!m || m.kind !== "new-outfit") return "";
@@ -96,16 +99,6 @@ export function newOutfitModal(state: AppState): string {
                  and the emblem button read it out of the DOM instead. -->
             <input class="new-outfit-name" type="text" placeholder="Unnamed outfit" value="${escapeHtml(draft.name ?? "")}" autocomplete="off" autofocus />
           </label>
-        </div>
-        <div class="no-starter">
-          <p class="no-starter-head">Or start with a ready-made crew</p>
-          ${STARTER_OUTFITS.map(
-            (s) => `
-            <button class="no-starter-opt" data-action="solo-new-outfit-preset" data-preset="${s.key}">
-              <span class="no-starter-name">${escapeHtml(s.name)} <span class="no-starter-count">${s.ships.length} ships</span></span>
-              <span class="no-starter-blurb">${escapeHtml(s.blurb)}</span>
-            </button>`,
-          ).join("")}
         </div>
       </div>
       <footer class="modal-footer">

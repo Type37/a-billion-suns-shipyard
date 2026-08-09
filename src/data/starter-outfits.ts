@@ -1,9 +1,10 @@
 import type { PilotClass } from "../types.ts";
 
-// Ready-made Outfits offered in the "Start a new outfit" dialog, so a first-time
-// solo player has a crew on the table in one click instead of a blank ¢30k
-// budget. Both are legal openers: 5 ships or fewer, total cost <= ¢30k (the
-// Junkspace starting purse, p.201), ship ids from JUNKSPACE_SHIPS.
+// Ready-made Outfits, shipped as pre-built outfits that are simply already on
+// the Solo page (see web/seed-outfits.ts), so a first-time solo player has a
+// crew on the table without first facing a blank ¢30k budget. Both are legal
+// openers: 5 ships or fewer, total cost <= ¢30k (the Junkspace starting purse,
+// p.201), ship ids from JUNKSPACE_SHIPS.
 //
 // PILOT names are drawn from the user's own "🎌" callsign pool in their Steel
 // Rift builder (Gravity Rush Nevi + Vampire Hunter D). Do NOT invent names for

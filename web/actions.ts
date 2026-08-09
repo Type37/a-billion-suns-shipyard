@@ -40,7 +40,6 @@ import {
 } from "./state.ts";
 import type { AppState, LastRoll, PrintOpts, ShipFilter } from "./state.ts";
 import { RANDOM_BEHAVIOUR, GLITCH_BLIP, type RollRow } from "../src/data/junkspace-solo.ts";
-import { STARTER_OUTFITS } from "../src/data/starter-outfits.ts";
 import { EXAMPLE_FACTIONS, EXAMPLE_FACTION_IDS } from "./example-factions.ts";
 import { renderMarkdown } from "./richtext.ts";
 import { LIB_PAGE, libraryIcon, randomIconId } from "./emblems.ts";
@@ -310,20 +309,48 @@ function importFactionJson(text: string, notFactionMessage: string): void {
   showToast(`Imported "${parsed.name}".`);
 }
 
+/*
+ * IMAGES
+ *
+ * Everything below is one pipeline: a File arrives (from the file dialog, a
+ * drag from the desktop, or a paste), gets decoded and redrawn onto a canvas at
+ * a fixed size, and comes back as a data URL small enough to live in
+ * localStorage next to the fleet that uses it.
+ *
+ * The two shapes are deliberate. An emblem is a badge and is drawn in a circle
+ * at 40-60px almost everywhere, so it is centre-cropped square. Ship art is a
+ * picture of a hull and is drawn in a landscape frame, so it is cover-fitted
+ * into 5:3 instead of having its nose and tail cropped off.
+ */
+
+/** What a rejected upload was: used to say something more useful than "nope". */
+type ImageFault = "type" | "read" | "decode" | "canvas";
+
+function imageFailure(fault: ImageFault): string {
+  switch (fault) {
+    case "type":
+      return "That file is not an image. Try a PNG, JPEG, WebP or GIF.";
+    case "decode":
+      return "That image could not be opened - it may be damaged, or in a format this browser cannot read.";
+    default:
+      return "That image could not be read. Try saving it again, or use a different file.";
+  }
+}
+
 // Read an uploaded image, downscale it to a square emblem, and return a compact
-// data URL. Keeping it small (240px, JPEG) means it survives localStorage and
-// does not bloat the app. Rejects non-images.
+// data URL. Keeping it small (480px) means it survives localStorage and does not
+// bloat the app. Rejects non-images.
 function readEmblemImage(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     if (!file.type.startsWith("image/")) {
-      reject(new Error("not an image"));
+      reject(new Error("type"));
       return;
     }
     const reader = new FileReader();
-    reader.onerror = () => reject(new Error("read failed"));
+    reader.onerror = () => reject(new Error("read"));
     reader.onload = () => {
       const img = new Image();
-      img.onerror = () => reject(new Error("decode failed"));
+      img.onerror = () => reject(new Error("decode"));
       img.onload = () => {
         const size = 480;
         const canvas = document.createElement("canvas");
@@ -331,7 +358,7 @@ function readEmblemImage(file: File): Promise<string> {
         canvas.height = size;
         const ctx = canvas.getContext("2d");
         if (!ctx) {
-          reject(new Error("no canvas"));
+          reject(new Error("canvas"));
           return;
         }
         // Cover-fit: crop to a centred square, then scale.
@@ -355,14 +382,14 @@ function readEmblemImage(file: File): Promise<string> {
 function readShipImage(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     if (!file.type.startsWith("image/")) {
-      reject(new Error("not an image"));
+      reject(new Error("type"));
       return;
     }
     const reader = new FileReader();
-    reader.onerror = () => reject(new Error("read failed"));
+    reader.onerror = () => reject(new Error("read"));
     reader.onload = () => {
       const img = new Image();
-      img.onerror = () => reject(new Error("decode failed"));
+      img.onerror = () => reject(new Error("decode"));
       img.onload = () => {
         const w = 320;
         const h = 192; // 5:3
@@ -371,7 +398,7 @@ function readShipImage(file: File): Promise<string> {
         canvas.height = h;
         const ctx = canvas.getContext("2d");
         if (!ctx) {
-          reject(new Error("no canvas"));
+          reject(new Error("canvas"));
           return;
         }
         // Cover-fit: scale so the frame is filled, crop the overflow, centred.
@@ -390,6 +417,121 @@ function readShipImage(file: File): Promise<string> {
     };
     reader.readAsDataURL(file);
   });
+}
+
+/**
+ * One route for every image that enters the app, whatever brought it in.
+ *
+ * There are three ways to hand the app a picture - the file dialog, a drag from
+ * the desktop, and a paste - and five places that accept one: the four emblem
+ * targets (a fleet, a custom faction, a saved outfit, the outfit being started
+ * in the dialog) and per-ship art in the Foundry. Wiring three events to five
+ * destinations separately would be fifteen copies of "decode it, shrink it, put
+ * it there", which is what the change handler alone used to hold five of.
+ *
+ * So every entry point funnels through here, keyed by the same action name the
+ * file input already carries. A drop zone does not need to know what it is a
+ * drop zone FOR - it finds its own <input> and hands over its dataset.
+ */
+function applyImageUpload(action: string, data: DOMStringMap, file: File): void {
+  const fail = (err: unknown): void => {
+    const code = err instanceof Error ? err.message : "read";
+    showToast(imageFailure(code as ImageFault), { icon: "close" });
+  };
+  const done = (): void => showToast("Image added.", { icon: "check" });
+
+  switch (action) {
+    case "emblem-upload": {
+      const id = currentListId();
+      if (!id) return;
+      readEmblemImage(file)
+        .then((dataUrl) => {
+          store.setState((s) => updateList(s, id, (l) => ({ ...l, emblemImage: dataUrl })));
+          done();
+        })
+        .catch(fail);
+      break;
+    }
+    case "cf-emblem-upload": {
+      const fid = currentFoundryId();
+      if (!fid) return;
+      readEmblemImage(file)
+        .then((dataUrl) => {
+          editFaction(fid, (f) => ({ ...f, emblemImage: dataUrl }));
+          done();
+        })
+        .catch(fail);
+      break;
+    }
+    case "outfit-emblem-upload": {
+      readEmblemImage(file)
+        .then((dataUrl) => {
+          editOutfit((o) => ({ ...o, emblemImage: dataUrl }));
+          done();
+        })
+        .catch(fail);
+      break;
+    }
+    case "no-emblem-upload": {
+      readEmblemImage(file)
+        .then((dataUrl) => {
+          editNewOutfit((d) => ({ ...d, emblemImage: dataUrl }));
+          done();
+        })
+        .catch(fail);
+      break;
+    }
+    case "cf-ship-image-upload": {
+      const fid = currentFoundryId();
+      const si = Number(data["ship"]);
+      if (!fid || !Number.isInteger(si)) return;
+      readShipImage(file)
+        .then((dataUrl) => {
+          editFaction(fid, (f) => ({
+            ...f,
+            ships: f.ships.map((s, i) => (i === si ? { ...s, image: dataUrl } : s)),
+          }));
+          done();
+        })
+        .catch(fail);
+      break;
+    }
+    default:
+      break;
+  }
+}
+
+/** True if this action is one applyImageUpload knows how to place. */
+function isImageUpload(action: string | undefined): action is string {
+  return (
+    action === "emblem-upload" ||
+    action === "cf-emblem-upload" ||
+    action === "outfit-emblem-upload" ||
+    action === "no-emblem-upload" ||
+    action === "cf-ship-image-upload"
+  );
+}
+
+/**
+ * The first image on a DataTransfer, from a drag or a paste.
+ *
+ * A paste of a screenshot arrives as an item with no name and a copied file
+ * arrives as a real one; both are Files by the time they get here. Anything
+ * that is not an image (a dragged link, the text that rides along with a
+ * copied image) is skipped rather than rejected, so dropping a picture that
+ * happens to carry an HTML fragment still works.
+ */
+function firstImage(dt: DataTransfer | null): File | null {
+  if (!dt) return null;
+  for (const item of Array.from(dt.items ?? [])) {
+    if (item.kind !== "file") continue;
+    const f = item.getAsFile();
+    if (f?.type.startsWith("image/")) return f;
+  }
+  for (const f of Array.from(dt.files ?? [])) {
+    if (f.type.startsWith("image/")) return f;
+  }
+  return null;
 }
 
 // ---------------------------------------------------------------------------
@@ -638,12 +780,8 @@ function dispatchAction(target: HTMLElement): void {
       );
       break;
     }
-    case "emblem-upload-pick": {
-      // The file input is hidden (a styled drop zone stands in for it), which
-      // also takes it out of the tab order. This button is the keyboard route in.
-      document.getElementById("emblem-upload-input")?.click();
-      break;
-    }
+    // No "emblem-upload-pick". The drop box IS the file input now (stretched
+    // invisibly across it), so there is nothing left to forward a click to.
     case "emblem-lib-more": {
       // Fired by the sentinel at the foot of the grid scrolling into view.
       store.setState((s) =>
@@ -1447,33 +1585,9 @@ function dispatchAction(target: HTMLElement): void {
       location.hash = routeHash({ view: "solo-outfit", outfitId: outfit.id });
       break;
     }
-    case "solo-new-outfit-preset": {
-      // A ready-made crew: the preset's ships (with fresh instance ids and any
-      // name typed in the dialog still honoured), otherwise a normal new outfit.
-      const preset = STARTER_OUTFITS.find((s2) => s2.key === target.dataset["preset"]);
-      if (!preset) return;
-      const typed = liveOutfitName();
-      const outfit: SavedOutfit = {
-        ...createOutfit(),
-        name: typed || preset.name,
-        // No shipName: the presets do not carry one (see starter-outfits.ts).
-        // An unnamed ship shows its class in the field, which says what it is
-        // and leaves the naming available.
-        ships: preset.ships.map((s2) => ({
-          id: newId("os"),
-          shipClassId: s2.shipClassId,
-          pilotClass: s2.pilotClass,
-          pilotName: s2.pilotName,
-        })),
-      };
-      store.setState((s) => {
-        const outfits = [...s.outfits, outfit];
-        persistOutfits(outfits);
-        return { ...s, outfits, ui: { ...s.ui, modal: undefined, newOutfit: undefined, soloTab: "outfit" } };
-      });
-      location.hash = routeHash({ view: "solo-outfit", outfitId: outfit.id });
-      break;
-    }
+    // No "solo-new-outfit-preset". The ready-made crews are pre-built outfits
+    // sitting on the Solo page now (see seed-outfits.ts), so starting one is
+    // opening it, not asking the dialog to build it.
     case "duplicate-outfit": {
       const id = target.dataset["id"];
       const src = state.outfits.find((o) => o.id === id);
@@ -2272,24 +2386,6 @@ function handleChange(e: Event): void {
       target.value = "";
       break;
     }
-    case "outfit-emblem-upload": {
-      const file = target.files?.[0];
-      if (!file) return;
-      readEmblemImage(file)
-        .then((dataUrl) => editOutfit((o) => ({ ...o, emblemImage: dataUrl })))
-        .catch(() => showToast("That image could not be used. Try a PNG or JPEG."));
-      target.value = "";
-      break;
-    }
-    case "no-emblem-upload": {
-      const file = target.files?.[0];
-      if (!file) return;
-      readEmblemImage(file)
-        .then((dataUrl) => editNewOutfit((d) => ({ ...d, emblemImage: dataUrl })))
-        .catch(() => showToast("That image could not be used. Try a PNG or JPEG."));
-      target.value = "";
-      break;
-    }
 
     // ---- Ship compendium --------------------------------------------------
     case "ship-filter":
@@ -2515,41 +2611,15 @@ function handleChange(e: Event): void {
       }));
       break;
     }
-    case "emblem-upload": {
-      const id = currentListId();
-      const file = target.files?.[0];
-      if (!id || !file) return;
-      readEmblemImage(file)
-        .then((dataUrl) => {
-          store.setState((s) => updateList(s, id, (l) => ({ ...l, emblemImage: dataUrl })));
-        })
-        .catch(() => showToast("That image could not be used. Try a PNG or JPEG."));
-      target.value = "";
-      break;
-    }
-    case "cf-emblem-upload": {
-      const fid = currentFoundryId();
-      const file = target.files?.[0];
-      if (!fid || !file) return;
-      readEmblemImage(file)
-        .then((dataUrl) => editFaction(fid, (f) => ({ ...f, emblemImage: dataUrl })))
-        .catch(() => showToast("That image could not be used. Try a PNG or JPEG."));
-      target.value = "";
-      break;
-    }
+    // Every image upload, whichever of the five inputs fired it. The value is
+    // cleared so picking the SAME file again still fires a change event.
+    case "emblem-upload":
+    case "cf-emblem-upload":
+    case "outfit-emblem-upload":
+    case "no-emblem-upload":
     case "cf-ship-image-upload": {
-      const fid = currentFoundryId();
-      const si = Number(target.dataset["ship"]);
       const file = target.files?.[0];
-      if (!fid || !file || !Number.isInteger(si)) return;
-      readShipImage(file)
-        .then((dataUrl) =>
-          editFaction(fid, (f) => ({
-            ...f,
-            ships: f.ships.map((s, i) => (i === si ? { ...s, image: dataUrl } : s)),
-          })),
-        )
-        .catch(() => showToast("That image could not be used. Try a PNG or JPEG."));
+      if (file) applyImageUpload(action, target.dataset, file);
       target.value = "";
       break;
     }
@@ -2576,9 +2646,86 @@ function handleChange(e: Event): void {
   }
 }
 
+/**
+ * Drag an image onto a drop zone, and paste one into the emblem picker.
+ *
+ * Delegated, like every other handler here, because the app replaces its own
+ * DOM on each state change - a listener bound to a particular drop zone would
+ * be attached to a node that no longer exists by the time you let go of the
+ * file. A zone is marked with a bare `data-drop`; what it is a zone FOR comes
+ * off the <input type="file"> inside it, so the markup carries the action name
+ * exactly once.
+ *
+ * The document-level preventDefault is the important half. A file dropped
+ * anywhere on a page the browser has not been told about NAVIGATES to it: miss
+ * the 100x60 art tile by ten pixels and the app is replaced by a JPEG, with the
+ * dialog you had open gone. Cancelling both events everywhere makes a missed
+ * drop do nothing, which is the only acceptable outcome.
+ */
+function zoneFor(e: Event): { zone: HTMLElement; input: HTMLInputElement } | null {
+  const el = e.target instanceof Element ? e.target.closest<HTMLElement>("[data-drop]") : null;
+  const input = el?.querySelector<HTMLInputElement>('input[type="file"]');
+  return el && input && isImageUpload(input.dataset["action"]) ? { zone: el, input } : null;
+}
+
+function wireImageDrops(): void {
+  document.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    const hit = zoneFor(e);
+    if (!hit) return;
+    if (e.dataTransfer) e.dataTransfer.dropEffect = "copy";
+    hit.zone.classList.add("is-dropping");
+  });
+  // dragleave fires when the pointer crosses onto a CHILD as well, so the class
+  // comes off only once the pointer has genuinely left the zone's box.
+  document.addEventListener("dragleave", (e) => {
+    const hit = zoneFor(e);
+    if (hit && !hit.zone.contains(e.relatedTarget as Node | null)) hit.zone.classList.remove("is-dropping");
+  });
+  document.addEventListener("drop", (e) => {
+    e.preventDefault();
+    const hit = zoneFor(e);
+    if (!hit) return;
+    hit.zone.classList.remove("is-dropping");
+    const file = firstImage(e.dataTransfer);
+    if (!file) {
+      showToast("That was not an image. Drop a PNG, JPEG, WebP or GIF.", { icon: "close" });
+      return;
+    }
+    applyImageUpload(hit.input.dataset["action"]!, hit.input.dataset, file);
+  });
+
+  /*
+   * Paste, but only into the emblem picker.
+   *
+   * A screenshot on the clipboard is the single most likely source of a fleet
+   * badge, and until now the only way to use one was to save it to disk first.
+   * It is scoped to the open picker because that is the one place in the app
+   * with exactly one unambiguous destination - the Foundry has nine ship art
+   * slots on screen at once and no way to know which one a paste meant.
+   *
+   * Ignored while the caret is in a text field, where Ctrl+V means paste text.
+   */
+  document.addEventListener("paste", (e) => {
+    const s = store.getState();
+    if (s.ui.modal?.kind !== "emblem") return;
+    const active = document.activeElement;
+    if (active instanceof HTMLInputElement && active.type !== "file") return;
+    if (active instanceof HTMLTextAreaElement) return;
+    const file = firstImage(e.clipboardData);
+    if (!file) return;
+    const input = document.querySelector<HTMLInputElement>('.em-modal input[type="file"]');
+    const action = input?.dataset["action"];
+    if (!isImageUpload(action)) return;
+    e.preventDefault();
+    applyImageUpload(action, input!.dataset, file);
+  });
+}
+
 export function wireActions(root: HTMLElement): void {
   root.addEventListener("click", handleClick);
   root.addEventListener("change", handleChange);
+  wireImageDrops();
   /**
    * Naming a person puts the caret at the END of their job, ready to type.
    *

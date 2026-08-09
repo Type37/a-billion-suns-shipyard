@@ -1047,8 +1047,10 @@ button { font-family: inherit; }
 .emblem-img, .lib-icon img { filter: none; }
 /* Per-ship-class art upload in the Foundry ship editor. */
 .cf-shipimg-row { display: flex; align-items: center; gap: 10px; margin-top: 5px; flex-wrap: wrap; }
-/* A proper click-to-upload tile: the whole dashed box is the button. */
+/* A proper click-to-upload tile: the whole dashed box is the button, and (since
+   it holds a stretched .file-cover) a drop target as well. */
 .cf-shipimg-drop {
+  position: relative;
   display: flex; align-items: center; justify-content: center; min-width: 220px; min-height: 70px;
   border: 1.5px dashed var(--hair); background: var(--paper); color: var(--ink-3); cursor: pointer; overflow: hidden;
   transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
@@ -1065,11 +1067,15 @@ button { font-family: inherit; }
    a stray line box and the cell measured 70px for a 44px thumbnail. */
 .cf-shipimg-cell { position: relative; flex: 0 0 auto; display: flex; }
 /* min-height as well as height - the base tile's 70px floor beats a plain
-   height and held the whole row open. */
-.cf-shipimg-cell > .cf-shipimg-drop { min-width: 0; width: 78px; height: 44px; min-height: 44px; padding: 3px; }
+   height and held the whole row open.
+
+   Sized 5:3, the same frame readShipImage crops to, and big enough to see what
+   the art actually is: at the old 78x44 a hull was a smudge, and 44px is also
+   under the 44px thumb floor once its border is counted. */
+.cf-shipimg-cell > .cf-shipimg-drop { min-width: 0; width: 108px; height: 65px; min-height: 65px; padding: 4px; }
 .cf-shipimg-cell > .cf-shipimg-drop.has-img { padding: 0; }
 .cf-shipimg-cell > .cf-shipimg-drop img { width: 100%; max-width: none; height: 100%; object-fit: cover; }
-.cf-shipimg-cell .cf-shipimg-cue { flex-direction: column; gap: 1px; font-size: 9px; line-height: 1.1; text-align: center; }
+.cf-shipimg-cell .cf-shipimg-cue { flex-direction: column; gap: 3px; font-size: 10.5px; line-height: 1.1; text-align: center; pointer-events: none; }
 /* Clears the art, and only exists when there is art to clear. Sits on the
    corner of the thumbnail it clears rather than taking a slot in the row. */
 .cf-shipimg-x {
@@ -1859,7 +1865,9 @@ button { font-family: inherit; }
 .breadcrumb { font-size: 11px; font-weight: 600; color: var(--ink-3); margin-bottom: 10px; }
 .breadcrumb a { color: var(--blue); }
 .foundry-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 20px 0 30px; align-items: flex-start; }
-.file-btn { cursor: pointer; }
+/* Holds the stretched .file-cover input, so an "Import..." button is a real
+   focusable control rather than a label over a hidden one. */
+.file-btn { cursor: pointer; position: relative; }
 
 /* "Forge a new faction" opens onto existing factions as starting points,
    on the same footing as a blank sheet - so cloning is never the harder path. */
@@ -1872,32 +1880,45 @@ button { font-family: inherit; }
   width: min(720px, 90vw); max-height: 70vh; overflow-y: auto;
   background: var(--paper); border: 2px solid var(--hair); padding: 16px;
 }
-.faction-plaque-blank { border-style: dashed; margin-bottom: 12px; width: 100%; }
-.cf-new-heading { font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--ink-3); margin: 14px 0 8px; }
+.faction-plaque-blank { border-style: dashed; margin-bottom: 14px; width: 100%; }
+.cf-new-heading { font-family: var(--sans); font-size: 13px; font-weight: 700; color: var(--ink-3); margin: 18px 0 10px; }
 .mf-hvp-note { font-family: var(--serif); font-size: 13px; font-style: italic; color: var(--ink-2); margin: 2px 0 10px; }
 
-/* Custom Rules is a workbench, not a reading page: it is nine ship classes and
-   seven personnel on one screen, so the air between them was costing a screen
-   and a half of scrolling on its own. Everything below tightens the page
-   furniture - section rules, headings, notes - without touching the controls. */
-.cf-section { margin-bottom: 12px; border-top: 2px solid var(--hair); padding-top: 8px; }
-.cf-section .panel-title { margin-bottom: 6px; }
+/* Custom Rules is a workbench, not a reading page: nine ship classes and seven
+   personnel on one screen. An earlier pass took that as licence to shrink
+   everything, controls included - 10px uppercase labels over 13px inputs with
+   5px of padding - and a page that is ALMOST ENTIRELY form fields is the one
+   page where the fields cannot be the thing that gives. What was actually
+   costing the scroll was the furniture between the blocks, so the furniture
+   stays tight (section rules, headings, notes) and the controls are back at a
+   size you can read and hit: 15px text, a 42px minimum box, labels legible
+   without leaning in. The page is wider to pay for it. */
+.foundry-main { max-width: 1120px; }
+.cf-section { margin-bottom: 26px; border-top: 2px solid var(--hair); padding-top: 16px; }
+.cf-section .panel-title { margin-bottom: 12px; font-size: 14px; letter-spacing: 0.03em; text-transform: uppercase; }
 .foundry-main { padding-top: clamp(14px, 2vw, 22px); }
 .foundry-main .page-title { margin-bottom: 6px; }
-.foundry-main .panel-note { margin-bottom: 12px; }
-.foundry-main .breadcrumb { margin-bottom: 6px; }
-.foundry-actions { margin: 12px 0 16px; }
-.cf-grid { gap: 8px; }
-.cf-hvp { margin-bottom: 6px; }
-.cf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-.field-block { display: flex; flex-direction: column; gap: 5px; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.foundry-main .panel-note { margin-bottom: 12px; font-size: 15px; }
+.foundry-main .breadcrumb { margin-bottom: 6px; font-size: 12px; }
+.foundry-actions { margin: 14px 0 20px; }
+.cf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px 16px; }
+.field-block { display: flex; flex-direction: column; gap: 6px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.045em; text-transform: uppercase; color: var(--ink-3); }
 .field-block.wide { grid-column: 1 / -1; }
+/* Only where there is a second column to span into. In a one-column grid,
+   `span 2` invents an implicit second column and the whole form overflows. */
+@media (min-width: 640px) { .cf-emblem-field { grid-column: span 2; } }
 .field-block input, .field-block select, .field-block textarea,
 .cf-hvp input, .cf-hvp textarea, .weapon-edit-row input, .weapon-edit-row select {
-  font-family: var(--sans); font-size: 14px; font-weight: 500; padding: 9px 11px;
+  font-family: var(--sans); font-size: 15px; font-weight: 500; padding: 10px 12px; min-height: 42px;
   border: 1px solid var(--hair); background: var(--paper); color: var(--ink); letter-spacing: 0;
 }
-.field-block textarea, .cf-hvp textarea { font-family: var(--serif); resize: vertical; }
+/* A field you are typing in should be obvious at a glance on a page holding
+   sixty of them. The blue is the same one the nav pill and the plaques use. */
+.field-block input:focus, .field-block select:focus, .field-block textarea:focus,
+.cf-hvp input:focus, .cf-hvp textarea:focus, .weapon-edit-row input:focus, .weapon-edit-row select:focus {
+  outline: none; border-color: var(--blue); box-shadow: inset 0 -2px 0 var(--blue);
+}
+.field-block textarea, .cf-hvp textarea { font-family: var(--serif); resize: vertical; min-height: 84px; }
 /*
  * A ship class is three rows, always the same three: name, stats, weapons.
  *
@@ -1906,35 +1927,43 @@ button { font-family: inherit; }
  * broke differently at every width and read as arbitrary. These rows are fixed
  * and only their contents flex, so a ship class looks like a ship class.
  */
-.cf-ship { position: relative; border: 1px solid var(--hair); padding: 8px 10px; margin-bottom: 6px; }
+/* A card, not a hairline box. The left rule is the same device the plaques and
+   the callout use, and it is what makes a stack of nine ship classes read as
+   nine things rather than one long grid of inputs. */
+.cf-ship {
+  position: relative; border: 1px solid var(--hair); border-left: 4px solid var(--hair);
+  background: var(--paper); padding: 16px 18px; margin-bottom: 14px;
+  transition: border-color 0.12s ease;
+}
+.cf-ship:hover, .cf-ship:focus-within { border-left-color: var(--color-action); }
 /* Row 1, always: art, name, the five stats. Art and name hold the left, and
    the stats wrap under them as a block when the row runs out of room - never
    two of them on one line and three on the next. */
-.cf-ship-head { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 6px 8px; padding-right: 34px; }
-.cf-ship-name { flex: 1 1 200px; min-width: 0; }
+.cf-ship-head { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; padding-right: 44px; }
+.cf-ship-name { flex: 1 1 220px; min-width: 0; }
 .cf-ship-name > input { width: 100%; }
-.cf-ship-stats { flex: 1 1 430px; display: flex; gap: 6px; min-width: 0; }
+.cf-ship-stats { flex: 1 1 460px; display: flex; gap: 8px; min-width: 0; }
 /* Top right, out of the flow, so it is in the same place on every class no
    matter how the row below it wraps. */
 .cf-ship-x {
-  position: absolute; top: 6px; right: 6px;
+  position: absolute; top: 10px; right: 10px;
   display: inline-flex; align-items: center; justify-content: center;
-  width: 30px; height: 30px; padding: 0; cursor: pointer;
+  width: 34px; height: 34px; padding: 0; cursor: pointer;
   background: transparent; border: 1px solid var(--red-wash); color: var(--red);
 }
 .cf-ship-x:hover { background: var(--red); border-color: var(--red); color: #fff; }
 .cf-ship-stats > .field-block { flex: 1 1 0; min-width: 0; }
 .cf-ship-stats > .field-block > input, .cf-ship-stats > .field-block > select { width: 100%; }
-.cf-ship .field-block { gap: 2px; }
-.cf-ship .cf-slot h5 { margin-bottom: 4px; }
-.cf-ship .weapon-edit-row { margin-bottom: 4px; }
+.cf-ship .field-block { gap: 5px; }
+.cf-ship .cf-slot h5 { margin-bottom: 8px; }
+.cf-ship .weapon-edit-row { margin-bottom: 8px; }
 .cf-ship .field-block input, .cf-ship .field-block select,
-.cf-ship .weapon-edit-row input, .cf-ship .weapon-edit-row select { padding: 5px 8px; font-size: 13px; }
-/* Row 3: the two weapon slots, side by side while they each have ~280px. */
-.cf-slots { display: flex; flex-wrap: wrap; gap: 8px 12px; margin: 8px 0 0; }
-.cf-slot { flex: 1 1 280px; min-width: 0; }
-.cf-slot h5 { font-family: var(--sans); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.check-inline { font-size: 10px; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--ink-2); display: inline-flex; gap: 5px; align-items: center; }
+.cf-ship .weapon-edit-row input, .cf-ship .weapon-edit-row select { padding: 9px 11px; font-size: 14.5px; min-height: 42px; }
+/* Row 3: the two weapon slots, side by side while they each have ~300px. */
+.cf-slots { display: flex; flex-wrap: wrap; gap: 14px 20px; margin: 16px 0 0; padding-top: 14px; border-top: 1px solid var(--hair-soft); }
+.cf-slot { flex: 1 1 300px; min-width: 0; }
+.cf-slot h5 { font-family: var(--sans); font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; color: var(--ink-2); }
+.check-inline { font-size: 12px; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--ink-2); display: inline-flex; gap: 7px; align-items: center; }
 /*
  * Name, attack, range, remove - in that order, on one line while they fit and
  * wrapping when they do not.
@@ -1946,32 +1975,43 @@ button { font-family: inherit; }
  */
 .weapon-edit-row {
   display: flex; flex-wrap: wrap; align-items: center;
-  gap: 5px 8px; margin-bottom: 6px;
+  gap: 8px 10px; margin-bottom: 8px;
 }
-.weapon-edit-row .we-name { flex: 1 1 170px; min-width: 0; }
+.weapon-edit-row .we-name { flex: 1 1 180px; min-width: 0; }
 .weapon-edit-row .we-group { flex: 0 0 auto; }
 .weapon-edit-row > .ghost-btn { flex: 0 0 auto; margin-left: auto; }
 /* Attack and range read as single grouped controls: "2 x D6", "0 - 12 in". */
-.we-group { display: inline-flex; align-items: center; gap: 6px; }
-.weapon-edit-row .we-num { width: 46px; text-align: center; }
-.weapon-edit-row .we-die { width: 60px; }
+.we-group { display: inline-flex; align-items: center; gap: 7px; }
+.weapon-edit-row .we-num { width: 58px; text-align: center; }
+.weapon-edit-row .we-die { width: 74px; }
 .we-x, .we-dash { font-weight: 700; color: var(--ink-3); }
-.we-unit { font-size: 12px; font-weight: 600; color: var(--ink-3); }
+.we-unit { font-size: 13px; font-weight: 600; color: var(--ink-3); }
 /* The name column can grow: fixed at 220px it cut "Special Operations
    Commander" to "Special Operations Comman". */
-.cf-hvp { display: grid; grid-template-columns: auto minmax(220px, 320px) 1fr auto; gap: 8px; align-items: start; margin-bottom: 10px; }
-.cf-hvp-num { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; margin-top: 8px; border: 1.5px solid var(--blue); color: var(--blue); font-family: var(--display); font-weight: 800; font-size: 13px; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+.cf-hvp { display: grid; grid-template-columns: auto minmax(240px, 340px) 1fr auto; gap: 12px; align-items: start; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--hair-soft); }
+.cf-hvp:last-of-type { border-bottom: none; }
+.cf-hvp-num { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin-top: 6px; border: 1.5px solid var(--blue); color: var(--blue); font-family: var(--display); font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums; flex-shrink: 0; }
 /* Each field says what it is, in every layout. These used to appear only in the
    stacked one, where the column header disappeared - which left a sighted user
    with an unlabelled "[1] x [D6]" and "[0] - [6] in". Now there is no header to
    lose them with. Same swap the weapons table uses (.wt-inline-lbl). */
 .we-inline-lbl {
   display: inline-block;
-  font-family: var(--narrow); font-size: 10px; font-weight: 700;
+  font-family: var(--narrow); font-size: 11.5px; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3);
 }
 @media (max-width: 720px) {
   .cf-hvp { grid-template-columns: 1fr; }
+  /*
+   * The five stats wrap instead of being crushed.
+   *
+   * As one non-wrapping flex row they got ~60px each on a 390px phone, which
+   * clipped two-digit costs and ran "SILHOUETTE" straight through "SHIELDS"
+   * and "COST" - three labels overlapping in the space of one. A grid that
+   * fits as many 92px columns as there is room for gives 3+2 on a phone and
+   * the full run of five as soon as the screen can hold it.
+   */
+  .cf-ship-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 10px 8px; flex: 1 1 100%; }
 }
 
 /* ------------------------------------------------------------ misc */
@@ -2240,13 +2280,6 @@ button { font-family: inherit; }
 .no-name-field { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
 /* Ready-made crews under the blank-outfit fields: each a full-width tile that
    creates the outfit and opens it. */
-.no-starter { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--hair-soft); display: flex; flex-direction: column; gap: 8px; }
-.no-starter-head { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; font-size: 11px; color: var(--ink-3); margin: 0; }
-.no-starter-opt { text-align: left; border: 1px solid var(--hair-soft); border-left: 3px solid var(--blue); background: var(--paper); padding: 10px 12px; cursor: pointer; display: flex; flex-direction: column; gap: 3px; }
-.no-starter-opt:hover { background: var(--blue-wash); border-left-color: var(--blue-deep); }
-.no-starter-name { font-family: var(--display); font-weight: 800; font-size: 15px; color: var(--ink); }
-.no-starter-count { font-family: var(--sans); font-weight: 600; font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.03em; margin-left: 6px; }
-.no-starter-blurb { font-size: 12.5px; color: var(--ink-2); line-height: 1.4; }
 /* An unstyled input rendered at 21px tall - under the 24px floor, and nothing
    about it said "type here". It is a box with a real edge and a real height,
    set in the display face it will be wearing on the card a moment later. */
@@ -4262,14 +4295,52 @@ button { font-family: inherit; }
 .em-tab.on { color: var(--ink); border-bottom-color: var(--blue); }
 .em-body { padding: 16px 18px; min-height: 160px; }
 .em-scroll { max-height: none; overflow: visible; }
-.em-upload { display: flex; flex-direction: column; gap: 10px; }
+/* ---------------------------------------------------------- image uploads
+   Every drop zone in the app - the emblem picker's big box and the Foundry's
+   little ship-art tiles - is a <label> holding an <input type="file"> that has
+   been stretched invisibly across the whole of it.
+
+   That one trick is what makes all of this work. The box is clickable because
+   the box IS the input, so there is no button forwarding clicks to a hidden
+   control, and the input keeps its native focus ring, its Enter/Space handling
+   and its place in the tab order. The cue text is pointer-events: none so a
+   click always lands on the input and never on the label as well, which is
+   what used to open the file dialog twice. */
+.file-cover {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  opacity: 0; cursor: pointer; font-size: 0;
+}
+.file-cover:focus-visible { outline: none; }
+.file-btn:focus-within { border-color: var(--blue); color: var(--blue); }
+/* The zone shows the focus, since the control inside it is invisible. */
+.em-drop:focus-within, .cf-shipimg-drop:focus-within { border-color: var(--blue); color: var(--blue); background: var(--blue-wash); }
+/* Mid-drag, set by wireImageDrops: solid and filled, so the difference between
+   "over the target" and "about to miss it" is unmistakable. */
+.em-drop.is-dropping, .cf-shipimg-drop.is-dropping,
+.em-modal.is-dropping .em-drop {
+  border-style: solid; border-color: var(--blue); color: var(--blue-deep); background: var(--blue-wash);
+}
+.em-modal.is-dropping { outline: 3px solid var(--blue); outline-offset: -3px; }
+
+.em-upload { display: flex; flex-direction: column; gap: 14px; }
 .em-drop {
-  display: flex; width: 100%; align-items: center; justify-content: center; min-height: 180px; cursor: pointer;
+  position: relative;
+  display: flex; width: 100%; align-items: center; justify-content: center; min-height: 190px; cursor: pointer;
   border: 1.5px dashed var(--hair); background: var(--paper); color: var(--ink-3);
   transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
 }
 .em-drop:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-wash); }
-.em-drop-cue { display: inline-flex; flex-direction: column; align-items: center; gap: 8px; font-family: var(--sans); font-weight: 700; font-size: 14px; }
+.em-drop-cue { display: inline-flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 20px; text-align: center; pointer-events: none; }
+.em-drop-head { font-family: var(--display); font-weight: 800; font-size: 19px; letter-spacing: -0.01em; color: var(--ink); }
+.em-drop:hover .em-drop-head, .em-drop:focus-within .em-drop-head, .em-drop.is-dropping .em-drop-head { color: inherit; }
+.em-drop-sub { font-family: var(--sans); font-weight: 600; font-size: 13px; color: var(--ink-3); max-width: 42ch; line-height: 1.45; }
+.em-drop-note { font-family: var(--sans); font-size: 12.5px; line-height: 1.5; color: var(--ink-3); }
+/* What you already have, at a size you can judge. The header preview is 40px:
+   big enough to confirm a mark, too small to see that you cropped somebody's
+   head off. */
+.em-current { display: flex; align-items: center; gap: 14px; padding: 12px; border: 1px solid var(--hair); background: var(--paper); }
+.em-current img { width: 88px; height: 88px; object-fit: cover; border-radius: 50%; flex: none; border: 1px solid var(--hair-soft); }
+.em-current figcaption { font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-2); }
 .em-search { width: 100%; margin-bottom: 10px; font-family: var(--sans); font-size: 14px; padding: 9px 11px; border: 1px solid var(--hair); background: var(--paper); color: var(--ink); }
 .em-search:focus { outline: none; border-color: var(--blue); }
 /* Folder chips for the emblem library. */
@@ -5717,7 +5788,9 @@ main.play-body .roster-section::before { content: none; }
   .comp-search, .limit-input, .print-toggle,
   /* Remove-unit is the single most-tapped control in the whole builder and
      measured a 24px box; modal-close and the rich-text toolbar were 28-30px. */
-  .ru-remove, .modal-close, .rt-btn {
+  /* Remove-ship-class in the Foundry: a 34px box on a page that is otherwise
+     all 42px controls, and the one control on it you cannot undo. */
+  .ru-remove, .modal-close, .rt-btn, .cf-ship-x {
     min-height: var(--tap);
     box-sizing: border-box;
   }
@@ -5727,9 +5800,14 @@ main.play-body .roster-section::before { content: none; }
      is no label holding the box open. */
   .mf-name-gen, .emblem-current-btn, .sy-hvp-check, .onboard-close, .card-act,
   .learn-dot.is-sub, .sy-ref-btn, .play-bar-print, .play-bar-reset,
-  .foundry-main .ghost-btn, .ru-remove, .modal-close, .rt-btn {
+  .foundry-main .ghost-btn, .ru-remove, .modal-close, .rt-btn, .cf-ship-x {
     min-width: var(--tap);
   }
+  /* The clear-art badge is the exception the other way: it is pinned to the
+     corner of a 108x65 thumbnail, and a 44px button there would cover the art
+     it is a badge on. It gets a 44px HIT area instead - an invisible
+     pseudo-element - and keeps its 18px face. */
+  .cf-shipimg-x::after { content: ""; position: absolute; inset: -13px; }
   /* Icon-only buttons centre their glyph in the grown box rather than pinning
      it to the top-left corner the padding used to put it in. */
   .mf-name-gen, .sy-hvp-check, .onboard-close, .emblem-current-btn,

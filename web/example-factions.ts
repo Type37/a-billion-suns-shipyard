@@ -37,7 +37,7 @@ import { w } from "../src/data/_helpers.ts";
  *
  * The one exception is the Covenant's Gigas-class Bomber Wing, which is new
  * (the Ordinate has no bomber). It is flagged as the single unbalanced stat
- * block in CUSTOM-FACTIONS.md and it is flagged in its backstory here too.
+ * block in CUSTOM-FACTIONS.md, which is the only place that caveat lives now.
  */
 
 /** Stable ids, so "already loaded?" is a set membership test rather than a
@@ -59,7 +59,9 @@ interface ReskinSpec {
   prefix: string;
   emblemLib?: string;
   playstyle?: string;
-  backstory: string;
+  /** Omit for no backstory at all - the base faction's is never inherited, or a
+   *  reskin would carry a story about the faction it is no longer called. */
+  backstory?: string;
   /** Replaces the base faction rule. Omit to keep the book's rule verbatim. */
   rule?: FactionRule;
   /**
@@ -160,8 +162,11 @@ const COVENANT: Faction = reskin(THE_ORDINATE, {
   emblemLib: "nonhuman/Halo1_-_Covenant_Symbol.webp",
   playstyle:
     "Fastest to act in the game and brutal at close range, weaker at long. Get the first word in, then let passive fire punish anything that closes.",
-  backstory:
-    "**A worked example.** This is The Ordinate (Age of Unity, rules p.154-155) with new names on everything, so its balance is the book's rather than something guessed at. The faction rule keeps its printed name.\n\n**Attack Ship** is a class, not one name: Zanar, Storm Cutter and Rothen are all patterns fielded on that stat line — same hull, same cost, different name on the model depending which one you are flying.\n\n**The Gigas-class Bomber Wing is the one invented stat block here.** The Ordinate has no dedicated bomber, so one was added: it slots between the two existing wings on cost (5 / 10 / 16) and gives the fleet a torpedo-armed Mass 0 option. Nothing in the book balanced it. Worth a look after a few games.\n\n**Known compromise.** The Ordinate is explicitly weaker at long range and the Covenant arguably should out-range you — the Sinaris in particular tops out at a 0-9\" Laser Cannon. AEGIS went to the Posthuman Republic and no other faction covered shields, capitals and superior tech together, so this was accepted rather than solved.",
+  // No backstory. What stood here was four paragraphs of design notes - which
+  // book faction this reskins, why the Attack Ship carries three pattern names,
+  // that the Gigas Bomber Wing is unbalanced, and which trade was accepted on
+  // range. That is the making-of, and it belongs in CUSTOM-FACTIONS.md (where
+  // all of it still is), not in the field a player writes their own fiction in.
   ships: [
     ["light-fighter-wing", "Space Banshee Wing"],
     ["advanced-fighter-wing", "Seraph Wing"],

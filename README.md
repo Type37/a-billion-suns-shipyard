@@ -92,7 +92,7 @@ Covered by `test/fleet-names.test.ts`.
 Requires Node ≥ 22.6.
 
 ```bash
-npm install       # dev-only deps: Vite + TypeScript
+npm install       # Vite + TypeScript to build; Cropper.js is the one runtime dep
 npm run dev       # dev server at http://localhost:5731
 npm run build     # production build to dist/
 npm run preview   # serve the built site

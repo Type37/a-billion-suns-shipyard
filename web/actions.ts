@@ -50,6 +50,7 @@ import { creditsText } from "./format.ts";
 import { writeOnInput } from "./write-on.ts";
 import { shareUrl } from "./share.ts";
 import { visibleAnchor } from "./tours.ts";
+import { activeCropper } from "./cropper.ts";
 import { fleetToMarkdown } from "./export-text.ts";
 
 // --- Solo dice roller -------------------------------------------------------
@@ -313,16 +314,31 @@ function importFactionJson(text: string, notFactionMessage: string): void {
 /*
  * IMAGES
  *
- * Everything below is one pipeline: a File arrives (from the file dialog, a
- * drag from the desktop, or a paste), gets decoded and redrawn onto a canvas at
- * a fixed size, and comes back as a data URL small enough to live in
- * localStorage next to the fleet that uses it.
+ * One pipeline, three ways in and one way out. A File arrives (from the file
+ * dialog, a drag from the desktop, or a paste), is decoded at full size, and is
+ * handed to the cropper. Whatever region you choose there is redrawn onto a
+ * canvas at a fixed output size and comes back as a data URL small enough to
+ * live in localStorage beside the fleet that uses it.
  *
- * The two shapes are deliberate. An emblem is a badge and is drawn in a circle
- * at 40-60px almost everywhere, so it is centre-cropped square. Ship art is a
- * picture of a hull and is drawn in a landscape frame, so it is cover-fitted
- * into 5:3 instead of having its nose and tail cropped off.
+ * The crop step is not decoration. This used to centre-crop whatever it was
+ * given, which is right about half the time and silently wrong the rest - a
+ * logo whose mark sits off to one side, a photo of a hull that is mostly sky.
+ * The automatic fit is still what the cropper OPENS on, so accepting the
+ * default is one press and nothing got slower for the centred case.
+ *
+ * The two frames are deliberate. An emblem is a badge drawn in a circle at
+ * 40-60px almost everywhere, so it is square. Ship art is a picture of a hull
+ * drawn in a landscape frame, so it is 5:3.
  */
+
+/** Output frame per destination: what the cropper crops to. */
+const IMAGE_FRAME: Record<string, { outW: number; outH: number; round: boolean }> = {
+  "emblem-upload": { outW: 480, outH: 480, round: true },
+  "cf-emblem-upload": { outW: 480, outH: 480, round: true },
+  "outfit-emblem-upload": { outW: 480, outH: 480, round: true },
+  "no-emblem-upload": { outW: 480, outH: 480, round: true },
+  "cf-ship-image-upload": { outW: 320, outH: 192, round: false },
+};
 
 /** What a rejected upload was: used to say something more useful than "nope". */
 type ImageFault = "type" | "read" | "decode" | "canvas";
@@ -338,10 +354,8 @@ function imageFailure(fault: ImageFault): string {
   }
 }
 
-// Read an uploaded image, downscale it to a square emblem, and return a compact
-// data URL. Keeping it small (480px) means it survives localStorage and does not
-// bloat the app. Rejects non-images.
-function readEmblemImage(file: File): Promise<string> {
+/** The file at full size, as a data URL. Rejects non-images. */
+function readImageFile(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     if (!file.type.startsWith("image/")) {
       reject(new Error("type"));
@@ -350,70 +364,11 @@ function readEmblemImage(file: File): Promise<string> {
     const reader = new FileReader();
     reader.onerror = () => reject(new Error("read"));
     reader.onload = () => {
+      // Decoded once here rather than trusted: a .png that is not a PNG should
+      // fail at the door, not inside the cropper with a broken-image icon.
       const img = new Image();
       img.onerror = () => reject(new Error("decode"));
-      img.onload = () => {
-        const size = 480;
-        const canvas = document.createElement("canvas");
-        canvas.width = size;
-        canvas.height = size;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          reject(new Error("canvas"));
-          return;
-        }
-        // Cover-fit: crop to a centred square, then scale.
-        const side = Math.min(img.width, img.height);
-        const sx = (img.width - side) / 2;
-        const sy = (img.height - side) / 2;
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, size, size);
-        ctx.drawImage(img, sx, sy, side, side, 0, 0, size, size);
-        const hasAlpha = file.type === "image/png";
-        resolve(canvas.toDataURL(hasAlpha ? "image/png" : "image/jpeg", 0.82));
-      };
-      img.src = reader.result as string;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-// Ship art is landscape, not a square badge: cover-fit into a 5:3 frame so a
-// hull keeps its proportions instead of being centre-cropped to a square.
-function readShipImage(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    if (!file.type.startsWith("image/")) {
-      reject(new Error("type"));
-      return;
-    }
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error("read"));
-    reader.onload = () => {
-      const img = new Image();
-      img.onerror = () => reject(new Error("decode"));
-      img.onload = () => {
-        const w = 320;
-        const h = 192; // 5:3
-        const canvas = document.createElement("canvas");
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          reject(new Error("canvas"));
-          return;
-        }
-        // Cover-fit: scale so the frame is filled, crop the overflow, centred.
-        const scale = Math.max(w / img.width, h / img.height);
-        const dw = img.width * scale;
-        const dh = img.height * scale;
-        const dx = (w - dw) / 2;
-        const dy = (h - dh) / 2;
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, w, h);
-        ctx.drawImage(img, dx, dy, dw, dh);
-        const hasAlpha = file.type === "image/png";
-        resolve(canvas.toDataURL(hasAlpha ? "image/png" : "image/jpeg", 0.82));
-      };
+      img.onload = () => resolve(reader.result as string);
       img.src = reader.result as string;
     };
     reader.readAsDataURL(file);
@@ -421,80 +376,77 @@ function readShipImage(file: File): Promise<string> {
 }
 
 /**
- * One route for every image that enters the app, whatever brought it in.
+ * Open the cropper on a chosen file.
  *
- * There are three ways to hand the app a picture - the file dialog, a drag from
- * the desktop, and a paste - and five places that accept one: the four emblem
- * targets (a fleet, a custom faction, a saved outfit, the outfit being started
- * in the dialog) and per-ship art in the Foundry. Wiring three events to five
- * destinations separately would be fifteen copies of "decode it, shrink it, put
- * it there", which is what the change handler alone used to hold five of.
- *
- * So every entry point funnels through here, keyed by the same action name the
- * file input already carries. A drop zone does not need to know what it is a
- * drop zone FOR - it finds its own <input> and hands over its dataset.
+ * Everything that accepts an image comes through here: the file dialog, a drop,
+ * a paste. The destination is carried as the action name the file input already
+ * had, so nothing downstream needs to know which of the three brought it.
  */
-function applyImageUpload(action: string, data: DOMStringMap, file: File): void {
-  const fail = (err: unknown): void => {
-    const code = err instanceof Error ? err.message : "read";
-    showToast(imageFailure(code as ImageFault), { icon: "close" });
-  };
-  const done = (): void => showToast("Image added.", { icon: "check" });
+function startImageCrop(action: string, data: DOMStringMap, file: File): void {
+  const frame = IMAGE_FRAME[action];
+  if (!frame) return;
+  readImageFile(file)
+    .then((src) => {
+      store.setState((s) => ({
+        ...s,
+        ui: {
+          ...s.ui,
+          crop: { src, action, ...(data["ship"] ? { ship: data["ship"] } : {}), ...frame },
+        },
+      }));
+    })
+    .catch((err: unknown) => {
+      const code = err instanceof Error ? err.message : "read";
+      showToast(imageFailure(code as ImageFault), { icon: "close" });
+    });
+}
 
+/**
+ * Place a cropped image where it was headed.
+ *
+ * Five destinations - the four emblem targets (a fleet, a custom faction, a
+ * saved outfit, the outfit being started in the dialog) and per-ship art in the
+ * Foundry - reached by the same action name the upload carried all the way
+ * through. Wiring three input events to five destinations separately would be
+ * fifteen copies of "put it there", which is what the change handler alone used
+ * to hold five of.
+ */
+function applyImageUpload(action: string, data: DOMStringMap, dataUrl: string): void {
+  const done = (): void => showToast("Image added.", { icon: "check" });
   switch (action) {
     case "emblem-upload": {
       const id = currentListId();
       if (!id) return;
-      readEmblemImage(file)
-        .then((dataUrl) => {
-          store.setState((s) => updateList(s, id, (l) => ({ ...l, emblemImage: dataUrl })));
-          done();
-        })
-        .catch(fail);
+      store.setState((s) => updateList(s, id, (l) => ({ ...l, emblemImage: dataUrl })));
+      done();
       break;
     }
     case "cf-emblem-upload": {
       const fid = currentFoundryId();
       if (!fid) return;
-      readEmblemImage(file)
-        .then((dataUrl) => {
-          editFaction(fid, (f) => ({ ...f, emblemImage: dataUrl }));
-          done();
-        })
-        .catch(fail);
+      editFaction(fid, (f) => ({ ...f, emblemImage: dataUrl }));
+      done();
       break;
     }
     case "outfit-emblem-upload": {
-      readEmblemImage(file)
-        .then((dataUrl) => {
-          editOutfit((o) => ({ ...o, emblemImage: dataUrl }));
-          done();
-        })
-        .catch(fail);
+      editOutfit((o) => ({ ...o, emblemImage: dataUrl }));
+      done();
       break;
     }
     case "no-emblem-upload": {
-      readEmblemImage(file)
-        .then((dataUrl) => {
-          editNewOutfit((d) => ({ ...d, emblemImage: dataUrl }));
-          done();
-        })
-        .catch(fail);
+      editNewOutfit((d) => ({ ...d, emblemImage: dataUrl }));
+      done();
       break;
     }
     case "cf-ship-image-upload": {
       const fid = currentFoundryId();
       const si = Number(data["ship"]);
       if (!fid || !Number.isInteger(si)) return;
-      readShipImage(file)
-        .then((dataUrl) => {
-          editFaction(fid, (f) => ({
-            ...f,
-            ships: f.ships.map((s, i) => (i === si ? { ...s, image: dataUrl } : s)),
-          }));
-          done();
-        })
-        .catch(fail);
+      editFaction(fid, (f) => ({
+        ...f,
+        ships: f.ships.map((s, i) => (i === si ? { ...s, image: dataUrl } : s)),
+      }));
+      done();
       break;
     }
     default:
@@ -783,6 +735,64 @@ function dispatchAction(target: HTMLElement): void {
     }
     // No "emblem-upload-pick". The drop box IS the file input now (stretched
     // invisibly across it), so there is nothing left to forward a click to.
+
+    // ---- The crop step ----------------------------------------------------
+    case "crop-cancel": {
+      // Drops the pending image and leaves whatever opened the cropper standing
+      // - the emblem picker if it came from there, the Foundry page if not.
+      store.setState((s) => ({ ...s, ui: { ...s.ui, crop: undefined } }));
+      break;
+    }
+    case "crop-rotate": {
+      activeCropper()?.rotate(90);
+      break;
+    }
+    case "crop-reset": {
+      activeCropper()?.reset();
+      break;
+    }
+    case "crop-apply": {
+      const c = state.ui.crop;
+      const cr = activeCropper();
+      if (!c || !cr) return;
+      /*
+       * The chosen region, redrawn at the destination's own size.
+       *
+       * getCroppedCanvas does the scaling, so the stored image is exactly as
+       * big as it needs to be however large the original was - a 12MP phone
+       * photo and a 200px logo both come out at 480px. imageSmoothingQuality is
+       * worth setting: the default makes a heavy downscale visibly crunchy.
+       */
+      const canvas = cr.getCroppedCanvas({
+        width: c.outW,
+        height: c.outH,
+        fillColor: "#ffffff",
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: "high",
+      });
+      if (!canvas) {
+        showToast(imageFailure("canvas"), { icon: "close" });
+        return;
+      }
+      /*
+       * JPEG, always, and this is a deliberate change from what came before.
+       *
+       * The old pipeline kept a PNG whenever the SOURCE was a PNG, which is
+       * most uploads - and a 480px PNG is comfortably half a megabyte of a
+       * roughly 5MB store (see storage.ts write). Nothing was gained for it:
+       * the canvas is filled white before the image is drawn, so there is no
+       * transparency in the output to preserve either way, and every emblem is
+       * displayed at 40-60px. The same crop as JPEG is about a tenth the size.
+       *
+       * Emblems get the higher quality of the two: they are usually line art
+       * or a logo, where hard edges show ringing first.
+       */
+      const dataUrl = canvas.toDataURL("image/jpeg", c.round ? 0.9 : 0.85);
+      const data = { ...(c.ship !== undefined ? { ship: c.ship } : {}) } as DOMStringMap;
+      store.setState((s) => ({ ...s, ui: { ...s.ui, crop: undefined } }));
+      applyImageUpload(c.action, data, dataUrl);
+      break;
+    }
     case "emblem-lib-more": {
       // Fired by the sentinel at the foot of the grid scrolling into view.
       store.setState((s) =>
@@ -2620,7 +2630,7 @@ function handleChange(e: Event): void {
     case "no-emblem-upload":
     case "cf-ship-image-upload": {
       const file = target.files?.[0];
-      if (file) applyImageUpload(action, target.dataset, file);
+      if (file) startImageCrop(action, target.dataset, file);
       target.value = "";
       break;
     }
@@ -2693,7 +2703,7 @@ function wireImageDrops(): void {
       showToast("That was not an image. Drop a PNG, JPEG, WebP or GIF.", { icon: "close" });
       return;
     }
-    applyImageUpload(hit.input.dataset["action"]!, hit.input.dataset, file);
+    startImageCrop(hit.input.dataset["action"]!, hit.input.dataset, file);
   });
 
   /*
@@ -2719,7 +2729,7 @@ function wireImageDrops(): void {
     const action = input?.dataset["action"];
     if (!isImageUpload(action)) return;
     e.preventDefault();
-    applyImageUpload(action, input!.dataset, file);
+    startImageCrop(action, input!.dataset, file);
   });
 }
 
@@ -2799,6 +2809,13 @@ export function wireActions(root: HTMLElement): void {
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
     const s = store.getState();
+    // The cropper is the topmost layer when it is open, so it unstacks first -
+    // back to the emblem picker that launched it, if that is what launched it.
+    if (s.ui.crop) {
+      e.preventDefault();
+      store.setState((st) => ({ ...st, ui: { ...st.ui, crop: undefined } }));
+      return;
+    }
     if (s.ui.modal) {
       e.preventDefault();
       // Escape unstacks one layer, the same as the X and Done: from the emblem

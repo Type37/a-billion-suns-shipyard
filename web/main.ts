@@ -9,6 +9,7 @@ import { runDecode, DIGIT_POOL } from "./write-on.ts";
 import { visibleAnchor } from "./tours.ts";
 import { renderMarkdown } from "./richtext.ts";
 import { FleetSync } from "./fleet-sync.ts";
+import { syncCropper } from "./cropper.ts";
 import "./style.css";
 
 // Keep every Markdown notes editor's preview in step with its textarea as the
@@ -262,6 +263,7 @@ function paint(): void {
 
   measureStickyHeader();
   observeEmblemLibrary();
+  syncCropper();
   wireMarkdownPreviews();
   markJustPickedFaction();
   animateFactionTitle();
@@ -817,7 +819,11 @@ function focusables(root: Element): HTMLElement[] {
 }
 
 function syncModalFocus(): void {
-  const panel = document.querySelector<HTMLElement>(".modal-root .modal-panel");
+  // The LAST panel, not the first: dialogs stack (the cropper opens over the
+  // emblem picker), and the trap has to hold the one actually on top or Tab
+  // walks into the dialog underneath.
+  const panels = document.querySelectorAll<HTMLElement>(".modal-root .modal-panel");
+  const panel = panels[panels.length - 1] ?? null;
 
   if (!panel) {
     if (trapHandler) {
@@ -842,7 +848,8 @@ function syncModalFocus(): void {
 
     trapHandler = (e: KeyboardEvent) => {
       if (e.key !== "Tab") return;
-      const live = document.querySelector<HTMLElement>(".modal-root .modal-panel");
+      const open = document.querySelectorAll<HTMLElement>(".modal-root .modal-panel");
+      const live = open[open.length - 1];
       if (!live) return;
       const items = focusables(live);
       if (items.length === 0) return;

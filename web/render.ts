@@ -4384,6 +4384,44 @@ function emblemModal(state: AppState): string {
   </div>`;
 }
 
+/**
+ * The crop step, between choosing an image and storing it.
+ *
+ * The <div> the cropper builds into carries data-morph-skip, because the
+ * cropper owns those nodes and holds references to them - a repaint from any
+ * other corner of the app would otherwise delete the crop box mid-drag. See
+ * morphNode. Everything outside that one container is ordinary rendered markup
+ * and repaints as usual.
+ *
+ * It is its own modal layer rather than a tab inside the emblem picker, because
+ * ship art has no picker to be a tab of: the Foundry's tiles open this directly.
+ */
+function cropModal(state: AppState): string {
+  const c = state.ui.crop;
+  if (!c) return "";
+  return `
+  <div class="modal-root crop-root">
+    <div class="modal-backdrop" data-action="crop-cancel"></div>
+    <div class="modal-panel crop-modal" role="dialog" aria-modal="true" aria-label="Crop the image">
+      <header class="modal-header">
+        <h2 class="modal-title">${c.round ? "Frame the emblem" : "Frame the art"}</h2>
+        <button class="modal-close" data-action="crop-cancel" aria-label="Cancel">${icon("close", 18)}</button>
+      </header>
+      <p class="crop-hint">Drag the picture to move it, drag a corner to resize, scroll or pinch to zoom. ${c.round ? "Emblems are shown in a circle." : "Ship art is shown in a landscape frame."}</p>
+      <!-- Owned by Cropper.js from here down: see mountCropper in main.ts. -->
+      <div class="crop-stage ${c.round ? "is-round" : ""}" data-morph-skip data-crop-stage data-src="${c.src}" data-aspect="${c.outW / c.outH}"></div>
+      <div class="crop-foot">
+        <!-- "sync" is the circular-arrows glyph; there is no dedicated rotate
+             mark in the set and a quarter turn is what it depicts. -->
+        <button class="bar-btn" data-action="crop-rotate" title="Rotate a quarter turn">${icon("sync", 15)} Rotate</button>
+        <button class="bar-btn" data-action="crop-reset">Reset</button>
+        <button class="bar-btn" data-action="crop-cancel">Cancel</button>
+        <button class="cta-btn crop-use" data-action="crop-apply">${icon("check", 16)} Use this image</button>
+      </div>
+    </div>
+  </div>`;
+}
+
 export function render(state: AppState): string {
   const body = (() => {
     switch (state.route.view) {
@@ -4413,5 +4451,7 @@ export function render(state: AppState): string {
         return learnClassicView(state);
     }
   })();
-  return `${body}${optionsModal(state)}${syncModal(state)}${emblemModal(state)}${newOutfitModal(state)}${confirmModal(state)}${tourPopover(state)}`;
+  // The cropper renders last: it opens OVER the emblem picker that launched it,
+  // and hands back to it on cancel.
+  return `${body}${optionsModal(state)}${syncModal(state)}${emblemModal(state)}${newOutfitModal(state)}${confirmModal(state)}${cropModal(state)}${tourPopover(state)}`;
 }

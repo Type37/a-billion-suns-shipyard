@@ -97,6 +97,24 @@ function morphNode(from: Node, to: Node): Node {
     return from;
   }
 
+  /*
+   * A subtree this renderer does not own.
+   *
+   * render() emits an empty container and something else fills it - the image
+   * cropper, which builds a few dozen nodes of its own inside one and tracks
+   * them by reference. Everything else on the page can be rebuilt from state at
+   * any moment; that cannot, and a repaint from an unrelated corner of the app
+   * (a toast appearing, Fleet Sync landing) would otherwise delete the crop box
+   * out from under the pointer mid-drag.
+   *
+   * Attributes are still reconciled - those come from the render and are how
+   * the container is addressed. Only the children are left alone.
+   */
+  if (from.hasAttribute("data-morph-skip")) {
+    morphAttributes(from, to);
+    return from;
+  }
+
   morphAttributes(from, to);
   morphChildren(from, to);
   morphFormState(from, to);

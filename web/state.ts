@@ -332,6 +332,31 @@ export interface AppState {
       emblemLib?: string;
       emblemColor?: "ink" | "blue" | "red";
     };
+    /**
+     * An image waiting to be cropped, and where it is going once it is.
+     *
+     * Every upload lands here first now. The app used to centre-crop whatever
+     * it was given and store the result, which is right about half the time and
+     * silently wrong the rest: a logo with its mark off to one side, a photo of
+     * a hull that is mostly sky. Nothing about the destination is decided here
+     * beyond the frame - `action` and `ship` are the same values the file input
+     * carried, replayed against applyImageUpload once you press Use.
+     *
+     * `src` is the file at full size, untouched. The downscale happens on the
+     * way OUT of the cropper, from the region you chose.
+     */
+    crop?: {
+      src: string;
+      /** The upload action to replay: "emblem-upload", "cf-ship-image-upload"... */
+      action: string;
+      /** Ship index, for per-ship art. */
+      ship?: string;
+      /** Output size in px. Square for emblems, 5:3 for ship art. */
+      outW: number;
+      outH: number;
+      /** Draw the crop box as a circle: emblems are always shown in one. */
+      round: boolean;
+    };
     /** In-progress first-visit coachmark tour, once the user has advanced past step 0. */
     tour?: { tourId: string; step: number };
     /** Print-setup options. Persisted (abs2.print.v1) so reprinting after an

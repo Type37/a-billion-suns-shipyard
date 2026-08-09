@@ -98,12 +98,58 @@ function read<T>(key: string, fallback: T): T {
   }
 }
 
+/*
+ * A save that did not fit used to be swallowed here, with a comment claiming
+ * "the app keeps working in memory". It does - and that is the problem. The
+ * write simply did not happen: you carry on editing, everything on screen looks
+ * saved, and the work is gone at the next reload with nothing having said so.
+ *
+ * Text never got near the ~5MB budget, so this was theoretical. Uploaded images
+ * are not: localStorage holds UTF-16, so a base64 data URL costs about two
+ * bytes per character, and one 480px emblem can be half a megabyte of quota.
+ * Art on nine ship classes reaches the ceiling easily.
+ *
+ * So a full-storage failure is now reported rather than hidden. Anything else
+ * (private-mode blocking, a disabled store) still fails quietly, because there
+ * is nothing the player can do about those and nothing was going to persist in
+ * that session anyway.
+ */
+let onStorageFull: (() => void) | undefined;
+export function setStorageFullHook(fn: () => void): void {
+  onStorageFull = fn;
+}
+
+function isQuotaError(e: unknown): boolean {
+  // Firefox uses its own name, and older Safari only sets the legacy code.
+  return (
+    e instanceof DOMException &&
+    (e.name === "QuotaExceededError" || e.name === "NS_ERROR_DOM_QUOTA_REACHED" || e.code === 22)
+  );
+}
+
 function write(key: string, value: unknown): void {
   try {
     localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    // Storage full or blocked: the app keeps working in memory.
+  } catch (e) {
+    if (isQuotaError(e)) onStorageFull?.();
+    // Anything else: blocked or unavailable storage; the session runs in memory.
   }
+}
+
+/** Roughly how many bytes this app is holding, for the storage readout. */
+export function storageBytes(): number {
+  let total = 0;
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k?.startsWith("abs2.")) continue;
+      // UTF-16: two bytes per code unit, key included.
+      total += (k.length + (localStorage.getItem(k)?.length ?? 0)) * 2;
+    }
+  } catch {
+    return 0;
+  }
+  return total;
 }
 
 export function loadLists(): SavedList[] {

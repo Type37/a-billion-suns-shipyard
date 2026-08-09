@@ -29,6 +29,7 @@ import { FACTION_LORE } from "./faction-lore.ts";
 import type { AppState } from "./state.ts";
 import { activeList, activeOutfit, DEFAULT_PRINT, PAPER } from "./state.ts";
 import type { SavedList, UnitPosition } from "./storage.ts";
+import { storageBytes } from "./storage.ts";
 import { FleetSync } from "./fleet-sync.ts";
 import { soloListView, soloOutfitView, newOutfitModal } from "./solo.ts";
 import { learnView } from "./learn.ts";
@@ -3690,6 +3691,17 @@ function optionsModal(state: AppState): string {
         <section class="opt-section">
           <h3 class="opt-h">Your data</h3>
           <p class="opt-note">Everything you build is saved in this browser only.</p>
+          <!--
+            A budget nobody could see until they hit it. The ceiling is the
+            browser's, around 5MB, and text never approaches it - uploaded art
+            is what spends it, so the figure is only worth showing once there
+            is enough stored to be worth knowing about.
+          -->
+          ${
+            storageBytes() > 250_000
+              ? `<p class="opt-note opt-usage">Using about ${Math.round(storageBytes() / 1024)}&nbsp;KB of this browser's ~5&nbsp;MB. Uploaded images are almost all of that; export a backup if you are getting close.</p>`
+              : ""
+          }
           <div class="opt-actions">
             <button class="bar-btn" data-action="export-data">${icon("download", 15)} Export a backup</button>
             <label class="bar-btn file-btn">${icon("upload", 15)} Import a backup

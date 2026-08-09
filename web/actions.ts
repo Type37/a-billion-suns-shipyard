@@ -19,6 +19,7 @@ import {
   persistSettings,
   persistPrintOpts,
   persistOutfits,
+  setStorageFullHook,
 } from "./storage.ts";
 import type { SavedOutfit } from "./storage.ts";
 import { FleetSync } from "./fleet-sync.ts";
@@ -2726,6 +2727,15 @@ export function wireActions(root: HTMLElement): void {
   root.addEventListener("click", handleClick);
   root.addEventListener("change", handleChange);
   wireImageDrops();
+  // Loud, because it is the one message in the app that means work is about to
+  // be lost. Uploaded art is named as the cause: it is what fills the budget,
+  // and deleting one image buys back what a hundred fleets of text would.
+  setStorageFullHook(() =>
+    showToast("That did not save - this browser's storage for the app is full. Remove an uploaded image or an old fleet, then try again.", {
+      icon: "close",
+      loud: true,
+    }),
+  );
   /**
    * Naming a person puts the caret at the END of their job, ready to type.
    *

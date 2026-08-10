@@ -27,8 +27,8 @@
 // empty boxes with a single smudge in the top-left. Keeping the two on separate
 // elements means the keyframes can own transform completely without the layout
 // depending on it.
-const SHIP = (x: number, y: number, rot = 0, cls = "dg-ship") =>
-  `<g transform="translate(${x} ${y}) rotate(${rot})"><g class="${cls}"><path d="M0 -9 L6 7 L0 4 L-6 7 Z"/></g></g>`;
+const SHIP = (x: number, y: number, rot = 0, cls = "dg-ship", scale = 1) =>
+  `<g transform="translate(${x} ${y}) rotate(${rot})${scale === 1 ? "" : ` scale(${scale})`}"><g class="${cls}"><path d="M0 -9 L6 7 L0 4 L-6 7 Z"/></g></g>`;
 
 const LABEL = (x: number, y: number, text: string, cls = "dg-label") =>
   `<text class="${cls}" x="${x}" y="${y}">${text}</text>`;
@@ -97,6 +97,36 @@ function jumpPointDiagram(): string {
 }
 
 /**
+ * Passing: the third thing you can do on your turn in the Jump Phase.
+ *
+ * The only one of the three with nothing to draw on the table, so it draws the
+ * turn order instead - four seats, play going clockwise, and one seat going
+ * quiet and being skipped from then on. That is the rule it has to carry:
+ * passing is not "do nothing this turn", it is "take no further turns this
+ * phase", and the phase ends when the last seat has gone quiet.
+ */
+function passDiagram(): string {
+  const seat = (i: number, x: number, y: number) => `
+    <g transform="translate(${x} ${y})">
+      <g class="dg-seat dg-seat-${i}">
+        <circle r="15"/>
+        <text class="dg-seat-l" y="4">P${i}</text>
+      </g>
+    </g>`;
+  return `
+  <svg class="learn-dg" viewBox="0 0 320 170" role="img"
+       aria-label="Passing: you take no further turns this Jump Phase, and play carries on clockwise without you. Once all players have passed, the phase ends.">
+    ${LABEL(160, 16, "Pass", "dg-title")}
+    <circle class="dg-turn-ring" cx="160" cy="92" r="52"/>
+    ${seat(1, 160, 40)}${seat(2, 212, 92)}${seat(3, 160, 144)}${seat(4, 108, 92)}
+    <g class="dg-turn-mark" transform="translate(160 92)">
+      <g class="dg-turn-dot"><circle r="6"/></g>
+    </g>
+    ${LABEL(160, 166, "Play carries on clockwise without you", "dg-measure-text")}
+  </svg>`;
+}
+
+/**
  * Jumping in a unit: every ship of it deployed inside the point's 6" bubble.
  *
  * The bubble is the rule - "deploy all ships from that unit within 6 inches of
@@ -151,18 +181,24 @@ function jumpInDiagram(): string {
 function dragSelectDiagram(): string {
   const LEAD_X = 128, LEAD_Y = 100, R6 = 54;
 
-  // Selection brackets: four corner ticks, not a box, so they read as a UI
-  // affordance sitting on top of the table rather than another range shape.
-  const brackets = (x: number, y: number, cls: string, h = 13, arm = 5) => `
-    <g transform="translate(${x} ${y})"><g class="dgs-lock ${cls}">
-      <path d="M${-h} ${-h + arm} L${-h} ${-h} L${-h + arm} ${-h}
-               M${h - arm} ${-h} L${h} ${-h} L${h} ${-h + arm}
-               M${h} ${h - arm} L${h} ${h} L${h - arm} ${h}
-               M${-h + arm} ${h} L${-h} ${h} L${-h} ${h - arm}"/>
-    </g></g>`;
+  /**
+   * Hull size follows Mass, because Mass is what the picture is about.
+   *
+   * Every ship used to be drawn the same size with its Mass written underneath,
+   * which meant the one number the diagram exists to explain was carried
+   * entirely by a caption. Now the M:4 lead is visibly twice the M:1 escort and
+   * the 4+3+2+1 sum reads off the shapes.
+   */
+  const sizeFor = (m: number): number => 0.62 + m * 0.24;
 
   const mass = (x: number, y: number, m: number, cls = "dgs-mass") =>
     `<text class="${cls}" x="${x}" y="${y}">M:${m}</text>`;
+
+  /** A hull and its Mass label, with the label clearing the (now variable) hull. */
+  const unit = (x: number, y: number, rot: number, cls: string, m: number, labelCls?: string) => {
+    const sc = sizeFor(m);
+    return `${SHIP(x, y, rot, cls, sc)}${mass(x, y + 12 + Math.round(11 * sc), m, labelCls)}`;
+  };
 
   return `
   <svg class="learn-dg" viewBox="0 0 320 192" role="img"
@@ -172,17 +208,12 @@ function dragSelectDiagram(): string {
       .learn-dg .dgs-mass-out { fill: var(--ink-3); }
       .learn-dg .dgs-total { font-family: var(--narrow); font-size: 10px; font-weight: 700; fill: var(--blue); text-anchor: middle; text-transform: uppercase; letter-spacing: 0.04em; }
       .learn-dg .dgs-marq path { fill: none; stroke: var(--blue); stroke-width: 1.6; stroke-linecap: square; }
-      .learn-dg .dgs-lock path { fill: none; stroke: var(--blue); stroke-width: 1.4; stroke-linecap: square; }
       .learn-dg .dgs-pulse { fill: none; stroke: var(--blue); stroke-width: 1.5; }
       .learn-dg .dgs-cursor { fill: var(--ink); stroke: var(--paper); stroke-width: 1; stroke-linejoin: round; }
 
       @keyframes dgs-pulse { 0% { r: 7; opacity: 0.75; } 6% { opacity: 0.7; } 40%, 100% { r: 62; opacity: 0; } }
       @keyframes dgs-click { 0%, 3% { transform: scale(1); } 7% { transform: scale(0.82); } 13%, 100% { transform: scale(1); } }
       @keyframes dgs-marq { 0%, 5% { transform: scale(0.06); opacity: 0; } 11% { opacity: 1; } 26%, 88% { transform: scale(1); opacity: 1; } 96%, 100% { transform: scale(1); opacity: 0; } }
-      @keyframes dgs-lock-0 { 0%, 12% { opacity: 0; transform: scale(1.5); } 18%, 90% { opacity: 1; transform: scale(1); } 96%, 100% { opacity: 0; transform: scale(1); } }
-      @keyframes dgs-lock-1 { 0%, 22% { opacity: 0; transform: scale(1.5); } 28%, 90% { opacity: 1; transform: scale(1); } 96%, 100% { opacity: 0; transform: scale(1); } }
-      @keyframes dgs-lock-2 { 0%, 28% { opacity: 0; transform: scale(1.5); } 34%, 90% { opacity: 1; transform: scale(1); } 96%, 100% { opacity: 0; transform: scale(1); } }
-      @keyframes dgs-lock-3 { 0%, 34% { opacity: 0; transform: scale(1.5); } 40%, 90% { opacity: 1; transform: scale(1); } 96%, 100% { opacity: 0; transform: scale(1); } }
       @keyframes dgs-tint-1 { 0%, 22% { fill: var(--ink); } 28%, 90% { fill: var(--blue); } 96%, 100% { fill: var(--ink); } }
       @keyframes dgs-tint-2 { 0%, 28% { fill: var(--ink); } 34%, 90% { fill: var(--blue); } 96%, 100% { fill: var(--ink); } }
       @keyframes dgs-tint-3 { 0%, 34% { fill: var(--ink); } 40%, 90% { fill: var(--blue); } 96%, 100% { fill: var(--ink); } }
@@ -192,11 +223,6 @@ function dragSelectDiagram(): string {
       .learn-dg .dgs-pulse-2 { animation-delay: 260ms; }
       .learn-dg .dgs-cursor { animation: dgs-click 3600ms ease-out infinite; transform-box: fill-box; transform-origin: 10% 6%; }
       .learn-dg .dgs-marq { animation: dgs-marq 3600ms cubic-bezier(0.2, 0.9, 0.3, 1) infinite; }
-      .learn-dg .dgs-lock { transform-box: fill-box; transform-origin: center; }
-      .learn-dg .dgs-lock-0 { animation: dgs-lock-0 3600ms ease-out infinite; }
-      .learn-dg .dgs-lock-1 { animation: dgs-lock-1 3600ms ease-out infinite; }
-      .learn-dg .dgs-lock-2 { animation: dgs-lock-2 3600ms ease-out infinite; }
-      .learn-dg .dgs-lock-3 { animation: dgs-lock-3 3600ms ease-out infinite; }
       .learn-dg .dgs-catch-1 { animation: dgs-tint-1 3600ms step-end infinite; }
       .learn-dg .dgs-catch-2 { animation: dgs-tint-2 3600ms step-end infinite; }
       .learn-dg .dgs-catch-3 { animation: dgs-tint-3 3600ms step-end infinite; }
@@ -219,7 +245,12 @@ function dragSelectDiagram(): string {
     <circle class="dgs-pulse dgs-pulse-1" cx="${LEAD_X}" cy="${LEAD_Y}" r="7"/>
     <circle class="dgs-pulse dgs-pulse-2" cx="${LEAD_X}" cy="${LEAD_Y}" r="7"/>
 
-    <!-- Marquee corners, snapping open from the lead. -->
+    <!-- ONE square on this diagram, and it is the drag itself.
+         There used to be five: this marquee plus a set of corner brackets locking
+         on around every selected hull. Four little squares snapping shut inside a
+         big square, on top of a circle, with a cursor and a ripple - the picture
+         was mostly lines about lines. Selection is carried by the hulls turning
+         blue, which is one cue instead of two and needs no geometry. -->
     <g transform="translate(${LEAD_X} ${LEAD_Y})"><g class="dgs-marq">
       <path d="M-52 -38 L-52 -50 L-40 -50
                M40 -50 L52 -50 L52 -38
@@ -227,41 +258,26 @@ function dragSelectDiagram(): string {
                M-40 50 L-52 50 L-52 38"/>
     </g></g>
 
-    <!-- Every Mass sits 24 below its hull, which clears the selection brackets
-         (13 half-height) rather than landing on their bottom corners. "lead" goes
-         above its ship for the same reason: below, it ran into the top-left
-         bracket of the M:1 ship. -->
-    ${LABEL(LEAD_X, LEAD_Y - 22, "lead", "dg-mini")}
-    ${brackets(LEAD_X, LEAD_Y, "dgs-lock-0")}
-    ${SHIP(LEAD_X, LEAD_Y, 0, "dg-ship dg-lead")}
-    ${mass(LEAD_X, LEAD_Y + 24, 4)}
+    ${LABEL(LEAD_X, LEAD_Y - 26, "lead", "dg-mini")}
+    ${unit(LEAD_X, LEAD_Y, 0, "dg-ship dg-lead", 4)}
+    ${unit(86, 60, 15, "dg-ship dgs-catch-1", 3)}
+    ${unit(174, 58, -10, "dg-ship dgs-catch-2", 2)}
+    ${unit(150, 142, 0, "dg-ship dgs-catch-3", 1)}
 
-    ${brackets(92, 68, "dgs-lock-1")}
-    ${SHIP(92, 68, 15, "dg-ship dgs-catch-1")}
-    ${mass(92, 92, 3)}
-
-    ${brackets(166, 66, "dgs-lock-2")}
-    ${SHIP(166, 66, -10, "dg-ship dgs-catch-2")}
-    ${mass(166, 90, 2)}
-
-    ${brackets(152, 138, "dgs-lock-3")}
-    ${SHIP(152, 138, 0, "dg-ship dgs-catch-3")}
-    ${mass(152, 162, 1)}
-
-    ${SHIP(266, 104, 0, "dg-ship dg-outside")}
-    ${mass(266, 128, 2, "dgs-mass dgs-mass-out")}
-    ${LABEL(266, 140, "too far", "dg-mini dg-mini-out")}
+    ${unit(268, 98, 0, "dg-ship dg-outside", 2, "dgs-mass dgs-mass-out")}
+    ${LABEL(268, 138, "too far", "dg-mini dg-mini-out")}
 
     <!-- The pointer sits on the lead, tip on the hull. -->
     <g transform="translate(133 92)">
       <path class="dgs-cursor" d="M0 0 L0 15 L4 11.2 L6.4 16.6 L9.4 15.2 L7 10 L11.6 9.6 Z"/>
     </g>
 
+    <!-- The radius is drawn to the LEFT. It used to point right, straight
+         through the Mass label of the ship at the top right; left is the only
+         quarter of the bubble with nothing in it. -->
     <g class="dg-measure" transform="translate(${LEAD_X} ${LEAD_Y})">
-      <line x1="0" y1="0" x2="${R6}" y2="0"/>
-      <!-- Under the rule, not over it: above the line the figure landed on the
-           M:2 of the ship at the top right. -->
-      ${LABEL(R6 / 2, 12, '6"', "dg-measure-text")}
+      <line x1="0" y1="0" x2="${-R6}" y2="0"/>
+      ${LABEL(-R6 / 2, 13, '6"', "dg-measure-text")}
     </g>
 
     <text class="dgs-total" x="160" y="182">Combined Mass 4+3+2+1 = 10 (max 10)</text>
@@ -676,6 +692,7 @@ const DIAGRAMS: Record<string, () => string> = {
   command: commandDiagram,
   "jump-point": jumpPointDiagram,
   "jump-in": jumpInDiagram,
+  pass: passDiagram,
   "drag-select": dragSelectDiagram,
   "double-move": doubleMoveDiagram,
   movement: movementDiagram,

@@ -393,7 +393,6 @@ function sectionPrepare(): string {
        ${p("When setting up a game, your mission may instruct you to &ldquo;Add 1 Sector&rdquo; or &ldquo;Set up 2 Sectors&rdquo;. Simply agree on another flat playable surface to count as the new sector or divide your current play area in two with tape or string to create the additional sector.")}
        ${p("You don&rsquo;t have to divide your table up evenly, and sectors don&rsquo;t even have to be regular shapes. You could even use a nearby side table or counter-top as a sector. Sectors can be as small as 16&rdquo; by 16&rdquo; and still be playable. A Billion Suns is designed to be flexible to the size and shape of each play area &ndash; there is no &lsquo;standard&rsquo; size for any of the sectors. The game works perfectly on any size or shape of table.")}`,
     )}
-    ${learnDiagram("deployment")}
     ${cool(
       // p.29, verbatim - the sidebar beside the Sectors rules.
       `<p>It will seem weird at first, but playing with multiple opponents across multiple tables creates a joyously chaotic deep-space gaming experience. It is one of the unique elements of A Billion Suns and shouldn&rsquo;t be house-ruled out if you want to experience the game at its best, doubly-so if you are playing with 3 or 4 players.</p>
@@ -452,9 +451,7 @@ function sectionCommand(): string {
     )}
     ${quote(
       // p.49, verbatim.
-      `${p("Commands are special effects that you can spend CMD tokens to invoke. The Core Commands are always available, and your faction rules, High-Value Personnel, or era of play may provide additional options.")}
-       ${p("Each CMD token represents an amount of influence that the fleet commander, admiral or CEO can exert on their fleet. You start the game with zero CMD tokens. During each Command Phase, you receive fresh CMD tokens. Use gaming gems, beads or coins to represent them.")}
-       ${p("To use a Command, spend the listed number of CMD tokens. Each Command says when it can be used, and how many CMD tokens are needed to use it. When a CMD token is spent, discard it.")}
+      `${p("To use a Command, spend the listed number of CMD tokens. Each Command says when it can be used, and how many CMD tokens are needed to use it. When a CMD token is spent, discard it.")}
        ${p("Unspent CMD tokens are discarded in the End Phase.")}`,
     )}
 
@@ -474,6 +471,81 @@ function sectionCommand(): string {
 // 4. The Jump Phase
 // ---------------------------------------------------------------------------
 
+/**
+ * The three things you can do on your turn in the Jump Phase, as a picker.
+ *
+ * They were a bulleted list of three lines and then two headed sections further
+ * down that repeated two of them at length, which buried the actual shape of a
+ * turn: it is a choice of exactly one of three, and a list does not say
+ * "choose". Pressing A, B or C swaps the panel underneath, each with its own
+ * animation, so the rules for a choice live inside the choice.
+ *
+ * Radios and CSS, no JavaScript and nothing in the store. Which option you are
+ * looking at is not application state - nothing else on the page depends on it,
+ * it should not survive a reload, and routing it through the store would mean a
+ * full re-render (and a fresh diagram, restarting mid-animation) on every press.
+ * A checked radio also gets keyboard arrow-key switching for free, which a set
+ * of buttons would have to implement.
+ */
+function turnPicker(): string {
+  const opts: { k: string; letter: string; name: string; body: string }[] = [
+    {
+      k: "a",
+      letter: "A",
+      name: "Open a Jump Point",
+      body: `${learnDiagram("jump-point")}
+        ${quote(
+          // p.30 and p.32, verbatim.
+          `${p("<b>Open a Jump Point:</b> Take a jump point from the supply and place it into play, anywhere you like.")}
+           ${p("During the Jump Phase, you can use your turn to open a new Jump Point, if you have any remaining in your supply. Take a Jump Point from your supply, and place it into play, anywhere outside of 9&rdquo; from a planetoid.")}
+           ${p("<b>Gravity Well:</b> Jump Points cannot be placed within 9&rdquo; of a planetoid. Units cannot Jump into a position within 9&rdquo; of a planetoid. A unit cannot Jump Hop or Jump Out if a ship in that unit is within 9&rdquo; of a planetoid.")}`,
+        )}`,
+    },
+    {
+      k: "b",
+      letter: "B",
+      name: "Jump In",
+      body: `${learnDiagram("jump-in")}
+        ${quote(
+          // p.30 and p.33, verbatim.
+          `${p("<b>Jump In:</b> Deploy a unit from Reserve.")}
+           ${p("During the Jump Phase, you can use your turn to Jump In a single unit from your Reserves area.")}
+           ${p("To Jump In a unit, deploy all ships from that unit within 6&rdquo; of a friendly Jump Point.")}`,
+        )}`,
+    },
+    {
+      k: "c",
+      letter: "C",
+      name: "Pass",
+      body: `${learnDiagram("pass")}
+        ${quote(
+          // p.30, verbatim.
+          `${p("<b>Pass:</b> You take no further turns during this Jump Phase.")}`,
+        )}`,
+    },
+  ];
+  return `
+  <div class="ltp-pick">
+    ${opts
+      .map(
+        (o, i) =>
+          `<input class="ltp-pick-radio" type="radio" name="jump-turn" id="jt-${o.k}" ${i === 0 ? "checked" : ""}>`,
+      )
+      .join("")}
+    <div class="ltp-pick-rail">
+      ${opts
+        .map(
+          (o) => `<label class="ltp-pick-tab" for="jt-${o.k}">
+            <span class="ltp-pick-k">${o.letter}</span>
+            <span class="ltp-pick-n">${escapeHtml(o.name)}</span>
+          </label>`,
+        )
+        .join("")}
+    </div>
+    ${opts.map((o) => `<div class="ltp-pick-panel" data-k="${o.k}">${o.body}</div>`).join("")}
+  </div>`;
+}
+
 function sectionJump(): string {
   return `
     ${cool(
@@ -485,13 +557,12 @@ function sectionJump(): string {
     ${quote(
       // p.30, verbatim.
       `${p("The units in your Fleet start the game in Reserve and must be jumped into the combat zone via jump point during the Jump Phase.")}
-       ${p("In the Jump Phase, players take turns, clockwise from the player with Initiative. On your turn, you do one of the following:")}
-       ${ul([
-         "<b>Open a Jump Point:</b> Take a jump point from the supply and place it into play, anywhere you like.",
-         "<b>Jump In:</b> Deploy a unit from Reserve.",
-         "<b>Pass:</b> You take no further turns during this Jump Phase.",
-       ])}
-       ${p("Once all players have passed, the Jump Phase ends.")}`,
+       ${p("In the Jump Phase, players take turns, clockwise from the player with Initiative. On your turn, you do one of the following:")}`,
+    )}
+    ${turnPicker()}
+    ${quote(
+      // p.30, verbatim.
+      p("Once all players have passed, the Jump Phase ends."),
     )}
 
     ${h(3, "Jump points")}
@@ -501,22 +572,6 @@ function sectionJump(): string {
        ${p("The number of Jump Points you start the game with is determined by the era of play, and sometimes by the mission.")}`,
     )}
 
-    ${h(3, "Opening a jump point")}
-    ${learnDiagram("jump-point")}
-    ${quote(
-      // p.32, verbatim.
-      `${p("During the Jump Phase, you can use your turn to open a new Jump Point, if you have any remaining in your supply. Take a Jump Point from your supply, and place it into play, anywhere outside of 9&rdquo; from a planetoid.")}
-       ${p("<b>Gravity Well:</b> Jump Points cannot be placed within 9&rdquo; of a planetoid. Units cannot Jump into a position within 9&rdquo; of a planetoid. A unit cannot Jump Hop or Jump Out if a ship in that unit is within 9&rdquo; of a planetoid.")}`,
-    )}
-
-    ${h(3, "Jumping in units")}
-    ${learnDiagram("jump-in")}
-    ${quote(
-      // p.33, verbatim.
-      `${p("During the Jump Phase, you can use your turn to Jump In a single unit from your Reserves area.")}
-       ${p("To Jump In a unit, deploy all ships from that unit within 6&rdquo; of a friendly Jump Point.")}`,
-    )}
-
     ${h(3, "Leaving by jump")}
     ${quote(
       // p.33, verbatim.
@@ -524,25 +579,7 @@ function sectionJump(): string {
        ${p("Jump Hop is exclusively for Jumping between sectors. In a game with only a single Sector (such as Combat Training), the Jump Hop action is of no use.")}
        ${p("<b>Jump Out.</b> A unit can use the Jump Out action during their activation to leave play and go into your Reserves area. When a unit Jumps Out into reserve, it keeps all its tokens, both game tokens and asset tokens. At the end of the game, asset tokens carried by ships in your reserves area will count towards revenue and victory conditions: they are safely returned to base.")}`,
     )}
-
-    ${h(3, "In Hypergrowth, you start in the Shipyard")}
-    ${quote(
-      // p.122, verbatim.
-      `${p("Print out a Fleet Roster sheet and fill it up with ships totalling no more than &cent;300bn. You are buying ships; you don&rsquo;t have to organise them into units until you requisition them during the game. Ideally, you have miniatures ready for all the ships in your Shipyard.")}
-       ${p("In the Jump Phase, you use the Requisition command to move ships from your shipyard to the play area, via your Reserves area.")}
-       ${p("When it is your turn to Jump In a unit, if you have nothing in your reserves, use the Requisition command to form a unit from ships in your Shipyard, and then move it to your Reserves. From there, you Jump the unit into play.")}
-       ${p("When you requisition a unit, you can additionally requisition Squadron units, without spending additional CMD tokens, if they can all be carried by the first unit.")}
-       ${p("Once you have requisitioned a particular ship, strike it off your Shipyard Roster &ndash; you cannot requisition it again.")}`,
-    )}
-    ${quote(
-      // p.50, verbatim.
-      p("<b>Requisition (1 CMD).</b> (Hypergrowth Game Mode only) When it is your turn to Jump In a unit, you can spend 1 CMD token to form a new unit using the ships in your Shipyard. Pay their cost in credits. Gather the appropriate miniatures and jump them into play as if they were in your Reserves area."),
-    )}
-    ${quote(
-      // p.121-122, verbatim.
-      `${p("In Hypergrowth games, deploying ships costs you the very victory points you are seeking to capture and defend, represented by Credits (&cent;).")}
-       ${p("In the first round of a game of Hypergrowth, you will move your Credit Tracker into deficit, because an upfront investment of Credits is needed to requisition the ships required to earn revenue from the missions.")}`,
-    )}`;
+`;
 }
 
 // ---------------------------------------------------------------------------
@@ -792,21 +829,13 @@ function sectionEnd(): string {
          "Begin a new Round.",
        ])}`,
     )}
-    ${cool(
-      // p.31, verbatim - the vignette printed beside the End Phase.
-      `<p>The metallic blackbird chimed twice from its perch on the bonsai tree, announcing the presence of a guest. Enrok&eacute; turned in his heavy chair, taking one final glance out the tower&rsquo;s window at the city-like ship clusters below.</p>
-       <p>&ldquo;Peacemil,&rdquo; he spoke sharply. &ldquo;The delegation has concluded its paperwork. Do you wish to review it?&rdquo;</p>
-       <p>&ldquo;Not now, Peacemil. Send them to the guest hall. Let them stew for a bit.&rdquo;</p>
-       <p>&ldquo;And the bombardment?&rdquo; Peacemil enquired.</p>
-       <p>Enrok&eacute; held out his finger. The little bird hopped onto it, cocked its head and chirped a brief digital squall. &ldquo;Hold position, but do not stand down. No reason to weaken our negotiating position.&rdquo;</p>`,
-    )}
-
     ${h(3, "Your first game")}
     ${quote(
       // p.11 and p.60, verbatim.
       `${p("To get started with A Billion Suns, read the Core Rules section, gather some miniatures to represent the Training Fleets then play the two Basic Training missions: Combat Simulator and Management Training.")}
        ${p("I recommend you play the Combat Simulator scenario first, to learn the basics of moving and shooting, then play the Management Training scenario next, to learn how to manage jumping in and reinforcing your fleet.")}`,
     )}
+    ${learnDiagram("deployment")}
     <div class="ltp-launch">
       <button class="ltp-btn ltp-btn-go" data-action="learn-launch">${icon("flag", 17)} Set up the Combat Simulator</button>
       <p class="ltp-launch-note">Builds the Training Fleet for you and drops you straight into Play Mode, with the phase tracker running.</p>
@@ -835,40 +864,25 @@ const SECTIONS: Record<string, () => string> = {
 };
 
 /**
- * One group of pages: the two under #/learn, or the four under #/rules.
+ * Every page, in reading order, each carrying the route it lives under.
  *
- * Both routes render through here, because they are the same object with
- * different contents - a header, a tab strip in two placements, one page, and a
- * pager. What differs is only which list of tabs is on the bar and what the
- * header calls itself.
+ * The rail shows all six even though they are split across two routes. Two
+ * separate URLs was the right call - a link should say whether it is the front
+ * of the game or the rules - but a rail that showed only the two or only the
+ * four made the other half of the walkthrough invisible from where you were
+ * standing, so you had to already know #/rules existed to get to it. One rail,
+ * six stops, and pressing one changes the URL root as well as the page.
  */
-interface LearnGroup {
-  view: "learn" | "rules";
-  root: string;
-  title: string;
-  tabs: LearnTab[];
-  /** Where the reader goes off the end of this group, if anywhere. */
-  onward?: { href: string; label: string };
-  /** Where the reader came from, if this group is not the first. */
-  back?: { href: string; label: string };
+interface LearnPage extends LearnTab {
+  root: "#/learn" | "#/rules";
 }
 
-const GROUPS: Record<"learn" | "rules", LearnGroup> = {
-  learn: {
-    view: "learn",
-    root: "#/learn",
-    title: "Learn to Play",
-    tabs: LEARN_TABS,
-    onward: { href: "#/rules/command", label: "The rules: Command Phase" },
-  },
-  rules: {
-    view: "rules",
-    root: "#/rules",
-    title: "The rules",
-    tabs: RULES_TABS,
-    back: { href: "#/learn/prepare", label: "Getting prepared" },
-  },
-};
+const ALL_PAGES: LearnPage[] = [
+  ...LEARN_TABS.map((t) => ({ ...t, root: "#/learn" as const })),
+  ...RULES_TABS.map((t) => ({ ...t, root: "#/rules" as const })),
+];
+
+const pageHref = (t: LearnPage): string => `${t.root}/${t.id}`;
 
 /**
  * The tab strip. Rendered twice, identically, and placed by CSS: once inside
@@ -876,21 +890,23 @@ const GROUPS: Record<"learn" | "rules", LearnGroup> = {
  * bottom of the viewport for phones. Two copies rather than one moved node,
  * because moving it would mean the header's height changes between breakpoints
  * in JS, and the sticky offset is measured from CSS.
+ *
+ * A thin rule between Prepare and Command marks where one route ends and the
+ * other begins - enough to show the rail has two halves, without making that
+ * anybody's problem to understand before they press something.
  */
-function tabStrip(g: LearnGroup, active: string, place: "top" | "bottom"): string {
+function tabStrip(active: string, place: "top" | "bottom"): string {
   return `
-  <nav class="ltp-tabs ltp-tabs--${place}" aria-label="${escapeHtml(g.title)} pages">
-    ${g.tabs
-      .map(
-        (t, i) => `
-      <a class="ltp-tab ${t.id === active ? "on" : ""}" href="${g.root}/${t.id}" data-ltp-tab="${t.id}"
-         ${t.id === active ? 'aria-current="true"' : ""}>
+  <nav class="ltp-tabs ltp-tabs--${place}" aria-label="Learn to Play pages">
+    ${ALL_PAGES.map(
+      (t, i) => `
+      <a class="ltp-tab ${t.id === active ? "on" : ""} ${t.root === "#/rules" && i > 0 && ALL_PAGES[i - 1]!.root === "#/learn" ? "is-split" : ""}"
+         href="${pageHref(t)}" data-ltp-tab="${t.id}" ${t.id === active ? 'aria-current="true"' : ""}>
         ${icon(t.ico, 17, "ltp-tab-ico")}
         <span class="ltp-tab-l">${escapeHtml(t.short)}</span>
         <span class="ltp-tab-n">${i + 1}</span>
       </a>`,
-      )
-      .join("")}
+    ).join("")}
   </nav>`;
 }
 
@@ -909,55 +925,54 @@ const GAME_PITCH = `
   fighters, and battle for supremacy of the stars.</p>
   <p class="ltp-pitch ltp-pitch-2">It is an alternating activations space wargame. It&rsquo;s miniature-agnostic.</p>`;
 
-const pagerBtn = (dir: "prev" | "next", href: string, label: string): string => `
-  <a class="ltp-pager-btn ltp-pager-${dir}" href="${href}">
+const pagerBtn = (dir: "prev" | "next", t: LearnPage): string => `
+  <a class="ltp-pager-btn ltp-pager-${dir}" href="${pageHref(t)}">
     ${dir === "prev" ? icon("chevronLeft", 16) : ""}
     <span class="ltp-pager-txt">
       <span class="ltp-pager-dir">${dir === "prev" ? "Previous" : "Next"}</span>
-      <span class="ltp-pager-name">${escapeHtml(label)}</span>
+      <span class="ltp-pager-name">${escapeHtml(t.label)}</span>
     </span>
     ${dir === "next" ? icon("chevronRight", 16) : ""}
   </a>`;
 
 export function learnView(state: AppState): string {
-  const view = state.route.view === "rules" ? "rules" : "learn";
-  const g = GROUPS[view];
-  const routeTab = state.route.view === view ? state.route.tab : undefined;
-  const tab = g.tabs.find((t) => t.id === routeTab) ?? g.tabs[0]!;
+  const root = state.route.view === "rules" ? "#/rules" : "#/learn";
+  const routeTab = state.route.view === "learn" || state.route.view === "rules" ? state.route.tab : undefined;
+  // Match on the route AND the tab: "command" only means the Command Phase
+  // under #/rules, and an unknown tab falls back to the first page of the route
+  // that was actually asked for.
+  const tab =
+    ALL_PAGES.find((t) => t.root === root && t.id === routeTab) ?? ALL_PAGES.find((t) => t.root === root)!;
 
-  // Previous and next, so the reader can walk the pages in order without going
-  // back up to the tabs. At the ends of a group they cross into the other one
-  // rather than disappearing, which is what keeps #/learn and #/rules a single
-  // readable path despite being two separate places.
-  const at = g.tabs.indexOf(tab);
-  const before = g.tabs[at - 1];
-  const after = g.tabs[at + 1];
-  const prev = before ? { href: `${g.root}/${before.id}`, label: before.label } : g.back;
-  const next = after ? { href: `${g.root}/${after.id}`, label: after.label } : g.onward;
+  // Previous and next walk all six, straight across the boundary between the
+  // two routes, so the read-it-in-order path is one path.
+  const at = ALL_PAGES.indexOf(tab);
+  const prev = ALL_PAGES[at - 1];
+  const next = ALL_PAGES[at + 1];
 
   return `
   <main class="ltp" data-ltp-active="${escapeHtml(tab.id)}">
     <header class="ltp-head">
       <div class="ltp-head-in">
         <div class="ltp-head-id">
-          <p class="ltp-head-title">${escapeHtml(g.title)}</p>
+          <p class="ltp-head-title">${root === "#/rules" ? "The rules" : "Learn to Play"}</p>
         </div>
       </div>
-      ${tabStrip(g, tab.id, "top")}
+      ${tabStrip(tab.id, "top")}
     </header>
     <div class="ltp-body">
       <section class="ltp-sec" id="ltp-${tab.id}" aria-labelledby="ltp-h-${tab.id}">
-        ${view === "learn" && at === 0 ? GAME_PITCH : ""}
+        ${at === 0 ? GAME_PITCH : ""}
         <header class="ltp-sec-head">
           <h2 class="ltp-sec-title" id="ltp-h-${tab.id}">${escapeHtml(tab.label)}</h2>
         </header>
         ${SECTIONS[tab.id]!()}
       </section>
-      <nav class="ltp-pager" aria-label="${escapeHtml(g.title)} pages">
-        ${prev ? pagerBtn("prev", prev.href, prev.label) : `<span class="ltp-pager-gap"></span>`}
-        ${next ? pagerBtn("next", next.href, next.label) : `<span class="ltp-pager-gap"></span>`}
+      <nav class="ltp-pager" aria-label="Learn to Play pages">
+        ${prev ? pagerBtn("prev", prev) : `<span class="ltp-pager-gap"></span>`}
+        ${next ? pagerBtn("next", next) : `<span class="ltp-pager-gap"></span>`}
       </nav>
     </div>
-    ${tabStrip(g, tab.id, "bottom")}
+    ${tabStrip(tab.id, "bottom")}
   </main>`;
 }

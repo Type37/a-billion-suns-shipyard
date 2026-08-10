@@ -4860,6 +4860,33 @@ a .icon,
 }
 @keyframes dg-jp-taken { 0%, 5% { opacity: 1; } 6%, 100% { opacity: 0; } }
 
+/* Passing. Play goes round the ring; P1 goes quiet a third of the way in and
+   the marker skips that seat for the rest of the loop. steps(1) on the marker,
+   because a turn hops from seat to seat - it does not glide between them. */
+.learn-dg .dg-turn-ring { fill: none; stroke: var(--hair-soft); stroke-width: 1.5; stroke-dasharray: 3 5; }
+.learn-dg .dg-seat circle { fill: var(--paper); stroke: var(--blue); stroke-width: 1.8; }
+.learn-dg .dg-seat-l { font-family: var(--narrow); font-size: 10px; font-weight: 700; fill: var(--blue); text-anchor: middle; }
+.learn-dg .dg-turn-dot circle { fill: var(--red); }
+.learn-dg .dg-seat-1 { animation: dg-seat-pass 4400ms steps(1, end) infinite; }
+.learn-dg .dg-turn-mark { animation: dg-turn 4400ms steps(1, end) infinite; }
+@keyframes dg-seat-pass {
+  0%, 24%   { opacity: 1; }
+  25%, 100% { opacity: 0.28; }
+}
+/* Four seats at 12, 3, 6 and 9 o'clock on a 52px ring, then round again with
+   the top seat skipped: 3 o'clock, 6, 9, 3, 6, 9. */
+@keyframes dg-turn {
+  0%   { transform: translate(0, -52px); }
+  12%  { transform: translate(52px, 0); }
+  24%  { transform: translate(0, 52px); }
+  36%  { transform: translate(-52px, 0); }
+  48%  { transform: translate(52px, 0); }
+  60%  { transform: translate(0, 52px); }
+  72%  { transform: translate(-52px, 0); }
+  84%  { transform: translate(52px, 0); }
+  100% { transform: translate(0, 52px); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .learn-dg * { animation: none !important; }
 }
@@ -5956,6 +5983,9 @@ main.play-body .roster-section::before { content: none; }
 .ltp-tab:hover { color: var(--ink); }
 .ltp-tab.on { color: var(--blue); border-bottom-color: var(--blue); }
 .ltp-tab-ico { flex: none; }
+/* Where #/learn ends and #/rules begins. A hairline, not a gap: the rail is one
+   reading order across two routes, and a gap would read as two rails. */
+.ltp-tab.is-split { border-left: 1px solid var(--hair-soft); }
 /* Never clipped: the label is the whole point of the tab. */
 .ltp-tab-l { white-space: nowrap; }
 /* The step number is for the landscape-phone bar, where the icon alone is
@@ -6021,6 +6051,70 @@ main.play-body .roster-section::before { content: none; }
   font-style: normal;
 }
 .ltp-cite svg { vertical-align: -2px; margin-right: 4px; }
+
+/* ------------------------------------------------------------- A/B/C picker
+   Three radios, three labels, three panels, and CSS sibling selectors doing the
+   switching. No JavaScript and nothing in the store: which option you are
+   looking at is not application state, and routing it through the store would
+   re-render the whole page and restart the diagram's animation on every press.
+   A checked radio also brings keyboard arrow-key switching with it, which a row
+   of buttons would have to reimplement. The inputs are rendered before both the
+   rail and the panels so `~` can reach either of them. */
+.ltp-pick { margin: 0 0 18px; }
+/* The standard visually-hidden recipe, NOT opacity:0 - a 1px transparent radio
+   still gets its native control painted by some engines, which showed up as a
+   blue speck under the left end of the rail. clip-path removes it from paint
+   entirely while leaving it focusable. */
+.ltp-pick-radio {
+  position: absolute; width: 1px; height: 1px; margin: -1px;
+  clip-path: inset(50%); overflow: hidden; white-space: nowrap;
+}
+.ltp-pick-rail {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+  background: var(--hair); border: 1px solid var(--hair);
+}
+.ltp-pick-tab {
+  display: flex; align-items: center; gap: 9px;
+  padding: 11px 13px; min-height: var(--tap);
+  background: var(--paper); cursor: pointer;
+  font-family: var(--sans); font-weight: 700; font-size: 14px; color: var(--ink);
+  transition: background 120ms var(--ease), color 120ms var(--ease);
+}
+.ltp-pick-tab:hover { background: var(--blue-wash); }
+.ltp-pick-k {
+  flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px;
+  font-family: var(--display); font-weight: 800; font-size: 12px;
+  color: var(--paper); background: var(--ink-off);
+  transition: background 120ms var(--ease);
+}
+.ltp-pick-n { min-width: 0; }
+.ltp-pick-panel { display: none; padding-top: 14px; }
+
+/* One pair of rules per option: the checked input lights its label and shows
+   its panel. Three ids, written out, because a sibling selector cannot be
+   parameterised. */
+#jt-a:checked ~ .ltp-pick-rail [for="jt-a"],
+#jt-b:checked ~ .ltp-pick-rail [for="jt-b"],
+#jt-c:checked ~ .ltp-pick-rail [for="jt-c"] { background: var(--blue); color: #fff; }
+#jt-a:checked ~ .ltp-pick-rail [for="jt-a"] .ltp-pick-k,
+#jt-b:checked ~ .ltp-pick-rail [for="jt-b"] .ltp-pick-k,
+#jt-c:checked ~ .ltp-pick-rail [for="jt-c"] .ltp-pick-k { background: var(--red); }
+#jt-a:checked ~ .ltp-pick-panel[data-k="a"],
+#jt-b:checked ~ .ltp-pick-panel[data-k="b"],
+#jt-c:checked ~ .ltp-pick-panel[data-k="c"] { display: block; }
+/* The input is off-screen, so the focus ring has to be drawn on its label. */
+#jt-a:focus-visible ~ .ltp-pick-rail [for="jt-a"],
+#jt-b:focus-visible ~ .ltp-pick-rail [for="jt-b"],
+#jt-c:focus-visible ~ .ltp-pick-rail [for="jt-c"] { outline: 2px solid var(--red); outline-offset: -3px; }
+.ltp-pick-panel > .ltp-quote:last-child { margin-bottom: 0; }
+
+@media (max-width: 560px) {
+  /* Three labels of "Open a Jump Point" length do not fit across a phone. One
+     per row, full width, letter still leading. */
+  .ltp-pick-rail { grid-template-columns: 1fr; }
+}
 
 /* --------------------------------------------------------- why this is cool
    The book's own voice: a designer's note, a sidebar, or one of the fiction

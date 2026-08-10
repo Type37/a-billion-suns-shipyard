@@ -69,6 +69,7 @@ const VIEW_TITLE: Record<string, string> = {
   ships: "Ship Compendium",
   play: "Play Mode",
   learn: "Learn to Play",
+  rules: "The rules",
   "learn-classic": "Learn to Play (archived)",
 };
 
@@ -131,13 +132,52 @@ function syncLearnTarget(): void {
  * called from paint() for whichever accordion renders open. Each title animates
  * once per opening: closing and reopening plays it again, which is the point.
  */
+/**
+ * How much longer an era title takes on the Learn to Play card than in the
+ * faction picker. Big enough that you watch it rather than catch it: the picker
+ * is a list you scrub through, this is a card you deliberately opened.
+ */
+const ERA_SLOW = 2.8;
+
 function animateEraTitle(el: HTMLElement): void {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const era = el.dataset["era"] ?? "arma";
   const title = el.dataset["title"] ?? el.textContent ?? "";
-  if (era === "hyper") decodeTitle(el, title);
-  else if (era === "arma") slamTitle(el, title);
-  else wipeTitle(el, title);
+  if (era === "hyper") {
+    decodeTitle(el, title, ERA_SLOW);
+    return;
+  }
+  if (era === "arma") {
+    slamTitle(el, title, ERA_SLOW);
+    // The galaxy is in flames. Two CSS layers behind the name, lit as it lands
+    // and burnt out two and a half seconds later (see .is-burning in the
+    // stylesheet, which also explains why they hang off the accordion body
+    // rather than off the heading). The class goes on the <details>, is dropped
+    // and re-added around a reflow, or reopening the card would find it already
+    // there and never restart the keyframes.
+    const card = el.closest(".ltp-era");
+    if (card) {
+      card.classList.remove("is-burning");
+      void (card as HTMLElement).offsetWidth;
+      card.classList.add("is-burning");
+      window.setTimeout(() => card.classList.remove("is-burning"), 2600);
+    }
+    return;
+  }
+  // Age of Unity, and the one place the Star Wars reference is allowed to be
+  // unsubtle: the name flies in on a perspective tilt like the opening crawl,
+  // flattening as the wipe edge uncovers it. Transform here, clip-path in
+  // wipeTitle - two different properties, so the two animations compose rather
+  // than one replacing the other.
+  wipeTitle(el, title, ERA_SLOW);
+  el.animate(
+    [
+      { transform: "perspective(560px) rotateX(46deg) translateY(30px) scale(1.22)", opacity: 0.15 },
+      { transform: "perspective(560px) rotateX(12deg) translateY(6px) scale(1.04)", opacity: 1, offset: 0.55 },
+      { transform: "perspective(560px) rotateX(0deg) translateY(0) scale(1)", opacity: 1 },
+    ],
+    { duration: Math.round(WIPE_MS * ERA_SLOW), easing: "cubic-bezier(.25,.8,.25,1)" },
+  );
 }
 
 function animateOpenEraTitles(): void {
@@ -545,7 +585,13 @@ function titleRule(): HTMLSpanElement {
 
 // Hypergrowth: each glyph flickers through random characters and settles
 // left-to-right - mechanical, fast, transactional.
-function decodeTitle(el: HTMLElement, text: string): void {
+//
+// `slow` stretches the whole thing without changing its character. The faction
+// picker leaves it at 1: you meet that title dozens of times a session while
+// arrowing through a list, and anything longer than a flicker starts costing
+// you time. Learn to Play's era cards pass a bigger number, because there are
+// three of them, you open each one once, and there the animation IS the point.
+function decodeTitle(el: HTMLElement, text: string, slow = 1): void {
   el.textContent = "";
   const spans = [...text].map((c) => {
     const s = document.createElement("span");
@@ -568,7 +614,7 @@ function decodeTitle(el: HTMLElement, text: string): void {
     spans.forEach((s, i) => {
       const o = s.dataset["o"] ?? "";
       if (o === " ") return;
-      if (t < 70 + i * 26) {
+      if (t < (70 + i * 26) * slow) {
         s.textContent = DECODE_POOL[Math.floor(Math.random() * DECODE_POOL.length)] ?? o;
         done = false;
       } else {
@@ -590,12 +636,17 @@ function decodeTitle(el: HTMLElement, text: string): void {
 // must revert to `none` so the red underline can overhang the box afterwards.
 // The travelling edge is a pseudo-element (see .nfd-title.is-wiping::before),
 // which WAAPI cannot reach, so it is driven by a class instead.
-function wipeTitle(el: HTMLElement, text: string): void {
+function wipeTitle(el: HTMLElement, text: string, slow = 1): void {
+  const ms = Math.round(WIPE_MS * slow);
   el.textContent = text;
   el.appendChild(titleRule());
   el.style.transformOrigin = "";
+  // The travelling edge is CSS, so its duration has to reach the stylesheet
+  // somehow; a custom property is the only channel, since WAAPI cannot animate
+  // a pseudo-element. Both timings read from this one number and stay locked.
+  el.style.setProperty("--wipe-ms", `${ms}ms`);
   el.animate([{ clipPath: "inset(-20% 100% -20% 0)" }, { clipPath: "inset(-20% 0 -20% 0)" }], {
-    duration: WIPE_MS,
+    duration: ms,
     easing: "cubic-bezier(.3,0,.1,1)",
   });
   // Re-picking the same era re-runs this, and a class that is already present
@@ -603,7 +654,7 @@ function wipeTitle(el: HTMLElement, text: string): void {
   el.classList.remove("is-wiping");
   void el.offsetWidth;
   el.classList.add("is-wiping");
-  window.setTimeout(() => el.classList.remove("is-wiping"), WIPE_MS + 60);
+  window.setTimeout(() => el.classList.remove("is-wiping"), ms + 60);
 }
 
 /** Shared by the clip-path reveal and the travelling edge, so they stay locked. */
@@ -613,7 +664,8 @@ const WIPE_MS = 460;
 // on impact (a quick diagonal recoil) before settling. The red underline is held
 // collapsed through the slam and only draws in once the name has landed. This is
 // the original, punchier slam - more fun to watch than the contained thump.
-function slamTitle(el: HTMLElement, text: string): void {
+function slamTitle(el: HTMLElement, text: string, slow = 1): void {
+  const ms = Math.round(340 * slow);
   el.textContent = text;
   el.appendChild(titleRule());
   el.classList.add("is-landing"); // hold the underline collapsed through the slam
@@ -630,12 +682,12 @@ function slamTitle(el: HTMLElement, text: string): void {
       { transform: "translateY(1px) scale(0.995)", offset: 0.9 },
       { transform: "translate(0,0) scale(1)" },
     ],
-    { duration: 340, easing: "cubic-bezier(.2,.9,.2,1)", fill: "forwards" },
+    { duration: ms, easing: "cubic-bezier(.2,.9,.2,1)", fill: "forwards" },
   );
-  // Only once the title has landed (slam is 340ms): drop the hold and the CSS
-  // transition on .nfd-rule draws the red underline in. A timer, not the finish
-  // event, so the underline never gets stranded if the finish event is missed.
-  window.setTimeout(() => el.classList.remove("is-landing"), 360);
+  // Only once the title has landed: drop the hold and the CSS transition on
+  // .nfd-rule draws the red underline in. A timer, not the finish event, so the
+  // underline never gets stranded if the finish event is missed.
+  window.setTimeout(() => el.classList.remove("is-landing"), ms + 20);
 }
 
 // The dice / command glyphs pop in with a short left-to-right stagger just after

@@ -57,6 +57,7 @@ export type Route =
   | { view: "ships" }
   | { view: "play"; listId: string }
   | { view: "learn"; tab?: string }
+  | { view: "rules"; tab?: string }
   | { view: "learn-classic"; step: number; anchor?: string };
 
 // Kept as a literal rather than derived from ROUND_PHASES: the router must not
@@ -68,15 +69,22 @@ const phaseSlugFor = (i: number): string => PHASE_SLUGS[i] ?? "command";
 const LEARN_LAST_STEP = 3;
 
 /**
- * The tabs of the current Learn to Play page, as URL surface.
+ * Two separate places, not one with six tabs.
  *
- * Named, not numbered, and that is what keeps the archived walkthrough alive at
- * the same root: `#/learn/tactical` is the new page, `#/learn/3` is a link from
- * the old one, and the two can never be confused for each other because one is
- * a word and the other is a digit. Old numbered links are redirected into
- * `#/learn-classic`, which is unlinked from the app but still resolves.
+ * `#/learn` is the front of the game - which era you are playing and what you
+ * need on the table. `#/rules` is the round, phase by phase. They were one
+ * route and they should not have been: the first is read once while you are
+ * deciding whether to play, the second is opened mid-game to settle an
+ * argument, and a shared link should say which of those two things it is.
+ *
+ * Named segments, not numbers, which is also what keeps the archived
+ * walkthrough alive under the same root: `#/learn/prepare` is a word and
+ * `#/learn/3` is a digit, so the router can tell them apart with no ambiguity.
+ * A phase name under `#/learn` is forwarded to `#/rules`, because those links
+ * were live for a while.
  */
-const LEARN_TAB_IDS = ["eras", "prepare", "command", "jump", "tactical", "end"] as const;
+const LEARN_TAB_IDS = ["eras", "prepare"] as const;
+const RULES_TAB_IDS = ["command", "jump", "tactical", "end"] as const;
 
 export function parseRoute(hash: string): Route {
   const h = hash.replace(/^#/, "");
@@ -88,12 +96,19 @@ export function parseRoute(hash: string): Route {
   if (parts[0] === "solo") return parts[1] ? { view: "solo-outfit", outfitId: parts[1] } : { view: "solo" };
   if (parts[0] === "ships") return { view: "ships" };
   if (parts[0] === "play" && parts[1]) return { view: "play", listId: parts[1] };
+  if (parts[0] === "rules") {
+    const tab = RULES_TAB_IDS.find((t) => t === parts[1]);
+    return tab ? { view: "rules", tab } : { view: "rules" };
+  }
   if (parts[0] === "learn" && !/^\d+$/.test(parts[1] ?? "")) {
-    // The current Learn to Play: one long page, six named tabs. An unknown tab
-    // name lands on the first section rather than 404ing, because the tab is a
-    // scroll position on a page that is entirely present either way.
+    // An unknown tab name lands on the first page of Learn to Play rather than
+    // 404ing. A phase name is forwarded to its page under #/rules, where the
+    // phases moved to.
     const tab = LEARN_TAB_IDS.find((t) => t === parts[1]);
-    return tab ? { view: "learn", tab } : { view: "learn" };
+    if (tab) return { view: "learn", tab };
+    const moved = RULES_TAB_IDS.find((t) => t === parts[1]);
+    if (moved) return { view: "rules", tab: moved };
+    return { view: "learn" };
   }
   if (parts[0] === "learn" || parts[0] === "learn-classic") {
     // The archived five-page walkthrough. Unlinked from the app since the
@@ -145,6 +160,8 @@ export function routeHash(route: Route): string {
       return `#/play/${route.listId}`;
     case "learn":
       return route.tab ? `#/learn/${route.tab}` : "#/learn";
+    case "rules":
+      return route.tab ? `#/rules/${route.tab}` : "#/rules";
     case "learn-classic": {
       if (route.anchor) return `#/learn-classic/${route.step}/${route.anchor}`;
       return route.step > 0 ? `#/learn-classic/${route.step}` : "#/learn-classic";

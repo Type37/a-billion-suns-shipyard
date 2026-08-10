@@ -470,6 +470,10 @@ function footer(): string {
       <span class="gif-title">A Billion Suns</span>
       <span>by <a href="https://planetsmashergames.com/a-billion-suns/" target="_blank" rel="noopener">Mike Hutchinson</a>, Osprey Games</span>
       <a href="./ABS-2E-Quick-Reference.pdf" target="_blank" rel="noopener">${icon("scroll", 13)} Quick Reference</a>
+      <!-- The game's community, on every page. It was one row in Learn to Play's
+           list of places to buy spaceships, which is neither where it belongs
+           nor the only page somebody might want it from. -->
+      <a href="https://planetsmashergames.com/discord/" target="_blank" rel="noopener">${icon("commander", 13)} Planet Smasher Discord</a>
       <span class="gif-builder">Shipyard by <a class="wl-sig" href="https://linktr.ee/warlore" target="_blank" rel="noopener">WarLore</a></span>
       <a href="mailto:warlore1@outlook.com">Send Feedback</a>
       <a href="https://github.com/Type37/a-billion-suns-shipyard" target="_blank" rel="noopener">Source on GitHub</a>
@@ -547,6 +551,7 @@ function homeView(state: AppState): string {
         ${row("#/solo", "Solo Play", "Play the Junkspace in solo/campaign mode.")}
         ${row("#/ships", "Ship Compendium", "Compare all ships and stats.")}
         ${row("#/learn", "Learn to Play", "If you&rsquo;re new, come here to learn how the game works.")}
+        ${row("#/rules", "The Rules", "A round, phase by phase. The book&rsquo;s own words.")}
         ${row("#/foundry", "Custom Rules", "Customize your own factions. Make &rsquo;em Your Guys!")}
       </nav>
     </div>
@@ -4451,7 +4456,10 @@ export function render(state: AppState): string {
         return shipsView(state);
       case "play":
         return playView(state);
+      // Two routes, one view: #/learn is the front of the game, #/rules is the
+      // round phase by phase. See LearnGroup in learn.ts.
       case "learn":
+      case "rules":
         return `${topbar()}${learnView(state)}${toast(state)}${footer()}`;
       // Archived. Unlinked from the app since the Learn to Play rewrite, but
       // still routed so that old shared links keep working. See state.ts.

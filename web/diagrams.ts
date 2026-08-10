@@ -60,15 +60,54 @@ function commandDiagram(): string {
 }
 
 /**
- * The Jump Phase: a jump point opens, then a unit arrives anywhere inside its
- * 6" bubble. The bubble is the rule - "deploy within 6 inches of a friendly
- * Jump Point" - so it is drawn to scale rather than suggested.
+ * Opening a Jump Point, on its own.
+ *
+ * This and jumpInDiagram used to be one picture that opened a point and landed
+ * three ships in a single loop. They are two different turns you can take in
+ * the Jump Phase - you either open a point OR jump a unit in, never both - and
+ * drawing them together said the opposite of the rule they illustrate.
+ *
+ * What this one has to show is that the point comes out of a finite supply and
+ * can go anywhere: a token leaves the tray on the left, crosses open space and
+ * settles, and the tray is visibly one token shorter for the rest of the loop.
  */
-function jumpDiagram(): string {
+function jumpPointDiagram(): string {
+  const supply = (i: number, x: number) =>
+    `<g transform="translate(${x} 96)"><g class="dg-jp-stock dg-jp-stock-${i}">
+       <circle class="dg-jp-core" r="8"/></g></g>`;
+  return `
+  <svg class="learn-dg" viewBox="0 0 320 150" role="img"
+       aria-label="Opening a Jump Point: take a token from your supply and place it into play, anywhere you like.">
+    ${LABEL(160, 16, "Open a Jump Point", "dg-title")}
+    <rect class="dg-tray" x="16" y="72" width="86" height="48" rx="3"/>
+    ${LABEL(59, 136, "Your supply", "dg-measure-text")}
+    ${supply(1, 36)}${supply(2, 59)}${supply(3, 82)}
+    <!-- The travelling token. Position on the outer group, motion on the inner
+         one: a CSS transform would otherwise wipe out the transform attribute
+         and drop it on the SVG origin (see the note at the top of this file). -->
+    <g transform="translate(82 96)"><g class="dg-jp-fly">
+      <circle class="dg-jp-core" r="8"/>
+    </g></g>
+    <g class="dg-jp-landed" transform="translate(232 96)">
+      <circle class="dg-jp-core" r="9"/>
+      <circle class="dg-jp-ring" r="9"/>
+    </g>
+    ${LABEL(232, 132, "Anywhere you like", "dg-measure-text")}
+  </svg>`;
+}
+
+/**
+ * Jumping in a unit: every ship of it deployed inside the point's 6" bubble.
+ *
+ * The bubble is the rule - "deploy all ships from that unit within 6 inches of
+ * a friendly Jump Point" - so it is drawn to scale (one unit = 4px) rather than
+ * suggested, and the radius carries its measurement.
+ */
+function jumpInDiagram(): string {
   return `
   <svg class="learn-dg" viewBox="0 0 320 170" role="img"
-       aria-label="The Jump Phase: open a jump point, then deploy a unit wholly within six inches of it.">
-    ${LABEL(160, 16, "Open a Jump Point, then Jump In", "dg-title")}
+       aria-label="Jumping in: deploy all the ships of one unit within six inches of a friendly jump point.">
+    ${LABEL(160, 16, "Jump In a unit", "dg-title")}
     <circle class="dg-range dg-range-grow" cx="160" cy="95" r="52"/>
     <g class="dg-jumppoint" transform="translate(160 95)">
       <circle class="dg-jp-core" r="9"/>
@@ -635,7 +674,8 @@ const DIAGRAMS: Record<string, () => string> = {
   "gravity-well": gravityWellDiagram,
   "jump-strain": jumpStrainDiagram,
   command: commandDiagram,
-  jump: jumpDiagram,
+  "jump-point": jumpPointDiagram,
+  "jump-in": jumpInDiagram,
   "drag-select": dragSelectDiagram,
   "double-move": doubleMoveDiagram,
   movement: movementDiagram,

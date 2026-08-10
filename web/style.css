@@ -3879,7 +3879,10 @@ button { font-family: inherit; }
   background: var(--red);
   box-shadow: 0 0 12px 2px rgb(238 53 36 / 0.5);
   pointer-events: none;
-  animation: unity-wipe 460ms cubic-bezier(.3, 0, .1, 1) forwards;
+  /* --wipe-ms is set by wipeTitle() so the travelling edge and the clip-path
+     reveal it chases always run for exactly the same length of time. Learn to
+     Play's era cards set it long; the faction picker leaves it at the default. */
+  animation: unity-wipe var(--wipe-ms, 460ms) cubic-bezier(.3, 0, .1, 1) forwards;
 }
 @keyframes unity-wipe {
   from { left: -2px; opacity: 1; }
@@ -4837,6 +4840,25 @@ a .icon,
 .learn-dg .dg-measure-late { animation: dg-fade-in 500ms ease both; animation-delay: 900ms; }
 .learn-dg .dg-shot { stroke-dasharray: 130; animation: dg-fire 1600ms ease-out infinite; }
 .learn-dg .dg-shot-2 { animation-delay: 260ms; }
+
+/* Opening a Jump Point. One 3.4s loop: a token leaves the supply tray, crosses
+   to its place and settles, and the third token in the tray stays gone for the
+   rest of the cycle so the supply visibly costs something. */
+.learn-dg .dg-tray { fill: none; stroke: var(--hair-soft); stroke-width: 1.5; }
+.learn-dg .dg-jp-fly { animation: dg-jp-fly 3400ms var(--ease) infinite; }
+.learn-dg .dg-jp-landed { animation: dg-jp-land 3400ms var(--ease) infinite; transform-box: fill-box; transform-origin: center; }
+.learn-dg .dg-jp-stock-3 { animation: dg-jp-taken 3400ms steps(1, end) infinite; }
+@keyframes dg-jp-fly {
+  0%, 6%   { transform: translate(0, 0); opacity: 1; }
+  40%      { transform: translate(150px, 0); opacity: 1; }
+  44%, 100% { transform: translate(150px, 0); opacity: 0; }
+}
+@keyframes dg-jp-land {
+  0%, 40%   { opacity: 0; transform: scale(0.4); }
+  52%       { opacity: 1; transform: scale(1); }
+  100%      { opacity: 1; transform: scale(1); }
+}
+@keyframes dg-jp-taken { 0%, 5% { opacity: 1; } 6%, 100% { opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
   .learn-dg * { animation: none !important; }
@@ -6001,47 +6023,24 @@ main.play-body .roster-section::before { content: none; }
 .ltp-cite svg { vertical-align: -2px; margin-right: 4px; }
 
 /* --------------------------------------------------------- why this is cool
-   Our voice, and the only italic serif on the page. Same treatment faction
-   taglines get elsewhere in the app, so serif italic already reads as "someone
-   is talking to you" rather than "this is a rule". */
-.ltp-cool {
-  margin: 0 0 18px; padding: 12px 14px;
-  border: 1px solid var(--hair); border-left: 3px solid var(--red);
-  background: var(--paper);
-}
-.ltp-cool-tag {
-  font-family: var(--sans); font-size: 10.5px; font-weight: 800;
-  letter-spacing: 0.1em; text-transform: uppercase; color: var(--red-deep);
-  margin: 0 0 6px; display: flex; align-items: center; gap: 5px;
-}
-.ltp-cool-tag svg { flex: none; }
-.ltp-cool-star { fill: currentColor; }
-.ltp-cool-body p {
-  font-family: var(--serif); font-style: italic; font-weight: 400;
-  font-size: 15.5px; line-height: 1.55; color: var(--ink);
-  margin: 0 0 8px;
-}
-.ltp-cool-body p:last-child { margin-bottom: 0; }
-/* Emphasis inside an all-italic block has to go the other way to register. */
-.ltp-cool-body em { font-style: normal; font-weight: 600; }
+   The book's own voice: a designer's note, a sidebar, or one of the fiction
+   vignettes that head its chapters. It used to be OUR voice, in a bordered box
+   under a "WHY THIS IS COOL" label, telling the reader why the rule they had
+   just read was clever. Both the box and the explaining are gone.
 
-/* ------------------------------------------------------------- round strip */
-.ltp-round {
-  list-style: none; margin: 0 0 20px; padding: 0;
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
-  background: var(--hair); border: 1px solid var(--hair);
+   What is left is the treatment faction taglines already get elsewhere in the
+   app: italic serif, run into the page as ordinary paragraphs. Serif italic
+   reads as "somebody is talking to you" and sans reads as "this is the rule",
+   which is the whole distinction that box was drawn to make. */
+.ltp-cool { margin: 0 0 18px; }
+.ltp-cool p {
+  font-family: var(--serif); font-style: italic; font-weight: 400;
+  font-size: 16px; line-height: 1.6; color: var(--ink);
+  margin: 0 0 9px;
 }
-.ltp-round-stop {
-  background: var(--paper); padding: 10px 11px 11px;
-  display: flex; flex-direction: column; gap: 3px;
-}
-.ltp-round-n {
-  font-family: var(--display); font-weight: 800; font-size: 13px; color: var(--red);
-}
-.ltp-round-name {
-  font-family: var(--sans); font-weight: 800; font-size: 13px; color: var(--ink);
-}
-.ltp-round-what { font-size: 12.5px; line-height: 1.4; color: var(--ink-2); }
+.ltp-cool p:last-child { margin-bottom: 0; }
+/* Emphasis inside an all-italic block has to go the other way to register. */
+.ltp-cool em { font-style: normal; font-weight: 600; }
 
 /* ---------------------------------------------------------- era accordions */
 .ltp-eras { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
@@ -6081,6 +6080,90 @@ main.play-body .roster-section::before { content: none; }
    (decode / wipe / slam). It repeats the era name from the summary above
    deliberately - the summary is a control, this is the title card. */
 .ltp-era-title { font-size: 27px; margin: 14px 0 4px; }
+
+/* Armageddon: the galaxy is in flames, so the title arrives on fire.
+   Two layers on the heading's own pseudo-elements, both behind the letters
+   (z-index -1 sits them under the parent's content but above the page, and the
+   heading has no background of its own to hide them). One slow bed of heat, one
+   faster set of licks offset against it - the two cycles going out of step is
+   the entire trick, because a single rising gradient reads as a wipe and two
+   read as flicker. Pure background/transform/filter, nothing that reflows, and
+   the whole thing is removed 2.6s after it is lit. */
+/* The flames hang off the accordion BODY, not off the heading, and the class
+   that lights them rides the <details>.
+
+   The obvious version - two z-index:-1 pseudo-elements on the heading itself -
+   cannot work, and it is worth writing down why. A negative-z-index child
+   paints in step 2 of its stacking context and in-flow block backgrounds paint
+   in step 3, so the accordion's white background goes straight over the top of
+   the fire. Isolating the heading does not rescue it either: that just moves
+   the whole heading, flames and all, into one atomic unit that still paints
+   after the background it needed to sit above.
+
+   Two positioned siblings in one stacking context settle it with no subtlety
+   at all: the flames at z-index 0, the heading at z-index 1, both above the
+   background because both are positioned. */
+.ltp-era-body { position: relative; }
+.ltp-era-title { z-index: 1; }
+.ltp-era.is-burning .ltp-era-body::before,
+.ltp-era.is-burning .ltp-era-body::after {
+  content: "";
+  position: absolute; z-index: 0;
+  pointer-events: none; transform-origin: 50% 100%;
+}
+/* The bed of heat. Its BOTTOM edge is parked on the era name's baseline, which
+   is what makes the fire look like it is coming off the word rather than
+   floating in the paragraph underneath it: the heading sits about 14px down the
+   body and runs ~40px tall, so a 78px box ending at 56px burns up through the
+   letters and fades out above them. */
+/* Sized to the WORD, not to the accordion. The body is 740px wide and the era
+   name is about 180 of them, so a full-width flame box put four fifths of the
+   fire in the empty margin to the right of it and none of it under the letters.
+   A fixed width a little wider than the longest era name keeps the fire on the
+   thing that is meant to be burning. */
+.ltp-era.is-burning .ltp-era-body::before {
+  left: 2px; width: 250px; top: -20px;
+  height: 76px;
+  /* Explicit ellipse radii, NOT closest-side. Every one of these blobs is
+     anchored on the bottom edge of the box, and closest-side measures to the
+     nearest edge - which is the one it is sitting on, so the radius came out at
+     zero and the whole thing rendered as nothing at all. */
+  background:
+    radial-gradient(58px 70px at 12% 100%, rgba(255, 176, 40, 0.98), rgba(226, 52, 16, 0.8) 52%, transparent 84%),
+    radial-gradient(74px 84px at 38% 102%, rgba(255, 206, 74, 0.98), rgba(211, 44, 18, 0.78) 50%, transparent 82%),
+    radial-gradient(66px 76px at 64% 100%, rgba(255, 188, 52, 0.98), rgba(226, 52, 16, 0.78) 52%, transparent 84%),
+    radial-gradient(54px 64px at 88% 100%, rgba(255, 164, 36, 0.95), rgba(211, 44, 18, 0.72) 54%, transparent 86%);
+  animation: ltp-burn-bed 2600ms cubic-bezier(.2, .6, .3, 1) both;
+}
+/* The licks: narrower, brighter, shorter-lived, and reaching a little higher
+   than the bed. Two layers out of step is the entire trick - one rising
+   gradient reads as a wipe, two read as flicker. */
+.ltp-era.is-burning .ltp-era-body::after {
+  left: 14px; width: 210px; top: -32px;
+  height: 82px;
+  background:
+    radial-gradient(26px 72px at 22% 102%, rgba(255, 246, 206, 1), rgba(255, 156, 26, 0.7) 44%, transparent 76%),
+    radial-gradient(32px 86px at 50% 104%, rgba(255, 240, 182, 1), rgba(255, 128, 20, 0.68) 42%, transparent 74%),
+    radial-gradient(24px 64px at 78% 102%, rgba(255, 236, 168, 0.98), rgba(255, 112, 18, 0.66) 44%, transparent 76%);
+  animation: ltp-burn-lick 2600ms cubic-bezier(.2, .7, .3, 1) both;
+}
+@keyframes ltp-burn-bed {
+  0%   { opacity: 0; transform: translateY(16px) scaleY(0.45) scaleX(0.94); filter: blur(12px); }
+  14%  { opacity: 1; transform: translateY(0) scaleY(1.05) scaleX(1); filter: blur(6px); }
+  46%  { opacity: 0.9; transform: translateY(-6px) scaleY(0.95) scaleX(1.03); filter: blur(9px); }
+  100% { opacity: 0; transform: translateY(-30px) scaleY(1.5) scaleX(0.9); filter: blur(18px); }
+}
+@keyframes ltp-burn-lick {
+  0%   { opacity: 0; transform: translateY(10px) scaleY(0.6) scaleX(1.02); filter: blur(9px); }
+  10%  { opacity: 0.95; transform: translateY(-2px) scaleY(1.15) scaleX(0.97); filter: blur(4px); }
+  30%  { opacity: 0.7; transform: translateY(-8px) scaleY(0.9) scaleX(1.04); filter: blur(8px); }
+  54%  { opacity: 0.85; transform: translateY(-16px) scaleY(1.2) scaleX(0.95); filter: blur(7px); }
+  100% { opacity: 0; transform: translateY(-40px) scaleY(1.6) scaleX(1.06); filter: blur(20px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ltp-era.is-burning .ltp-era-body::before,
+  .ltp-era.is-burning .ltp-era-body::after { content: none; }
+}
 .ltp-era-tagline {
   font-family: var(--serif); font-style: italic; font-weight: 400;
   font-size: 17px; line-height: 1.45; color: var(--ink);
@@ -6221,7 +6304,6 @@ main.play-body .roster-section::before { content: none; }
 
 /* Two-up grids stop being grids before their cells get too narrow to read. */
 @media (max-width: 720px) {
-  .ltp-round { grid-template-columns: repeat(2, 1fr); }
   .ltp-cmds { grid-template-columns: 1fr; }
 }
 
@@ -6266,7 +6348,6 @@ main.play-body .roster-section::before { content: none; }
   .ltp-era-title { font-size: 23px; }
   .ltp-era-tagline { font-size: 16px; }
   .ltp-era-name { font-size: 16.5px; }
-  .ltp-round { grid-template-columns: 1fr; }
   .ltp-head-in { gap: 12px; }
   .ltp-head-title { font-size: 15.5px; }
   .ltp-lede { font-size: 15.5px; }

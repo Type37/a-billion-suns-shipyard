@@ -473,7 +473,7 @@ function footer(): string {
       <!-- The game's community, on every page. It was one row in Learn to Play's
            list of places to buy spaceships, which is neither where it belongs
            nor the only page somebody might want it from. -->
-      <a href="https://planetsmashergames.com/discord/" target="_blank" rel="noopener">${icon("commander", 13)} Planet Smasher Discord</a>
+      <a href="https://planetsmashergames.com/discord/" target="_blank" rel="noopener">${icon("discord", 13)} Planet Smasher Discord</a>
       <span class="gif-builder">Shipyard by <a class="wl-sig" href="https://linktr.ee/warlore" target="_blank" rel="noopener">WarLore</a></span>
       <a href="mailto:warlore1@outlook.com">Send Feedback</a>
       <a href="https://github.com/Type37/a-billion-suns-shipyard" target="_blank" rel="noopener">Source on GitHub</a>

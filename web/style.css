@@ -4860,6 +4860,38 @@ a .icon,
 }
 @keyframes dg-jp-taken { 0%, 5% { opacity: 1; } 6%, 100% { opacity: 0; } }
 
+/* Jump In, on the same 3400ms loop as Open a Jump Point so the two panels of
+   the A/B/C picker feel like one pair. Everything here is infinite on purpose:
+   these diagrams live inside panels that start display:none, and a one-shot
+   animation on a hidden element either never runs or runs once on first reveal
+   and then holds a dead end-frame for the rest of the session. */
+.learn-dg .dg-range-loop {
+  animation: dg-jin-range 3400ms var(--ease) infinite;
+  transform-box: fill-box; transform-origin: center;
+}
+.learn-dg .dg-jin { animation: dg-jin-pop 3400ms var(--ease) infinite; transform-box: fill-box; transform-origin: center; }
+.learn-dg .dg-jin-1 { animation-delay: 260ms; }
+.learn-dg .dg-jin-2 { animation-delay: 460ms; }
+.learn-dg .dg-jin-3 { animation-delay: 660ms; }
+.learn-dg .dg-jin-measure { animation: dg-jin-measure 3400ms ease infinite; }
+@keyframes dg-jin-range {
+  0%       { transform: scale(0.18); opacity: 0; }
+  9%       { transform: scale(1); opacity: 1; }
+  88%      { transform: scale(1); opacity: 1; }
+  97%, 100% { transform: scale(1); opacity: 0; }
+}
+@keyframes dg-jin-pop {
+  0%, 6%   { transform: scale(0.5); opacity: 0; }
+  14%      { transform: scale(1); opacity: 1; }
+  88%      { transform: scale(1); opacity: 1; }
+  97%, 100% { transform: scale(1); opacity: 0; }
+}
+@keyframes dg-jin-measure {
+  0%, 16%  { opacity: 0; }
+  24%, 88% { opacity: 1; }
+  97%, 100% { opacity: 0; }
+}
+
 /* Passing. Play goes round the ring; P1 goes quiet a third of the way in and
    the marker skips that seat for the rest of the loop. steps(1) on the marker,
    because a turn hops from seat to seat - it does not glide between them. */
@@ -5937,7 +5969,7 @@ main.play-body .roster-section::before { content: none; }
    has to be set at ID specificity too or it silently loses. See the same note
    at the print sheet and the solo shell. */
 #app > .ltp {
-  max-width: 780px;                  /* a reading measure, not the app shell */
+  max-width: 840px;                  /* a reading measure, not the app shell */
   margin: 0 auto;
 }
 .ltp { padding: 0 20px 80px; }
@@ -5958,7 +5990,7 @@ main.play-body .roster-section::before { content: none; }
 }
 .ltp-head-id { min-width: 0; }
 .ltp-head-title {
-  font-family: var(--display); font-weight: 800; font-size: 17px;
+  font-family: var(--display); font-weight: 800; font-size: 19px;
   letter-spacing: -0.01em; margin: 0; color: var(--ink);
 }
 
@@ -5974,7 +6006,7 @@ main.play-body .roster-section::before { content: none; }
   display: flex; align-items: center; justify-content: center; gap: 6px;
   min-height: var(--tap);
   padding: 8px 10px;
-  font-family: var(--sans); font-size: 12.5px; font-weight: 700;
+  font-family: var(--sans); font-size: 14px; font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--ink-2); text-decoration: none;
   border-bottom: 3px solid transparent;
@@ -5986,6 +6018,40 @@ main.play-body .roster-section::before { content: none; }
 /* Where #/learn ends and #/rules begins. A hairline, not a gap: the rail is one
    reading order across two routes, and a gap would read as two rails. */
 .ltp-tab.is-split { border-left: 1px solid var(--hair-soft); }
+
+/* ----------------------------------------------------------- the sub-rail
+   The Tactical Phase's five steps. Deliberately NOT a second copy of the main
+   tab bar: numbered, boxed and quieter, so it reads as one level down rather
+   than as a competing set of six. It scrolls sideways on a phone instead of
+   moving to the bottom - there is already a bar down there and two would be
+   one too many. */
+.ltp-subrail {
+  display: flex; gap: 1px; margin: 0 0 18px;
+  background: var(--hair-soft); border: 1px solid var(--hair-soft);
+  overflow-x: auto; scrollbar-width: none;
+}
+.ltp-subrail::-webkit-scrollbar { display: none; }
+.ltp-subtab {
+  flex: 1 1 0; min-width: 0;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 9px 10px; min-height: 40px;
+  background: var(--paper); text-decoration: none;
+  font-family: var(--sans); font-weight: 700; font-size: 14px; color: var(--ink-2);
+  white-space: nowrap;
+  transition: background 120ms var(--ease), color 120ms var(--ease);
+}
+.ltp-subtab:hover { background: var(--blue-wash); color: var(--ink); }
+.ltp-subtab-n {
+  flex: none;
+  font-family: var(--display); font-weight: 800; font-size: 11px;
+  color: var(--paper); background: var(--ink-off);
+  min-width: 18px; height: 18px; line-height: 18px; text-align: center;
+}
+.ltp-subtab.on { background: var(--blue); color: #fff; }
+.ltp-subtab.on .ltp-subtab-n { background: var(--red); }
+/* The step's own heading, straight under the rail: no top rule, because the
+   rail is already the divider. */
+.ltp-h3-step { margin-top: 0; padding-top: 0; border-top: 0; }
 /* Never clipped: the label is the whole point of the tab. */
 .ltp-tab-l { white-space: nowrap; }
 /* The step number is for the landscape-phone bar, where the icon alone is
@@ -6005,26 +6071,26 @@ main.play-body .roster-section::before { content: none; }
 }
 .ltp-sec-head { margin-bottom: 14px; }
 .ltp-sec-title {
-  font-family: var(--display); font-weight: 800; font-size: 30px; line-height: 1.1;
+  font-family: var(--display); font-weight: 800; font-size: 34px; line-height: 1.1;
   letter-spacing: -0.02em; margin: 0; color: var(--ink);
 }
 
 .ltp-h3 {
-  font-family: var(--display); font-weight: 800; font-size: 19px; line-height: 1.2;
+  font-family: var(--display); font-weight: 800; font-size: 22px; line-height: 1.2;
   letter-spacing: -0.01em; margin: 30px 0 8px; color: var(--ink);
   padding-top: 10px; border-top: 1px solid var(--hair-soft);
 }
 .ltp-h4 {
-  font-family: var(--sans); font-weight: 800; font-size: 14px;
-  letter-spacing: 0.02em; margin: 22px 0 6px; color: var(--blue);
+  font-family: var(--sans); font-weight: 800; font-size: 16px;
+  letter-spacing: 0.02em; margin: 24px 0 7px; color: var(--blue);
 }
 .ltp-lede {
-  font-family: var(--sans); font-size: 16.5px; line-height: 1.5; font-weight: 500;
+  font-family: var(--sans); font-size: 18px; line-height: 1.5; font-weight: 500;
   color: var(--ink); margin: 0 0 16px;
 }
-.ltp-p { font-size: 15px; line-height: 1.62; color: var(--ink); margin: 0 0 11px; }
-.ltp-p-note { font-size: 13.5px; color: var(--ink-2); }
-.ltp-list { margin: 0 0 11px; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--ink); }
+.ltp-p { font-size: 17px; line-height: 1.62; color: var(--ink); margin: 0 0 12px; }
+.ltp-p-note { font-size: 15px; color: var(--ink-2); }
+.ltp-list { margin: 0 0 12px; padding-left: 24px; font-size: 17px; line-height: 1.6; color: var(--ink); }
 .ltp-list li { margin-bottom: 5px; }
 .ltp-list-num { list-style: decimal; }
 
@@ -6077,15 +6143,15 @@ main.play-body .roster-section::before { content: none; }
   display: flex; align-items: center; gap: 9px;
   padding: 11px 13px; min-height: var(--tap);
   background: var(--paper); cursor: pointer;
-  font-family: var(--sans); font-weight: 700; font-size: 14px; color: var(--ink);
+  font-family: var(--sans); font-weight: 700; font-size: 15.5px; color: var(--ink);
   transition: background 120ms var(--ease), color 120ms var(--ease);
 }
 .ltp-pick-tab:hover { background: var(--blue-wash); }
 .ltp-pick-k {
   flex: none;
   display: inline-flex; align-items: center; justify-content: center;
-  width: 22px; height: 22px;
-  font-family: var(--display); font-weight: 800; font-size: 12px;
+  width: 24px; height: 24px;
+  font-family: var(--display); font-weight: 800; font-size: 13px;
   color: var(--paper); background: var(--ink-off);
   transition: background 120ms var(--ease);
 }
@@ -6129,8 +6195,8 @@ main.play-body .roster-section::before { content: none; }
 .ltp-cool { margin: 0 0 18px; }
 .ltp-cool p {
   font-family: var(--serif); font-style: italic; font-weight: 400;
-  font-size: 16px; line-height: 1.6; color: var(--ink);
-  margin: 0 0 9px;
+  font-size: 18px; line-height: 1.6; color: var(--ink);
+  margin: 0 0 10px;
 }
 .ltp-cool p:last-child { margin-bottom: 0; }
 /* Emphasis inside an all-italic block has to go the other way to register. */
@@ -6148,11 +6214,11 @@ main.play-body .roster-section::before { content: none; }
 .ltp-era-head:hover { background: var(--ground); }
 .ltp-era-head-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .ltp-era-name {
-  font-family: var(--display); font-weight: 800; font-size: 18px;
+  font-family: var(--display); font-weight: 800; font-size: 20px;
   letter-spacing: -0.01em; color: var(--ink);
 }
 .ltp-era-meta {
-  font-family: var(--sans); font-size: 11.5px; font-weight: 700;
+  font-family: var(--sans); font-size: 12.5px; font-weight: 700;
   letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-2);
 }
 .ltp-dot { color: var(--ink-off); }
@@ -6173,7 +6239,7 @@ main.play-body .roster-section::before { content: none; }
    and its red underline, and main.ts runs that era's entrance animation on it
    (decode / wipe / slam). It repeats the era name from the summary above
    deliberately - the summary is a control, this is the title card. */
-.ltp-era-title { font-size: 27px; margin: 14px 0 4px; }
+.ltp-era-title { font-size: 31px; margin: 15px 0 5px; }
 
 /* Armageddon: the galaxy is in flames, so the title arrives on fire.
    Two layers on the heading's own pseudo-elements, both behind the letters
@@ -6260,8 +6326,8 @@ main.play-body .roster-section::before { content: none; }
 }
 .ltp-era-tagline {
   font-family: var(--serif); font-style: italic; font-weight: 400;
-  font-size: 17px; line-height: 1.45; color: var(--ink);
-  margin: 0 0 12px;
+  font-size: 19px; line-height: 1.45; color: var(--ink);
+  margin: 0 0 13px;
 }
 /* ------------------------------------------------------------ the commands */
 .ltp-cmds {
@@ -6271,15 +6337,15 @@ main.play-body .roster-section::before { content: none; }
 .ltp-cmd { background: var(--paper); padding: 11px 13px 12px; }
 .ltp-cmd-name {
   display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-  font-family: var(--sans); font-weight: 800; font-size: 14px; color: var(--ink);
-  margin: 0 0 5px;
+  font-family: var(--sans); font-weight: 800; font-size: 16px; color: var(--ink);
+  margin: 0 0 6px;
 }
 .ltp-cmd-ico { flex: none; color: var(--blue); }
 .ltp-cmd-cost {
   font-size: 10px; font-weight: 800; letter-spacing: 0.08em;
   color: var(--paper); background: var(--blue); padding: 2px 5px;
 }
-.ltp-cmd-text { font-size: 13.5px; line-height: 1.5; color: var(--ink); margin: 0; }
+.ltp-cmd-text { font-size: 15px; line-height: 1.52; color: var(--ink); margin: 0; }
 
 /* ------------------------------------------------------- miniature sources */
 /* The whole list lives behind one closed <details>: about forty links is the
@@ -6330,7 +6396,7 @@ main.play-body .roster-section::before { content: none; }
   font-family: var(--sans); font-size: 10.5px; font-weight: 700;
   letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3);
 }
-.ltp-pager-name { font-family: var(--display); font-weight: 800; font-size: 15px; line-height: 1.2; }
+.ltp-pager-name { font-family: var(--display); font-weight: 800; font-size: 16.5px; line-height: 1.2; }
 
 .ltp-src-group { margin-bottom: 18px; }
 /* Each row is a name and a link, nothing else. It used to carry a second line
@@ -6349,13 +6415,13 @@ main.play-body .roster-section::before { content: none; }
 .ltp-src:hover { background: var(--blue-wash); }
 .ltp-src-name {
   display: flex; align-items: center; gap: 6px;
-  font-family: var(--sans); font-weight: 700; font-size: 14px; color: var(--blue);
+  font-family: var(--sans); font-weight: 700; font-size: 15.5px; color: var(--blue);
 }
 .ltp-src-name svg { flex: none; }
 
 /* -------------------------------------------------------------- the tables */
 .ltp-fig { margin: 0 0 16px; }
-.ltp-table { border-collapse: collapse; border: 1px solid var(--hair); font-size: 14px; }
+.ltp-table { border-collapse: collapse; border: 1px solid var(--hair); font-size: 16px; }
 .ltp-table caption {
   text-align: left; font-family: var(--sans); font-size: 10.5px; font-weight: 800;
   letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-off);
@@ -6369,17 +6435,17 @@ main.play-body .roster-section::before { content: none; }
   text-transform: uppercase; color: var(--ink-2); background: var(--ground);
 }
 .ltp-table tr:last-child td { border-bottom: 0; }
-.ltp-fig figcaption { font-size: 12.5px; line-height: 1.5; color: var(--ink-2); margin-top: 6px; }
+.ltp-fig figcaption { font-size: 14.5px; line-height: 1.5; color: var(--ink-2); margin-top: 7px; }
 .ltp-fig-cite { color: var(--ink-off); }
 
 /* -------------------------------------------------------------------- CTAs */
 .ltp-launch { margin: 16px 0 8px; }
-.ltp-launch-note { font-size: 12.5px; line-height: 1.45; color: var(--ink-2); margin: 7px 0 0; }
+.ltp-launch-note { font-size: 14.5px; line-height: 1.45; color: var(--ink-2); margin: 8px 0 0; }
 .ltp-cta { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 6px; }
 .ltp-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   min-height: var(--tap); padding: 11px 18px;
-  font-family: var(--sans); font-weight: 800; font-size: 14.5px;
+  font-family: var(--sans); font-weight: 800; font-size: 16px;
   letter-spacing: 0.01em; text-decoration: none; cursor: pointer;
   border: 1px solid var(--hair); background: var(--paper); color: var(--ink);
 }
@@ -6387,7 +6453,7 @@ main.play-body .roster-section::before { content: none; }
 .ltp-btn:hover { background: var(--ground); }
 .ltp-btn-go, .ltp-btn-buy { background: var(--blue); border-color: var(--blue); color: #fff; }
 .ltp-btn-go:hover, .ltp-btn-buy:hover { background: var(--blue-deep); border-color: var(--blue-deep); }
-.ltp-btn-buy { font-size: 16px; padding: 13px 22px; }
+.ltp-btn-buy { font-size: 17.5px; padding: 14px 24px; }
 
 /* The diagrams are shared with the archived walkthrough and are sized for its
    narrower column, so they get room to breathe here. */
@@ -6437,18 +6503,20 @@ main.play-body .roster-section::before { content: none; }
 @media (max-width: 560px) {
   .ltp { padding-left: 14px; padding-right: 14px; }
   .ltp-head { margin: 0 -14px; padding: 0 14px; }
-  .ltp-sec-title { font-size: 25px; }
-  .ltp-h3 { font-size: 17.5px; }
-  .ltp-era-title { font-size: 23px; }
-  .ltp-era-tagline { font-size: 16px; }
-  .ltp-era-name { font-size: 16.5px; }
+  .ltp-sec-title { font-size: 28px; }
+  .ltp-h3 { font-size: 20px; }
+  .ltp-p, .ltp-list { font-size: 16.5px; }
+  .ltp-cool p { font-size: 17.5px; }
+  .ltp-era-title { font-size: 26px; }
+  .ltp-era-tagline { font-size: 17.5px; }
+  .ltp-era-name { font-size: 18px; }
   .ltp-head-in { gap: 12px; }
-  .ltp-head-title { font-size: 15.5px; }
-  .ltp-lede { font-size: 15.5px; }
+  .ltp-head-title { font-size: 17px; }
+  .ltp-lede { font-size: 17px; }
   /* Six tabs across 375px. The label is shrunk, never truncated - if it ever
      stops fitting it is dropped whole (see the landscape rule below), because a
      tab reading "Tacti..." is worse than a tab reading nothing. */
-  .ltp-tabs--bottom .ltp-tab-l { font-size: 9.5px; }
+  .ltp-tabs--bottom .ltp-tab-l { font-size: 10.5px; }
   .ltp-cta { flex-direction: column; align-items: stretch; }
   .ltp-btn { width: 100%; }
 }

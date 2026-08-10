@@ -57,7 +57,7 @@ export type Route =
   | { view: "ships" }
   | { view: "play"; listId: string }
   | { view: "learn"; tab?: string }
-  | { view: "rules"; tab?: string }
+  | { view: "rules"; tab?: string; sub?: string }
   | { view: "learn-classic"; step: number; anchor?: string };
 
 // Kept as a literal rather than derived from ROUND_PHASES: the router must not
@@ -85,6 +85,16 @@ const LEARN_LAST_STEP = 3;
  */
 const LEARN_TAB_IDS = ["eras", "prepare"] as const;
 const RULES_TAB_IDS = ["command", "jump", "tactical", "end"] as const;
+/**
+ * The Tactical Phase is five pages, not one.
+ *
+ * It is longer than the other three phases put together - select, move, get
+ * shot at, act, and the whole of combat - and reading it meant scrolling past
+ * four things to reach the fifth. A third segment splits it: #/rules/tactical
+ * is the first of them, #/rules/tactical/shoot is the one you open mid-game to
+ * settle an argument about duds.
+ */
+const TACTICAL_SUB_IDS = ["select", "move", "passive", "action", "shoot"] as const;
 
 export function parseRoute(hash: string): Route {
   const h = hash.replace(/^#/, "");
@@ -98,7 +108,11 @@ export function parseRoute(hash: string): Route {
   if (parts[0] === "play" && parts[1]) return { view: "play", listId: parts[1] };
   if (parts[0] === "rules") {
     const tab = RULES_TAB_IDS.find((t) => t === parts[1]);
-    return tab ? { view: "rules", tab } : { view: "rules" };
+    if (!tab) return { view: "rules" };
+    // Only the Tactical Phase has sub-pages; a third segment anywhere else is
+    // ignored rather than 404ing.
+    const sub = tab === "tactical" ? TACTICAL_SUB_IDS.find((x) => x === parts[2]) : undefined;
+    return sub ? { view: "rules", tab, sub } : { view: "rules", tab };
   }
   if (parts[0] === "learn" && !/^\d+$/.test(parts[1] ?? "")) {
     // An unknown tab name lands on the first page of Learn to Play rather than
@@ -161,7 +175,8 @@ export function routeHash(route: Route): string {
     case "learn":
       return route.tab ? `#/learn/${route.tab}` : "#/learn";
     case "rules":
-      return route.tab ? `#/rules/${route.tab}` : "#/rules";
+      if (!route.tab) return "#/rules";
+      return route.sub ? `#/rules/${route.tab}/${route.sub}` : `#/rules/${route.tab}`;
     case "learn-classic": {
       if (route.anchor) return `#/learn-classic/${route.step}/${route.anchor}`;
       return route.step > 0 ? `#/learn-classic/${route.step}` : "#/learn-classic";

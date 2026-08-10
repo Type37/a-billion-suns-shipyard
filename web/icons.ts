@@ -56,6 +56,13 @@ const PATHS: Record<string, string> = {
   eraser: '<path d="M19 20H8.5l-4.21-4.3a1 1 0 0 1 0-1.41l10-10a1 1 0 0 1 1.41 0l5 5a1 1 0 0 1 0 1.41L11.5 20m6.5-6.7L11.7 7"/>',
   // Utility ship (streamline-plump wrench-circle): a Mass 1+ ship with Utility Bays.
   utility: '<path fill="currentColor" stroke="none" d="M1.5 24C1.5 11.574 11.574 1.5 24 1.5S46.5 11.574 46.5 24c0 10.493-7.182 19.308-16.899 21.797V39.69c0-1.59.974-2.987 2.287-3.884A13.98 13.98 0 0 0 38 24.24c0-5.09-2.717-9.547-6.78-11.997c-1.182-.712-2.553.242-2.553 1.622v8.223c0 .445-.147.878-.452 1.202c-.638.676-1.914 1.861-3.591 2.578c-.398.17-.849.17-1.247 0c-1.723-.736-3.022-1.967-3.64-2.632a1.7 1.7 0 0 1-.44-1.072c-.13-2.299-.172-5.234-.17-8.154c.002-1.401-1.397-2.367-2.582-1.62c-3.93 2.479-6.542 6.86-6.542 11.85c0 4.806 2.422 9.047 6.112 11.567c1.313.897 2.287 2.294 2.287 3.884v6.108C8.684 43.31 1.5 34.494 1.5 24"/>',
+  // Discord's own wordless mark, from Simple Icons (simple-icons:discord).
+  // A brand mark, so it is TRACED FROM THE REAL ONE and not drawn from memory:
+  // the previous footer link used the `commander` org-chart glyph, which said
+  // nothing about Discord at all. If another brand ever needs a mark here, take
+  // it from Simple Icons too - do not approximate a logo.
+  discord:
+    '<path fill="currentColor" stroke="none" d="M20.317 4.3698a19.7913 19.7913 0 0 0-4.8851-1.5152.0741.0741 0 0 0-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 0 0-.0785-.037 19.7363 19.7363 0 0 0-4.8852 1.515.0699.0699 0 0 0-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 0 0 .0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 0 0 .0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 0 0-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 0 1-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 0 1 .0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 0 1 .0785.0095c.1202.099.246.198.3728.2924a.077.077 0 0 1-.0066.1276 12.2986 12.2986 0 0 1-1.873.8914.0766.0766 0 0 0-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 0 0 .0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 0 0 .0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 0 0-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/>',
   close: '<line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/>',
   check: '<polyline points="5 13 10 18 19 7"/>',
   warning: '<path d="M12 3 22 20 2 20 Z"/><line x1="12" y1="9.5" x2="12" y2="14.5"/><line x1="12" y1="17" x2="12" y2="17.01"/>',
@@ -91,7 +98,12 @@ const PATHS: Record<string, string> = {
   more: '<circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
   menu: '<line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/>',
   info: '<circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16.5"/><line x1="12" y1="7.5" x2="12" y2="7.51"/>',
-  book: '<path d="M4 5 A2 2 0 0 1 6 3 H20 V19 H6 A2 2 0 0 0 4 21 Z"/><line x1="4" y1="19" x2="4" y2="5"/><line x1="20" y1="19" x2="6" y2="19"/>',
+  // An OPEN book (Tabler `book`): two facing pages with a spine down the middle.
+  // The previous one was a hand-drawn closed hardback and at 16-20px it drew as
+  // a plain empty square with no spine and no pages - a rectangle labelled "Get
+  // the rulebook". It is on the home page, the onboarding card, the footer and
+  // the buy CTA, which made it the most-seen broken glyph in the app.
+  book: '<path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><line x1="3" y1="6" x2="3" y2="19"/><line x1="12" y1="6" x2="12" y2="19"/><line x1="21" y1="6" x2="21" y2="19"/>',
   flag: '<line x1="5" y1="3" x2="5" y2="21"/><path d="M5 4 H19 L16 8.5 19 13 H5"/>',
   wrench: '<path d="M14.5 6.5a4.5 4.5 0 0 0-6 6L3 18l3 3 5.5-5.5a4.5 4.5 0 0 0 6-6L14 13l-3-3Z"/>',
   scroll: '<path d="M7 3 H19 V17 A2 2 0 0 1 17 19 H7"/><path d="M7 3 A2 2 0 0 0 5 5 V19 A2 2 0 0 0 7 21 H17"/><line x1="9.5" y1="8" x2="16" y2="8"/><line x1="9.5" y1="12" x2="16" y2="12"/>',

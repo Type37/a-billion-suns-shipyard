@@ -88,10 +88,15 @@ function jumpPointDiagram(): string {
     <g transform="translate(82 96)"><g class="dg-jp-fly">
       <circle class="dg-jp-core" r="8"/>
     </g></g>
-    <g class="dg-jp-landed" transform="translate(232 96)">
+    <!-- Position on the outer group, animation class on the inner one. This had
+         both on one element and the keyframes settle on scale(1), an identity
+         matrix, which a CSS transform applies OVER the transform attribute -
+         so the landed point was drawn at the SVG origin and clipped away by the
+         top-left corner. Same trap as the note at the top of this file. -->
+    <g transform="translate(232 96)"><g class="dg-jp-landed">
       <circle class="dg-jp-core" r="9"/>
       <circle class="dg-jp-ring" r="9"/>
-    </g>
+    </g></g>
     ${LABEL(232, 132, "Anywhere you like", "dg-measure-text")}
   </svg>`;
 }
@@ -138,15 +143,15 @@ function jumpInDiagram(): string {
   <svg class="learn-dg" viewBox="0 0 320 170" role="img"
        aria-label="Jumping in: deploy all the ships of one unit within six inches of a friendly jump point.">
     ${LABEL(160, 16, "Jump In a unit", "dg-title")}
-    <circle class="dg-range dg-range-grow" cx="160" cy="95" r="52"/>
+    <circle class="dg-range dg-range-loop" cx="160" cy="95" r="52"/>
     <g class="dg-jumppoint" transform="translate(160 95)">
       <circle class="dg-jp-core" r="9"/>
       <circle class="dg-jp-ring" r="9"/>
     </g>
-    ${SHIP(122, 74, -20, "dg-ship dg-arrive dg-arrive-1")}
-    ${SHIP(196, 78, 25, "dg-ship dg-arrive dg-arrive-2")}
-    ${SHIP(160, 128, 0, "dg-ship dg-arrive dg-arrive-3")}
-    <g class="dg-measure" transform="translate(160 95)">
+    ${SHIP(122, 74, -20, "dg-ship dg-jin dg-jin-1")}
+    ${SHIP(196, 78, 25, "dg-ship dg-jin dg-jin-2")}
+    ${SHIP(160, 128, 0, "dg-ship dg-jin dg-jin-3")}
+    <g class="dg-measure dg-jin-measure" transform="translate(160 95)">
       <line x1="0" y1="0" x2="52" y2="0"/>
       <!-- Below the line, not above it: at -6 the label sat on the arriving ship
            at (196,78). The space under the radius line is empty. -->
@@ -179,108 +184,135 @@ function jumpInDiagram(): string {
  * step with the ripple within a few passes.
  */
 function dragSelectDiagram(): string {
-  const LEAD_X = 128, LEAD_Y = 100, R6 = 54;
+  const LEAD_X = 120, LEAD_Y = 100, R6 = 54;
 
   /**
-   * Hull size follows Mass, because Mass is what the picture is about.
+   * Hull size follows Mass, hard.
    *
    * Every ship used to be drawn the same size with its Mass written underneath,
-   * which meant the one number the diagram exists to explain was carried
-   * entirely by a caption. Now the M:4 lead is visibly twice the M:1 escort and
-   * the 4+3+2+1 sum reads off the shapes.
+   * so the one number this picture exists to explain was carried entirely by a
+   * caption. The ramp is deliberately steep - a Mass 3 capital is nearly four
+   * times a Mass 0 squadron - because a gentle one just looks like sloppy
+   * drawing rather than a difference you are meant to read.
+   *
+   * Mass tops out at 3. An earlier version of this diagram had a Mass 4 lead
+   * and summed to exactly 10, which is not a fleet that can exist.
    */
-  const sizeFor = (m: number): number => 0.62 + m * 0.24;
+  const sizeFor = (m: number): number => 0.55 + m * 0.5;
 
-  const mass = (x: number, y: number, m: number, cls = "dgs-mass") =>
-    `<text class="${cls}" x="${x}" y="${y}">M:${m}</text>`;
+  const mass = (x: number, y: number, label: string, cls = "dgs-mass") =>
+    `<text class="${cls}" x="${x}" y="${y}">${label}</text>`;
 
-  /** A hull and its Mass label, with the label clearing the (now variable) hull. */
-  const unit = (x: number, y: number, rot: number, cls: string, m: number, labelCls?: string) => {
+  /** A hull and its Mass label, the label clearing the (very variable) hull. */
+  const unit = (x: number, y: number, rot: number, cls: string, m: number, label?: string, labelCls?: string) => {
     const sc = sizeFor(m);
-    return `${SHIP(x, y, rot, cls, sc)}${mass(x, y + 12 + Math.round(11 * sc), m, labelCls)}`;
+    const txt = label === undefined ? `M:${m}` : label;
+    return `${SHIP(x, y, rot, cls, sc)}${txt ? mass(x, y + 11 + Math.round(11 * sc), txt, labelCls) : ""}`;
   };
 
   return `
-  <svg class="learn-dg" viewBox="0 0 320 192" role="img"
-       aria-label="Drag to Select: click a lead unit of Mass 4, then drag a selection over the other unactivated units at least partially within six inches of it - Mass 3, Mass 2 and Mass 1 - for a Combined Mass of 10, which is the maximum. A Mass 2 unit further away is out of range and is not selected.">
+  <svg class="learn-dg" viewBox="0 0 320 200" role="img"
+       aria-label="Drag to Select: click a lead unit of Mass 3 and a pulse goes out six inches. Every unactivated unit it reaches joins the battlegroup - a Mass 2, two Mass 1s and three Mass 0 squadrons - for a Combined Mass of 7, under the maximum of 10. A Mass 2 unit beyond the pulse is out of range and stays unselected.">
     <style>
-      .learn-dg .dgs-mass { font-family: var(--narrow); font-size: 9.5px; font-weight: 700; fill: var(--ink-2); text-anchor: middle; letter-spacing: 0.03em; }
+      .learn-dg .dgs-mass { font-family: var(--narrow); font-size: 10.5px; font-weight: 700; fill: var(--ink-2); text-anchor: middle; letter-spacing: 0.03em; }
       .learn-dg .dgs-mass-out { fill: var(--ink-3); }
-      .learn-dg .dgs-total { font-family: var(--narrow); font-size: 10px; font-weight: 700; fill: var(--blue); text-anchor: middle; text-transform: uppercase; letter-spacing: 0.04em; }
-      .learn-dg .dgs-marq path { fill: none; stroke: var(--blue); stroke-width: 1.6; stroke-linecap: square; }
-      .learn-dg .dgs-pulse { fill: none; stroke: var(--blue); stroke-width: 1.5; }
+      .learn-dg .dgs-total { font-family: var(--narrow); font-size: 10.5px; font-weight: 700; fill: var(--blue); text-anchor: middle; text-transform: uppercase; letter-spacing: 0.04em; }
       .learn-dg .dgs-cursor { fill: var(--ink); stroke: var(--paper); stroke-width: 1; stroke-linejoin: round; }
 
-      @keyframes dgs-pulse { 0% { r: 7; opacity: 0.75; } 6% { opacity: 0.7; } 40%, 100% { r: 62; opacity: 0; } }
-      @keyframes dgs-click { 0%, 3% { transform: scale(1); } 7% { transform: scale(0.82); } 13%, 100% { transform: scale(1); } }
-      @keyframes dgs-marq { 0%, 5% { transform: scale(0.06); opacity: 0; } 11% { opacity: 1; } 26%, 88% { transform: scale(1); opacity: 1; } 96%, 100% { transform: scale(1); opacity: 0; } }
-      @keyframes dgs-tint-1 { 0%, 22% { fill: var(--ink); } 28%, 90% { fill: var(--blue); } 96%, 100% { fill: var(--ink); } }
-      @keyframes dgs-tint-2 { 0%, 28% { fill: var(--ink); } 34%, 90% { fill: var(--blue); } 96%, 100% { fill: var(--ink); } }
-      @keyframes dgs-tint-3 { 0%, 34% { fill: var(--ink); } 40%, 90% { fill: var(--blue); } 96%, 100% { fill: var(--ink); } }
-      @keyframes dgs-total { 0%, 44% { opacity: 0; } 52%, 92% { opacity: 1; } 98%, 100% { opacity: 0; } }
+      /* The pulse IS the range. It leaves the lead on the click, runs out to
+         exactly 6", and stays there as the boundary for the rest of the loop -
+         one shape doing the job a static dashed circle and a separate throwaway
+         ripple were splitting between them. */
+      .learn-dg .dgs-wave { fill: var(--blue-wash); stroke: var(--blue); stroke-width: 1.5; }
+      .learn-dg .dgs-wave-2 { fill: none; stroke: var(--blue); stroke-width: 2; }
 
-      .learn-dg .dgs-pulse { animation: dgs-pulse 3600ms ease-out infinite; }
-      .learn-dg .dgs-pulse-2 { animation-delay: 260ms; }
+      @keyframes dgs-wave {
+        0%, 4%   { r: 9; opacity: 0; }
+        7%       { r: 9; opacity: 0.95; }
+        24%      { r: 54px; opacity: 0.95; }
+        30%, 88% { r: 54px; opacity: 0.85; }
+        97%, 100% { r: 54px; opacity: 0; }
+      }
+      /* A second, thinner front that keeps going and dies just past the
+         boundary, so the wave reads as expanding rather than as a circle that
+         faded up. */
+      @keyframes dgs-wave-2 {
+        0%, 6%  { r: 9; opacity: 0.8; }
+        34%     { r: 74; opacity: 0; }
+        100%    { r: 74; opacity: 0; }
+      }
+      @keyframes dgs-click { 0%, 3% { transform: scale(1); } 7% { transform: scale(0.82); } 13%, 100% { transform: scale(1); } }
+      /* Each hull lights the moment the front reaches it. Staggered wider apart
+         than the true distances, which are within a few px of each other -
+         everything flicking on in one frame reads as a single event, and the
+         point is that the wave picks them up one by one. */
+      @keyframes dgs-tint-1 { 0%, 11% { fill: var(--ink); } 14%, 90% { fill: var(--blue); } 97%, 100% { fill: var(--ink); } }
+      @keyframes dgs-tint-2 { 0%, 15% { fill: var(--ink); } 18%, 90% { fill: var(--blue); } 97%, 100% { fill: var(--ink); } }
+      @keyframes dgs-tint-3 { 0%, 19% { fill: var(--ink); } 22%, 90% { fill: var(--blue); } 97%, 100% { fill: var(--ink); } }
+      @keyframes dgs-tint-4 { 0%, 23% { fill: var(--ink); } 26%, 90% { fill: var(--blue); } 97%, 100% { fill: var(--ink); } }
+      @keyframes dgs-total { 0%, 30% { opacity: 0; } 38%, 92% { opacity: 1; } 98%, 100% { opacity: 0; } }
+
+      .learn-dg .dgs-wave { animation: dgs-wave 3600ms cubic-bezier(0.15, 0.85, 0.25, 1) infinite; }
+      .learn-dg .dgs-wave-2 { animation: dgs-wave-2 3600ms cubic-bezier(0.1, 0.9, 0.3, 1) infinite; }
       .learn-dg .dgs-cursor { animation: dgs-click 3600ms ease-out infinite; transform-box: fill-box; transform-origin: 10% 6%; }
-      .learn-dg .dgs-marq { animation: dgs-marq 3600ms cubic-bezier(0.2, 0.9, 0.3, 1) infinite; }
       .learn-dg .dgs-catch-1 { animation: dgs-tint-1 3600ms step-end infinite; }
       .learn-dg .dgs-catch-2 { animation: dgs-tint-2 3600ms step-end infinite; }
       .learn-dg .dgs-catch-3 { animation: dgs-tint-3 3600ms step-end infinite; }
+      .learn-dg .dgs-catch-4 { animation: dgs-tint-4 3600ms step-end infinite; }
       .learn-dg .dgs-total { animation: dgs-total 3600ms ease infinite; }
 
-      /* Motion off: settle on the informative frame - everything inside 6" is
-         selected and blue, the ripple is just a ring on the lead. */
+      /* Motion off: settle on the informative frame - the wave sits at 6" and
+         everything inside it is selected. */
       @media (prefers-reduced-motion: reduce) {
         .learn-dg .dg-ship.dgs-catch-1,
         .learn-dg .dg-ship.dgs-catch-2,
-        .learn-dg .dg-ship.dgs-catch-3 { fill: var(--blue); }
-        .learn-dg .dgs-pulse-2 { display: none; }
+        .learn-dg .dg-ship.dgs-catch-3,
+        .learn-dg .dg-ship.dgs-catch-4 { fill: var(--blue); }
+        .learn-dg .dgs-wave { r: 54px; opacity: 0.85; }
+        .learn-dg .dgs-wave-2 { display: none; }
       }
     </style>
 
     ${LABEL(160, 16, "Drag to Select a battlegroup", "dg-title")}
-    <circle class="dg-range dg-range-grow" cx="${LEAD_X}" cy="${LEAD_Y}" r="${R6}"/>
 
-    <!-- The click, and the ripple it throws out. -->
-    <circle class="dgs-pulse dgs-pulse-1" cx="${LEAD_X}" cy="${LEAD_Y}" r="7"/>
-    <circle class="dgs-pulse dgs-pulse-2" cx="${LEAD_X}" cy="${LEAD_Y}" r="7"/>
+    <!-- No marquee, no selection brackets, no dashed range ring.
+         There were five squares of lines on this diagram at one point, sitting
+         on top of a circle, a cursor and a ripple, and it had stopped being a
+         picture of anything. What is left is the gesture: you press the big
+         ship, a pulse goes out six inches, and whatever it touches turns blue.
+         The ship it does not reach stays grey. -->
+    <circle class="dgs-wave" cx="${LEAD_X}" cy="${LEAD_Y}" r="9"/>
+    <circle class="dgs-wave-2" cx="${LEAD_X}" cy="${LEAD_Y}" r="9"/>
 
-    <!-- ONE square on this diagram, and it is the drag itself.
-         There used to be five: this marquee plus a set of corner brackets locking
-         on around every selected hull. Four little squares snapping shut inside a
-         big square, on top of a circle, with a cursor and a ripple - the picture
-         was mostly lines about lines. Selection is carried by the hulls turning
-         blue, which is one cue instead of two and needs no geometry. -->
-    <g transform="translate(${LEAD_X} ${LEAD_Y})"><g class="dgs-marq">
-      <path d="M-52 -38 L-52 -50 L-40 -50
-               M40 -50 L52 -50 L52 -38
-               M52 38 L52 50 L40 50
-               M-40 50 L-52 50 L-52 38"/>
-    </g></g>
+    ${LABEL(LEAD_X, LEAD_Y - 30, "lead", "dg-mini")}
+    ${unit(LEAD_X, LEAD_Y, 0, "dg-ship dg-lead", 3)}
+    ${unit(78, 72, 15, "dg-ship dgs-catch-1", 2)}
+    ${unit(162, 70, -10, "dg-ship dgs-catch-2", 1)}
+    ${unit(156, 140, 0, "dg-ship dgs-catch-3", 1)}
 
-    ${LABEL(LEAD_X, LEAD_Y - 26, "lead", "dg-mini")}
-    ${unit(LEAD_X, LEAD_Y, 0, "dg-ship dg-lead", 4)}
-    ${unit(86, 60, 15, "dg-ship dgs-catch-1", 3)}
-    ${unit(174, 58, -10, "dg-ship dgs-catch-2", 2)}
-    ${unit(150, 142, 0, "dg-ship dgs-catch-3", 1)}
+    <!-- Three Mass 0 squadrons, labelled once as a group. They ride along for
+         free, which is the whole reason to draw them: the Combined Mass below
+         comes to 7 with all three of them in the battlegroup. -->
+    ${unit(86, 130, 5, "dg-ship dgs-catch-4", 0, "")}
+    ${unit(101, 143, -8, "dg-ship dgs-catch-4", 0, "")}
+    ${unit(72, 145, 12, "dg-ship dgs-catch-4", 0, "")}
+    ${LABEL(88, 164, "M:0 &#215;3", "dgs-mass")}
 
-    ${unit(268, 98, 0, "dg-ship dg-outside", 2, "dgs-mass dgs-mass-out")}
-    ${LABEL(268, 138, "too far", "dg-mini dg-mini-out")}
+    ${unit(272, 96, 0, "dg-ship dg-outside", 2, "M:2", "dgs-mass dgs-mass-out")}
+    ${LABEL(272, 134, "too far", "dg-mini dg-mini-out")}
 
-    <!-- The pointer sits on the lead, tip on the hull. -->
-    <g transform="translate(133 92)">
+    <!-- The pointer, tip on the lead's hull. -->
+    <g transform="translate(126 94)">
       <path class="dgs-cursor" d="M0 0 L0 15 L4 11.2 L6.4 16.6 L9.4 15.2 L7 10 L11.6 9.6 Z"/>
     </g>
 
-    <!-- The radius is drawn to the LEFT. It used to point right, straight
-         through the Mass label of the ship at the top right; left is the only
-         quarter of the bubble with nothing in it. -->
+    <!-- The radius runs left, the only quarter of the wave with nothing in it. -->
     <g class="dg-measure" transform="translate(${LEAD_X} ${LEAD_Y})">
       <line x1="0" y1="0" x2="${-R6}" y2="0"/>
-      ${LABEL(-R6 / 2, 13, '6"', "dg-measure-text")}
+      ${LABEL(-R6 / 2, 14, '6"', "dg-measure-text")}
     </g>
 
-    <text class="dgs-total" x="160" y="182">Combined Mass 4+3+2+1 = 10 (max 10)</text>
+    <text class="dgs-total" x="160" y="192">Combined Mass 3+2+1+1 = 7 (max 10)</text>
   </svg>`;
 }
 

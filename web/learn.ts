@@ -266,7 +266,7 @@ const MINI_SOURCES: { group: string; items: MiniSource[] }[] = [
       { name: "Amarillo Design Bureau: Starline 2400", url: "https://www.starfleetstore.com/starline-2400-miniatures-c-12/" },
       { name: "Little Metal Spaceships", url: "https://littlemetalspaceships.com/" },
       { name: "Krakon Games", url: "https://krakongames.com/product-category/affiliated-games/a-billion-suns/" },
-      { name: "Star Wars: Armada (out of print, secondhand only)", url: "https://boardgamegeek.com/boardgame/181834/star-wars-armada" },
+      { name: "Star Wars: Armada (out of print, secondhand only)", url: "https://boardgamegeek.com/boardgame/163745/star-wars-armada" },
       { name: "Firestorm Armada (Warcradle, mid-rewrite)", url: "https://blog.warcradle.com/firestorm-armada-news" },
     ],
   },
@@ -361,7 +361,22 @@ function sectionPrepare(): string {
       `${p("A Billion Suns is designed to be played with spaceship miniatures of any scale, from any manufacturer, mounted on any shape or size of base. During play, ship bases are ignored for the purposes of measuring.")}`,
     )}
 
-    ${h(3, "Tokens")}
+    ${h(3, "The play area")}
+    ${quote(
+      // p.29, verbatim.
+      `${p("You will need one or more flat surfaces to play A Billion Suns across. This game is designed to be played across multiple tables at once, or with your gaming table divided into sections. These separate tables, or sections, are referred to as Sectors.")}
+       ${p("You always start with a single sector. Some missions may instruct you to add additional sectors.")}
+       ${p("When setting up a game, your mission may instruct you to &ldquo;Add 1 Sector&rdquo; or &ldquo;Set up 2 Sectors&rdquo;. Simply agree on another flat playable surface to count as the new sector or divide your current play area in two with tape or string to create the additional sector.")}
+       ${p("You don&rsquo;t have to divide your table up evenly, and sectors don&rsquo;t even have to be regular shapes. You could even use a nearby side table or counter-top as a sector. Sectors can be as small as 16&rdquo; by 16&rdquo; and still be playable. A Billion Suns is designed to be flexible to the size and shape of each play area &ndash; there is no &lsquo;standard&rsquo; size for any of the sectors. The game works perfectly on any size or shape of table.")}`,
+    )}
+    ${cool(
+      // p.29, verbatim - the sidebar beside the Sectors rules.
+      `<p>It will seem weird at first, but playing with multiple opponents across multiple tables creates a joyously chaotic deep-space gaming experience. It is one of the unique elements of A Billion Suns and shouldn&rsquo;t be house-ruled out if you want to experience the game at its best, doubly-so if you are playing with 3 or 4 players.</p>
+       <p>It&rsquo;s not as difficult to set up multiple sectors as it might sound. You could play across the kitchen table, a kitchen counter and a flat-seated chair. You could take a normal wargaming table and use masking tape or string to split it up into halves or quarters. If you normally use a number of smaller boards to make up a larger gaming table, just pull the board sections apart an inch or so.</p>`,
+    )}
+
+    ${h(3, "When you&rsquo;re ready for bigger games")}
+    ${h(4, "Tokens")}
     ${quote(
       // p.12, verbatim.
       `<p>You will need a selection of scavenged tokens, gaming gems or spare dice to represent the following:</p>
@@ -369,7 +384,7 @@ function sectionPrepare(): string {
        ${p("Missions sometimes need a variety of different token types. Don&rsquo;t stress about having a matching token design for every variety of token. You can just use different coloured gems, dice or tokens scavenged from other games. As long as everyone knows which tokens represent what during a particular game, you&rsquo;ll be fine.")}`,
     )}
 
-    ${h(3, "Other miniatures")}
+    ${h(4, "Other miniatures")}
     ${quote(
       // p.13, verbatim.
       `${p("As well as your fleets, the missions in this book require you to have a specific set of miniatures and terrain pieces in your collection. You can use miniatures for these, scratch-build them, or make flat tokens for them.")}
@@ -383,20 +398,6 @@ function sectionPrepare(): string {
        ])}
        ${p("You might also choose to make terrain or tokens for the following, but they are not required")}
        ${ul(["3 Gas Clouds", "3 Debris Fields"])}`,
-    )}
-
-    ${h(3, "The play area")}
-    ${quote(
-      // p.29, verbatim.
-      `${p("You will need one or more flat surfaces to play A Billion Suns across. This game is designed to be played across multiple tables at once, or with your gaming table divided into sections. These separate tables, or sections, are referred to as Sectors.")}
-       ${p("You always start with a single sector. Some missions may instruct you to add additional sectors.")}
-       ${p("When setting up a game, your mission may instruct you to &ldquo;Add 1 Sector&rdquo; or &ldquo;Set up 2 Sectors&rdquo;. Simply agree on another flat playable surface to count as the new sector or divide your current play area in two with tape or string to create the additional sector.")}
-       ${p("You don&rsquo;t have to divide your table up evenly, and sectors don&rsquo;t even have to be regular shapes. You could even use a nearby side table or counter-top as a sector. Sectors can be as small as 16&rdquo; by 16&rdquo; and still be playable. A Billion Suns is designed to be flexible to the size and shape of each play area &ndash; there is no &lsquo;standard&rsquo; size for any of the sectors. The game works perfectly on any size or shape of table.")}`,
-    )}
-    ${cool(
-      // p.29, verbatim - the sidebar beside the Sectors rules.
-      `<p>It will seem weird at first, but playing with multiple opponents across multiple tables creates a joyously chaotic deep-space gaming experience. It is one of the unique elements of A Billion Suns and shouldn&rsquo;t be house-ruled out if you want to experience the game at its best, doubly-so if you are playing with 3 or 4 players.</p>
-       <p>It&rsquo;s not as difficult to set up multiple sectors as it might sound. You could play across the kitchen table, a kitchen counter and a flat-seated chair. You could take a normal wargaming table and use masking tape or string to split it up into halves or quarters. If you normally use a number of smaller boards to make up a larger gaming table, just pull the board sections apart an inch or so.</p>`,
     )}
 
     ${sourceList()}
@@ -586,15 +587,32 @@ function sectionJump(): string {
 // 5. The Tactical Phase
 // ---------------------------------------------------------------------------
 
-function sectionTactical(): string {
-  return `
+/**
+ * The Tactical Phase, as five pages.
+ *
+ * It is longer than the other three phases put together, and on one page you
+ * scrolled past four things to reach the fifth. Each step of an activation is
+ * its own page now, addressed at #/rules/tactical/<step>, with a second rail
+ * under the heading. Shooting gets its own page for the same reason it goes
+ * last in the book: it is the biggest single body of rules in the game and the
+ * one you come back to mid-game.
+ */
+export const TACTICAL_SUBS: { id: string; label: string; short: string }[] = [
+  { id: "select", label: "Drag to Select", short: "Select" },
+  { id: "move", label: "Movement Step", short: "Move" },
+  { id: "passive", label: "Passive Attacks Step", short: "Passive" },
+  { id: "action", label: "Action Step", short: "Act" },
+  { id: "shoot", label: "Shooting", short: "Shoot" },
+];
+
+const TACTICAL_PAGES: Record<string, () => string> = {
+  select: () => `
     ${quote(
       // p.31, verbatim.
       `${p("In the Tactical Phase, players take turns to activate battlegroups, clockwise from the player with Initiative.")}
        ${p("On your turn, you Drag to Select a battlegroup and activate the units in that battlegroup.")}`,
     )}
 
-    ${h(3, "Drag to Select")}
     ${quote(
       // p.34, verbatim.
       `<p>When you Drag To Select a battlegroup:</p>
@@ -624,9 +642,8 @@ function sectionTactical(): string {
          "<b>Action Step:</b> Choose one action for each unit in the battlegroup. (You can choose different actions for different units.) Each ship in the unit takes that action. Resolve all the actions from one unit before starting the next unit.",
        ])}
        ${p("After activating a unit, give it an Activated token.")}`,
-    )}
-
-    ${h(4, "1 &middot; Movement Step")}
+    )}`,
+  move: () => `
     ${quote(
       // p.36, verbatim.
       `${p("When you move a unit, move each of the ships once, one at a time and in any order.")}
@@ -643,18 +660,16 @@ function sectionTactical(): string {
        ${p("<b>Table Edges.</b> If a ship moves into contact with the edge of a Sector, it immediately stops moving.")}
        ${p("<b>Overlapping Bases.</b> When moving, ships ignore other ships. Ships can end their movement in a position that results in the bases of two models overlapping, as long as the miniatures are stable in their final placement. No two ships can share the same position.")}`,
     )}
-    ${learnDiagram("double-move")}
-
-    ${h(4, "2 &middot; Passive Attacks Step")}
+    ${learnDiagram("double-move")}`,
+  passive: () => `
     ${quote(
       // p.38, verbatim.
       `${p("After moving the units in the battlegroup, there is a Passive Attacks step. Every passive enemy unit that has one or more active units in range and arc of fire of their auxiliary weapons may attack once with their auxiliary weapons, targeting only active units.")}
        ${p("A unit can only make passive attacks once during this battlegroup&rsquo;s activation. It can make further passive attacks in later activations.")}
        ${p("If you have three or more players, the passive players make attacks in turns in a clockwise direction, beginning with the player to the left of the active player.")}`,
     )}
-    ${learnDiagram("passive")}
-
-    ${h(4, "3 &middot; Action Step")}
+    ${learnDiagram("passive")}`,
+  action: () => `
     ${quote(
       // p.38, verbatim.
       `${p("After moving and potentially suffering passive attacks, each unit in the battlegroup takes one Action.")}
@@ -662,7 +677,28 @@ function sectionTactical(): string {
     )}
     ${learnDiagram("action")}
 
-    ${h(3, "Shooting")}
+    ${h(3, "The other actions")}
+    ${quote(
+      // p.38-39, verbatim.
+      `${ul([
+        "<b>Open Fire (action):</b> Attack with all this ship&rsquo;s weapon systems.",
+        "<b>Scan (action):</b> Scan a single object or ship within 3&rdquo; or collect any/all Free-floating asset tokens within 3&rdquo;.",
+        "<b>Scramble Squadrons (action):</b> Select one Mass 0 unit carried by the unit and deploy it wholly within 6&rdquo;. The scrambled unit takes one action and then receives an Activated token.",
+        "<b>Jump Hop (action):</b> If all the ships in this unit are within 6&rdquo; of a friendly Jump Point, remove all the ships in this unit from play and set them up within 6&rdquo; of a friendly Jump Point in another Sector.",
+        "<b>Jump Out (action):</b> If all the ships in this unit are within 6&rdquo; of a friendly Jump Point, remove all the ships in this unit from play and place them into your Reserves area.",
+      ])}
+       ${p("<b>Scan.</b> Scanning requires no arc of fire; it can target any object or ship within range in any direction. Scan has no built-in effect but might be required to fulfil a contract or some other special rule. When scanning, you must declare a single purpose for that scan.")}`,
+    )}
+
+    ${h(3, "Carrying fighters")}
+    ${quote(
+      // p.28, verbatim.
+      `${p("Ships of Mass 0 represent small groups of tiny attack craft or starfighters rather than a single starship. Mass 0 ships are also referred to as Squadrons, and can be carried into battle in the bellies of larger ships.")}
+       ${p("A unit can carry a number of Squadrons up to twice its Combined Mass. (E.g. a unit of one Mass 2 ship can carry up to 4 Squadrons, a single Mass 3 ship can carry up to 6 Squadrons, and a unit of three Mass 2 ships can carry up to 12.) Those carried Squadrons can be arranged into any number of units.")}
+       ${p("For reasons of abstraction and simplicity, Squadrons are carried by &rsquo;the unit&lsquo;, not by an individual ship, and are always considered to be carried by the last surviving ship in the unit. You don&rsquo;t have to destroy the carried Squadrons until the last ship in the carrying unit is destroyed.")}
+       ${p("A unit that is carrying Squadrons can take the Scramble Squadrons action to deploy a unit of Squadrons.")}`,
+    )}`,
+  shoot: () => `
     ${cool(
       // p.41, verbatim - the vignette that heads the Combat chapter.
       `<p>The silent flashes of the megabombs illuminated the nightside of Beren III like an electrical storm. Black silhouettes of battleships watched from low orbit like hungry crows.</p>`,
@@ -766,30 +802,30 @@ function sectionTactical(): string {
       `${p("Large ships can offer protection to their smaller fleet-mates in the form of heavy shielding, point defence coverage, and pure physical bulk. Ships benefitting from such protection are referred to as being &lsquo;Under Mother&rsquo;s Wing&rsquo;.")}
        ${p("Every ship has a Mother&rsquo;s Wing Zone of radius 2ⓜ&rdquo; which can protect friendly units of a lower mass. If every ship in a friendly unit is within the Mother&rsquo;s Wing Zone of a friendly unit of a higher mass, the lower mass unit can use the Shields value of the higher mass unit in place of its own (and may further boost this with Power to Shields).")}
        ${p("<b>Protecting Objectives.</b> When an objective (such as a neutral ship or a facility) is attacked by a player, another player may use the Mother&rsquo;s Wing effect from one of their nearby units to protect that objective (if that objective has a lighter mass).")}`,
-    )}
+    )}`,
+};
 
-    ${h(3, "The other actions")}
-    ${quote(
-      // p.38-39, verbatim.
-      `${ul([
-        "<b>Open Fire (action):</b> Attack with all this ship&rsquo;s weapon systems.",
-        "<b>Scan (action):</b> Scan a single object or ship within 3&rdquo; or collect any/all Free-floating asset tokens within 3&rdquo;.",
-        "<b>Scramble Squadrons (action):</b> Select one Mass 0 unit carried by the unit and deploy it wholly within 6&rdquo;. The scrambled unit takes one action and then receives an Activated token.",
-        "<b>Jump Hop (action):</b> If all the ships in this unit are within 6&rdquo; of a friendly Jump Point, remove all the ships in this unit from play and set them up within 6&rdquo; of a friendly Jump Point in another Sector.",
-        "<b>Jump Out (action):</b> If all the ships in this unit are within 6&rdquo; of a friendly Jump Point, remove all the ships in this unit from play and place them into your Reserves area.",
-      ])}
-       ${p("<b>Scan.</b> Scanning requires no arc of fire; it can target any object or ship within range in any direction. Scan has no built-in effect but might be required to fulfil a contract or some other special rule. When scanning, you must declare a single purpose for that scan.")}`,
-    )}
+/** The sub-rail: the same control as the main tab strip, one level down. */
+function tacticalRail(active: string): string {
+  return `
+  <nav class="ltp-subrail" aria-label="Tactical Phase steps">
+    ${TACTICAL_SUBS.map(
+      (t, i) => `
+      <a class="ltp-subtab ${t.id === active ? "on" : ""}" href="#/rules/tactical/${t.id}"
+         ${t.id === active ? 'aria-current="true"' : ""}>
+        <span class="ltp-subtab-n">${i + 1}</span>
+        <span class="ltp-subtab-l">${escapeHtml(t.short)}</span>
+      </a>`,
+    ).join("")}
+  </nav>`;
+}
 
-    ${h(3, "Carrying fighters")}
-    ${quote(
-      // p.28, verbatim.
-      `${p("Ships of Mass 0 represent small groups of tiny attack craft or starfighters rather than a single starship. Mass 0 ships are also referred to as Squadrons, and can be carried into battle in the bellies of larger ships.")}
-       ${p("A unit can carry a number of Squadrons up to twice its Combined Mass. (E.g. a unit of one Mass 2 ship can carry up to 4 Squadrons, a single Mass 3 ship can carry up to 6 Squadrons, and a unit of three Mass 2 ships can carry up to 12.) Those carried Squadrons can be arranged into any number of units.")}
-       ${p("For reasons of abstraction and simplicity, Squadrons are carried by &rsquo;the unit&lsquo;, not by an individual ship, and are always considered to be carried by the last surviving ship in the unit. You don&rsquo;t have to destroy the carried Squadrons until the last ship in the carrying unit is destroyed.")}
-       ${p("A unit that is carrying Squadrons can take the Scramble Squadrons action to deploy a unit of Squadrons.")}`,
-    )}
-`;
+function sectionTactical(sub?: string): string {
+  const at = TACTICAL_SUBS.find((t) => t.id === sub) ?? TACTICAL_SUBS[0]!;
+  return `
+    ${tacticalRail(at.id)}
+    <h3 class="ltp-h3 ltp-h3-step">${escapeHtml(at.label)}</h3>
+    ${TACTICAL_PAGES[at.id]!()}`;
 }
 
 /** The attack die to damage table, p.42. Four rows, so it reads as a figure. */
@@ -854,7 +890,7 @@ function sectionEnd(): string {
 // The page
 // ---------------------------------------------------------------------------
 
-const SECTIONS: Record<string, () => string> = {
+const SECTIONS: Record<string, (sub?: string) => string> = {
   eras: sectionEras,
   prepare: sectionPrepare,
   command: sectionCommand,
@@ -883,6 +919,21 @@ const ALL_PAGES: LearnPage[] = [
 ];
 
 const pageHref = (t: LearnPage): string => `${t.root}/${t.id}`;
+
+/**
+ * Every page in reading order, with the Tactical Phase expanded into its five
+ * steps. The tab rail still shows six stops - this is only what Previous and
+ * Next walk, so paging through does not skip four fifths of the longest phase.
+ */
+interface Stop {
+  href: string;
+  label: string;
+}
+const READING_ORDER: Stop[] = ALL_PAGES.flatMap((t) =>
+  t.id === "tactical"
+    ? TACTICAL_SUBS.map((x) => ({ href: `#/rules/tactical/${x.id}`, label: `${t.label}: ${x.label}` }))
+    : [{ href: pageHref(t), label: t.label }],
+);
 
 /**
  * The tab strip. Rendered twice, identically, and placed by CSS: once inside
@@ -925,8 +976,8 @@ const GAME_PITCH = `
   fighters, and battle for supremacy of the stars.</p>
   <p class="ltp-pitch ltp-pitch-2">It is an alternating activations space wargame. It&rsquo;s miniature-agnostic.</p>`;
 
-const pagerBtn = (dir: "prev" | "next", t: LearnPage): string => `
-  <a class="ltp-pager-btn ltp-pager-${dir}" href="${pageHref(t)}">
+const pagerBtn = (dir: "prev" | "next", t: Stop): string => `
+  <a class="ltp-pager-btn ltp-pager-${dir}" href="${t.href}">
     ${dir === "prev" ? icon("chevronLeft", 16) : ""}
     <span class="ltp-pager-txt">
       <span class="ltp-pager-dir">${dir === "prev" ? "Previous" : "Next"}</span>
@@ -944,11 +995,14 @@ export function learnView(state: AppState): string {
   const tab =
     ALL_PAGES.find((t) => t.root === root && t.id === routeTab) ?? ALL_PAGES.find((t) => t.root === root)!;
 
-  // Previous and next walk all six, straight across the boundary between the
-  // two routes, so the read-it-in-order path is one path.
-  const at = ALL_PAGES.indexOf(tab);
-  const prev = ALL_PAGES[at - 1];
-  const next = ALL_PAGES[at + 1];
+  // Previous and next walk READING_ORDER, straight across the boundary between
+  // the two routes and through the Tactical Phase's five steps, so the
+  // read-it-in-order path is one path.
+  const sub = state.route.view === "rules" ? state.route.sub : undefined;
+  const here = tab.id === "tactical" ? `#/rules/tactical/${sub ?? TACTICAL_SUBS[0]!.id}` : pageHref(tab);
+  const at = Math.max(0, READING_ORDER.findIndex((x) => x.href === here));
+  const prev = READING_ORDER[at - 1];
+  const next = READING_ORDER[at + 1];
 
   return `
   <main class="ltp" data-ltp-active="${escapeHtml(tab.id)}">
@@ -966,7 +1020,7 @@ export function learnView(state: AppState): string {
         <header class="ltp-sec-head">
           <h2 class="ltp-sec-title" id="ltp-h-${tab.id}">${escapeHtml(tab.label)}</h2>
         </header>
-        ${SECTIONS[tab.id]!()}
+        ${SECTIONS[tab.id]!(sub)}
       </section>
       <nav class="ltp-pager" aria-label="Learn to Play pages">
         ${prev ? pagerBtn("prev", prev) : `<span class="ltp-pager-gap"></span>`}

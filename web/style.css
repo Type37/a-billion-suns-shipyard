@@ -721,14 +721,18 @@ button { font-family: inherit; }
 /* The one bit of showmanship on the site: on hover the row slides right, a
    blue panel sweeps in from the left behind the content (skewed, so it reads
    as motion not a fill), a red spine grows at the leading edge, and the whole
-   plate throws an offset drop-shadow. The clipped corner keeps it from looking
-   like a plain button. */
+   plate throws an offset drop-shadow.
+   
+   The corner used to be clipped - a 16px diagonal off the bottom right, on the
+   theory that it stopped the row looking like a plain button. It just made five
+   stacked rectangles that were not rectangles, which on a page whose entire
+   design is hard Swiss edges read as a mistake rather than a flourish. The
+   motion is the flourish; the plate is a plate. */
 .index-row {
   position: relative; isolation: isolate; overflow: hidden; width: 100%;
   display: grid; grid-template-columns: 1fr 36px; align-items: center; gap: 16px;
   padding: 15px 18px; border: 1px solid var(--hair); color: var(--ink); background: var(--paper);
   font-family: inherit; text-align: left; cursor: pointer;
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%);
   transition: transform 0.16s var(--ease), filter 0.16s ease, border-color 0.16s;
 }
 .index-row::before {

@@ -60,40 +60,6 @@ function cmdGainDiagram(): string {
 }
 
 /**
- * Spending one: a token leaves your pool, the Command fires, the token is gone.
- *
- * The rule this has to carry is the last line of the section - "when a CMD
- * token is spent, discard it" - because that is the bit people forget. So the
- * pool visibly goes from three to two and the spent one does not come back.
- */
-function cmdSpendDiagram(): string {
-  const token = (i: number, x: number) => `
-    <g transform="translate(${x} 62)">
-      <g class="dg-pool dg-pool-${i}">
-        <circle r="13"/>
-        <path class="dg-token-mark" d="M-5 0 L0 -6 L5 0 L0 6 Z"/>
-      </g>
-    </g>`;
-  return `
-  <svg class="learn-dg" viewBox="0 0 320 126" role="img"
-       aria-label="Spending a CMD token: one leaves your pool to invoke a Command, and is then discarded. It does not come back.">
-    <rect class="dg-tray" x="20" y="34" width="118" height="56" rx="3"/>
-    ${LABEL(79, 106, "Your pool", "dg-measure-text")}
-    ${token(1, 50)}${token(2, 79)}${token(3, 108)}
-    <!-- The travelling token: position outside, motion inside. -->
-    <g transform="translate(108 62)"><g class="dg-spend">
-      <circle class="dg-spend-face" r="13"/>
-      <path class="dg-token-mark" d="M-5 0 L0 -6 L5 0 L0 6 Z"/>
-    </g></g>
-    <g transform="translate(238 62)">
-      <rect class="dg-cmd-slot" x="-56" y="-22" width="112" height="44" rx="2"/>
-      <g class="dg-cmd-fire"><text class="dg-cmd-word" x="0" y="5">COMMAND</text></g>
-    </g>
-    ${LABEL(238, 106, "Spent, then discarded", "dg-measure-text")}
-  </svg>`;
-}
-
-/**
  * The Initiative Check: roll low.
  *
  * Every die is drawn with its face value, because "each roll of a 2 or 3 counts
@@ -135,32 +101,43 @@ function initiativeDiagram(): string {
  * settles, and the tray is visibly one token shorter for the rest of the loop.
  */
 function jumpPointDiagram(): string {
-  const supply = (i: number, x: number) =>
-    `<g transform="translate(${x} 96)"><g class="dg-jp-stock dg-jp-stock-${i}">
-       <circle class="dg-jp-core" r="8"/></g></g>`;
   return `
-  <svg class="learn-dg" viewBox="0 0 320 150" role="img"
-       aria-label="Opening a Jump Point: take a token from your supply and place it into play, anywhere you like.">
+  <svg class="learn-dg" viewBox="0 0 320 178" role="img"
+       aria-label="Opening a Jump Point: take a token from your supply and place it into play, anywhere you like on any table, as long as it is more than nine inches from a planetoid.">
     ${LABEL(160, 16, "Open a Jump Point", "dg-title")}
-    <rect class="dg-tray" x="16" y="72" width="86" height="48" rx="3"/>
-    ${LABEL(59, 136, "Your supply", "dg-measure-text")}
-    ${supply(1, 36)}${supply(2, 59)}${supply(3, 82)}
-    <!-- The travelling token. Position on the outer group, motion on the inner
-         one: a CSS transform would otherwise wipe out the transform attribute
-         and drop it on the SVG origin (see the note at the top of this file). -->
-    <g transform="translate(82 96)"><g class="dg-jp-fly">
-      <circle class="dg-jp-core" r="8"/>
+
+    <!-- The 9" gravity well, drawn to the same scale as everything else (one
+         unit = 4px, so 9" is 36px against a 1" token). It is here because
+         "anywhere you like" is only true outside it, and the two halves of that
+         rule are printed a paragraph apart in the book - a reader can easily
+         take the first half and place a point on top of a planet. -->
+    <circle class="dg-well" cx="72" cy="96" r="36"/>
+    <circle class="dg-planet" cx="72" cy="96" r="15"/>
+    <g class="dg-measure" transform="translate(72 96)">
+      <line x1="0" y1="0" x2="36" y2="0"/>
+      ${LABEL(18, -5, '9"', "dg-measure-text")}
+    </g>
+    ${LABEL(72, 152, "Planetoid", "dg-measure-text")}
+    <g class="dg-no"><g transform="translate(96 70)">
+      <circle class="dg-no-ring" r="11"/>
+      <line class="dg-no-bar" x1="-7" y1="7" x2="7" y2="-7"/>
     </g></g>
-    <!-- Position on the outer group, animation class on the inner one. This had
-         both on one element and the keyframes settle on scale(1), an identity
-         matrix, which a CSS transform applies OVER the transform attribute -
-         so the landed point was drawn at the SVG origin and clipped away by the
-         top-left corner. Same trap as the note at the top of this file. -->
-    <g transform="translate(232 96)"><g class="dg-jp-landed">
+
+    <!-- Where it CAN go: anywhere outside the well, including a different
+         table. The dashed edge is the sector boundary. -->
+    <line class="dg-sector-edge" x1="196" y1="40" x2="196" y2="152"/>
+    ${LABEL(258, 40, "Any table", "dg-measure-text")}
+    <!-- No dg-jp-landed here. That class animates transform, and this element
+         carries a transform ATTRIBUTE - the collision documented at the top of
+         this file, which drops the element on the SVG origin. It also has
+         nothing to animate into any more: the token no longer flies in from a
+         supply tray, because this diagram is about WHERE a point may go, not
+         about the journey. The ring keeps pulsing on its own. -->
+    <g transform="translate(252 96)">
       <circle class="dg-jp-core" r="9"/>
       <circle class="dg-jp-ring" r="9"/>
-    </g></g>
-    ${LABEL(232, 132, "Anywhere you like", "dg-measure-text")}
+    </g>
+    ${LABEL(252, 152, "Anywhere out here", "dg-measure-text")}
   </svg>`;
 }
 
@@ -174,23 +151,33 @@ function jumpPointDiagram(): string {
  * phase", and the phase ends when the last seat has gone quiet.
  */
 function passDiagram(): string {
+  // Four seats on a 52px ring at 12, 3, 6 and 9 o'clock. Written out rather
+  // than computed so the keyframes below can name the same coordinates.
+  const seats: [number, number][] = [
+    [160, 44],
+    [212, 96],
+    [160, 148],
+    [108, 96],
+  ];
   const seat = (i: number, x: number, y: number) => `
     <g transform="translate(${x} ${y})">
-      <g class="dg-seat dg-seat-${i}">
-        <circle r="15"/>
-        <text class="dg-seat-l" y="4">P${i}</text>
+      <g class="dg-seat dg-seat-${i + 1}">
+        <circle r="16"/>
+        <text class="dg-seat-l" y="4">P${i + 1}</text>
       </g>
     </g>`;
   return `
-  <svg class="learn-dg" viewBox="0 0 320 170" role="img"
-       aria-label="Passing: you take no further turns this Jump Phase, and play carries on clockwise without you. Once all players have passed, the phase ends.">
-    ${LABEL(160, 16, "Pass", "dg-title")}
-    <circle class="dg-turn-ring" cx="160" cy="92" r="52"/>
-    ${seat(1, 160, 40)}${seat(2, 212, 92)}${seat(3, 160, 144)}${seat(4, 108, 92)}
-    <g class="dg-turn-mark" transform="translate(160 92)">
-      <g class="dg-turn-dot"><circle r="6"/></g>
-    </g>
-    ${LABEL(160, 166, "Play carries on clockwise without you", "dg-measure-text")}
+  <svg class="learn-dg" viewBox="0 0 320 186" role="img"
+       aria-label="Passing: you take no further turns this Jump Phase. Play carries on clockwise without you, and when everyone has passed the phase ends.">
+    ${LABEL(160, 18, "Pass", "dg-title")}
+    <circle class="dg-turn-ring" cx="160" cy="96" r="52"/>
+    ${seats.map(([x, y], i) => seat(i, x, y)).join("")}
+    <!-- The marker hops seat to seat. Position on the outer group, motion on
+         the inner one, same as everything else in this file. -->
+    <g transform="translate(160 96)"><g class="dg-turn-mark">
+      <circle class="dg-turn-dot" r="7"/>
+    </g></g>
+    ${LABEL(160, 178, "P1 passes. Play carries on without them.", "dg-measure-text")}
   </svg>`;
 }
 
@@ -202,23 +189,39 @@ function passDiagram(): string {
  * suggested, and the radius carries its measurement.
  */
 function jumpInDiagram(): string {
+  // Three hulls in a wedge, every pair inside 6" of every other pair, because
+  // that is Unit Coherence and a picture of three ships scattered around a
+  // bubble says the opposite. The 6" coherence line is drawn between the two
+  // furthest apart, which is the pair the rule actually constrains.
+  // The bubble is 52px for 6", so one inch is 8.67px. Every pair below is
+  // inside 50px (5.7"), which is in coherence with a little room - the first
+  // version had the widest pair at 52px dead on the limit, and a picture of a
+  // legal formation should not be legal only by rounding.
+  const A: [number, number] = [138, 74];
+  const B: [number, number] = [186, 84];
+  const C: [number, number] = [156, 116];
   return `
-  <svg class="learn-dg" viewBox="0 0 320 170" role="img"
-       aria-label="Jumping in: deploy all the ships of one unit within six inches of a friendly jump point.">
+  <svg class="learn-dg" viewBox="0 0 320 186" role="img"
+       aria-label="Jumping in: deploy all the ships of one unit within six inches of a friendly jump point, and in coherence - every ship within six inches of every other ship in its unit.">
     ${LABEL(160, 16, "Jump In a unit", "dg-title")}
-    <circle class="dg-range dg-range-loop" cx="160" cy="95" r="52"/>
-    <g class="dg-jumppoint" transform="translate(160 95)">
+    <circle class="dg-range dg-range-loop" cx="160" cy="98" r="52"/>
+    <g class="dg-jumppoint" transform="translate(160 98)">
       <circle class="dg-jp-core" r="9"/>
       <circle class="dg-jp-ring" r="9"/>
     </g>
-    ${SHIP(122, 74, -20, "dg-ship dg-jin dg-jin-1")}
-    ${SHIP(196, 78, 25, "dg-ship dg-jin dg-jin-2")}
-    ${SHIP(160, 128, 0, "dg-ship dg-jin dg-jin-3")}
-    <g class="dg-measure dg-jin-measure" transform="translate(160 95)">
-      <line x1="0" y1="0" x2="52" y2="0"/>
-      <!-- Below the line, not above it: at -6 the label sat on the arriving ship
-           at (196,78). The space under the radius line is empty. -->
-      ${LABEL(26, 14, '6"', "dg-measure-text")}
+
+    <!-- The unit, in formation. -->
+    <g class="dg-coh dg-jin-measure">
+      <line x1="${A[0]}" y1="${A[1]}" x2="${B[0]}" y2="${B[1]}"/>
+      ${LABEL(162, 68, 'every pair within 6"', "dg-measure-text")}
+    </g>
+    ${SHIP(A[0], A[1], 12, "dg-ship dg-jin dg-jin-1")}
+    ${SHIP(B[0], B[1], 12, "dg-ship dg-jin dg-jin-2")}
+    ${SHIP(C[0], C[1], 12, "dg-ship dg-jin dg-jin-3")}
+
+    <g class="dg-measure dg-jin-measure" transform="translate(160 98)">
+      <line x1="0" y1="0" x2="-52" y2="0"/>
+      ${LABEL(-26, 14, '6" of the point', "dg-measure-text")}
     </g>
   </svg>`;
 }
@@ -425,29 +428,34 @@ function movementDiagram(): string {
  * a ship can physically reach, and the walkthrough never mentioned it.
  */
 function doubleMoveDiagram(): string {
-  const Y = 96, A = 52, B = 150, C = 250;
+  // Two legs at an angle, not one straight line broken in the middle.
+  //
+  // "Move twice during this movement step (pivoting and moving ahead both
+  // times)" is the rule, and the pivot is the half of it worth drawing: a ship
+  // that runs in a straight line for double its Thrust has only shown you the
+  // distance. The second leg turns, so the picture says you get a second PIVOT
+  // as well as a second move - which is what actually makes the Command worth
+  // a token.
+  const A: [number, number] = [40, 66];
+  const B: [number, number] = [148, 66];
+  const C: [number, number] = [238, 124];
   return `
-  <svg class="learn-dg" viewBox="0 0 320 150" role="img"
-       aria-label="Power to Engines: spend one CMD token at the start of the movement step to take that step twice - pivot and move, then pivot and move again.">
-    ${LABEL(160, 15, "Power to Engines — move twice", "dg-title")}
-    <line class="dg-straight" x1="${A}" y1="${Y}" x2="${B}" y2="${Y}"/>
-    <line class="dg-straight dg-straight-2" x1="${B}" y1="${Y}" x2="${C}" y2="${Y}"/>
-    <!-- Static transform = the animation's END frame (translate(250,96) in
-         dg-double-run), so the reduced-motion still-frame rests at the end of the
-         second move rather than collapsing onto the SVG origin. The running
-         animation overrides this attribute. -->
-    <g class="dg-dbl-mover" transform="translate(${C} ${Y})">${SHIP(0, 0, 90, "dg-ship")}</g>
-    <g class="dg-measure" transform="translate(${A} ${Y + 24})">
-      <line x1="0" y1="0" x2="${B - A}" y2="0"/>
-      <line x1="0" y1="-5" x2="0" y2="5"/>
-      <line x1="${B - A}" y1="-5" x2="${B - A}" y2="5"/>
-      ${LABEL((B - A) / 2, 16, "Thrust", "dg-measure-text")}
-    </g>
-    <g class="dg-measure" transform="translate(${B} ${Y + 24})">
-      <line x1="0" y1="0" x2="${C - B}" y2="0"/>
-      <line x1="${C - B}" y1="-5" x2="${C - B}" y2="5"/>
-      ${LABEL((C - B) / 2, 16, "Thrust again", "dg-measure-text")}
-    </g>
+  <svg class="learn-dg" viewBox="0 0 320 152" role="img"
+       aria-label="Power to Engines: spend one CMD token at the start of the movement step to take that step twice - pivot and move ahead, then pivot again and move ahead again.">
+    <line class="dg-straight" x1="${A[0]}" y1="${A[1]}" x2="${B[0]}" y2="${B[1]}"/>
+    <line class="dg-straight dg-straight-2" x1="${B[0]}" y1="${B[1]}" x2="${C[0]}" y2="${C[1]}"/>
+    <!-- The turn at the halfway point, marked so it reads as a decision rather
+         than as a kink in the line. -->
+    <path class="dg-turn-arc" d="M${B[0] + 22} ${B[1]} A22 22 0 0 1 ${B[0] + 15.6} ${B[1] + 15.6}"/>
+
+    <!-- Static transform = the animation's END frame, so the reduced-motion
+         still-frame rests at the end of the second leg rather than collapsing
+         onto the SVG origin. The running animation overrides this attribute. -->
+    <g class="dg-dbl-mover" transform="translate(${C[0]} ${C[1]}) rotate(33)">${SHIP(0, 0, 90, "dg-ship")}</g>
+
+    ${LABEL(94, 56, "1 · Thrust", "dg-measure-text")}
+    ${LABEL(216, 84, "2 · Thrust again", "dg-measure-text")}
+    ${LABEL(160, 146, "One CMD, one movement step, done twice", "dg-measure-text")}
   </svg>`;
 }
 
@@ -785,7 +793,6 @@ const DIAGRAMS: Record<string, () => string> = {
   "gravity-well": gravityWellDiagram,
   "jump-strain": jumpStrainDiagram,
   "cmd-gain": cmdGainDiagram,
-  "cmd-spend": cmdSpendDiagram,
   initiative: initiativeDiagram,
   "jump-point": jumpPointDiagram,
   "jump-in": jumpInDiagram,

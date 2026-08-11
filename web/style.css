@@ -4815,6 +4815,17 @@ a .icon,
 .learn-dg .dg-turn-arrow { fill: none; stroke: var(--blue); stroke-width: 2.4; }
 .learn-dg .dg-straight { stroke: var(--ink-3); stroke-width: 2; }
 .learn-dg .dg-straight-2 { stroke: var(--blue); }
+/* Opening a Jump Point: the 9" gravity well you cannot place inside, and the
+   sector boundary you are free to cross. */
+.learn-dg .dg-well { fill: var(--red-wash); stroke: var(--red); stroke-width: 1.2; stroke-dasharray: 4 4; }
+.learn-dg .dg-planet { fill: var(--ink-3); }
+.learn-dg .dg-no-ring { fill: none; stroke: var(--red-deep); stroke-width: 2.2; }
+.learn-dg .dg-no-bar { stroke: var(--red-deep); stroke-width: 2.2; }
+.learn-dg .dg-sector-edge { stroke: var(--hair-soft); stroke-width: 2; stroke-dasharray: 6 5; }
+/* Unit Coherence: the tie between the two ships furthest apart in a unit. */
+.learn-dg .dg-coh line { stroke: var(--blue); stroke-width: 1.2; stroke-dasharray: 3 3; }
+/* The pivot at the halfway point of a doubled move. */
+.learn-dg .dg-turn-arc { fill: none; stroke: var(--ink-3); stroke-width: 1.4; stroke-dasharray: 3 3; }
 .learn-dg .dg-arc-fill { fill: var(--blue); fill-opacity: 0.14; }
 .learn-dg .dg-arc-pri { fill: var(--red); fill-opacity: 0.16; }
 .learn-dg .dg-shot { stroke: var(--red); stroke-width: 2; stroke-linecap: round; }
@@ -4835,11 +4846,16 @@ a .icon,
   32%, 40% { transform: translate(62px, 92px) rotate(0deg); }
   88%, 100% { transform: translate(250px, 92px) rotate(0deg); }
 }
-/* Two full steps, with a beat between them so the second reads as a second. */
+/* Two full steps, with a beat between them so the second reads as a second -
+   and a PIVOT in that beat, because a second pivot is half of what the CMD
+   token buys and a ship running straight for double its Thrust does not show
+   it. Leg one runs flat, the ship turns 33 degrees on the spot at the halfway
+   mark, then leg two runs down the new heading. */
 @keyframes dg-double-run {
-  0%, 8% { transform: translate(52px, 96px) rotate(0deg); }
-  40%, 52% { transform: translate(150px, 96px) rotate(0deg); }
-  88%, 100% { transform: translate(250px, 96px) rotate(0deg); }
+  0%, 8%    { transform: translate(40px, 66px) rotate(0deg); }
+  38%       { transform: translate(148px, 66px) rotate(0deg); }
+  50%, 58%  { transform: translate(148px, 66px) rotate(33deg); }
+  90%, 100% { transform: translate(238px, 124px) rotate(33deg); }
 }
 @keyframes dg-fade-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes dg-fire { 0%, 40% { opacity: 0; stroke-dashoffset: 130; } 55% { opacity: 1; } 100% { opacity: 0.9; stroke-dashoffset: 0; } }
@@ -4867,23 +4883,8 @@ a .icon,
 .learn-dg .dg-shot { stroke-dasharray: 130; animation: dg-fire 1600ms ease-out infinite; }
 .learn-dg .dg-shot-2 { animation-delay: 260ms; }
 
-/* Opening a Jump Point. One 3.4s loop: a token leaves the supply tray, crosses
-   to its place and settles, and the third token in the tray stays gone for the
-   rest of the cycle so the supply visibly costs something. */
+/* The tray and the "one taken" fade are still used by the CMD-token diagram. */
 .learn-dg .dg-tray { fill: none; stroke: var(--hair-soft); stroke-width: 1.5; }
-.learn-dg .dg-jp-fly { animation: dg-jp-fly 3400ms var(--ease) infinite; }
-.learn-dg .dg-jp-landed { animation: dg-jp-land 3400ms var(--ease) infinite; transform-box: fill-box; transform-origin: center; }
-.learn-dg .dg-jp-stock-3 { animation: dg-jp-taken 3400ms steps(1, end) infinite; }
-@keyframes dg-jp-fly {
-  0%, 6%   { transform: translate(0, 0); opacity: 1; }
-  40%      { transform: translate(150px, 0); opacity: 1; }
-  44%, 100% { transform: translate(150px, 0); opacity: 0; }
-}
-@keyframes dg-jp-land {
-  0%, 40%   { opacity: 0; transform: scale(0.4); }
-  52%       { opacity: 1; transform: scale(1); }
-  100%      { opacity: 1; transform: scale(1); }
-}
 @keyframes dg-jp-taken { 0%, 5% { opacity: 1; } 6%, 100% { opacity: 0; } }
 
 /* --------------------------------------------------- the Command Phase trio */
@@ -4976,31 +4977,36 @@ a .icon,
   97%, 100% { opacity: 0; }
 }
 
-/* Passing. Play goes round the ring; P1 goes quiet a third of the way in and
-   the marker skips that seat for the rest of the loop. steps(1) on the marker,
-   because a turn hops from seat to seat - it does not glide between them. */
+/* Passing. Play goes round the ring, P1 goes quiet, and from then on the
+   marker skips that seat. steps(1) on the marker because a turn HOPS from seat
+   to seat - it does not glide between them, and a gliding dot reads as a ship
+   flying round in a circle.
+
+   The seat coordinates here have to match the ones passed to seat() in
+   passDiagram: 12, 3, 6 and 9 o'clock on a 52px ring, centre (160, 96). The
+   marker's transform is relative to that centre. */
 .learn-dg .dg-turn-ring { fill: none; stroke: var(--hair-soft); stroke-width: 1.5; stroke-dasharray: 3 5; }
 .learn-dg .dg-seat circle { fill: var(--paper); stroke: var(--blue); stroke-width: 1.8; }
-.learn-dg .dg-seat-l { font-family: var(--narrow); font-size: 10px; font-weight: 700; fill: var(--blue); text-anchor: middle; }
-.learn-dg .dg-turn-dot circle { fill: var(--red); }
-.learn-dg .dg-seat-1 { animation: dg-seat-pass 4400ms steps(1, end) infinite; }
-.learn-dg .dg-turn-mark { animation: dg-turn 4400ms steps(1, end) infinite; }
+.learn-dg .dg-seat-l { font-family: var(--narrow); font-size: 11px; font-weight: 700; fill: var(--blue); text-anchor: middle; }
+.learn-dg .dg-turn-dot { fill: var(--red); }
+.learn-dg .dg-seat-1 { animation: dg-seat-pass 5200ms steps(1, end) infinite; }
+.learn-dg .dg-turn-mark { animation: dg-turn 5200ms steps(1, end) infinite; }
+/* P1 is live for its own first turn, then passes and stays greyed for the rest
+   of the loop - because "you take no further turns during this Jump Phase" is
+   the whole rule, and a seat that dims and comes back says the opposite. */
 @keyframes dg-seat-pass {
-  0%, 24%   { opacity: 1; }
-  25%, 100% { opacity: 0.28; }
+  0%, 17%   { opacity: 1; }
+  18%, 100% { opacity: 0.25; }
 }
-/* Four seats at 12, 3, 6 and 9 o'clock on a 52px ring, then round again with
-   the top seat skipped: 3 o'clock, 6, 9, 3, 6, 9. */
+/* Six hops. P1, P2, P3, P4, then round again with P1 skipped: P2, P3, P4. */
 @keyframes dg-turn {
-  0%   { transform: translate(0, -52px); }
-  12%  { transform: translate(52px, 0); }
-  24%  { transform: translate(0, 52px); }
-  36%  { transform: translate(-52px, 0); }
-  48%  { transform: translate(52px, 0); }
-  60%  { transform: translate(0, 52px); }
-  72%  { transform: translate(-52px, 0); }
-  84%  { transform: translate(52px, 0); }
-  100% { transform: translate(0, 52px); }
+  0%    { transform: translate(0, -52px); }
+  17%   { transform: translate(52px, 0); }
+  34%   { transform: translate(0, 52px); }
+  51%   { transform: translate(-52px, 0); }
+  68%   { transform: translate(52px, 0); }
+  85%   { transform: translate(0, 52px); }
+  100%  { transform: translate(-52px, 0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -6223,35 +6229,39 @@ main.play-body .roster-section::before { content: none; }
   position: absolute; width: 1px; height: 1px; margin: -1px;
   clip-path: inset(50%); overflow: hidden; white-space: nowrap;
 }
+/* Three fat separated cards, not three cells of one strip. The strip version
+   read as a segmented control - three views of one thing - when the rule is
+   that these are three different turns and you take exactly one of them. Gap,
+   own border each, and the letter carried at size. */
 .ltp-pick-rail {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
-  background: var(--hair); border: 1px solid var(--hair);
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
 }
 .ltp-pick-tab {
-  display: flex; align-items: center; gap: 9px;
-  padding: 11px 13px; min-height: var(--tap);
+  display: flex; align-items: center; gap: 10px;
+  padding: 13px 14px; min-height: var(--tap);
   background: var(--paper); cursor: pointer;
+  border: 1px solid var(--hair); border-top: 3px solid var(--hair);
   font-family: var(--sans); font-weight: 700; font-size: 15.5px; color: var(--ink);
-  transition: background 120ms var(--ease), color 120ms var(--ease);
+  transition: background 120ms var(--ease), color 120ms var(--ease), border-color 120ms var(--ease);
 }
 .ltp-pick-tab:hover { background: var(--blue-wash); }
 .ltp-pick-k {
   flex: none;
   display: inline-flex; align-items: center; justify-content: center;
-  width: 24px; height: 24px;
-  font-family: var(--display); font-weight: 800; font-size: 13px;
+  width: 28px; height: 28px;
+  font-family: var(--display); font-weight: 800; font-size: 15px;
   color: var(--paper); background: var(--ink-3);
   transition: background 120ms var(--ease);
 }
 .ltp-pick-n { min-width: 0; }
-.ltp-pick-panel { display: none; padding-top: 14px; }
+.ltp-pick-panel { display: none; padding: 16px 0 0; }
 
 /* One pair of rules per option: the checked input lights its label and shows
    its panel. Three ids, written out, because a sibling selector cannot be
    parameterised. */
 #jt-a:checked ~ .ltp-pick-rail [for="jt-a"],
 #jt-b:checked ~ .ltp-pick-rail [for="jt-b"],
-#jt-c:checked ~ .ltp-pick-rail [for="jt-c"] { background: var(--blue); color: #fff; }
+#jt-c:checked ~ .ltp-pick-rail [for="jt-c"] { background: var(--blue); color: #fff; border-color: var(--blue); border-top-color: var(--red); }
 #jt-a:checked ~ .ltp-pick-rail [for="jt-a"] .ltp-pick-k,
 #jt-b:checked ~ .ltp-pick-rail [for="jt-b"] .ltp-pick-k,
 #jt-c:checked ~ .ltp-pick-rail [for="jt-c"] .ltp-pick-k { background: var(--red-deep); }
@@ -6434,6 +6444,51 @@ main.play-body .roster-section::before { content: none; }
   color: var(--paper); background: var(--blue); padding: 2px 5px;
 }
 .ltp-cmd-text { font-size: 15px; line-height: 1.52; color: var(--ink); margin: 0; }
+
+/* One Command dropped inline where that Command is the subject - Power to
+   Engines under Doubling your move. Same card, one column, tighter, so it reads
+   as a citation of the Command Phase page rather than a second list of them. */
+.ltp-cmds-inline { grid-template-columns: 1fr; margin-bottom: 12px; }
+.ltp-cmds-inline .ltp-cmd { padding: 9px 12px; }
+.ltp-cmds-inline .ltp-cmd-name { font-size: 15px; }
+.ltp-cmds-inline .ltp-cmd-text { font-size: 14.5px; }
+
+/* ------------------------------------------------------- lettered procedure
+   A, B, C for sequences where the ORDER is the rule. The Movement Step was
+   five paragraphs of equal weight, so "first pivot, then move ahead" - the
+   actual procedure - looked like just another note, and Inertial Strain sat at
+   the same level as the pivot it is a consequence of. */
+.ltp-steps {
+  list-style: none; margin: 0 0 14px; padding: 0;
+  display: flex; flex-direction: column; gap: 1px;
+  background: var(--hair-soft); border: 1px solid var(--hair-soft);
+}
+.ltp-step { display: flex; gap: 12px; padding: 11px 13px; background: var(--paper); }
+/* The letter is generated, not typed, so a step cannot be renumbered by hand
+   into disagreeing with its position. */
+.ltp-steps { counter-reset: ltp-step; }
+.ltp-step { counter-increment: ltp-step; }
+.ltp-step-k {
+  flex: none; align-self: flex-start;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px;
+  font-family: var(--display); font-weight: 800; font-size: 13px;
+  color: var(--paper); background: var(--blue);
+}
+.ltp-step-k::before { content: counter(ltp-step, upper-alpha); }
+.ltp-step-body { min-width: 0; }
+.ltp-step-name {
+  font-family: var(--sans); font-weight: 800; font-size: 16px; color: var(--ink);
+  margin: 2px 0 3px;
+}
+.ltp-step-text { font-size: 16px; line-height: 1.55; color: var(--ink); margin: 0; }
+.ltp-step-subs {
+  margin: 7px 0 0; padding-left: 18px;
+  font-size: 15px; line-height: 1.5; color: var(--ink-2);
+  border-left: 2px solid var(--red); padding: 2px 0 2px 12px; list-style: none;
+}
+.ltp-step-subs li + li { margin-top: 5px; }
+.ltp-step-subs b { color: var(--ink); }
 
 /* ------------------------------------------------------- miniature sources */
 /* The whole list lives behind one closed <details>: about forty links is the

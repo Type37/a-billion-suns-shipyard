@@ -105,6 +105,50 @@ const ul = (items: string[], cls = ""): string =>
 const ol = (items: string[]): string =>
   `<ol class="ltp-list ltp-list-num">${items.map((i) => `<li>${massGlyphs(i)}</li>`).join("")}</ol>`;
 
+/**
+ * A lettered procedure: A, B, C down the side, each step named, with optional
+ * riders indented under it.
+ *
+ * For sequences where the ORDER is the rule. The Movement Step was five
+ * paragraphs of equal weight, so "first pivot, then move ahead" - which is the
+ * whole procedure - read as just another note among the notes, and Inertial
+ * Strain (a consequence of how far you pivoted) sat at the same level as the
+ * pivot itself.
+ */
+const steps = (items: [string, string, string[]?][]): string => `
+  <ol class="ltp-steps">
+    ${items
+      .map(
+        ([name, text, subs]) => `
+      <li class="ltp-step">
+        <span class="ltp-step-k" aria-hidden="true"></span>
+        <div class="ltp-step-body">
+          <p class="ltp-step-name">${massGlyphs(name)}</p>
+          <p class="ltp-step-text">${massGlyphs(text)}</p>
+          ${subs?.length ? `<ul class="ltp-step-subs">${subs.map((x) => `<li>${massGlyphs(x)}</li>`).join("")}</ul>` : ""}
+        </div>
+      </li>`,
+      )
+      .join("")}
+  </ol>`;
+
+/**
+ * One Command, in the same card the Command Phase page uses, dropped inline
+ * wherever that Command is the thing being talked about.
+ *
+ * Power to Engines is explained on the Movement page and Requisition in the
+ * Jump Phase; both used to be a sentence of ours paraphrasing the card. Showing
+ * the card means the reader meets the same object in the same styling in both
+ * places, and the wording stays the book's.
+ */
+const cmdCard = (name: string, text: string): string => `
+  <div class="ltp-cmds ltp-cmds-inline">
+    <div class="ltp-cmd">
+      <p class="ltp-cmd-name">${icon("cmd-delta", 15, "ltp-cmd-ico")} ${escapeHtml(name)} <span class="ltp-cmd-cost">1 CMD</span></p>
+      <p class="ltp-cmd-text">${massGlyphs(text)}</p>
+    </div>
+  </div>`;
+
 // ---------------------------------------------------------------------------
 // 1. Pick an era
 // ---------------------------------------------------------------------------
@@ -474,7 +518,6 @@ function sectionCommand(): string {
     ${learnDiagram("cmd-gain")}
 
     ${h(3, "CMD tokens")}
-    ${learnDiagram("cmd-spend")}
     ${quote(
       // p.49, verbatim.
       `${p("To use a Command, spend the listed number of CMD tokens. Each Command says when it can be used, and how many CMD tokens are needed to use it. When a CMD token is spent, discard it.")}
@@ -605,16 +648,7 @@ function sectionJump(): string {
       // p.32, verbatim.
       `${p("A Jump Point is represented on the tabletop by a token approximately 1&rdquo; in diameter. You could use a gaming gem, a coin or a token. All measurements to and from jump points are from its centrepoint, so the exact size isn&rsquo;t important.")}
        ${p("The number of Jump Points you start the game with is determined by the era of play, and sometimes by the mission.")}`,
-    )}
-
-    ${h(3, "Leaving by jump")}
-    ${quote(
-      // p.33, verbatim.
-      `${p("<b>Jump Hop.</b> A unit can use the Jump Hop action during their activation to teleport between two sectors. If all the ships in this unit are within 6&rdquo; of a friendly Jump Point, take the Jump Hop action to remove all the ships in this unit from play and set them up within 6&rdquo; of a friendly Jump Point in another Sector.")}
-       ${p("Jump Hop is exclusively for Jumping between sectors. In a game with only a single Sector (such as Combat Training), the Jump Hop action is of no use.")}
-       ${p("<b>Jump Out.</b> A unit can use the Jump Out action during their activation to leave play and go into your Reserves area. When a unit Jumps Out into reserve, it keeps all its tokens, both game tokens and asset tokens. At the end of the game, asset tokens carried by ships in your reserves area will count towards revenue and victory conditions: they are safely returned to base.")}`,
-    )}
-`;
+    )}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -648,14 +682,15 @@ const TACTICAL_PAGES: Record<string, () => string> = {
     )}
 
     ${quote(
-      // p.34, verbatim.
-      `<p>When you Drag To Select a battlegroup:</p>
+      // p.31, verbatim - five steps, not p.34's three. See the note above.
+      `<p>When you Drag to Select a battlegroup:</p>
        ${ol([
          "Select a friendly unactivated unit to be the lead unit.",
-         "Select any number of other friendly unactivated units at least partially within 6&rdquo; of the lead unit. The combined mass of selected units must be 10 or less.",
-         "Activate the units in that battlegroup.",
-       ])}
-       ${p("After a unit activates, give it an &lsquo;Activated&rsquo; token. Once you have finished activating all the units in that battlegroup, the battlegroup is deselected, and you pass play to the next player clockwise.")}`,
+         "Select any number of other friendly unactivated units at least partially within 6&rdquo; of the lead unit. The Combined Mass of selected units must be 10 or less.",
+         "Activate the units in that Battlegroup.",
+         "After a unit activates, give it an &lsquo;Activated&rsquo; token. Once you have finished activating all the units in that battlegroup, the battlegroup is deselected, and you pass play to the next player clockwise.",
+         "Once all in-play units have activated, the Tactical Phase ends.",
+       ])}`,
     )}
     ${learnDiagram("drag-select")}
 
@@ -681,10 +716,21 @@ const TACTICAL_PAGES: Record<string, () => string> = {
     ${quote(
       // p.36, verbatim.
       `${p("When you move a unit, move each of the ships once, one at a time and in any order.")}
-       ${p("When you move a ship, first pivot it by any amount, and then move it straight ahead up to its Thrust value in inches. When measuring movement, remember to measure from the ship&rsquo;s Position (its flight peg).")}
-       ${p("<b>Pivot.</b> To pivot a ship: rotate the ship about its centrepoint by any amount, without changing its position.")}
-       ${p("<b>Inertial Strain.</b> If a ship pivots more than 90 degrees in a single pivot, it cannot attack with its primary weapon systems during this activation.")}
-       ${p("<b>Unit Cohesion.</b> After a unit jumps in, and at the end of its movement step, all the ships in the unit must be within 6&rdquo; of all other ships in that unit.")}`,
+       ${steps([
+         [
+           "Pivot",
+           "To pivot a ship: rotate the ship about its centrepoint by any amount, without changing its position.",
+           ["<b>Inertial Strain.</b> If a ship pivots more than 90 degrees in a single pivot, it cannot attack with its primary weapon systems during this activation."],
+         ],
+         [
+           "Move ahead",
+           "Move it straight ahead up to its Thrust value in inches. When measuring movement, remember to measure from the ship&rsquo;s Position (its flight peg).",
+         ],
+         [
+           "Check coherence",
+           "After a unit jumps in, and at the end of its movement step, all the ships in the unit must be within 6&rdquo; of all other ships in that unit.",
+         ],
+       ])}`,
     )}
     ${learnDiagram("movement")}
     ${quote(
@@ -694,7 +740,18 @@ const TACTICAL_PAGES: Record<string, () => string> = {
        ${p("<b>Table Edges.</b> If a ship moves into contact with the edge of a Sector, it immediately stops moving.")}
        ${p("<b>Overlapping Bases.</b> When moving, ships ignore other ships. Ships can end their movement in a position that results in the bases of two models overlapping, as long as the miniatures are stable in their final placement. No two ships can share the same position.")}`,
     )}
-    ${learnDiagram("double-move")}`,
+
+    ${h(4, "Doubling your move")}
+    ${cmdCard("Power to Engines", "At the start of a friendly unit&rsquo;s movement step, spend 1 CMD token to move twice during this movement step (pivoting and moving ahead both times).")}
+    ${learnDiagram("double-move")}
+
+    ${h(3, "Leaving by jump")}
+    ${quote(
+      // p.33, verbatim.
+      `${p("<b>Jump Hop.</b> A unit can use the Jump Hop action during their activation to teleport between two sectors. If all the ships in this unit are within 6&rdquo; of a friendly Jump Point, take the Jump Hop action to remove all the ships in this unit from play and set them up within 6&rdquo; of a friendly Jump Point in another Sector.")}
+       ${p("Jump Hop is exclusively for Jumping between sectors. In a game with only a single Sector (such as Combat Training), the Jump Hop action is of no use.")}
+       ${p("<b>Jump Out.</b> A unit can use the Jump Out action during their activation to leave play and go into your Reserves area. When a unit Jumps Out into reserve, it keeps all its tokens, both game tokens and asset tokens. At the end of the game, asset tokens carried by ships in your reserves area will count towards revenue and victory conditions: they are safely returned to base.")}`,
+    )}`,
   passive: () => `
     ${quote(
       // p.38, verbatim.

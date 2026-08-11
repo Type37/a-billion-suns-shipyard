@@ -2,7 +2,17 @@
 
 The **A Billion Suns 2e Shipyard**, a fleet builder for ABS 2E. Framework-free TypeScript SPA, deployed to GitHub Pages.
 
-**Naming (see README > Naming):** the product is the **Shipyard**; what you build is a **Fleet List** (Armageddon, Age of Unity) or a **Shipyard** (Hypergrowth); "fleet builder" is a category noun, lowercase, allowed only in `<meta name="description">`, `package.json`, and the README's opening line — never in on-screen copy. Code identifiers and comments (`builderView`, `.builder`, `MODE_BUILDER_SHAPE`, `view: "builder"`) keep "builder" as the shape-neutral internal word.
+**Naming.** Three words, three jobs. Kept apart on purpose. (This lived in the README until it was cut back to a README; it is a contributor convention, not something a visitor needs before the install instructions.)
+
+| Word | What it names | Where it belongs |
+| --- | --- | --- |
+| **Shipyard** | The product — *and*, in Hypergrowth, the game object it is named for: the stock of hulls you requisition from. | Wordmark, `<title>`, footer credit, the Hypergrowth build screen and everything about it. Always capitalised. |
+| **Fleet List** | What Armageddon and Age of Unity build: units and High-Value Personnel committed before the game, to a credits limit. The rulebook's term. | The build screen's title in those eras, the "Build a Fleet List" button, print and share copy. Capitalised as the rulebook does. |
+| **fleet** | The in-game force itself, and the app's section of saved ones. | "Fleets" nav and page, fleet cards, fleet names, fleet notes. Lowercase in prose, capitalised only as the section name. |
+
+**"fleet builder"** is the *category* the product sits in, not a name for the product or for any screen inside it. In copy a reader sees it is allowed in exactly three places, lowercase, where a stranger needs a familiar noun to know what this is: the `<meta name="description">` in `web/index.html`, the `description` in `package.json`, and the line under the title of the README. In on-screen copy it is a bug — a Hypergrowth session is not building a fleet at all, it is stocking a Shipyard, and no units exist until they are requisitioned mid-game.
+
+Code identifiers and comments are outside the rule: `builderView`, `.builder`, `view: "builder"`, `MODE_BUILDER_SHAPE` and the `abs-v2-builder` package key all use "builder" as the shape-neutral internal word for "the screen you build on", which is exactly what it has to mean when it covers both shapes.
 
 **Live version:** v0.20.0 (deployed to gh-pages). The per-mode builder redesign (Phases A–E) is **complete**, print setup is a real paginated preview, and the tutorial is split in two: `#/learn` (era + prep) and `#/rules` (the four phases).
 (Older v0.8.0 / v0.8.26 / v0.8.46 handoffs previously lived here; superseded by this file.)

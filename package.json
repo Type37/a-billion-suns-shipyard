@@ -1,6 +1,6 @@
 {
   "name": "abs-v2-builder",
-  "version": "0.22.1",
+  "version": "0.23.0",
   "private": true,
   "type": "module",
   "description": "A Billion Suns 2e Shipyard - a fleet builder for A Billion Suns, 2nd Edition. All three eras, twelve factions, live rules validation.",

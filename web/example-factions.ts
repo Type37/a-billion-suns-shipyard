@@ -220,16 +220,21 @@ const UNSC: Faction = reskin(GEN_OMEGA, {
     "Hits harder the worse it is going. Deliberately less top-heavy than the other two examples: one real capital, one cheap utility hull, and frigates doing the work.",
   backstory:
     "**A worked example.** This is Gen Ω (Armageddon, rules p.168-169) with new names on everything, so the numbers are the book's and stay balanced against the published factions. The faction rule keeps its printed name, \"Martyrs' Fury\".\n\n**On the roster.** Gen Ω fields only two Mass 3 hulls and one of them (here the Control Ship) is a cheap utility hull with no primary weapon at all. That makes this fleet noticeably less top-heavy than the Covenant or the Posthuman Republic, which is the trade for a rule that pays you for taking damage.\n\nThe personnel names are all invented and unreviewed — the least settled part of the example. Change any of them; that is what it is for.",
+  // Real UNSC classes off Halopedia rather than the bare nouns this used to
+  // carry ("Light Frigate", "Cruiser", "Carrier"), matched to the Mass of the
+  // Gen Omega hull each one is a reskin of: Mass 0 wings, Mass 1 corvette and
+  // prowler, Mass 2 frigates and a destroyer, Mass 3 cruiser and carrier.
+  // Halopedia's own names are the game's names, and they cost nothing to use.
   ships: [
-    ["warcry-fighter-wing", "Longsword Fighter Wing"],
+    ["warcry-fighter-wing", "Longsword Interceptor Wing"],
     ["eidolon-yynnx-stealth-bomber", "Sabre Wing"],
-    ["void-dancer-scout-marauder", "Gladius-class Corvette"],
-    ["halo-class-transport", "Prowler"],
-    ["werewolf-stealth-frigate", "Light Frigate"],
-    ["ghost-hunter-assault-frigate", "Heavy Frigate"],
-    ["torchbearer-heavy-destroyer", "Cruiser"],
-    ["matryoshka-class-factory-ship", "Control Ship"],
-    ["termina-class-colony-ship", "Carrier"],
+    ["void-dancer-scout-marauder", "Mako-class Corvette"],
+    ["halo-class-transport", "Winter-class Prowler"],
+    ["werewolf-stealth-frigate", "Stalwart-class Light Frigate"],
+    ["ghost-hunter-assault-frigate", "Paris-class Heavy Frigate"],
+    ["torchbearer-heavy-destroyer", "Halberd-class Destroyer"],
+    ["matryoshka-class-factory-ship", "Phoenix-class Support Vessel"],
+    ["termina-class-colony-ship", "Marathon-class Heavy Cruiser"],
   ],
   hvp: [
     ["eschatological-demagogue", "Overcharge Gunnery Chief"],

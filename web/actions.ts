@@ -4,6 +4,7 @@ import { MODE_BUILDER_SHAPE } from "../src/types.ts";
 import { JUNKSPACE_SHIPS, OUTFIT_MAX_SHIPS, recastAsOutfit, startingAlertLevel } from "../src/data/junkspace.ts";
 import { w } from "../src/data/_helpers.ts";
 import { randomFleetName } from "../src/fleet-names.ts";
+import { capitalShipName } from "../src/ship-names.ts";
 import { announce } from "./announce.ts";
 import { findFaction, isCustom } from "./catalog.ts";
 import { ERA_MODES, resolveShip } from "./render.ts";
@@ -983,7 +984,19 @@ function dispatchAction(target: HTMLElement): void {
               return { ...f, units: f.units.map((u, i) => (i === idx ? { ...u, count: u.count + 1 } : u)) };
             }
           }
-          return { ...f, units: [...f.units, { id: nextUnitIdFor(f), shipClassId: shipId, count: 1 }] };
+          // Mass 3 is the top of the scale and a fleet holds one or two, so
+          // they are the hulls people talk about afterwards. They get christened
+          // on the way in, from the unit's own id, so the name is stable and
+          // never re-rolls on an unrelated re-render. Everything smaller stays
+          // unnamed - naming nine corvettes is noise, and the roster already
+          // shows what they are.
+          const unitId = nextUnitIdFor(f);
+          const mass = resolveShip(shipId, faction, s.customFactions)?.ship.mass;
+          const named =
+            mass === 3
+              ? { name: capitalShipName(`${f.factionId}:${unitId}`, f.units.map((u) => u.name ?? "")) }
+              : {};
+          return { ...f, units: [...f.units, { id: unitId, shipClassId: shipId, count: 1, ...named }] };
         }),
       );
       break;

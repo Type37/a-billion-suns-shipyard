@@ -4882,6 +4882,64 @@ a .icon,
 }
 @keyframes dg-jp-taken { 0%, 5% { opacity: 1; } 6%, 100% { opacity: 0; } }
 
+/* --------------------------------------------------- the Command Phase trio */
+/* Gaining: five tokens land in a stagger and stay. */
+.learn-dg .dg-token circle { fill: var(--blue); }
+.learn-dg .dg-token-mark { fill: var(--paper); }
+.learn-dg .dg-token-5 { animation-delay: 1100ms; }
+
+/* Spending: one token leaves the pool, the Command fires, the token is gone
+   and the pool is visibly one shorter for the rest of the loop. */
+.learn-dg .dg-pool circle { fill: var(--blue); }
+.learn-dg .dg-pool-3 { animation: dg-jp-taken 3600ms steps(1, end) infinite; }
+.learn-dg .dg-spend-face { fill: var(--blue); }
+.learn-dg .dg-spend { animation: dg-spend 3600ms var(--ease) infinite; }
+.learn-dg .dg-cmd-slot { fill: none; stroke: var(--hair-soft); stroke-width: 1.5; stroke-dasharray: 4 4; }
+.learn-dg .dg-cmd-word {
+  font-family: var(--narrow); font-size: 13px; font-weight: 700;
+  fill: var(--blue); text-anchor: middle; letter-spacing: 0.08em;
+}
+.learn-dg .dg-cmd-fire { animation: dg-cmd-fire 3600ms var(--ease) infinite; }
+@keyframes dg-spend {
+  0%, 4%    { transform: translate(0, 0) scale(1); opacity: 1; }
+  36%       { transform: translate(118px, 0) scale(1); opacity: 1; }
+  44%       { transform: translate(130px, 0) scale(0.2); opacity: 0; }
+  100%      { transform: translate(130px, 0) scale(0.2); opacity: 0; }
+}
+@keyframes dg-cmd-fire {
+  0%, 38%   { opacity: 0.25; transform: scale(0.94); }
+  46%       { opacity: 1; transform: scale(1.06); }
+  56%, 92%  { opacity: 1; transform: scale(1); }
+  100%      { opacity: 0.25; transform: scale(0.94); }
+}
+.learn-dg .dg-cmd-fire { transform-box: fill-box; transform-origin: center; }
+
+/* Initiative: four dice land in a stagger, each showing its face. Colour is
+   the result - a 1 is the crit, 2 and 3 are hits, the 5 is nothing - and the
+   note under each one says the same thing in words. */
+.learn-dg .dg-die rect { fill: var(--paper); stroke: var(--ink); stroke-width: 1.8; }
+.learn-dg .dg-die.is-crit rect { stroke: var(--red-deep); stroke-width: 2.4; }
+.learn-dg .dg-die.is-hit rect { stroke: var(--blue); }
+.learn-dg .dg-die.is-miss rect { stroke: var(--ink-off); }
+.learn-dg .dg-die.is-crit .dg-pip { fill: var(--red-deep); }
+.learn-dg .dg-die.is-hit .dg-pip { fill: var(--blue); }
+.learn-dg .dg-die.is-miss .dg-pip { fill: var(--ink-off); }
+.learn-dg .dg-die-note { animation: dg-fade-in 400ms ease both; }
+.learn-dg .dg-die-note.dg-die-1 { animation-delay: 500ms; }
+.learn-dg .dg-die-note.dg-die-2 { animation-delay: 620ms; }
+.learn-dg .dg-die-note.dg-die-3 { animation-delay: 740ms; }
+.learn-dg .dg-die-note.dg-die-4 { animation-delay: 860ms; }
+
+/* ------------------------------------------------------- play on sight only
+   A diagram that ran on load had already finished by the time you scrolled to
+   it - and the ones inside the Jump Phase's A/B/C picker start display:none,
+   so they either never ran or held a dead end-frame. Everything is paused
+   until an IntersectionObserver marks the figure on screen (observeDiagrams in
+   main.ts), which also means a page of eight looping SVGs costs nothing while
+   you are reading the top of it. */
+.dg-gated .learn-dg, .dg-gated .learn-dg * { animation-play-state: paused; }
+.dg-gated .learn-dg.is-onscreen, .dg-gated .learn-dg.is-onscreen * { animation-play-state: running; }
+
 /* Jump In, on the same 3400ms loop as Open a Jump Point so the two panels of
    the A/B/C picker feel like one pair. Everything here is infinite on purpose:
    these diagrams live inside panels that start display:none, and a one-shot
@@ -6397,6 +6455,42 @@ main.play-body .roster-section::before { content: none; }
 @media (prefers-reduced-motion: reduce) { .ltp-src-chev { transition: none; } }
 .ltp-src-acc-body { padding: 4px 14px 14px; border-top: 1px solid var(--hair-soft); }
 .ltp-src-acc-body .ltp-h4:first-child { margin-top: 14px; }
+
+/* The same control, generalised. Everything on Getting Prepared that is a
+   shopping trip rather than a rule sits behind one of these, closed: the
+   reader asking "what do I need" gets a short answer, and the reader kitting
+   out for a campaign opens the lot. */
+.ltp-fold { border: 1px solid var(--hair); background: var(--paper); margin: 12px 0 16px; }
+.ltp-fold-head {
+  display: flex; align-items: center; gap: 10px;
+  min-height: var(--tap); padding: 11px 14px; cursor: pointer;
+  font-family: var(--sans); font-weight: 800; font-size: 15.5px; color: var(--ink);
+  list-style: none; user-select: none;
+}
+.ltp-fold-head::-webkit-details-marker { display: none; }
+.ltp-fold-head:hover { background: var(--blue-wash); }
+.ltp-fold-l { flex: 1 1 auto; min-width: 0; }
+.ltp-fold-n {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--ink-3); white-space: nowrap;
+}
+.ltp-fold-chev { flex: none; color: var(--ink-3); transition: transform 140ms var(--ease); }
+.ltp-fold[open] .ltp-fold-chev { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) { .ltp-fold-chev { transition: none; } }
+.ltp-fold-body { padding: 12px 14px 4px; border-top: 1px solid var(--hair-soft); }
+.ltp-fold-body > :last-child { margin-bottom: 12px; }
+/* "No really... multiple tables?" is the reader's own second thought, so it is
+   set in the same italic serif as the book's voice that answers it. */
+.ltp-fold-ask { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 17px; }
+
+/* A step number on a Core Command, so the six on screen match the six in the
+   book in the same order. */
+.ltp-cmd-n {
+  display: inline-flex; align-items: center; justify-content: center;
+  flex: none; width: 20px; height: 20px;
+  font-family: var(--display); font-weight: 800; font-size: 12px;
+  color: var(--paper); background: var(--blue);
+}
 
 /* --------------------------------------------------------------- the pager */
 /* One page per tab now, so each one ends with the way on to the next. Fixed

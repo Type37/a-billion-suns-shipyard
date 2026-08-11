@@ -33,29 +33,92 @@ const SHIP = (x: number, y: number, rot = 0, cls = "dg-ship", scale = 1) =>
 const LABEL = (x: number, y: number, text: string, cls = "dg-label") =>
   `<text class="${cls}" x="${x}" y="${y}">${text}</text>`;
 
-/** The Command Phase: initiative dice land, then CMD tokens stack up. */
-function commandDiagram(): string {
-  const die = (i: number, x: number) => `
-    <g transform="translate(${x} 44)">
-      <g class="dg-die dg-die-${i}">
-        <rect x="-13" y="-13" width="26" height="26" rx="4"/>
-        <circle class="dg-pip" cx="0" cy="0" r="2.6"/>
-      </g>
-    </g>`;
+/**
+ * Gaining CMD tokens: they arrive at the top of the round, and they are spent.
+ *
+ * This and initiativeDiagram used to be one picture with a "1 - Roll your
+ * Initiative" half and a "2 - Take your CMD tokens" half stacked in one box.
+ * The Command Phase page puts those two things under their own headings now,
+ * several screens apart, so one diagram could only ever sit under the wrong
+ * half of it.
+ */
+function cmdGainDiagram(): string {
   const token = (i: number, x: number) => `
-    <g transform="translate(${x} 112)">
+    <g transform="translate(${x} 66)">
       <g class="dg-token dg-token-${i}">
-        <circle r="11"/>
-        <path class="dg-token-mark" d="M-4.5 0 L0 -5 L4.5 0 L0 5 Z"/>
+        <circle r="14"/>
+        <path class="dg-token-mark" d="M-5.5 0 L0 -6.5 L5.5 0 L0 6.5 Z"/>
       </g>
     </g>`;
   return `
-  <svg class="learn-dg" viewBox="0 0 320 150" role="img"
-       aria-label="The Command Phase: roll your initiative dice, then take your command tokens for the round.">
-    ${LABEL(160, 16, "1 · Roll your Initiative", "dg-title")}
-    ${die(1, 110)}${die(2, 160)}${die(3, 210)}
-    ${LABEL(160, 82, "2 · Take your CMD tokens", "dg-title")}
-    ${token(1, 118)}${token(2, 146)}${token(3, 174)}${token(4, 202)}
+  <svg class="learn-dg" viewBox="0 0 320 116" role="img"
+       aria-label="Gaining CMD tokens: at the start of the round you take the number of command tokens your faction gives you.">
+    ${LABEL(160, 18, "Take your CMD tokens", "dg-title")}
+    ${token(1, 92)}${token(2, 128)}${token(3, 164)}${token(4, 200)}${token(5, 236)}
+    ${LABEL(160, 104, "Your faction says how many", "dg-measure-text")}
+  </svg>`;
+}
+
+/**
+ * Spending one: a token leaves your pool, the Command fires, the token is gone.
+ *
+ * The rule this has to carry is the last line of the section - "when a CMD
+ * token is spent, discard it" - because that is the bit people forget. So the
+ * pool visibly goes from three to two and the spent one does not come back.
+ */
+function cmdSpendDiagram(): string {
+  const token = (i: number, x: number) => `
+    <g transform="translate(${x} 62)">
+      <g class="dg-pool dg-pool-${i}">
+        <circle r="13"/>
+        <path class="dg-token-mark" d="M-5 0 L0 -6 L5 0 L0 6 Z"/>
+      </g>
+    </g>`;
+  return `
+  <svg class="learn-dg" viewBox="0 0 320 126" role="img"
+       aria-label="Spending a CMD token: one leaves your pool to invoke a Command, and is then discarded. It does not come back.">
+    <rect class="dg-tray" x="20" y="34" width="118" height="56" rx="3"/>
+    ${LABEL(79, 106, "Your pool", "dg-measure-text")}
+    ${token(1, 50)}${token(2, 79)}${token(3, 108)}
+    <!-- The travelling token: position outside, motion inside. -->
+    <g transform="translate(108 62)"><g class="dg-spend">
+      <circle class="dg-spend-face" r="13"/>
+      <path class="dg-token-mark" d="M-5 0 L0 -6 L5 0 L0 6 Z"/>
+    </g></g>
+    <g transform="translate(238 62)">
+      <rect class="dg-cmd-slot" x="-56" y="-22" width="112" height="44" rx="2"/>
+      <g class="dg-cmd-fire"><text class="dg-cmd-word" x="0" y="5">COMMAND</text></g>
+    </g>
+    ${LABEL(238, 106, "Spent, then discarded", "dg-measure-text")}
+  </svg>`;
+}
+
+/**
+ * The Initiative Check: roll low.
+ *
+ * Every die is drawn with its face value, because "each roll of a 2 or 3 counts
+ * as one success; each roll of a 1 counts as two successes" is a rule about
+ * numbers and a picture of blank dice cannot show it. Two hits, one double, one
+ * miss - which is also a legible score to put under it.
+ */
+function initiativeDiagram(): string {
+  const die = (i: number, x: number, pips: string, cls: string, note: string) => `
+    <g transform="translate(${x} 52)">
+      <g class="dg-die dg-die-${i} ${cls}">
+        <rect x="-17" y="-17" width="34" height="34" rx="5"/>
+        ${pips}
+      </g>
+    </g>
+    <g class="dg-die-note dg-die-${i}">${LABEL(x, 88, note, "dg-measure-text")}</g>`;
+  const pip = (x: number, y: number) => `<circle class="dg-pip" cx="${x}" cy="${y}" r="3"/>`;
+  return `
+  <svg class="learn-dg" viewBox="0 0 320 108" role="img"
+       aria-label="An Initiative Check: roll low. A 1 is two successes, a 2 or a 3 is one success, and anything higher is nothing.">
+    ${LABEL(160, 16, "Roll low", "dg-title")}
+    ${die(1, 66, pip(0, 0), "is-crit", "1 = two")}
+    ${die(2, 128, pip(-7, -7) + pip(7, 7), "is-hit", "2 = one")}
+    ${die(3, 190, pip(-7, -7) + pip(0, 0) + pip(7, 7), "is-hit", "3 = one")}
+    ${die(4, 252, pip(-7, -7) + pip(7, -7) + pip(-7, 7) + pip(7, 7) + pip(0, 0), "is-miss", "5 = nothing")}
   </svg>`;
 }
 
@@ -721,7 +784,9 @@ const DIAGRAMS: Record<string, () => string> = {
   deployment: deploymentMap,
   "gravity-well": gravityWellDiagram,
   "jump-strain": jumpStrainDiagram,
-  command: commandDiagram,
+  "cmd-gain": cmdGainDiagram,
+  "cmd-spend": cmdSpendDiagram,
+  initiative: initiativeDiagram,
   "jump-point": jumpPointDiagram,
   "jump-in": jumpInDiagram,
   pass: passDiagram,

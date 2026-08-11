@@ -180,6 +180,56 @@ function animateEraTitle(el: HTMLElement): void {
   );
 }
 
+/**
+ * Learn to Play's diagrams play only while you can see them.
+ *
+ * Every one is an infinite CSS loop, and they were all running from the moment
+ * the page painted: the one under the fold had been looping for a minute by the
+ * time you scrolled to it, and the ones inside the Jump Phase's A/B/C picker
+ * start `display: none`, so they either never ran or held a dead end-frame
+ * forever. The stylesheet pauses `.learn-dg *` and unpauses it on
+ * `.is-onscreen`; this is the only thing that sets that class.
+ *
+ * One observer for the life of the page, re-scanning after each paint for
+ * figures it has not seen. A `data-obs` flag keeps re-observation cheap, and an
+ * element the morph removes is dropped by the observer on its own.
+ */
+let diagramObserver: IntersectionObserver | null = null;
+function observeDiagrams(): void {
+  const figures = document.querySelectorAll<SVGElement>(".learn-dg");
+  if (!figures.length || typeof IntersectionObserver === "undefined") return;
+  if (!diagramObserver) {
+    // The stylesheet only pauses diagrams once this class is on the root, and
+    // only this line ever sets it. Fail-safe by construction: if
+    // IntersectionObserver is missing, or this function never runs because
+    // something above it threw, the pause rule never applies and every diagram
+    // plays as it always did. The alternative - pausing in CSS unconditionally
+    // and relying on JS to un-pause - turns any script failure into a page of
+    // frozen figures, which is worse than the problem being solved.
+    document.documentElement.classList.add("dg-gated");
+    diagramObserver = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) e.target.classList.toggle("is-onscreen", e.isIntersecting);
+      },
+      // A sliver is enough: these are wide and short, and waiting for a quarter
+      // of one meant a figure could be fully readable and still frozen.
+      { threshold: 0.08 },
+    );
+  }
+  // Disconnect and re-observe from scratch on EVERY paint rather than tracking
+  // which figures are new.
+  //
+  // `is-onscreen` lives in the class attribute, and render() emits a plain
+  // `class="learn-dg"` every time, so morphing the new HTML over the old strips
+  // the class off every figure on screen. IntersectionObserver will not put it
+  // back on its own: nothing has entered or left the viewport, so there is no
+  // change to report, and the figure stays frozen for the rest of the session.
+  // Re-observing forces a fresh initial callback for every figure, which is the
+  // one thing that reliably re-derives the truth after a repaint.
+  diagramObserver.disconnect();
+  for (const f of figures) diagramObserver.observe(f);
+}
+
 function animateOpenEraTitles(): void {
   for (const d of document.querySelectorAll<HTMLDetailsElement>(".ltp-era[open]")) {
     const el = d.querySelector<HTMLElement>(".ltp-era-title[data-anim-title]");
@@ -352,6 +402,7 @@ function paint(): void {
   revealSelectedSigil();
   syncLearnAnchor();
   animateOpenEraTitles();
+  observeDiagrams();
   syncLearnTarget();
 }
 

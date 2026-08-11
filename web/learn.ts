@@ -335,6 +335,24 @@ function sourceList(): string {
   </details>`;
 }
 
+/**
+ * A closed accordion with a plain summary line.
+ *
+ * The same control the spaceship-source list uses, generalised: everything on
+ * this page that is a shopping trip rather than a rule sits behind one of
+ * these, closed. Somebody reading "what do I need" wants a short answer;
+ * somebody kitting out for a campaign wants all of it.
+ */
+const fold = (label: string, body: string, note?: string): string => `
+  <details class="ltp-fold">
+    <summary class="ltp-fold-head">
+      <span class="ltp-fold-l">${label}</span>
+      ${note ? `<span class="ltp-fold-n">${escapeHtml(note)}</span>` : ""}
+      ${icon("chevronDown", 18, "ltp-fold-chev")}
+    </summary>
+    <div class="ltp-fold-body">${body}</div>
+  </details>`;
+
 function sectionPrepare(): string {
   return `
     ${h(3, "What you will need to play")}
@@ -365,42 +383,56 @@ function sectionPrepare(): string {
     ${quote(
       // p.29, verbatim.
       `${p("You will need one or more flat surfaces to play A Billion Suns across. This game is designed to be played across multiple tables at once, or with your gaming table divided into sections. These separate tables, or sections, are referred to as Sectors.")}
-       ${p("You always start with a single sector. Some missions may instruct you to add additional sectors.")}
-       ${p("When setting up a game, your mission may instruct you to &ldquo;Add 1 Sector&rdquo; or &ldquo;Set up 2 Sectors&rdquo;. Simply agree on another flat playable surface to count as the new sector or divide your current play area in two with tape or string to create the additional sector.")}
+       ${p("You always start with a single sector. Some missions may instruct you to add additional sectors.")}`,
+    )}
+
+    ${h(4, "Multiple tables?")}
+    ${quote(
+      // p.29, verbatim.
+      `${p("When setting up a game, your mission may instruct you to &ldquo;Add 1 Sector&rdquo; or &ldquo;Set up 2 Sectors&rdquo;. Simply agree on another flat playable surface to count as the new sector or divide your current play area in two with tape or string to create the additional sector.")}
        ${p("You don&rsquo;t have to divide your table up evenly, and sectors don&rsquo;t even have to be regular shapes. You could even use a nearby side table or counter-top as a sector. Sectors can be as small as 16&rdquo; by 16&rdquo; and still be playable. A Billion Suns is designed to be flexible to the size and shape of each play area &ndash; there is no &lsquo;standard&rsquo; size for any of the sectors. The game works perfectly on any size or shape of table.")}`,
     )}
-    ${cool(
-      // p.29, verbatim - the sidebar beside the Sectors rules.
-      `<p>It will seem weird at first, but playing with multiple opponents across multiple tables creates a joyously chaotic deep-space gaming experience. It is one of the unique elements of A Billion Suns and shouldn&rsquo;t be house-ruled out if you want to experience the game at its best, doubly-so if you are playing with 3 or 4 players.</p>
-       <p>It&rsquo;s not as difficult to set up multiple sectors as it might sound. You could play across the kitchen table, a kitchen counter and a flat-seated chair. You could take a normal wargaming table and use masking tape or string to split it up into halves or quarters. If you normally use a number of smaller boards to make up a larger gaming table, just pull the board sections apart an inch or so.</p>`,
-    )}
-
-    ${h(3, "When you&rsquo;re ready for bigger games")}
-    ${h(4, "Tokens")}
-    ${quote(
-      // p.12, verbatim.
-      `<p>You will need a selection of scavenged tokens, gaming gems or spare dice to represent the following:</p>
-       ${ul(["CMD tokens.", "Damage tokens.", "Jump points (you can also use small jump gate or navigation buoy miniatures for these).", "Activated tokens", "Easy Target tokens", "Assorted other tokens for the missions."])}
-       ${p("Missions sometimes need a variety of different token types. Don&rsquo;t stress about having a matching token design for every variety of token. You can just use different coloured gems, dice or tokens scavenged from other games. As long as everyone knows which tokens represent what during a particular game, you&rsquo;ll be fine.")}`,
-    )}
-
-    ${h(4, "Other miniatures")}
-    ${quote(
-      // p.13, verbatim.
-      `${p("As well as your fleets, the missions in this book require you to have a specific set of miniatures and terrain pieces in your collection. You can use miniatures for these, scratch-build them, or make flat tokens for them.")}
-       ${ul([
-         "1 Planetoid. A circular object between 4&rdquo;&ndash;8&rdquo; in diameter. (You may very occasionally need a second planetoid, although you can just re-roll the mission if you only have one planetoid.)",
-         "3 Facilities, which can be space stations, asteroid bases, weapons platforms or floating space ports.",
-         "5 Comsats, or other small nav-buoys, satellites or technological space junk.",
-         "5 Container Ships, which I recommend are numbered with some form of markings.",
-         "5 Asteroids, each a couple of inches across.",
-         "5 Space Kraken, or similar interstellar beasts.",
-       ])}
-       ${p("You might also choose to make terrain or tokens for the following, but they are not required")}
-       ${ul(["3 Gas Clouds", "3 Debris Fields"])}`,
+    ${fold(
+      // The summary is the reader's own second thought, in the same italic
+      // serif the book's voice is set in - because what is behind it IS the
+      // book's voice, answering exactly that.
+      `<em class="ltp-fold-ask">No really&hellip; multiple tables?</em>`,
+      cool(
+        // p.29, verbatim - the sidebar beside the Sectors rules.
+        `<p>It will seem weird at first, but playing with multiple opponents across multiple tables creates a joyously chaotic deep-space gaming experience. It is one of the unique elements of A Billion Suns and shouldn&rsquo;t be house-ruled out if you want to experience the game at its best, doubly-so if you are playing with 3 or 4 players.</p>
+         <p>It&rsquo;s not as difficult to set up multiple sectors as it might sound. You could play across the kitchen table, a kitchen counter and a flat-seated chair. You could take a normal wargaming table and use masking tape or string to split it up into halves or quarters. If you normally use a number of smaller boards to make up a larger gaming table, just pull the board sections apart an inch or so.</p>`,
+      ),
     )}
 
     ${sourceList()}
+
+    ${h(3, "When you&rsquo;re ready for bigger games")}
+    ${fold(
+      "Tokens",
+      quote(
+        // p.12, verbatim.
+        `<p>You will need a selection of scavenged tokens, gaming gems or spare dice to represent the following:</p>
+         ${ul(["CMD tokens.", "Damage tokens.", "Jump points (you can also use small jump gate or navigation buoy miniatures for these).", "Activated tokens", "Easy Target tokens", "Assorted other tokens for the missions."])}
+         ${p("Missions sometimes need a variety of different token types. Don&rsquo;t stress about having a matching token design for every variety of token. You can just use different coloured gems, dice or tokens scavenged from other games. As long as everyone knows which tokens represent what during a particular game, you&rsquo;ll be fine.")}`,
+      ),
+    )}
+    ${fold(
+      "Other minis &amp; terrain",
+      quote(
+        // p.13, verbatim.
+        `${p("As well as your fleets, the missions in this book require you to have a specific set of miniatures and terrain pieces in your collection. You can use miniatures for these, scratch-build them, or make flat tokens for them.")}
+         ${ul([
+           "1 Planetoid. A circular object between 4&rdquo;&ndash;8&rdquo; in diameter. (You may very occasionally need a second planetoid, although you can just re-roll the mission if you only have one planetoid.)",
+           "3 Facilities, which can be space stations, asteroid bases, weapons platforms or floating space ports.",
+           "5 Comsats, or other small nav-buoys, satellites or technological space junk.",
+           "5 Container Ships, which I recommend are numbered with some form of markings.",
+           "5 Asteroids, each a couple of inches across.",
+           "5 Space Kraken, or similar interstellar beasts.",
+         ])}
+         ${p("You might also choose to make terrain or tokens for the following, but they are not required")}
+         ${ul(["3 Gas Clouds", "3 Debris Fields"])}`,
+      ),
+    )}
 `;
 }
 
@@ -408,48 +440,42 @@ function sectionPrepare(): string {
 // 3. Initiative & Command
 // ---------------------------------------------------------------------------
 
-/** The six Core Commands, verbatim from p.50. */
+/**
+ * The six Core Commands, verbatim from p.50, IN THE BOOK'S ORDER and numbered
+ * to match. The order is not alphabetical and not by usefulness - it is the
+ * order they are printed in, so somebody holding the book can find the same one
+ * in the same place.
+ */
 const CORE_COMMANDS: [string, string][] = [
-  ["All Hands (1 CMD)", "After a friendly unit takes its first action in the Action Step, spend 1 CMD token to take a second (different) action with it."],
-  ["Executive Oversight (1 CMD)", "Re-roll one attack die, initiative die or saving throw."],
-  ["Power to Engines (1 CMD)", "At the start of a friendly unit&rsquo;s movement step, spend 1 CMD token to move twice during this movement step (pivoting and moving ahead both times)."],
+  ["All Hands", "After a friendly unit takes its first action in the Action Step, spend 1 CMD token to take a second (different) action with it."],
+  ["Executive Oversight", "Re-roll one attack die, initiative die or saving throw."],
+  ["Power to Engines", "At the start of a friendly unit&rsquo;s movement step, spend 1 CMD token to move twice during this movement step (pivoting and moving ahead both times)."],
   [
-    "Power to Weapons (1 CMD)",
+    "Power to Weapons",
     "Before rolling to attack with a friendly unit, spend 1 CMD token to subtract 1 from the result of each attack dice (to a minimum of 1), for the current Salvo. This increases the chance of critical hits but doesn&rsquo;t prevent duds.",
   ],
   [
-    "Power to Shields (1 CMD)",
+    "Power to Shields",
     "Before rolling Saving Throws with a friendly unit with a Shields value of 1 or more, spend 1 CMD token to add 1 to this unit&rsquo;s Shields value, for the current Salvo only.",
   ],
   [
-    "Red Alert (1 CMD)",
-    "When a friendly ship without an Activated token would be destroyed, spend 1 CMD token: it isn&rsquo;t destroyed, and regains 1HP instead. At the end of your next activation, if this ship is still in play, it is reduced to 0HP, and you cannot use Red Alert to save it.",
+    "Red Alert",
+    "When a friendly ship without an Activated token would be destroyed, spend 1 CMD token: it isn&rsquo;t destroyed, and regains 1HP instead. At the end of your next activation, if this ship is still in play, it is reduced to 0HP, and you cannot use Red Alert to save it. If a ship jumps out after using Red Alert, it isn&rsquo;t reduced to 0HP and is saved from destruction, but cannot return to play.",
   ],
 ];
 
 function sectionCommand(): string {
   return `
-    ${learnDiagram("command")}
-
     ${h(3, "Gain CMD tokens")}
     ${quote(
-      // p.30, verbatim.
-      p("You gain a number of CMD tokens determined by your faction (if you are using the Training Fleet, you gain 7 CMD tokens). Unspent CMD tokens are discarded at the end of the round."),
+      // p.30, verbatim, less the Training Fleet aside - that is a note about one
+      // scenario's fleet and this page is not about that fleet.
+      p("You gain a number of CMD tokens determined by your faction. Unspent CMD tokens are discarded at the end of the round."),
     )}
+    ${learnDiagram("cmd-gain")}
 
-    ${h(3, "Seize Initiative")}
-    ${quote(
-      // p.30, verbatim.
-      `${p("All players make an Initiative Check. Roll a number of D6 equal to your faction&rsquo;s Initiative value. Each roll of a 2 or 3 counts as one success; each roll of a 1 counts as two successes. (This is equivalent to rolling to hit against a unit with Silhouette 3, if that helps you remember this mechanic.)")}
-       ${p("The player that rolls the most successes wins the Initiative Check and chooses which player has the Initiative for this round. If two or more players are tied, the tied players sum their dice values: the player with the lowest sum wins the Initiative Check. If still tied, the tied player clockwise from the last player to have Initiative wins the Initiative Check.")}
-       ${p("The player(s) that didn&rsquo;t win the Initiative Check receive 1 additional CMD token each.")}`,
-    )}
-
-    ${h(3, "What CMD tokens are")}
-    ${cool(
-      // p.49, verbatim - the line that opens the Commands chapter.
-      `<p>Whether by well-rehearsed doctrine, cunning pre-planning or just barking orders through foam-flecked lips, the job of any commander is to expect and extract the very best from their fleet and their personnel.</p>`,
-    )}
+    ${h(3, "CMD tokens")}
+    ${learnDiagram("cmd-spend")}
     ${quote(
       // p.49, verbatim.
       `${p("To use a Command, spend the listed number of CMD tokens. Each Command says when it can be used, and how many CMD tokens are needed to use it. When a CMD token is spent, discard it.")}
@@ -457,15 +483,30 @@ function sectionCommand(): string {
     )}
 
     ${h(3, "The Core Commands")}
+    ${cool(
+      // p.49, verbatim - the line that opens the Commands chapter.
+      `<p>Whether by well-rehearsed doctrine, cunning pre-planning or just barking orders through foam-flecked lips, the job of any commander is to expect and extract the very best from their fleet and their personnel.</p>`,
+    )}
     <div class="ltp-cmds">
       ${CORE_COMMANDS.map(
-        ([name, text]) => `
+        ([name, text], i) => `
         <div class="ltp-cmd">
-          <p class="ltp-cmd-name">${icon("cmd-delta", 15, "ltp-cmd-ico")} ${escapeHtml(name.replace(/ \(1 CMD\)$/, ""))} <span class="ltp-cmd-cost">1 CMD</span></p>
+          <p class="ltp-cmd-name"><span class="ltp-cmd-n">${i + 1}</span> ${escapeHtml(name)} <span class="ltp-cmd-cost">1 CMD</span></p>
           <p class="ltp-cmd-text">${massGlyphs(text)}</p>
         </div>`,
       ).join("")}
-    </div>`;
+    </div>
+
+    ${h(3, "Initiative")}
+    <p class="ltp-p">At the start of each game round, all players roll for Initiative. (In ABS, you always want to roll low.)</p>
+    ${learnDiagram("initiative")}
+    ${quote(
+      // p.30, verbatim, less the parenthetical cross-reference to Silhouette 3 -
+      // that is a mnemonic for a rule the reader has not met yet.
+      `${p("All players make an Initiative Check. Roll a number of D6 equal to your faction&rsquo;s Initiative value. Each roll of a 2 or 3 counts as one success; each roll of a 1 counts as two successes.")}
+       ${p("The player that rolls the most successes wins the Initiative Check and chooses which player has the Initiative for this round. If two or more players are tied, the tied players sum their dice values: the player with the lowest sum wins the Initiative Check. If still tied, the tied player clockwise from the last player to have Initiative wins the Initiative Check.")}
+       ${p("The player(s) that didn&rsquo;t win the Initiative Check receive 1 additional CMD token each.")}`,
+    )}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -549,12 +590,6 @@ function turnPicker(): string {
 
 function sectionJump(): string {
   return `
-    ${cool(
-      // p.32, verbatim - the vignette that heads the Jumping chapter.
-      `<p>The glittering lights of the shanty station rolled into his viewport. He forced himself to relax his grip on the control stick. His hands felt numb. The last three jump hops had been much too close, and they&rsquo;d almost caught him. But he was beyond Corp space now; surely, they hadn&rsquo;t the balls to follow him here.</p>`,
-    )}
-
-    ${h(3, "Your fleet starts off-board")}
     ${quote(
       // p.30, verbatim.
       `${p("The units in your Fleet start the game in Reserve and must be jumped into the combat zone via jump point during the Jump Phase.")}

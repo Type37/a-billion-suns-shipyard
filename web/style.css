@@ -324,6 +324,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 /* Keyboard users land here first and can jump the masthead nav. Off-screen
    until focused, then a normal-looking control in the top-left. */
 .skip-link {
+  min-height: var(--tap); box-sizing: border-box; display: inline-flex; align-items: center;
   position: absolute; top: 0; left: 0; z-index: 100;
   transform: translateY(-120%);
   background: var(--paper); color: var(--color-ink);
@@ -415,10 +416,15 @@ button { font-family: inherit; }
   font-size: 12px;
   font-weight: 600;
   padding: 7px 10px;
-  border-color: var(--hair-soft);
+  /* NOT --hair-soft (1.43:1 on white). A ghost button has no fill and no
+     shadow, so its border is the whole of its affordance - the one case
+     1.4.11 is written for. --field-edge is 3.52:1. */
+  border-color: var(--field-edge);
 }
 .ghost-btn:hover { border-color: var(--ink); color: var(--ink); }
-.ghost-btn.danger { color: var(--red-deep); border-color: var(--red-wash); }
+/* The destructive pair: --red-wash was a 1.14:1 tint, i.e. an invisible
+   warning. --red is 3.6:1, which clears 1.4.11 and actually reads as red. */
+.ghost-btn.danger { color: var(--red-deep); border-color: var(--red); }
 .ghost-btn.danger:hover { background: var(--red); color: #fff; border-color: var(--red); }
 
 .add-btn {
@@ -829,7 +835,7 @@ button { font-family: inherit; }
 .card-act:focus-visible { outline: 2px solid var(--red); outline-offset: 1px; }
 /* The labelled Delete: auto width for the word, a red keyline at rest so the
    action reads as destructive before it is hovered or tapped. */
-.card-act-labeled { width: auto; gap: 6px; padding: 0 11px; border-color: var(--red-wash); color: var(--red-deep); }
+.card-act-labeled { width: auto; gap: 6px; padding: 0 11px; border-color: var(--red); color: var(--red-deep); }
 .card-act-text { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
 
 .fleets-empty { margin-top: 26px; font-family: var(--display); font-weight: 800; font-size: clamp(20px, 3vw, 26px); color: var(--ink); line-height: 1.25; }
@@ -873,7 +879,9 @@ button { font-family: inherit; }
 .faction-plaques { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
 .faction-plaque {
   text-align: left; cursor: pointer; background: var(--paper);
-  border: 1px solid var(--hair-soft); border-left: 3px solid var(--blue);
+  /* --field-edge, not --hair-soft: this is a button, and on white paper a
+     1.43:1 keyline is not a boundary anybody can see. */
+  border: 1px solid var(--field-edge); border-left: 3px solid var(--blue);
   padding: 9px 12px; display: flex; flex-direction: column; justify-content: center; gap: 2px;
   min-height: 54px;
   transition: border-color 0.12s ease, background 0.12s ease, transform 0.06s ease;
@@ -2191,6 +2199,17 @@ button { font-family: inherit; }
   float: right; display: inline-flex; align-items: center; gap: 5px; margin-right: 14px;
   font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
   color: #fff; background: none; border: 1px solid rgba(255,255,255,0.5); padding: 3px 8px; cursor: pointer;
+  /* WCAG 2.5.8 (AA) asks 24x24 of ANY pointer, not just a thumb - the app's own
+     44px rule is the touch standard on top of it and is gated on pointer:coarse.
+     3px of padding on a 10px line came to 21. */
+  min-height: 24px; box-sizing: border-box;
+}
+/* ...and back up to the thumb floor on touch. The general 44px rule for
+   .cg-build lives ~1600 lines above this, so it loses to the 24 set here;
+   re-asserting it next to the thing it applies to is the only version that
+   survives someone editing either rule. */
+@media (max-width: 760px), (pointer: coarse) {
+  .comp-group .cg-build { min-height: var(--tap); }
 }
 .comp-group .cg-build:hover { background: rgba(255,255,255,0.12); }
 .comp-table.grouped tbody td { border-top: 1px solid var(--hair-soft); }
@@ -2561,7 +2580,10 @@ button { font-family: inherit; }
   .nav-fold > .nav-fold-btn {
     display: inline-flex; align-items: center; gap: 8px; list-style: none; cursor: pointer;
     padding: 9px 13px; color: #fff; font-family: var(--sans); font-weight: 700; font-size: 12px;
-    text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid rgba(255, 255, 255, 0.32);
+    /* 0.55, not 0.32. Over the blue bar, white at 32%% is 2.36:1 - under the
+       3:1 that 1.4.11 asks of the only line identifying a control. 0.55 is
+       3.3:1 and still reads as a keyline rather than a filled button. */
+    text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid rgba(255, 255, 255, 0.55);
   }
   .nav-fold > .nav-fold-btn::-webkit-details-marker { display: none; }
   .nav-fold[open] > .nav-fold-btn { background: rgba(255, 255, 255, 0.16); }
@@ -6034,7 +6056,11 @@ main.play-body .roster-section::before { content: none; }
 .ltp-subtab {
   flex: 1 1 0; min-width: 0;
   display: flex; align-items: center; justify-content: center; gap: 7px;
-  padding: 9px 10px; min-height: 40px;
+  /* var(--tap), not 40. This shipped at 40 and the audit caught it. Setting it
+     here rather than in the coarse-pointer block near the top of the file is
+     deliberate: that block is authored ~1000 lines above this one, style.css is
+     unlayered, and a min-height declared up there loses to this rule. */
+  padding: 9px 10px; min-height: var(--tap);
   background: var(--paper); text-decoration: none;
   font-family: var(--sans); font-weight: 700; font-size: 14px; color: var(--ink-2);
   white-space: nowrap;
@@ -6044,11 +6070,11 @@ main.play-body .roster-section::before { content: none; }
 .ltp-subtab-n {
   flex: none;
   font-family: var(--display); font-weight: 800; font-size: 11px;
-  color: var(--paper); background: var(--ink-off);
+  color: var(--paper); background: var(--ink-3);
   min-width: 18px; height: 18px; line-height: 18px; text-align: center;
 }
 .ltp-subtab.on { background: var(--blue); color: #fff; }
-.ltp-subtab.on .ltp-subtab-n { background: var(--red); }
+.ltp-subtab.on .ltp-subtab-n { background: var(--red-deep); }
 /* The step's own heading, straight under the rail: no top rule, because the
    rail is already the divider. */
 .ltp-h3-step { margin-top: 0; padding-top: 0; border-top: 0; }
@@ -6152,7 +6178,7 @@ main.play-body .roster-section::before { content: none; }
   display: inline-flex; align-items: center; justify-content: center;
   width: 24px; height: 24px;
   font-family: var(--display); font-weight: 800; font-size: 13px;
-  color: var(--paper); background: var(--ink-off);
+  color: var(--paper); background: var(--ink-3);
   transition: background 120ms var(--ease);
 }
 .ltp-pick-n { min-width: 0; }
@@ -6166,7 +6192,7 @@ main.play-body .roster-section::before { content: none; }
 #jt-c:checked ~ .ltp-pick-rail [for="jt-c"] { background: var(--blue); color: #fff; }
 #jt-a:checked ~ .ltp-pick-rail [for="jt-a"] .ltp-pick-k,
 #jt-b:checked ~ .ltp-pick-rail [for="jt-b"] .ltp-pick-k,
-#jt-c:checked ~ .ltp-pick-rail [for="jt-c"] .ltp-pick-k { background: var(--red); }
+#jt-c:checked ~ .ltp-pick-rail [for="jt-c"] .ltp-pick-k { background: var(--red-deep); }
 #jt-a:checked ~ .ltp-pick-panel[data-k="a"],
 #jt-b:checked ~ .ltp-pick-panel[data-k="b"],
 #jt-c:checked ~ .ltp-pick-panel[data-k="c"] { display: block; }
@@ -6221,7 +6247,7 @@ main.play-body .roster-section::before { content: none; }
   font-family: var(--sans); font-size: 12.5px; font-weight: 700;
   letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-2);
 }
-.ltp-dot { color: var(--ink-off); }
+.ltp-dot { color: var(--ink-3); }
 .ltp-era-chev { flex: none; color: var(--blue); transition: transform 200ms var(--ease); }
 .ltp-era[open] .ltp-era-chev { transform: rotate(180deg); }
 .ltp-era-body { padding: 4px 14px 16px; border-top: 1px solid var(--hair-soft); }
@@ -6424,7 +6450,7 @@ main.play-body .roster-section::before { content: none; }
 .ltp-table { border-collapse: collapse; border: 1px solid var(--hair); font-size: 16px; }
 .ltp-table caption {
   text-align: left; font-family: var(--sans); font-size: 10.5px; font-weight: 800;
-  letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-off);
+  letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3);
   padding-bottom: 5px;
 }
 .ltp-table th, .ltp-table td {

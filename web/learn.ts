@@ -404,8 +404,6 @@ function sectionPrepare(): string {
       ),
     )}
 
-    ${sourceList()}
-
     ${h(3, "When you&rsquo;re ready for bigger games")}
     ${fold(
       "Tokens",
@@ -433,6 +431,7 @@ function sectionPrepare(): string {
          ${ul(["3 Gas Clouds", "3 Debris Fields"])}`,
       ),
     )}
+    ${sourceList()}
 `;
 }
 

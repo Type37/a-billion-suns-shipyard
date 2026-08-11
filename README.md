@@ -10,15 +10,17 @@ in the browser and your lists are stored locally.
 
 ## What's in it
 
-- **Three eras.** Armageddon and Age of Unity build a **Fleet List**;
-  Hypergrowth stocks a **Shipyard** you requisition from mid-game.
-- **Twelve factions**, transcribed from the book, plus a Foundry for your own.
-- **Rules validation** as you edit — budget, unit sizes, HVP counts and
-  assignment.
-- **Play Mode**, a printable roster, share links, and a bundled Quick Reference.
-- **Learn to Play** (`#/learn`) and **the Rules** (`#/rules`) — the core rules
-  quoted from the book, phase by phase.
-- **Solo play** — the Junkspace campaign.
+- Three eras: Armageddon, Age of Unity, Hypergrowth
+- Twelve factions, and a Foundry for your own
+- Rules validation
+- Play Mode
+- Printable roster
+- Share links
+- Fleet Sync
+- Learn to Play, and the Rules
+- Solo play: Junkspace
+- Ship Compendium
+- Quick Reference PDF
 
 ## Running locally
 

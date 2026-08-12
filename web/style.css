@@ -6084,6 +6084,33 @@ main.play-body .roster-section::before { content: none; }
   letter-spacing: -0.01em; margin: 0; color: var(--ink);
 }
 
+/* --------------------------------------------------------------- progress
+   How far through the guide you are, parked in the sticky header so it is on
+   screen for the whole read. It is in the header ROW, not a full-width line
+   under the tabs where a reading bar usually goes: that edge already carries
+   blue under the current tab and red under the other route's two pages, and a
+   third coloured line there read as a third kind of tab marker.
+   scaleX on a transform, not a width: this moves on every scroll frame, and
+   width animates on the layout thread while transform does not. */
+.ltp-prog {
+  margin-left: auto; flex: none;
+  display: flex; align-items: center; gap: 9px;
+  align-self: center;
+}
+.ltp-prog-track {
+  display: block; width: 132px; height: 5px;
+  background: var(--hair-soft); overflow: hidden;
+}
+.ltp-prog-fill {
+  display: block; width: 100%; height: 100%;
+  background: var(--red); transform-origin: 0 50%; transform: scaleX(0);
+}
+.ltp-prog-num {
+  font-family: var(--display); font-weight: 800; font-size: 12px;
+  letter-spacing: 0.04em; color: var(--ink-3); white-space: nowrap;
+}
+.ltp-prog-of { font-weight: 500; color: var(--ink-off); }
+
 /* -------------------------------------------------------------------- tabs */
 .ltp-tabs {
   display: flex; gap: 0;
@@ -6163,6 +6190,24 @@ main.play-body .roster-section::before { content: none; }
   font-family: var(--sans); font-size: 17px; line-height: 1.55; font-weight: 500;
   color: var(--ink-2); margin: 0 0 26px; max-width: 62ch;
 }
+/* The one-line summary sits tight to the scope note under it: they are one
+   thought - here is what it is, here is how far this guide takes you. */
+.ltp-pitch-2 { margin-bottom: 14px; }
+/* What this guide is and is not, said before anybody has spent time on it.
+   Bold, full ink, red rule down the side: it has to survive being skimmed past
+   on the way to the era cards, because somebody who reads all eight pages and
+   only then learns they still need the book has been wasted. Not a warning
+   colour - it is not an error, it is the honest scope of the thing. */
+.ltp-scope {
+  max-width: 62ch; margin: 0 0 26px; padding: 14px 0 14px 16px;
+  border-left: 3px solid var(--red);
+  font-family: var(--sans); font-size: 16px; line-height: 1.5; font-weight: 700;
+  color: var(--ink);
+}
+.ltp-scope p { margin: 0 0 10px; }
+.ltp-scope p:last-child { margin-bottom: 0; }
+.ltp-scope a { color: var(--blue); text-decoration: underline; text-underline-offset: 2px; }
+.ltp-scope a:hover { color: var(--red-deep); }
 .ltp-sec-head { margin-bottom: 14px; }
 .ltp-sec-title {
   font-family: var(--display); font-weight: 800; font-size: 34px; line-height: 1.1;
@@ -6220,7 +6265,9 @@ main.play-body .roster-section::before { content: none; }
    A checked radio also brings keyboard arrow-key switching with it, which a row
    of buttons would have to reimplement. The inputs are rendered before both the
    rail and the panels so `~` can reach either of them. */
-.ltp-pick { margin: 0 0 18px; }
+/* Negative top margin: the fork's stem has to look like it hangs off the last
+   line of the quote above, not float in the gap under it. */
+.ltp-pick { margin: -6px 0 18px; }
 /* The standard visually-hidden recipe, NOT opacity:0 - a 1px transparent radio
    still gets its native control painted by some engines, which showed up as a
    blue speck under the left end of the rail. clip-path removes it from paint
@@ -6229,6 +6276,35 @@ main.play-body .roster-section::before { content: none; }
   position: absolute; width: 1px; height: 1px; margin: -1px;
   clip-path: inset(50%); overflow: hidden; white-space: nowrap;
 }
+/* The fork: one stem down out of the sentence above, one arm across, one drop
+   into each card. Three cards in a row still read as three steps you work
+   through; the fork is the mark you would draw on paper for "exactly one of
+   these", and it costs three empty elements and no script.
+   --fork-gap must track the rail's gap - the arm has to stop dead over the
+   centre of the first and last card, and with a gap between equal columns that
+   centre is (100% - 2*gap)/6 in from each end. */
+.ltp-pick-fork {
+  --fork-gap: 10px;
+  position: relative; height: 30px;
+}
+.ltp-pick-stem {
+  position: absolute; top: 0; left: 50%; margin-left: -1px;
+  width: 2px; height: 14px; background: var(--hair);
+}
+.ltp-pick-arm {
+  position: absolute; top: 12px; height: 2px; background: var(--hair);
+  left: calc((100% - 2 * var(--fork-gap)) / 6);
+  right: calc((100% - 2 * var(--fork-gap)) / 6);
+}
+.ltp-pick-drops {
+  position: absolute; top: 12px; bottom: 0; left: 0; right: 0;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--fork-gap);
+}
+.ltp-pick-drop {
+  justify-self: center; width: 2px; background: var(--hair);
+  transition: background 120ms var(--ease);
+}
+
 /* Three fat separated cards, not three cells of one strip. The strip version
    read as a segmented control - three views of one thing - when the rule is
    that these are three different turns and you take exactly one of them. Gap,
@@ -6265,6 +6341,11 @@ main.play-body .roster-section::before { content: none; }
 #jt-a:checked ~ .ltp-pick-rail [for="jt-a"] .ltp-pick-k,
 #jt-b:checked ~ .ltp-pick-rail [for="jt-b"] .ltp-pick-k,
 #jt-c:checked ~ .ltp-pick-rail [for="jt-c"] .ltp-pick-k { background: var(--red-deep); }
+/* The drop into the card you are reading takes the same red as that card's top
+   edge, so the fork tracks the choice rather than sitting there as decoration. */
+#jt-a:checked ~ .ltp-pick-fork .ltp-pick-drop[data-k="a"],
+#jt-b:checked ~ .ltp-pick-fork .ltp-pick-drop[data-k="b"],
+#jt-c:checked ~ .ltp-pick-fork .ltp-pick-drop[data-k="c"] { background: var(--red); }
 #jt-a:checked ~ .ltp-pick-panel[data-k="a"],
 #jt-b:checked ~ .ltp-pick-panel[data-k="b"],
 #jt-c:checked ~ .ltp-pick-panel[data-k="c"] { display: block; }
@@ -6278,6 +6359,11 @@ main.play-body .roster-section::before { content: none; }
   /* Three labels of "Open a Jump Point" length do not fit across a phone. One
      per row, full width, letter still leading. */
   .ltp-pick-rail { grid-template-columns: 1fr; }
+  /* A stacked column has nothing to fan out to, so the fork keeps the stem -
+     the cards still hang off the sentence - and drops the arm and the drops
+     rather than drawing an arm across one card. */
+  .ltp-pick-fork { height: 14px; }
+  .ltp-pick-arm, .ltp-pick-drops { display: none; }
 }
 
 /* --------------------------------------------------------- why this is cool
@@ -6458,6 +6544,38 @@ main.play-body .roster-section::before { content: none; }
    five paragraphs of equal weight, so "first pivot, then move ahead" - the
    actual procedure - looked like just another note, and Inertial Strain sat at
    the same level as the pivot it is a consequence of. */
+/* ------------------------------------------------------------------- terms
+   The one block on these pages that is the app talking rather than the book
+   (see terms() in learn.ts for why it had to be). It is deliberately NOT set
+   like .ltp-quote: term in the display face at the head of each row, definition
+   in a size below the quoted rules, hairline grid around the lot. A reader who
+   has learnt that the plain serif-ish body copy is the rulebook must not have
+   to wonder whether this is too. */
+.ltp-terms {
+  margin: 0 0 18px; padding: 0;
+  border: 1px solid var(--hair-soft);
+  display: flex; flex-direction: column; gap: 1px; background: var(--hair-soft);
+}
+.ltp-term { display: flex; gap: 14px; padding: 10px 13px; background: var(--paper); }
+.ltp-term-k {
+  /* Wide enough for BATTLEGROUP, the longest of the three, with air after it:
+     a label that touches its own definition reads as one run-on line. */
+  flex: none; width: 122px;
+  font-family: var(--display); font-weight: 800; font-size: 13px;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--blue-deep);
+  padding-top: 2px;
+}
+.ltp-term-d {
+  margin: 0; min-width: 0;
+  font-family: var(--sans); font-size: 15.5px; line-height: 1.5; color: var(--ink-2);
+}
+@media (max-width: 560px) {
+  /* 122px of label beside 40 characters of definition is a column of two-word
+     lines on a phone. Stack instead. */
+  .ltp-term { flex-direction: column; gap: 3px; }
+  .ltp-term-k { width: auto; }
+}
+
 .ltp-steps {
   list-style: none; margin: 0 0 14px; padding: 0;
   display: flex; flex-direction: column; gap: 1px;
@@ -6682,6 +6800,9 @@ main.play-body .roster-section::before { content: none; }
 @media (max-width: 560px) {
   .ltp { padding-left: 14px; padding-right: 14px; }
   .ltp-head { margin: 0 -14px; padding: 0 14px; }
+  /* A phone header is the title and this; the trough gives up what it has to so
+     the count - the half you can actually read at a glance - always fits. */
+  .ltp-prog-track { width: 74px; }
   .ltp-sec-title { font-size: 28px; }
   .ltp-h3 { font-size: 20px; }
   .ltp-p, .ltp-list { font-size: 16.5px; }

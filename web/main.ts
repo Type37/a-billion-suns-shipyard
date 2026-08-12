@@ -99,12 +99,13 @@ let lastLearnTarget: string | null = null;
  * Start a newly-opened Learn page at the top.
  *
  * What used to be here was a scroll-spy: all six sections lived on one page, so
- * a scroll listener worked out which one owned the reading line, moved the tab
- * highlight, and drove a progress bar. None of that exists now - the active tab
- * is rendered by learnView, and there is no progress to report across a single
- * page. What is left is the one thing a page change still needs: if you were
- * halfway down Tactical and press Scoring, you should arrive at the top of
- * Scoring rather than halfway down it.
+ * a scroll listener worked out which one owned the reading line and moved the
+ * tab highlight. That is gone - the active tab is rendered by learnView from
+ * the route. What is left is the one thing a page change still needs: if you
+ * were halfway down Tactical and press Scoring, you should arrive at the top of
+ * Scoring rather than halfway down it. (The progress bar came back, but it does
+ * not need a spy: which page you are on is in the URL, and all the listener
+ * below has to add is how far down that one page you have got.)
  *
  * Nothing happens on an ordinary repaint, only when the tab in the URL actually
  * changes, or any state change on the page would yank the reader back up.
@@ -122,6 +123,42 @@ function syncLearnTarget(): void {
   // A deep link arriving cold is already at the top; only a tab press mid-read
   // has anywhere to travel from.
   if (!first) window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/**
+ * Drive the reading-progress bar in the Learn/rules header.
+ *
+ * The bar itself is rendered by progressBar() in learn.ts, already filled to
+ * the fraction of the guide the pages BEFORE this one account for. All that is
+ * left to do here is add how far down the current page the reader has scrolled,
+ * which is the only part of the number that is not in the URL.
+ *
+ * Runs from paint() as well as from the scroll listener, because morphing the
+ * header back to its rendered markup drops the transform this last wrote, and
+ * because a route change moves `at` without necessarily moving the scrollbar.
+ */
+function syncLearnProgress(): void {
+  const bar = document.querySelector<HTMLElement>("[data-ltp-prog]");
+  const fill = bar?.querySelector<HTMLElement>(".ltp-prog-fill");
+  if (!bar || !fill) return;
+  const at = Number(bar.dataset["at"] ?? 0);
+  const of = Math.max(1, Number(bar.dataset["of"] ?? 1));
+  const room = document.documentElement.scrollHeight - window.innerHeight;
+  // A page with nothing to scroll is a page you have finished reading. Counting
+  // it as 0 instead would park the bar on the previous boundary and make a
+  // short page look unread no matter what you did.
+  const down = room > 8 ? Math.min(1, Math.max(0, window.scrollY / room)) : 1;
+  fill.style.transform = `scaleX(${((at + down) / of).toFixed(4)})`;
+}
+
+/** One update per frame at most: this reads scrollHeight, which forces layout. */
+let progFrame = 0;
+function scheduleLearnProgress(): void {
+  if (progFrame) return;
+  progFrame = requestAnimationFrame(() => {
+    progFrame = 0;
+    syncLearnProgress();
+  });
 }
 
 /**
@@ -404,6 +441,9 @@ function paint(): void {
   animateOpenEraTitles();
   observeDiagrams();
   syncLearnTarget();
+  // Last: syncLearnTarget may have started a smooth scroll to the top of a new
+  // page, and the scroll listener will keep the bar honest on the way there.
+  syncLearnProgress();
 }
 
 // A share link carries the whole list (and any custom faction) in the hash. Import
@@ -1191,6 +1231,12 @@ window.addEventListener(
   },
   { passive: true, capture: true },
 );
+
+// The reading-progress bar. Resize as well as scroll: rotating a phone changes
+// both the viewport height and the page's own height, so the same scrollY is a
+// different fraction of the page afterwards.
+window.addEventListener("scroll", scheduleLearnProgress, { passive: true });
+window.addEventListener("resize", scheduleLearnProgress, { passive: true });
 
 // Opening an era accordion is a native <details> toggle: it changes nothing in
 // the store, so paint() never runs and the title would never animate. Captured,

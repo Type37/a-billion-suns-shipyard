@@ -27,8 +27,9 @@
 //      and fiction, NOT our summary of why a rule is clever. There is no page
 //      citation printed on screen; the reader knows what they are reading.
 //
-//   2. The era pitches on the first page, which are the author's own finished
-//      copy for this app, supplied as-is.
+//   2. The era pitches on the first page, and the note under them saying what
+//      this guide is and is not, which are the author's own finished copy for
+//      this app, supplied as-is - capitals and all.
 //
 // Do not add explanatory prose. Every line of "this is the interesting bit"
 // and "the short version is" got written into this file once and cut again,
@@ -52,6 +53,14 @@ export interface LearnTab {
   short: string;
   ico: string;
 }
+
+/**
+ * Where the book is sold. Named because it is now cited twice - once in the
+ * scope note at the top of the first page, once on the CTA at the end of the
+ * last - and a dead link in one of the two places would be worse than a dead
+ * link in both.
+ */
+const BUY_URL = "https://planetsmashergames.com/a-billion-suns/";
 
 /** Ids are URL surface: see LEARN_TAB_IDS / RULES_TAB_IDS in state.ts. */
 export const LEARN_TABS: LearnTab[] = [
@@ -104,6 +113,38 @@ const ul = (items: string[], cls = ""): string =>
 
 const ol = (items: string[]): string =>
   `<ol class="ltp-list ltp-list-num">${items.map((i) => `<li>${massGlyphs(i)}</li>`).join("")}</ol>`;
+
+/**
+ * A short glossary: the term, then what it means.
+ *
+ * THE ONE PLACE ON THESE PAGES THAT IS NOT THE BOOK TALKING, and it exists
+ * because of a hole the verbatim rule left. "Unit" and "ship" are the two most
+ * used nouns in the game and the rulebook never stops to define either - it
+ * defines them by use, over sixty pages, which works for somebody reading sixty
+ * pages and not for somebody reading eight. On these pages the two words were
+ * used ninety times before either was explained, and a reader who has not
+ * worked out that a unit is up to three ships cannot parse a single sentence of
+ * the Tactical Phase. So: three terms, said once, where the reader first meets
+ * all three in one sentence.
+ *
+ * Everything in it is drawn from rules that ARE quoted on these pages (unit
+ * coherence, one action per unit, the Mass 3 limit from fleet building, the
+ * battlegroup's lifetime) - it is a summary of the book, not an addition to it.
+ * Set apart from the quoted rules so the difference is visible: this is the app
+ * telling you what a word means, not the rulebook.
+ */
+const terms = (items: [string, string][]): string => `
+  <dl class="ltp-terms">
+    ${items
+      .map(
+        ([term, def]) => `
+      <div class="ltp-term">
+        <dt class="ltp-term-k">${massGlyphs(term)}</dt>
+        <dd class="ltp-term-d">${massGlyphs(def)}</dd>
+      </div>`,
+      )
+      .join("")}
+  </dl>`;
 
 /**
  * A lettered procedure: A, B, C down the side, each step named, with optional
@@ -564,6 +605,13 @@ function sectionCommand(): string {
  * "choose". Pressing A, B or C swaps the panel underneath, each with its own
  * animation, so the rules for a choice live inside the choice.
  *
+ * Three cards in a row still read as three things you might do in sequence, so
+ * a fork hangs off the sentence above them: one stem out of "you do one of the
+ * following", an arm across, and a drop into each card. It is the shape you
+ * would draw on paper to mean "exactly one of these", and the drop into the
+ * card you are reading turns red with that card's top edge, so the diagram
+ * tracks the choice instead of just decorating it.
+ *
  * Radios and CSS, no JavaScript and nothing in the store. Which option you are
  * looking at is not application state - nothing else on the page depends on it,
  * it should not survive a reload, and routing it through the store would mean a
@@ -616,6 +664,13 @@ function turnPicker(): string {
           `<input class="ltp-pick-radio" type="radio" name="jump-turn" id="jt-${o.k}" ${i === 0 ? "checked" : ""}>`,
       )
       .join("")}
+    <div class="ltp-pick-fork" aria-hidden="true">
+      <i class="ltp-pick-stem"></i>
+      <i class="ltp-pick-arm"></i>
+      <span class="ltp-pick-drops">
+        ${opts.map((o) => `<i class="ltp-pick-drop" data-k="${o.k}"></i>`).join("")}
+      </span>
+    </div>
     <div class="ltp-pick-rail">
       ${opts
         .map(
@@ -666,7 +721,7 @@ function sectionJump(): string {
  * one you come back to mid-game.
  */
 export const TACTICAL_SUBS: { id: string; label: string; short: string }[] = [
-  { id: "select", label: "Drag to Select", short: "Select" },
+  { id: "select", label: "Drag to Select a battlegroup", short: "Select" },
   { id: "move", label: "Movement Step", short: "Move" },
   { id: "passive", label: "Passive Attacks Step", short: "Passive" },
   { id: "action", label: "Action Step", short: "Act" },
@@ -681,11 +736,26 @@ const TACTICAL_PAGES: Record<string, () => string> = {
        ${p("On your turn, you Drag to Select a battlegroup and activate the units in that battlegroup.")}`,
     )}
 
+    ${terms([
+      [
+        "Ship",
+        "One miniature, with its own Mass, Thrust, HP, weapons and arcs of fire. Ships are what you move, and what takes damage.",
+      ],
+      [
+        "Unit",
+        "One to three ships, grouped when the fleet is built (or when they are requisitioned mid-game) and kept together from then on. A unit moves in one step, all of its ships take the same action, and at the end of its movement they must all be within 6&rdquo; of each other. A Mass 3 ship is always a unit of one.",
+      ],
+      [
+        "Battlegroup",
+        "The units you drag together for a single activation, to a Combined Mass of 10. <b>Battlegroups are temporary formations and only exist during that activation.</b>",
+      ],
+    ])}
+
     ${quote(
       // p.31, verbatim - five steps, not p.34's three. See the note above.
       `<p>When you Drag to Select a battlegroup:</p>
        ${ol([
-         "Select a friendly unactivated unit to be the lead unit.",
+         "Select a friendly unactivated unit to be the <i>lead unit.</i>",
          "Select any number of other friendly unactivated units at least partially within 6&rdquo; of the lead unit. The Combined Mass of selected units must be 10 or less.",
          "Activate the units in that Battlegroup.",
          "After a unit activates, give it an &lsquo;Activated&rsquo; token. Once you have finished activating all the units in that battlegroup, the battlegroup is deselected, and you pass play to the next player clockwise.",
@@ -970,7 +1040,7 @@ function sectionEnd(): string {
 
     ${h(3, "Get the rulebook")}
     <div class="ltp-cta">
-      <a class="ltp-btn ltp-btn-buy" href="https://planetsmashergames.com/a-billion-suns/" target="_blank" rel="noopener">${icon("book", 18)} Buy A Billion Suns 2E</a>
+      <a class="ltp-btn ltp-btn-buy" href="${BUY_URL}" target="_blank" rel="noopener">${icon("book", 18)} Buy A Billion Suns 2E</a>
       <a class="ltp-btn ltp-btn-alt" href="./ABS-2E-Quick-Reference.pdf" target="_blank" rel="noopener">${icon("scroll", 17)} Quick Reference (PDF)</a>
       <a class="ltp-btn ltp-btn-alt" href="#/fleets">${icon("fleets", 17)} Build a fleet</a>
     </div>
@@ -1060,12 +1130,62 @@ function tabStrip(active: string, place: "top" | "bottom"): string {
  * it alternates activations, and it does not care whose spaceships you own.
  * Only on the first page - the rest are arrived at by somebody already reading,
  * and repeating the pitch on each would be furniture.
+ *
+ * Then what this guide is and is not, before anybody has spent time on it. It
+ * teaches the basics and the flow so you can decide whether 2E is for you; it
+ * is not a substitute for the book, and somebody who reads all eight pages and
+ * then finds out they still cannot play has been wasted. Said here, in bold,
+ * rather than apologised for at the end. The caps are the author's.
  */
 const GAME_PITCH = `
   <p class="ltp-pitch">A Billion Suns is a tabletop science-fiction miniatures wargame of interstellar
   combat for 2&ndash;4 players. You command a fleet of mighty battleships, sleek destroyers and agile
   fighters, and battle for supremacy of the stars.</p>
-  <p class="ltp-pitch ltp-pitch-2">It is an alternating activations space wargame. It&rsquo;s miniature-agnostic.</p>`;
+  <p class="ltp-pitch ltp-pitch-2">It is an alternating activations space wargame. It&rsquo;s miniature-agnostic.</p>
+  <div class="ltp-scope">
+    <p>This guide will teach you the BASICS of the game and give you A SENSE OF THE FLOW.
+    It can help you understand IF YOU WANT TO GET INTO ABS2E.</p>
+    <p>You will need to buy the <a href="${BUY_URL}" target="_blank" rel="noopener">RULEBOOK</a>
+    to actually play a full game.</p>
+  </div>`;
+
+/**
+ * How far through the guide you are, in the header beside the title.
+ *
+ * Not a scrollbar for this page: the ten stops in READING_ORDER are one read,
+ * and the question somebody halfway down the Tactical Phase is asking is "how
+ * much of this is left", not "how much of page six is left". So the trough
+ * carries both - the pages behind you are already filled in, and the page you
+ * are on fills as you scroll it. Reaching the bottom of a page leaves the fill
+ * exactly on the next page's boundary, which is what makes pressing Next feel
+ * like it continues rather than restarts.
+ *
+ * It sits in the header row and not as a full-width line under the tab strip,
+ * where a reading bar normally goes, because that edge already carries two
+ * coloured rules that mean something else: blue under the tab you are on, red
+ * under the two pages belonging to the other route. A third line there was read
+ * as a third kind of tab marker rather than as progress. Boxed, and captioned
+ * with the count, it cannot be mistaken for either.
+ *
+ * The fill is rendered at the page's own starting fraction so a cold load shows
+ * the right amount before any script runs; syncLearnProgress in main.ts takes
+ * it from there. The caption counts stops, so the Tactical Phase's five steps
+ * are five of them - it is the same path the Previous/Next pager walks, and a
+ * count that disagreed with the buttons under it would be worse than no count.
+ * The bar itself is aria-hidden with no role="progressbar": a value that
+ * changes on every scroll frame is a screen reader talking over the page, and
+ * the caption already says the same thing in words that hold still.
+ */
+function progressBar(at: number, of: number): string {
+  const start = of > 0 ? at / of : 0;
+  return `
+  <div class="ltp-prog" data-ltp-prog data-at="${at}" data-of="${of}">
+    <span class="ltp-prog-track" aria-hidden="true">
+      <i class="ltp-prog-fill" style="transform: scaleX(${start.toFixed(4)})"></i>
+    </span>
+    <span class="ltp-prog-num">${at + 1} <span class="ltp-prog-of">of</span> ${of}</span>
+  </div>`;
+}
 
 const pagerBtn = (dir: "prev" | "next", t: Stop): string => `
   <a class="ltp-pager-btn ltp-pager-${dir}" href="${t.href}">
@@ -1102,6 +1222,7 @@ export function learnView(state: AppState): string {
         <div class="ltp-head-id">
           <p class="ltp-head-title">${root === "#/rules" ? "The rules" : "Learn to Play"}</p>
         </div>
+        ${progressBar(at, READING_ORDER.length)}
       </div>
       ${tabStrip(tab.id, "top")}
     </header>

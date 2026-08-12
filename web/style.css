@@ -4945,37 +4945,60 @@ a .icon,
 .dg-gated .learn-dg, .dg-gated .learn-dg * { animation-play-state: paused; }
 .dg-gated .learn-dg.is-onscreen, .dg-gated .learn-dg.is-onscreen * { animation-play-state: running; }
 
-/* Jump In, on the same 3400ms loop as Open a Jump Point so the two panels of
-   the A/B/C picker feel like one pair. Everything here is infinite on purpose:
-   these diagrams live inside panels that start display:none, and a one-shot
-   animation on a hidden element either never runs or runs once on first reveal
-   and then holds a dead end-frame for the rest of the session. */
-.learn-dg .dg-range-loop {
-  animation: dg-jin-range 3400ms var(--ease) infinite;
-  transform-box: fill-box; transform-origin: center;
-}
-.learn-dg .dg-jin { animation: dg-jin-pop 3400ms var(--ease) infinite; transform-box: fill-box; transform-origin: center; }
-.learn-dg .dg-jin-1 { animation-delay: 260ms; }
-.learn-dg .dg-jin-2 { animation-delay: 460ms; }
-.learn-dg .dg-jin-3 { animation-delay: 660ms; }
-.learn-dg .dg-jin-measure { animation: dg-jin-measure 3400ms ease infinite; }
-@keyframes dg-jin-range {
-  0%       { transform: scale(0.18); opacity: 0; }
-  9%       { transform: scale(1); opacity: 1; }
-  88%      { transform: scale(1); opacity: 1; }
-  97%, 100% { transform: scale(1); opacity: 0; }
-}
+/* Jump In. Infinite on purpose: this diagram lives inside a panel that starts
+   display:none, and a one-shot animation on a hidden element either never runs
+   or runs once on first reveal and then holds a dead end-frame for the rest of
+   the session.
+
+   ONLY THE SHIPS MOVE. Every part of this picture used to be on the loop - the
+   6" bubble scaled up from nothing, the measurements faded in, and then the
+   whole lot faded to zero and did it again every 3.4 seconds. Read next to a
+   paragraph of rules that is a strobe, not an illustration: the reader's eye is
+   pulled off the text four times a minute by a picture that has already told
+   them everything it knows. The table is furniture now and stays put; a unit
+   arrives on it, holds for four fifths of the cycle, and leaves.
+
+   6200ms, up from 3400: the hold is the part that carries the information, and
+   the longer it is the less the arrival reads as flicker. */
+.learn-dg .dg-jin { animation: dg-jin-pop 6200ms var(--ease) infinite; transform-box: fill-box; transform-origin: center; }
+/* Baked into the keyframes, not animation-delay: a delay on an INFINITE
+   animation offsets that element's whole loop, so the three hulls drift out of
+   step with each other within a few passes. Same reason dragSelectDiagram
+   staggers by percentage. */
+.learn-dg .dg-jin-2 { animation-name: dg-jin-pop-2; }
+.learn-dg .dg-jin-3 { animation-name: dg-jin-pop-3; }
+/* Arrive over ~6% of the cycle, hold from there to 88%, then go. The exit is
+   slower than the entrance (9% against 6%) because a unit that snaps out reads
+   as a mistake and one that fades reads as "and now the next one". */
 @keyframes dg-jin-pop {
-  0%, 6%   { transform: scale(0.5); opacity: 0; }
-  14%      { transform: scale(1); opacity: 1; }
-  88%      { transform: scale(1); opacity: 1; }
+  0%       { transform: scale(0.55); opacity: 0; }
+  6%, 88%  { transform: scale(1); opacity: 1; }
   97%, 100% { transform: scale(1); opacity: 0; }
 }
-@keyframes dg-jin-measure {
-  0%, 16%  { opacity: 0; }
-  24%, 88% { opacity: 1; }
+@keyframes dg-jin-pop-2 {
+  0%, 3%   { transform: scale(0.55); opacity: 0; }
+  9%, 88%  { transform: scale(1); opacity: 1; }
+  97%, 100% { transform: scale(1); opacity: 0; }
+}
+@keyframes dg-jin-pop-3 {
+  0%, 6%   { transform: scale(0.55); opacity: 0; }
+  12%, 88% { transform: scale(1); opacity: 1; }
+  97%, 100% { transform: scale(1); opacity: 0; }
+}
+/* The coherence tie belongs to the ships, so it comes and goes with them - but
+   only once all three are down, because a line between two hulls that have not
+   arrived is a line to nowhere. */
+.learn-dg .dg-jin-coh { animation: dg-jin-coh 6200ms ease infinite; }
+@keyframes dg-jin-coh {
+  0%, 12%  { opacity: 0; }
+  20%, 88% { opacity: 1; }
   97%, 100% { opacity: 0; }
 }
+/* The smaller jump point on that diagram needs its own pulse: dg-ring animates
+   the r attribute in absolute pixels from the r9 token, and run against an r6
+   core it starts the ring visibly outside the dot it is supposed to leave. */
+.learn-dg .dg-jp-sm .dg-jp-ring { animation-name: dg-ring-sm; }
+@keyframes dg-ring-sm { 0% { r: 6; opacity: 1; } 100% { r: 22; opacity: 0; } }
 
 /* Passing. Play goes round the ring, P1 goes quiet, and from then on the
    marker skips that seat. steps(1) on the marker because a turn HOPS from seat
@@ -5007,6 +5030,51 @@ a .icon,
   68%   { transform: translate(52px, 0); }
   85%   { transform: translate(0, 52px); }
   100%  { transform: translate(-52px, 0); }
+}
+
+/* ...and then it glitches, and starts again.
+
+   Every other diagram on these pages loops something that really does loop.
+   This one does not: a Jump Phase ends when the last player has passed, and it
+   does not then run again with P1 back in their seat, so a seamless repeat was
+   quietly asserting a rule that is the opposite of the one being illustrated.
+   Four hundred milliseconds of tearing at the seam is the smallest mark that
+   says "the picture is starting over" without a caption saying it.
+
+   Kept to the last 8% of the same 5200ms cycle, and kept SMALL - a few pixels
+   of offset and three scan bars. It has to read at a glance and then be over;
+   a diagram that shakes for a second is a diagram somebody turns off. */
+.learn-dg .dg-glitch { animation: dg-glitch 5200ms steps(1, end) infinite; }
+@keyframes dg-glitch {
+  0%, 92%     { transform: translate(0, 0); opacity: 1; }
+  92.5%       { transform: translate(-4px, 1px); opacity: 0.45; }
+  94%         { transform: translate(5px, -2px); opacity: 1; }
+  95.5%       { transform: translate(-2px, 2px); opacity: 0.3; }
+  97%         { transform: translate(3px, 0); opacity: 1; }
+  98.5%       { transform: translate(-1px, -1px); opacity: 0.7; }
+  99.5%, 100% { transform: translate(0, 0); opacity: 1; }
+}
+/* The tears themselves: three bars in the accent red, each flashing once at a
+   different height. Fill only, no stroke - a bordered rectangle reads as a box
+   somebody drew, and this has to read as the picture failing. */
+.learn-dg .dg-glitch-bar { fill: var(--red); }
+.learn-dg .dg-glitch-bar-1 { animation: dg-glitch-bar-1 5200ms steps(1, end) infinite; }
+.learn-dg .dg-glitch-bar-2 { animation: dg-glitch-bar-2 5200ms steps(1, end) infinite; }
+.learn-dg .dg-glitch-bar-3 { animation: dg-glitch-bar-3 5200ms steps(1, end) infinite; }
+@keyframes dg-glitch-bar-1 {
+  0%, 92%     { opacity: 0; transform: translateY(52px); }
+  92.5%       { opacity: 0.85; transform: translateY(52px); }
+  94%, 100%   { opacity: 0; transform: translateY(52px); }
+}
+@keyframes dg-glitch-bar-2 {
+  0%, 94.5%   { opacity: 0; transform: translateY(104px); }
+  95%         { opacity: 0.8; transform: translateY(104px); }
+  96.5%, 100% { opacity: 0; transform: translateY(104px); }
+}
+@keyframes dg-glitch-bar-3 {
+  0%, 97%     { opacity: 0; transform: translateY(140px); }
+  97.5%       { opacity: 0.7; transform: translateY(140px); }
+  99%, 100%   { opacity: 0; transform: translateY(140px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -6544,36 +6612,73 @@ main.play-body .roster-section::before { content: none; }
    five paragraphs of equal weight, so "first pivot, then move ahead" - the
    actual procedure - looked like just another note, and Inertial Strain sat at
    the same level as the pivot it is a consequence of. */
-/* ------------------------------------------------------------------- terms
-   The one block on these pages that is the app talking rather than the book
-   (see terms() in learn.ts for why it had to be). It is deliberately NOT set
-   like .ltp-quote: term in the display face at the head of each row, definition
-   in a size below the quoted rules, hairline grid around the lot. A reader who
-   has learnt that the plain serif-ish body copy is the rulebook must not have
-   to wonder whether this is too. */
-.ltp-terms {
-  margin: 0 0 18px; padding: 0;
-  border: 1px solid var(--hair-soft);
-  display: flex; flex-direction: column; gap: 1px; background: var(--hair-soft);
+/* ------------------------------------------------------- glossary on the word
+   Ship, unit and battlegroup: the app talking rather than the book (see
+   GLOSSARY in learn.ts for why it had to). These were a bordered <dl> at the
+   top of Drag to Select - three definitions in a wall, on one of six pages, so
+   anybody who arrived at the Movement Step from a link never met them. Now the
+   first mention of each on whatever page you are reading carries its own.
+
+   The underline is the app's existing promise that a word opens a popover (the
+   same one the rename fields make), dotted rather than solid so it cannot be
+   read as a link to somewhere else. */
+.ltp-gloss {
+  position: relative;
+  border-bottom: 1px dotted var(--blue);
+  cursor: help;
+  /* The word must not move, gain weight or change colour on hover: it is inside
+     a sentence of quoted rules, and a word that reflows drags the line under it
+     with it. Colour only, and only the underline. */
+  color: inherit;
 }
-.ltp-term { display: flex; gap: 14px; padding: 10px 13px; background: var(--paper); }
-.ltp-term-k {
-  /* Wide enough for BATTLEGROUP, the longest of the three, with air after it:
-     a label that touches its own definition reads as one run-on line. */
-  flex: none; width: 122px;
-  font-family: var(--display); font-weight: 800; font-size: 13px;
+.ltp-gloss:hover, .ltp-gloss:focus-visible { border-bottom-color: var(--red); outline: none; }
+.ltp-gloss:focus-visible { border-bottom-width: 2px; }
+.ltp-gloss-pop {
+  /* Absolute, always: opening one of these must not move a single word of the
+     paragraph it is in. The vertical offset clears the underline. */
+  position: absolute;
+  top: calc(100% + 9px);
+  /* --gloss-x is set by syncGlossPopovers() in main.ts when the popover is
+     about to show, and is the number of pixels it has to slide to stay inside
+     the viewport. 0 is the honest default and is correct for every term that is
+     not near a screen edge, so the popover is usable with scripting off. */
+  left: 50%;
+  transform: translateX(calc(-50% + var(--gloss-x, 0px)));
+  z-index: 40;
+  width: max-content;
+  max-width: min(330px, calc(100vw - 28px));
+  padding: 10px 13px 11px;
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.14);
+  /* display:none, and it has to be display.
+     visibility:hidden was tried first, so that main.ts could measure the box
+     before showing it, and it put a horizontal scrollbar on the whole document:
+     a hidden-by-visibility element is still LAID OUT, so three 330px popovers
+     hanging off words near the right-hand edge of the column stretched the
+     Action Step page's scrollWidth from 375 to 470 on a phone. Nothing on this
+     site scrolls sideways. The measurement still works because :hover and
+     :focus apply before the pointerover/focusin handler runs, so by the time
+     main.ts reaches for the box it is displayed - and that handler bails if it
+     ever measures a zero-width one. */
+  display: none;
+  cursor: auto;
+  text-align: left;
+}
+.ltp-gloss:hover .ltp-gloss-pop,
+.ltp-gloss:focus .ltp-gloss-pop,
+.ltp-gloss:focus-within .ltp-gloss-pop { display: block; }
+.ltp-gloss-k {
+  display: block; margin-bottom: 3px;
+  font-family: var(--display); font-weight: 800; font-size: 12px;
   letter-spacing: 0.06em; text-transform: uppercase; color: var(--blue-deep);
-  padding-top: 2px;
 }
-.ltp-term-d {
-  margin: 0; min-width: 0;
-  font-family: var(--sans); font-size: 15.5px; line-height: 1.5; color: var(--ink-2);
-}
-@media (max-width: 560px) {
-  /* 122px of label beside 40 characters of definition is a column of two-word
-     lines on a phone. Stack instead. */
-  .ltp-term { flex-direction: column; gap: 3px; }
-  .ltp-term-k { width: auto; }
+.ltp-gloss-d {
+  display: block;
+  font-family: var(--sans); font-size: 14.5px; line-height: 1.45; color: var(--ink-2);
+  /* Definitions run to forty words. They wrap and the box grows; nothing here
+     is ever clipped or trimmed to fit. */
+  white-space: normal;
 }
 
 .ltp-steps {

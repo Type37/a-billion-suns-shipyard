@@ -4145,7 +4145,6 @@ function learnClassicView(state: AppState): string {
 
            <h3 class="learn-sub">Opening a Jump Point</h3>
            <p class="learn-note">During the Jump Phase, you can use your turn to open a new Jump Point, if you have any remaining in your supply. Take a Jump Point from your supply, and place it into play, anywhere outside of 9" from a planetoid.</p>
-           <p class="learn-note"><b>Gravity Well:</b> Jump Points cannot be placed within 9" of a planetoid. Units cannot Jump into a position within 9" of a planetoid. A unit cannot Jump Hop or Jump Out if a ship in that unit is within 9" of a planetoid.</p>
 
            <h3 class="learn-sub">Leaving by jump</h3>
            <ul class="learn-rules">

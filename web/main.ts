@@ -218,6 +218,63 @@ function animateEraTitle(el: HTMLElement): void {
 }
 
 /**
+ * Keep a glossary popover inside the viewport.
+ *
+ * The popover is centred under its word, which is right for a word in the
+ * middle of a line and wrong for the first or last word on one: a 330px box
+ * centred on a word 30px from the right edge hangs 135px off the screen, and
+ * off-screen content on this app means a horizontal scrollbar on the whole
+ * document. The stylesheet cannot know where the word is, so this measures once
+ * per open and writes the correction into --gloss-x.
+ *
+ * Delegated and lazy - it runs when a popover is about to be shown, not on
+ * every paint, because a page can carry three of these and the measurement is a
+ * forced layout. `pointerover` and `focusin` both bubble, which `mouseenter`
+ * does not, so one listener on the document covers every popover on every page
+ * for the life of the session.
+ *
+ * With scripting off the popover is still centred and still readable; only the
+ * two or three words that sit at a line's extreme edge would spill, which is
+ * the state this has always degraded to.
+ */
+const GLOSS_GUTTER = 12;
+function positionGlossPopover(word: HTMLElement): void {
+  const pop = word.querySelector<HTMLElement>(".ltp-gloss-pop");
+  if (!pop) return;
+  // Measure from a known-zero shift, or the previous correction is baked into
+  // the reading and each open drifts a little further.
+  pop.style.setProperty("--gloss-x", "0px");
+  const box = pop.getBoundingClientRect();
+  // The popover is display:none until :hover or :focus applies, which is always
+  // before this handler runs - but if a browser ever gets here first, an
+  // unlaid-out box measures 0x0 and every number below would be nonsense. Leave
+  // it centred rather than sliding it 12px for no reason.
+  if (!box.width) return;
+  // clientWidth, NOT window.innerWidth. innerWidth is the VISUAL viewport, and
+  // it grows to include horizontal overflow - so the moment a popover hung off
+  // the right-hand edge, innerWidth grew to cover it and the arithmetic
+  // concluded there was nothing to correct (measured: a box at right=470 on a
+  // 375px phone reported an overshoot of 12px instead of 107). clientWidth is
+  // the layout viewport, which is what "does this fit on the page" means.
+  const viewport = document.documentElement.clientWidth;
+  const overRight = box.right - (viewport - GLOSS_GUTTER);
+  const overLeft = GLOSS_GUTTER - box.left;
+  const shift = overRight > 0 ? -overRight : overLeft > 0 ? overLeft : 0;
+  if (shift) pop.style.setProperty("--gloss-x", `${Math.round(shift)}px`);
+}
+
+function watchGlossPopovers(): void {
+  for (const ev of ["pointerover", "focusin"] as const) {
+    document.addEventListener(ev, (e) => {
+      const t = e.target;
+      if (!(t instanceof Element)) return;
+      const word = t.closest<HTMLElement>(".ltp-gloss");
+      if (word) positionGlossPopover(word);
+    });
+  }
+}
+
+/**
  * Learn to Play's diagrams play only while you can see them.
  *
  * Every one is an infinite CSS loop, and they were all running from the moment
@@ -1280,6 +1337,7 @@ window.addEventListener("hashchange", () => {
 });
 
 wireActions(root);
+watchGlossPopovers();
 store.subscribe(paint);
 
 if (!tryImportShare()) {

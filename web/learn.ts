@@ -115,36 +115,154 @@ const ol = (items: string[]): string =>
   `<ol class="ltp-list ltp-list-num">${items.map((i) => `<li>${massGlyphs(i)}</li>`).join("")}</ol>`;
 
 /**
- * A short glossary: the term, then what it means.
- *
  * THE ONE PLACE ON THESE PAGES THAT IS NOT THE BOOK TALKING, and it exists
  * because of a hole the verbatim rule left. "Unit" and "ship" are the two most
  * used nouns in the game and the rulebook never stops to define either - it
  * defines them by use, over sixty pages, which works for somebody reading sixty
- * pages and not for somebody reading eight. On these pages the two words were
- * used ninety times before either was explained, and a reader who has not
- * worked out that a unit is up to three ships cannot parse a single sentence of
- * the Tactical Phase. So: three terms, said once, where the reader first meets
- * all three in one sentence.
+ * pages and not for somebody reading eight. On these pages the two words are
+ * used ninety times, and a reader who has not worked out that a unit is up to
+ * three ships cannot parse a single sentence of the Tactical Phase.
  *
- * Everything in it is drawn from rules that ARE quoted on these pages (unit
+ * Everything here is drawn from rules that ARE quoted on these pages (unit
  * coherence, one action per unit, the Mass 3 limit from fleet building, the
  * battlegroup's lifetime) - it is a summary of the book, not an addition to it.
- * Set apart from the quoted rules so the difference is visible: this is the app
- * telling you what a word means, not the rulebook.
+ *
+ * These three used to be a bordered <dl> at the top of Drag to Select, and that
+ * was the wrong shape for them twice over: it was a wall of definitions before
+ * the rule they serve, on ONE of the six pages, so a reader who arrived at the
+ * Movement Step from a shared link never saw it. A definition you can ask for
+ * where you are already reading beats a definition you had to have read
+ * earlier, so they became hover/focus notes on the word itself - see glossify()
+ * below for where they land.
  */
-const terms = (items: [string, string][]): string => `
-  <dl class="ltp-terms">
-    ${items
-      .map(
-        ([term, def]) => `
-      <div class="ltp-term">
-        <dt class="ltp-term-k">${massGlyphs(term)}</dt>
-        <dd class="ltp-term-d">${massGlyphs(def)}</dd>
-      </div>`,
-      )
-      .join("")}
-  </dl>`;
+const GLOSSARY: [string, string][] = [
+  ["ship", "One miniature, with its own Mass, Thrust, HP, weapons and arcs of fire. Ships are what you move, and what takes damage."],
+  [
+    "unit",
+    "One to three ships, grouped when the fleet is built (or when they are requisitioned mid-game) and kept together from then on. A unit moves in one step, all of its ships take the same action, and at the end of its movement they must all be within 6&rdquo; of each other. A Mass 3 ship is always a unit of one.",
+  ],
+  [
+    "battlegroup",
+    "The units you drag together for a single activation, to a Combined Mass of 10. Battlegroups are temporary formations and only exist during that activation.",
+  ],
+];
+
+/**
+ * Tags whose text must never be touched by glossify().
+ *
+ * `svg` is the one that matters: a diagram's <text> nodes say "Jump In a unit",
+ * and an HTML <span> inside SVG text is not a span, it is an unknown element
+ * that renders as nothing - the label would silently lose the word. The rest
+ * are places where a popover is either useless or actively wrong: headings and
+ * the tab rail (the word is a label, not prose), summaries and buttons (they
+ * already do something when you press them), and dt/caption for the same reason
+ * as headings.
+ */
+const NO_GLOSS = new Set(["svg", "h1", "h2", "h3", "h4", "summary", "button", "a", "caption", "dt", "nav"]);
+
+/**
+ * No role and no aria-label on the word.
+ *
+ * Both were tried and both are worse than nothing. `role="button"` promises
+ * that pressing it does something, and it does not - it shows a note. And an
+ * aria-label on the outer span REPLACES everything inside it, so a screen
+ * reader stops reading the sentence at that point and says the label instead:
+ * the one word a reader most needs in place is the one that would go missing.
+ * Left as plain text with tabindex, the sentence reads through, the definition
+ * reads after it, and a keyboard or a tap can still open it.
+ */
+const glossMarkup = (word: string, def: string): string =>
+  `<span class="ltp-gloss" tabindex="0"
+    >${word}<span class="ltp-gloss-pop" role="tooltip"
+      ><span class="ltp-gloss-k">${escapeHtml(word.toLowerCase())}</span
+      ><span class="ltp-gloss-d">${massGlyphs(def)}</span></span
+  ></span>`;
+
+/**
+ * The stand-in a matched word leaves behind until the whole pass is done.
+ *
+ * U+0001, because it cannot occur in any authored string in this file and is
+ * neither a letter nor a digit, so no later term can match inside it. A bare
+ * index would be worse than useless: the final pass would then rewrite every
+ * "6" and "10" on the page into a definition.
+ */
+const SENTINEL = "\u0001";
+
+/**
+ * Mark the FIRST mention of each glossary term on a page, and only the first.
+ *
+ * Once per page, not once per occurrence: "unit" appears fourteen times on the
+ * Movement Step alone, and fourteen dotted underlines down one column reads as
+ * a page of links rather than as prose with a couple of terms in it. First
+ * mention is also where a reader who does not know the word is standing.
+ *
+ * It runs over the finished HTML rather than over the source strings because
+ * the source is forty-odd separate literals and the first mention is a property
+ * of the assembled page, not of any one of them. The pass is a plain tokeniser
+ * - tags out, text in - with three guards: NO_GLOSS above, the SENTINEL, and
+ * the picker-panel scope below.
+ *
+ * THE PANELS GET THEIR OWN. The Jump Phase's A/B/C cards are three siblings of
+ * which two are `display: none`, and on the first build of this the only
+ * mention of "ships" on that page fell inside card B: the mark was made, was
+ * correct, and was invisible to anybody who did not press B. A hidden card must
+ * not be able to spend the page's one mark, and a card you have opened should
+ * carry its own - so each panel is its own scope with its own three terms, and
+ * the page outside them keeps its own.
+ */
+function glossify(html: string): string {
+  const slots: string[] = [];
+  const page = new Map(GLOSSARY);
+  let scope = page;
+  let noGloss = 0;
+  // Tracked so the end of a panel can be recognised: a panel's closing </div>
+  // is the one that brings div nesting back to the depth it opened at.
+  let divs = 0;
+  let panelDepth: number | null = null;
+
+  const out = html.replace(/<[^>]*>|[^<]+/g, (tok) => {
+    if (tok.startsWith("<")) {
+      const m = /^<(\/?)([a-zA-Z][\w-]*)/.exec(tok);
+      if (!m) return tok;
+      const closing = !!m[1];
+      const tag = m[2]!.toLowerCase();
+      if (NO_GLOSS.has(tag)) {
+        if (closing) noGloss = Math.max(0, noGloss - 1);
+        else if (!tok.endsWith("/>")) noGloss++;
+      }
+      if (tag === "div") {
+        if (closing) {
+          if (panelDepth !== null && divs === panelDepth) {
+            panelDepth = null;
+            scope = page;
+          }
+          divs--;
+        } else {
+          divs++;
+          if (panelDepth === null && tok.includes("ltp-pick-panel")) {
+            panelDepth = divs;
+            scope = new Map(GLOSSARY);
+          }
+        }
+      }
+      return tok;
+    }
+    if (noGloss > 0 || !scope.size) return tok;
+    let text = tok;
+    for (const [term, def] of [...scope]) {
+      // Plural too ("ships", "units"), so the first mention counts whichever
+      // number it happens to be in. Word boundaries both ends: "unit" must not
+      // match inside "opportunity".
+      const hit = new RegExp(`\\b(${term}s?)\\b`, "i").exec(text);
+      if (!hit) continue;
+      slots.push(glossMarkup(hit[1]!, def));
+      text = `${text.slice(0, hit.index)}${SENTINEL}${slots.length - 1}${SENTINEL}${text.slice(hit.index + hit[1]!.length)}`;
+      scope.delete(term);
+    }
+    return text;
+  });
+  return out.replace(/\u0001(\d+)\u0001/g, (_, n: string) => slots[Number(n)]!);
+}
 
 /**
  * A lettered procedure: A, B, C down the side, each step named, with optional
@@ -489,6 +607,23 @@ function sectionPrepare(): string {
       ),
     )}
 
+    ${sourceList()}
+`;
+}
+
+/**
+ * The shopping you only do once you are past your first game: the full token
+ * spread and the mission terrain.
+ *
+ * It sat on Getting Prepared, immediately under "what you will need to play",
+ * where it contradicted the thing above it - the six-line list on p.12 is the
+ * whole answer to "can I play tonight", and following it with a demand for 5
+ * Space Kraken makes it read as though you cannot. It is a better last page
+ * than a second first one: by the End Phase the reader has been through a whole
+ * round and is deciding what to buy next, which is exactly what this answers.
+ */
+function biggerGames(): string {
+  return `
     ${h(3, "When you&rsquo;re ready for bigger games")}
     ${fold(
       "Tokens",
@@ -515,9 +650,7 @@ function sectionPrepare(): string {
          ${p("You might also choose to make terrain or tokens for the following, but they are not required")}
          ${ul(["3 Gas Clouds", "3 Debris Fields"])}`,
       ),
-    )}
-    ${sourceList()}
-`;
+    )}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -628,9 +761,13 @@ function turnPicker(): string {
       body: `${learnDiagram("jump-point")}
         ${quote(
           // p.30 and p.32, verbatim.
+          // The Gravity Well paragraph that used to close this card is gone. It
+          // restated the 9" limit a third time in three sentences, and the
+          // sentence above it already carries the half of the rule this card is
+          // about ("anywhere outside of 9" from a planetoid"); the diagram
+          // carries the rest.
           `${p("<b>Open a Jump Point:</b> Take a jump point from the supply and place it into play, anywhere you like.")}
-           ${p("During the Jump Phase, you can use your turn to open a new Jump Point, if you have any remaining in your supply. Take a Jump Point from your supply, and place it into play, anywhere outside of 9&rdquo; from a planetoid.")}
-           ${p("<b>Gravity Well:</b> Jump Points cannot be placed within 9&rdquo; of a planetoid. Units cannot Jump into a position within 9&rdquo; of a planetoid. A unit cannot Jump Hop or Jump Out if a ship in that unit is within 9&rdquo; of a planetoid.")}`,
+           ${p("During the Jump Phase, you can use your turn to open a new Jump Point, if you have any remaining in your supply. Take a Jump Point from your supply, and place it into play, anywhere outside of 9&rdquo; from a planetoid.")}`,
         )}`,
     },
     {
@@ -729,27 +866,37 @@ export const TACTICAL_SUBS: { id: string; label: string; short: string }[] = [
 ];
 
 const TACTICAL_PAGES: Record<string, () => string> = {
+  // The shape of an activation goes FIRST, above the gesture that starts one.
+  //
+  // It used to close this page, four screens down, which had the five pages of
+  // the Tactical Phase reading as five unrelated procedures: you learnt how to
+  // draw a battlegroup, then how to move, then how passive attacks work, and
+  // only at the very end were you told the three of them are one sequence run
+  // by every unit in the group before the next step starts. That is the frame
+  // the other four pages hang off, and a frame is no use arriving last.
   select: () => `
+    ${h(3, "An activation, step by step")}
     ${quote(
+      // p.35, verbatim.
+      `<p>When you activate a battlegroup, you activate all the units in that battlegroup, completing each step with all units before starting the next step:</p>
+       ${ol([
+         "<b>Movement Step:</b> Move all the units in the battlegroup, one unit at a time, in any order.",
+         "<b>Passive Attacks Step:</b> The battlegroup suffers passive attacks.",
+         "<b>Action Step:</b> Choose one action for each unit in the battlegroup. (You can choose different actions for different units.) Each ship in the unit takes that action. Resolve all the actions from one unit before starting the next unit.",
+       ])}
+       ${p("After activating a unit, give it an Activated token.")}`,
+    )}
+
+    ${quote(
+      // No heading over this. The page is already titled "Drag to Select a
+      // battlegroup" by the sub-rail, and a second heading saying the same
+      // three words twenty lines under the first is furniture. The paragraph
+      // itself ("you Drag to Select a battlegroup and activate the units in
+      // that battlegroup") is the bridge back from the overview above.
       // p.31, verbatim.
       `${p("In the Tactical Phase, players take turns to activate battlegroups, clockwise from the player with Initiative.")}
        ${p("On your turn, you Drag to Select a battlegroup and activate the units in that battlegroup.")}`,
     )}
-
-    ${terms([
-      [
-        "Ship",
-        "One miniature, with its own Mass, Thrust, HP, weapons and arcs of fire. Ships are what you move, and what takes damage.",
-      ],
-      [
-        "Unit",
-        "One to three ships, grouped when the fleet is built (or when they are requisitioned mid-game) and kept together from then on. A unit moves in one step, all of its ships take the same action, and at the end of its movement they must all be within 6&rdquo; of each other. A Mass 3 ship is always a unit of one.",
-      ],
-      [
-        "Battlegroup",
-        "The units you drag together for a single activation, to a Combined Mass of 10. <b>Battlegroups are temporary formations and only exist during that activation.</b>",
-      ],
-    ])}
 
     ${quote(
       // p.31, verbatim - five steps, not p.34's three. See the note above.
@@ -769,18 +916,6 @@ const TACTICAL_PAGES: Record<string, () => string> = {
       // p.20 and p.26, verbatim.
       `${p("Mass is a broad measure of the size and bulk of a ship. Throughout the rules, when you see the icon ⓜ, replace it with the numerical value of the Mass of the unit&rsquo;s ship class. If a rule refers to the Combined Mass of ships, sum the ⓜ of all the related individual ships to form a total.")}
        ${p("Occasionally, when encountering the ⓜ icon, it may be unclear which ship&rsquo;s mass to apply. As a general rule, use the mass of the ship that is actively doing the thing, rather than the ship having the thing done to them.")}`,
-    )}
-
-    ${h(3, "An activation, step by step")}
-    ${quote(
-      // p.35, verbatim.
-      `<p>When you activate a battlegroup, you activate all the units in that battlegroup, completing each step with all units before starting the next step:</p>
-       ${ol([
-         "<b>Movement Step:</b> Move all the units in the battlegroup, one unit at a time, in any order.",
-         "<b>Passive Attacks Step:</b> The battlegroup suffers passive attacks.",
-         "<b>Action Step:</b> Choose one action for each unit in the battlegroup. (You can choose different actions for different units.) Each ship in the unit takes that action. Resolve all the actions from one unit before starting the next unit.",
-       ])}
-       ${p("After activating a unit, give it an Activated token.")}`,
     )}`,
   move: () => `
     ${quote(
@@ -1038,6 +1173,8 @@ function sectionEnd(): string {
       <p class="ltp-launch-note">Builds the Training Fleet for you and drops you straight into Play Mode, with the phase tracker running.</p>
     </div>
 
+    ${biggerGames()}
+
     ${h(3, "Get the rulebook")}
     <div class="ltp-cta">
       <a class="ltp-btn ltp-btn-buy" href="${BUY_URL}" target="_blank" rel="noopener">${icon("book", 18)} Buy A Billion Suns 2E</a>
@@ -1232,7 +1369,7 @@ export function learnView(state: AppState): string {
         <header class="ltp-sec-head">
           <h2 class="ltp-sec-title" id="ltp-h-${tab.id}">${escapeHtml(tab.label)}</h2>
         </header>
-        ${SECTIONS[tab.id]!(sub)}
+        ${glossify(SECTIONS[tab.id]!(sub))}
       </section>
       <nav class="ltp-pager" aria-label="Learn to Play pages">
         ${prev ? pagerBtn("prev", prev) : `<span class="ltp-pager-gap"></span>`}

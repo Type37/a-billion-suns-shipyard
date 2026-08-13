@@ -1164,11 +1164,6 @@ const TACTICAL_PAGES: Record<string, () => string> = {
           The "Silhouette and Shields" block that used to head it is gone: those
           three stats are quoted in full on Getting Prepared now, and printing
           p.27 twice was the same passage on two pages of one guide. */ ""}
-    ${cool(
-      // p.41, verbatim - the vignette that heads the Combat chapter.
-      `<p>The silent flashes of the megabombs illuminated the nightside of Beren III like an electrical storm. Black silhouettes of battleships watched from low orbit like hungry crows.</p>`,
-    )}
-
     ${h(3, "How an attack works")}
     ${quote(
       // p.41, verbatim - the line that opens the chapter and says when these

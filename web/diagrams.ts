@@ -338,12 +338,17 @@ function dragSelectDiagram(): string {
       .learn-dg .dgs-total { font-family: var(--narrow); font-size: calc(10.5px * var(--dgf)); font-weight: 700; fill: var(--blue); text-anchor: middle; text-transform: uppercase; letter-spacing: 0.04em; }
       .learn-dg .dgs-cursor { fill: var(--ink); stroke: var(--paper); stroke-width: 1; stroke-linejoin: round; }
 
-      /* The pulse IS the range. It leaves the lead on the click, runs out to
-         exactly 6", and stays there as the boundary for the rest of the loop -
-         one shape doing the job a static dashed circle and a separate throwaway
-         ripple were splitting between them. */
+      /* The pulse IS the range, and there is only one of it. It leaves the
+         lead on the click, runs out to exactly 6", and stays there as the
+         boundary for the rest of the loop.
+
+         A second thinner front used to chase it out to 74px and die past the
+         boundary, on the theory that it made the wave read as expanding. What
+         it actually did was draw a circle at a radius that is not a rule -
+         everything else in this set is measured, so a ring sailing through 6"
+         and stopping somewhere arbitrary invites the reader to look for what
+         that distance means. Nothing. */
       .learn-dg .dgs-wave { fill: var(--blue-wash); stroke: var(--blue); stroke-width: 1.5; }
-      .learn-dg .dgs-wave-2 { fill: none; stroke: var(--blue); stroke-width: 2; }
 
       @keyframes dgs-wave {
         0%, 4%   { r: 9; opacity: 0; }
@@ -351,14 +356,6 @@ function dragSelectDiagram(): string {
         24%      { r: 54px; opacity: 0.95; }
         30%, 88% { r: 54px; opacity: 0.85; }
         97%, 100% { r: 54px; opacity: 0; }
-      }
-      /* A second, thinner front that keeps going and dies just past the
-         boundary, so the wave reads as expanding rather than as a circle that
-         faded up. */
-      @keyframes dgs-wave-2 {
-        0%, 6%  { r: 9; opacity: 0.8; }
-        34%     { r: 74; opacity: 0; }
-        100%    { r: 74; opacity: 0; }
       }
       @keyframes dgs-click { 0%, 3% { transform: scale(1); } 7% { transform: scale(0.82); } 13%, 100% { transform: scale(1); } }
       /* Each hull lights the moment the front reaches it. Staggered wider apart
@@ -372,7 +369,6 @@ function dragSelectDiagram(): string {
       @keyframes dgs-total { 0%, 30% { opacity: 0; } 38%, 92% { opacity: 1; } 98%, 100% { opacity: 0; } }
 
       .learn-dg .dgs-wave { animation: dgs-wave 3600ms cubic-bezier(0.15, 0.85, 0.25, 1) infinite; }
-      .learn-dg .dgs-wave-2 { animation: dgs-wave-2 3600ms cubic-bezier(0.1, 0.9, 0.3, 1) infinite; }
       .learn-dg .dgs-cursor { animation: dgs-click 3600ms ease-out infinite; transform-box: fill-box; transform-origin: 10% 6%; }
       .learn-dg .dgs-catch-1 { animation: dgs-tint-1 3600ms step-end infinite; }
       .learn-dg .dgs-catch-2 { animation: dgs-tint-2 3600ms step-end infinite; }
@@ -388,7 +384,6 @@ function dragSelectDiagram(): string {
         .learn-dg .dg-ship.dgs-catch-3,
         .learn-dg .dg-ship.dgs-catch-4 { fill: var(--blue); }
         .learn-dg .dgs-wave { r: 54px; opacity: 0.85; }
-        .learn-dg .dgs-wave-2 { display: none; }
       }
     </style>
 
@@ -401,7 +396,6 @@ function dragSelectDiagram(): string {
          ship, a pulse goes out six inches, and whatever it touches turns blue.
          The ship it does not reach stays grey. -->
     <circle class="dgs-wave" cx="${LEAD_X}" cy="${LEAD_Y}" r="9"/>
-    <circle class="dgs-wave-2" cx="${LEAD_X}" cy="${LEAD_Y}" r="9"/>
 
     ${LABEL(LEAD_X, LEAD_Y - 30, "lead", "dg-mini")}
     ${unit(LEAD_X, LEAD_Y, 0, "dg-ship dg-lead", 3)}

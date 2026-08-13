@@ -5268,16 +5268,39 @@ a .icon,
 .learn-dg .dg-path { fill: none; stroke: var(--hair); stroke-width: 1.5; stroke-dasharray: 5 4; }
 .learn-dg .dg-enemy-away { opacity: 0.5; }
 .learn-dg .dg-mini-arc { fill: var(--red); }
+/* The shot LEAVES the enemy and LANDS ON THE UNIT.
+   It used to be a static line that faded in, which drew the geometry and none
+   of the event: you could not tell which end was the gun, and a line that
+   stops on whichever hull it happens to reach says the attack was aimed at
+   that miniature. It was not. An attack is declared against a unit, so the
+   line is aimed at the middle of the battlegroup and arrives as a ring drawn
+   round all three - the cheapest way to say those miniatures are one thing.
+
+   pathLength="100" on each line normalises a 56-unit shot and a 91-unit shot
+   to the same dash arithmetic, so one keyframe draws both at the same rate
+   regardless of how far away the shooter is. */
 @keyframes dg-passive-fire {
-  0%, 34% { opacity: 0; }
-  44%, 82% { opacity: 1; }
-  92%, 100% { opacity: 0; }
+  0%, 8%    { stroke-dashoffset: 100; opacity: 0; }
+  12%       { stroke-dashoffset: 100; opacity: 1; }
+  40%       { stroke-dashoffset: 0; opacity: 1; }
+  62%       { stroke-dashoffset: 0; opacity: 1; }
+  76%, 100% { stroke-dashoffset: 0; opacity: 0; }
 }
-.learn-dg .dg-passive-shots line { animation: dg-passive-fire 3200ms linear infinite; stroke-dasharray: none; }
-/* Staggered by a frame or two so the three read as one salvo being resolved
-   rather than as three separate attacks. */
-.learn-dg .dg-pshot-2 { animation-delay: 110ms; }
-.learn-dg .dg-pshot-3 { animation-delay: 220ms; }
+@keyframes dg-passive-hit {
+  0%, 38%   { r: 4; opacity: 0; }
+  44%       { r: 8; opacity: 0.9; }
+  70%       { r: 30; opacity: 0; }
+  100%      { r: 30; opacity: 0; }
+}
+.learn-dg .dg-passive-shots line {
+  animation: dg-passive-fire 3200ms linear infinite;
+  stroke-dasharray: 100;
+}
+.learn-dg .dg-pshot-hit { fill: none; stroke: var(--red); stroke-width: 2; }
+.learn-dg .dg-pshot-hit-1, .learn-dg .dg-pshot-hit-2 { animation: dg-passive-hit 3200ms ease-out infinite; }
+/* The second shooter is a beat behind, so two attacks read as two attacks
+   being resolved one after the other rather than as one wide flash. */
+.learn-dg .dg-pshot-2, .learn-dg .dg-pshot-hit-2 { animation-delay: 420ms; }
 
 /* ------------------------------------------------------------ play mode layout
 
@@ -6354,6 +6377,16 @@ main.play-body .roster-section::before { content: none; }
 }
 .ltp-p { font-size: 17px; line-height: 1.55; color: var(--ink); margin: 0 0 9px; }
 .ltp-p-note { font-size: 15px; color: var(--ink-2); }
+/* A caption under a diagram, in the page's own face.
+   The Passive Attacks figure used to carry its title and a legend INSIDE the
+   SVG, which set both in the 10px condensed face the diagram uses for pixel
+   labels. That face is for "6 inches" and "passive", not for a sentence: a
+   sentence in it is small, tracked out, and reads as furniture. Anything that
+   is prose comes out of the box and sits under it. */
+.ltp-figcap {
+  font-family: var(--sans); font-size: 15.5px; line-height: 1.45;
+  color: var(--ink-2); margin: 4px auto 12px; max-width: 62ch; text-align: center;
+}
 .ltp-list { margin: 0 0 9px; padding-left: 24px; font-size: 17px; line-height: 1.5; color: var(--ink); }
 .ltp-list li { margin-bottom: 3px; }
 .ltp-list-num { list-style: decimal; }

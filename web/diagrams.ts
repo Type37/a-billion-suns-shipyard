@@ -510,147 +510,120 @@ function doubleMoveDiagram(): string {
 }
 
 /**
- * Passive Attacks Step, redrawn August 2026 after an audit against p.38.
+ * Passive Attacks Step: the gauntlet.
  *
- * The rule, in full: "After moving the units in the battlegroup, there is a
+ * The rule, p.38: "After moving the units in the battlegroup, there is a
  * Passive Attacks step. Every passive enemy unit that has one or more active
  * units in range and arc of fire of their auxiliary weapons may attack once
  * with their auxiliary weapons, targeting only active units."
  *
- * Three things the previous drawing got wrong, all of them the same mistake -
- * drawing the journey instead of the position it ends in:
+ * EVERY is the word this drawing is built around, and three earlier versions
+ * missed it. Each drew one enemy shooting one unit and spent its whole area on
+ * the geometry of that single test, which is a picture of a range check rather
+ * than a picture of the step. What happens at the table is that you finish
+ * moving, take your hand off the models, and then everything that can see you
+ * takes a shot. So: your battlegroup where it stopped, the enemies around it,
+ * and each one's answer.
  *
- *   1. It was titled "Move INTO an enemy's AUX arc and it fires", and the
- *      animation existed to show a ship crossing the boundary. Nothing in the
- *      rule is about crossing anything. The check happens once, after the
- *      movement step, on where the units ARE: a unit that began the phase
- *      inside an enemy's arc and did not move an inch is shot at exactly the
- *      same. "Moving in" is the common case, not the rule.
- *   2. "in range AND arc of fire" is two conditions and only one of them was
- *      labelled. The half-disc always had a finite radius, but nothing said
- *      that radius WAS the weapon's maximum range, so it read as a pure arc and
- *      the range half of the rule was invisible.
- *   3. The path bent. Movement in this game is p.36's "first pivot it by any
- *      amount, and then move it straight ahead" - two straight legs. A curved
- *      trail drawn under a rule about straight-line movement is a picture of
- *      something the game does not let you do.
+ * ONE ENVELOPE, NOT ONE PER SHIP, and that was the hard-won bit. The first
+ * build drew every enemy's auxiliary envelope - a 180 degree arc to the front
+ * (p.42) out to maximum range - on the theory that repeating the shape would
+ * make the test read three times over. Rendered, it was a single grey-and-pink
+ * blob: an envelope has to be wide enough to swallow the whole battlegroup with
+ * clearance, and shapes that size around one small cluster necessarily overlap,
+ * so no reader could tell which belonged to which ship. It is drawn once, on
+ * the enemy at the right, as the worked example. The others are a hull, a
+ * heading and a verdict, which is all they need once the shape has been shown.
  *
- * And it drew one ship against one enemy, which cannot show the shape of the
- * step: a battlegroup of several units finishes moving and then EVERY passive
- * enemy that can see any of them fires. Three active ships in one unit, two
- * passive enemies, one of which has them and one of which does not.
+ * The two that fail, fail for the two different reasons and neither needs its
+ * failure spelled out: one is pointed straight at you from the far side of the
+ * table, the other is close enough to touch with its nose pointing away.
+ *
+ * The shot is a line out of the firing hull that lands as a RING around the
+ * whole battlegroup, not as a hit on the hull it happens to reach. An attack is
+ * declared against a unit, and the ring is the cheapest way to say that the
+ * three miniatures are one thing being shot at.
+ *
+ * No title and no legend inside the box. Both used to sit here and both were
+ * doing the caption's job from inside a picture, in a 10px condensed face that
+ * a sentence has no business being set in. The sentence lives under the figure
+ * now, in the page's own body face.
  */
 function passiveDiagram(): string {
-  // Both enemies get the SAME radius, and that is not a detail.
-  //
-  // The first version drew the firing enemy's arc at r78 and the facing-away
-  // one's at r46, purely so the second would fit the space left over. Two
-  // identical-looking hulls with visibly different reach is a claim about their
-  // weapons that nothing in the picture supports - and worse, it made the
-  // second enemy fail the check for TWO reasons at once (the unit was behind it
-  // AND miles outside its little arc) while the caption named only one. The
-  // whole job of the second enemy is to isolate the arc condition, so it now
-  // has the unit comfortably inside its range and still cannot shoot.
-  const R = 76;
-  const EX = 268, EY = 120; // fires
-  const BX = 156, BY = 96; // facing away, and close enough to have them in range
+  // The auxiliary envelope of the worked example. Big, because it has to
+  // contain the whole battlegroup with room to spare - a boundary that grazes
+  // the outermost hull is a picture of a rules argument, not of a rule.
+  const R = 85;
+  // Your battlegroup, where it stopped, and the point every shot is aimed at.
+  const A: [number, number] = [159, 110];
+  const B: [number, number] = [179, 120];
+  const C: [number, number] = [159, 132];
+  const HUB: [number, number] = [166, 120];
 
-  // An exact half-disc. Both endpoints are (0, -R) and (0, +R) in the ship's own
-  // frame, so the chord between them is the vertical diameter: dead straight,
-  // and through the hull's centre by construction rather than by eye. sweep-flag
-  // 0 bulges the curve towards -x (SVG's y axis points down, so sweep 1 would
-  // put the bulge behind the ship); at exactly 180 degrees the large-arc-flag is
-  // degenerate and either value gives the same semicircle.
-  const disc = `M0 -${R} A${R} ${R} 0 0 0 0 ${R} Z`;
+  /** A passive enemy: hull and heading. `deg` 0 faces left, 90 up, 180 right, 270 down. */
+  const enemy = (x: number, y: number, deg: number, live: boolean) =>
+    `<g transform="translate(${x} ${y}) rotate(${deg})">${SHIP(0, 0, -90, `dg-ship dg-enemy${live ? "" : " dg-enemy-away"}`, 1.35)}</g>`;
 
-  // One active unit of three, all WELL inside the firing enemy's half-disc.
-  //
-  // "Inside" has to be legible, not merely true. The first placement put them
-  // 11 to 15 units in from a curved boundary 76 units out - arithmetically
-  // inside and, on the page, three hulls sitting on the line, which is the one
-  // reading this picture cannot afford. They are 23 to 46 units in now.
-  // Distances from the enemy: 58, 39 and 55 against a radius of 76.
-  //
-  // None of the three sits on y = EY either, because that is where the max
-  // range measure runs; a measurement drawn through the thing it is not
-  // measuring reads as an attack line.
-  const A: [number, number] = [226, 80];
-  const B: [number, number] = [246, 152];
-  const C: [number, number] = [222, 150];
-  // A is 72 from the facing-away enemy - inside its 76 too, and still safe,
-  // because being in range is not being in arc.
-  const LEG: [number, number] = [-58, 12];
-  const trail = ([x, y]: [number, number]) =>
-    `<line class="dg-path" x1="${x + LEG[0]}" y1="${y + LEG[1]}" x2="${x}" y2="${y}"/>`;
+  // pathLength normalises both shots to 100 units so one keyframe can draw a
+  // 56-unit line and a 91-unit line at the same rate.
+  const HIT_R = 26;
+  const shot = (n: number, from: [number, number]) => {
+    // Stop the line ON the ring rather than at the hub. Run it to the centre
+    // and it crosses two hulls on the way, which puts the arrow through a
+    // miniature - and the whole point of the ring is that the attack was
+    // declared against the unit, not against whichever ship it reached first.
+    const dx = HUB[0] - from[0], dy = HUB[1] - from[1];
+    const len = Math.hypot(dx, dy);
+    const x2 = (from[0] + dx * ((len - HIT_R) / len)).toFixed(1);
+    const y2 = (from[1] + dy * ((len - HIT_R) / len)).toFixed(1);
+    return `<line class="dg-shot dg-pshot-${n}" pathLength="100" x1="${from[0]}" y1="${from[1]}" x2="${x2}" y2="${y2}"/>`;
+  };
 
   return `
-  <svg class="learn-dg" viewBox="0 0 340 222" role="img"
-       aria-label="Passive Attacks Step: once the battlegroup has finished moving, every passive enemy that has an active unit inside the range and 180 degree auxiliary arc of its weapons attacks once. Here a unit of three ships has ended its move inside one enemy's arc and that enemy fires. The second enemy has the same ships well inside its range, but they are behind it and outside its arc, so it does not.">
+  <svg class="learn-dg" viewBox="0 0 340 230" role="img"
+       aria-label="Passive Attacks Step: your battlegroup has finished moving and four passive enemies are around it. The one on the right has its auxiliary envelope drawn - a 180 degree arc out to maximum range - and your ships are inside it, so it fires. The one below also has them in range and arc and fires too. The one far to the left is pointed straight at you but is nowhere near close enough. The one beside your ships is close enough but is pointing away, so your ships are behind it.">
     <style>
       .learn-dg .dgp-arc-edge { fill: none; stroke: var(--red); stroke-width: 1; stroke-opacity: 0.55; }
       .learn-dg .dgp-arc-dia { stroke: var(--red); stroke-width: 1.2; stroke-opacity: 0.8; }
-      .learn-dg .dgp-arc-away { fill: var(--ink-3); fill-opacity: 0.08; }
-      .learn-dg .dgp-arc-away-edge { fill: none; stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 3 3; }
-      .learn-dg .dgp-range-ring { fill: none; stroke: var(--ink-3); stroke-width: 1; stroke-opacity: 0.5; stroke-dasharray: 2 4; }
     </style>
 
-    ${LABEL(170, 15, "End in range and arc, and it fires", "dg-title")}
-
-    <!-- The enemy that has them. Everything inside this shape is both in range
-         and in arc; the radius IS the weapon's maximum range. -->
-    <g transform="translate(${EX} ${EY})">
-      <path class="dg-arc-fill dg-arc-aux" d="${disc}"/>
-      <path class="dgp-arc-edge" d="${disc}"/>
+    ${/* The worked example: envelope drawn, unit inside it, and it shoots. */ ""}
+    <g transform="translate(222 120)">
+      <path class="dg-arc-fill dg-arc-aux" d="M0 -${R} A${R} ${R} 0 0 0 0 ${R} Z"/>
+      <path class="dgp-arc-edge" d="M0 -${R} A${R} ${R} 0 0 0 0 ${R} Z"/>
       <line class="dgp-arc-dia" x1="0" y1="-${R}" x2="0" y2="${R}"/>
-      ${SHIP(0, 0, -90, "dg-ship dg-enemy")}
     </g>
-    ${LABEL(246, 58, "aux 180°", "dg-mini dg-mini-arc")}
-    ${/* Beside the hull, outside the disc. Under it, this caption shared a line
-          with the active unit's caption and the two read as one sentence. */ ""}
-    ${LABEL(300, 124, "passive — fires", "dg-mini")}
-    <!-- The measure runs along y = EY, which threads between the top ship and
-         the middle one; nothing sits on it. -->
-    <g class="dg-measure" transform="translate(${EX} ${EY})">
-      <line x1="0" y1="0" x2="-${R}" y2="0"/>
-      ${LABEL(-R / 2, -7, "max range", "dg-measure-text")}
-    </g>
+    ${enemy(222, 120, 0, true)}
+    ${LABEL(258, 124, "fires", "dg-mini dg-mini-arc")}
 
-    <!-- The enemy that does not. Same radius, and the lead ship of the active
-         unit is inside it: the ONLY thing failing here is the arc. Its arc is
-         drawn, greyed and dashed, because "facing away" is an explanation only
-         if you can see which way it is facing. -->
-    <g transform="translate(${BX} ${BY})">
-      <!-- The FULL range circle, dashed, with only the front half shaded.
-           Without it the caption's "in range" is a claim the reader cannot
-           check: a half-disc shows you the arc and says nothing about how far
-           the weapon reaches behind the ship, so the lead ship of the active
-           unit just sat outside a grey shape like any out-of-range target. The
-           ring is the range, the shading is the arc, and the ship is visibly
-           inside one and outside the other - which is the whole rule. -->
-      <circle class="dgp-range-ring" r="${R}"/>
-      <path class="dgp-arc-away" d="${disc}"/>
-      <path class="dgp-arc-away-edge" d="${disc}"/>
-      ${SHIP(0, 0, -90, "dg-ship dg-enemy dg-enemy-away")}
-    </g>
-    ${LABEL(84, 196, "passive — in range, but", "dg-mini dg-mini-out")}
-    ${LABEL(84, 208, "they are behind it", "dg-mini dg-mini-out")}
+    ${/* Also fires: same test, no second envelope. */ ""}
+    ${enemy(120, 198, 120, true)}
+    ${LABEL(120, 222, "fires", "dg-mini dg-mini-arc")}
 
-    <!-- One unit of three, where it ended up. Three parallel straight legs,
-         because that is what a unit's movement step looks like: p.36 is pivot,
-         then move straight ahead. -->
-    ${trail(A)}${trail(B)}${trail(C)}
+    ${/* Pointed straight at you from the other side of the table. Far enough
+          out that the distance is the whole explanation - it is nearly twice
+          the radius of the envelope drawn on the right. */ ""}
+    ${enemy(16, 118, 180, false)}
+    ${LABEL(36, 142, "out of range", "dg-mini dg-mini-out")}
+
+    ${/* Close enough to touch, nose pointing the other way. */ ""}
+    ${enemy(120, 150, 0, false)}
+    ${/* Above its hull, not below: the second shooter's line runs up past this
+          ship and a caption underneath sat directly on it. */ ""}
+    ${LABEL(112, 134, "behind it", "dg-mini dg-mini-out")}
+
     ${SHIP(A[0], A[1], 78, "dg-ship")}
     ${SHIP(B[0], B[1], 78, "dg-ship")}
     ${SHIP(C[0], C[1], 78, "dg-ship")}
-    ${LABEL(222, 202, "your unit ends its move here", "dg-mini")}
+    ${LABEL(166, 88, "your battlegroup", "dg-mini")}
 
-    <!-- One salvo, converging on the unit. The enemy unit attacks ONCE and the
-         attack is aimed at a unit, not at a hull, so the three lines are one
-         attack arriving - not three attacks. -->
+    ${/* One shot per firing enemy, each aimed at the unit rather than at a
+          hull, and each landing as a ring around all three. */ ""}
     <g class="dg-passive-shots">
-      <line class="dg-shot dg-pshot-1" x1="${EX - 14}" y1="${EY - 6}" x2="${A[0] + 8}" y2="${A[1] + 4}"/>
-      <line class="dg-shot dg-pshot-2" x1="${EX - 14}" y1="${EY}" x2="${B[0] + 8}" y2="${B[1] - 4}"/>
-      <line class="dg-shot dg-pshot-3" x1="${EX - 14}" y1="${EY + 6}" x2="${C[0] + 8}" y2="${C[1] - 2}"/>
+      ${shot(1, [222, 120])}
+      ${shot(2, [120, 198])}
+      <circle class="dg-pshot-hit dg-pshot-hit-1" cx="${HUB[0]}" cy="${HUB[1]}" r="0"/>
+      <circle class="dg-pshot-hit dg-pshot-hit-2" cx="${HUB[0]}" cy="${HUB[1]}" r="0"/>
     </g>
   </svg>`;
 }

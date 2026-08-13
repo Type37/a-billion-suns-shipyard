@@ -199,6 +199,26 @@ const glossMarkup = (word: string, def: string): string =>
 const SENTINEL = "\u0001";
 
 /**
+ * Place a glossary mark BY HAND, on this exact word.
+ *
+ * glossify() below marks the first mention of each term on a page and no
+ * others, which is the right default and is occasionally the wrong answer. The
+ * Passive Attacks page is the case: "unit" first appears in the p.38 opening,
+ * four screens above "Each ship may declare one enemy unit as a Primary Target
+ * and any number of enemy units as Auxiliary Targets" - which is the sentence
+ * where the difference between a ship and a unit is load-bearing, and where
+ * somebody mid-game is going to stop and want it.
+ *
+ * A hand-placed mark spends the page's budget for that term: glossify() scans
+ * for these before its own pass and drops any term it finds already marked, so
+ * the same word is never underlined twice on one page.
+ */
+const gloss = (term: string): string => {
+  const def = GLOSSARY.find(([t]) => t === term)?.[1];
+  return def ? glossMarkup(term, def) : term;
+};
+
+/**
  * Mark the FIRST mention of each glossary term on a page, and only the first.
  *
  * Once per page, not once per occurrence: "unit" appears fourteen times on the
@@ -223,8 +243,17 @@ const SENTINEL = "\u0001";
 function glossify(html: string): string {
   const slots: string[] = [];
   const page = new Map(GLOSSARY);
+  // Anything gloss() placed by hand spends that term for the whole page, so
+  // the automatic pass does not underline the same word a second time above it.
+  for (const [term] of GLOSSARY) {
+    if (new RegExp(`>${term}<span class="ltp-gloss-pop"`, "i").test(html)) page.delete(term);
+  }
   let scope = page;
   let noGloss = 0;
+  // Depth inside a hand-placed mark. Its popover carries a definition that is
+  // itself full of glossary words - the unit definition says 'ships' five
+  // times - and matching one of those would nest a mark inside a mark.
+  let inGloss = 0;
   // Tracked so the end of a panel can be recognised: a panel's closing </div>
   // is the one that brings div nesting back to the depth it opened at.
   let divs = 0;
@@ -239,6 +268,10 @@ function glossify(html: string): string {
       if (NO_GLOSS.has(tag)) {
         if (closing) noGloss = Math.max(0, noGloss - 1);
         else if (!tok.endsWith("/>")) noGloss++;
+      }
+      if (tag === "span") {
+        if (closing) { if (inGloss > 0) inGloss--; }
+        else if (inGloss > 0 || tok.includes("ltp-gloss")) inGloss++;
       }
       if (tag === "div") {
         if (closing) {
@@ -257,7 +290,7 @@ function glossify(html: string): string {
       }
       return tok;
     }
-    if (noGloss > 0 || !scope.size) return tok;
+    if (noGloss > 0 || inGloss > 0 || !scope.size) return tok;
     let text = tok;
     for (const [term, def] of [...scope]) {
       // Plural too ("ships", "units"), so the first mention counts whichever
@@ -1153,6 +1186,11 @@ const TACTICAL_PAGES: Record<string, () => string> = {
        ${p("If you have three or more players, the passive players make attacks in turns in a clockwise direction, beginning with the player to the left of the active player.")}`,
     )}
     ${learnDiagram("passive")}
+    ${/* The caption the diagram used to carry inside itself, as a title and a
+          legend set in a 10px condensed face. A sentence is body copy; it
+          belongs under the figure in the page's own font, at the page's own
+          size, where it can be read. */ ""}
+    <p class="ltp-figcap">When you finish the movement step, all enemy ships make passive attacks once, before you get to make an action.</p>
 
     ${/* The whole Combat chapter, pp.41-48, lives here now - it was its own
           fifth page on the rail, "Shoot", which made combat look like a fifth
@@ -1187,7 +1225,7 @@ const TACTICAL_PAGES: Record<string, () => string> = {
     ${quote(
       // p.43-44, verbatim.
       `${p("When a unit attacks, each ship in the unit chooses its targets separately, then you resolve all the unit&rsquo;s attacks, one target at a time. The attack dice from a single weapon system targeting a given unit are called a Salvo.")}
-       ${p("Each ship may declare one enemy unit as a Primary Target and any number of enemy units as Auxiliary Targets.")}
+       ${p(`Each ship may declare one enemy ${gloss("unit")} as a Primary Target and any number of enemy units as Auxiliary Targets.`)}
        ${p("For a unit to be selected as a target, at least one ship from the target unit must lie within range, line of sight and arc of fire of the attacking ship. You can only target neutral or enemy ships.")}
        ${p("<b>Primary Target.</b> When a ship attacks with a primary weapon system, you select a single Primary Target. You attack this primary target with all of your primary attack dice.")}
        ${p("<b>Auxiliary Targets.</b> When a ship attacks with an auxiliary weapon system, you can select any number of Auxiliary Targets. You can divide your auxiliary attack dice as you wish between these Auxiliary Targets, but must declare which dice will attack which target before rolling any attacks.")}`,

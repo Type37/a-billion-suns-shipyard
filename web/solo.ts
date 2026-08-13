@@ -57,6 +57,16 @@ const shipById = new Map<string, ShipClass>(JUNKSPACE_SHIPS.map((s) => [s.id, s]
  * both fall back to the standard.
  */
 const debtStart = (o: SavedOutfit): number => o.debtStartK ?? STARTING_DEBT_K;
+/**
+ * What this outfit has to spend, which is what it borrowed.
+ *
+ * p.201 is one number said three ways: the loan you take out, the money you buy
+ * ships with, and the Debt you fly Jobs to clear. It was two constants, so
+ * raising the Debt to the harder ¢45k left you buying ships on ¢30k and owing
+ * ¢45k, which is not the harder game the book offers - it is a worse outfit AND
+ * a bigger hole.
+ */
+const budgetK = (o: SavedOutfit): number => o.debtStartK ?? OUTFIT_BUDGET_K;
 const gamesLimit = (o: SavedOutfit): number => o.gamesLimit ?? DEBT_CLEAR_GAMES;
 
 export function outfitCost(o: SavedOutfit): number {
@@ -251,7 +261,7 @@ function soloShipCatalog(): string {
 
 function outfitTab(o: SavedOutfit): string {
   const cost = outfitCost(o);
-  const remaining = OUTFIT_BUDGET_K - cost;
+  const remaining = budgetK(o) - cost;
   const full = o.ships.length >= OUTFIT_MAX_SHIPS;
   const over = remaining < 0;
 
@@ -332,7 +342,7 @@ function outfitTab(o: SavedOutfit): string {
           200px lower was the same outfit introduced to you twice.
         -->
         <div class="band-readout solo-readout ${over ? "over" : ""}">
-          <div class="readout"><span class="readout-label">Budget</span><span class="readout-value">${ck(OUTFIT_BUDGET_K)}</span></div>
+          <div class="readout"><span class="readout-label">Budget</span><span class="readout-value">${ck(budgetK(o))}</span></div>
           <div class="readout"><span class="readout-label">Spent</span><span class="readout-value">${ck(cost)}</span></div>
           <div class="readout"><span class="readout-label">Left</span><span class="readout-value ${over ? "negative" : ""}">${over ? "−" : ""}${ck(Math.abs(remaining))}</span></div>
         </div>

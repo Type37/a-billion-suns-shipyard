@@ -66,7 +66,17 @@ export const PILOT_PERKS: PilotPerk[] = [
 // Outfit building and campaign parameters (p.195, p.201)
 // ---------------------------------------------------------------------------
 
-/** "You get ¢30k with which to buy ships" (p.201). In ¢k. */
+/**
+ * The loan, which is also the budget, which is also the Debt.
+ *
+ * p.201 says it three ways about one number: "you take out a loan of ¢30k to
+ * create an Outfit, and then fly Jobs to clear your debt" and "You get ¢30k
+ * with which to buy ships". So the money you spend on hulls is exactly the
+ * money you owe, and an outfit that starts on the harder ¢45k debt has ¢45k to
+ * spend. This constant is the standard game's figure and the default for
+ * outfits that predate the campaign dials; the live number is
+ * outfitBudgetK(outfit) below.
+ */
 export const OUTFIT_BUDGET_K = 30;
 
 /** "you can buy up to a maximum of 5 ships" (p.201). */

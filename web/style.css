@@ -2559,6 +2559,30 @@ button { font-family: inherit; }
   text-transform: none; letter-spacing: 0; color: var(--red-deep);
 }
 
+/* ------------------------------------------------ the pilot, on the sheet
+   A Junkspace ship is half hull and half crew. The stat columns carry the
+   hull; this carries the pilot - the mark, the class, and every ability in
+   full, because a perk name on its own tells you nothing at a table.
+
+   Two blank rules at the end. Perks arrive between games, one per ¢1k earned,
+   and a sheet you cannot write on is a sheet you reprint after every game. */
+.pp { display: block; margin-top: 4px; }
+.pp-who { display: flex; align-items: center; gap: 5px; }
+.pp-ico {
+  width: 17px; height: 17px; flex: none; object-fit: contain;
+  print-color-adjust: exact; -webkit-print-color-adjust: exact;
+}
+.pp-name { font-weight: 700; color: var(--ink); }
+.pp-class {
+  font-family: var(--narrow); font-size: 9px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-3);
+}
+/* Full rule text, never trimmed. */
+.pp-perk { display: block; margin-top: 2px; font-size: 9px; line-height: 1.4; color: var(--ink-2); }
+.pp-perk b { color: var(--ink); }
+.pp-perk-base b::after { content: " (starting)"; font-weight: 400; color: var(--ink-3); }
+.pp-blank { display: block; margin-top: 7px; border-bottom: 1px solid var(--hair-soft); height: 1px; }
+
 /* ------------------------------------------------ campaign tab, tightened
    Five pilots came to seven hundred pixels of mostly nothing: each was a name
    line, a "No perks taken." line, a "Grant a perk" label and a full-width

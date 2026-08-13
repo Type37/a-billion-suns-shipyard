@@ -9,6 +9,19 @@ import {
   DEBT_CLEAR_GAMES,
 } from "../src/data/junkspace.ts";
 import { PERKS_BY_CLASS } from "../src/data/junkspace-solo.ts";
+// The three pilot marks the outfit builder draws. On the printed sheet a class
+// was a word in the same 9.5px caps as everything else around it, and a Gunner,
+// a Hauler and a Junker are the one thing on a crew sheet that is a character
+// rather than a number.
+import gunnerIcon from "./pilots/gunner.png";
+import haulerIcon from "./pilots/hauler.png";
+import junkerIcon from "./pilots/junker.png";
+
+const PRINT_PILOT_ICON: Record<string, string> = {
+  Gunner: gunnerIcon,
+  Hauler: haulerIcon,
+  Junker: junkerIcon,
+};
 import { TRAINING_FLEET } from "../src/data/training-fleet.ts";
 import { ACTIVATION_STEPS, CORE_ACTIONS, CORE_COMMANDS, ROUND_PHASES } from "../src/data/commands.ts";
 import { deriveCommandEffects, effectiveCost } from "../src/command-effects.ts";
@@ -1968,10 +1981,58 @@ function outfitPrintView(state: AppState): string {
     updatedAt: o.updatedAt,
   } as unknown as SavedList;
 
-  return printView(state, { list, factions: [faction] });
+  /*
+   * The pilot, printed. A Junkspace ship is half hull and half crew: the class
+   * sets a starting perk and every perk earned since changes how that ship
+   * plays (pp.212-213), and none of it is in a stat line. The mark goes on the
+   * page beside the word because the three classes are told apart at a glance
+   * in the app and should be on paper too.
+   *
+   * Two blank rules under each pilot. Perks arrive between games, one per ¢1k
+   * earned, and a sheet you cannot add to is a sheet you reprint every game.
+   */
+  const unitExtra = (unitId: string): string => {
+    const sh = o.ships.find((x) => x.id === unitId);
+    if (!sh) return "";
+    const base = PILOT_PERKS.find((p) => p.class === sh.pilotClass);
+    const earned = o.perks
+      .filter((p) => p.shipId === sh.id)
+      .map((p) => {
+        const found = PERKS_BY_CLASS[sh.pilotClass]?.find((x) => x.name === p.perk);
+        return `<span class="pp-perk"><b>${escapeHtml(p.perk)}</b> ${found ? ruleText(found.text) : ""}</span>`;
+      })
+      .join("");
+    const mark = PRINT_PILOT_ICON[sh.pilotClass];
+    return `
+      <span class="pp">
+        <span class="pp-who">
+          ${mark ? `<img class="pp-ico" src="${mark}" alt="" />` : ""}
+          <span class="pp-name">${escapeHtml(sh.pilotName?.trim() || "Unnamed pilot")}</span>
+          <span class="pp-class">${escapeHtml(sh.pilotClass)}</span>
+        </span>
+        ${base ? `<span class="pp-perk pp-perk-base"><b>${escapeHtml(base.perkName)}</b> ${ruleText(base.text)}</span>` : ""}
+        ${earned}
+        <span class="pp-blank"></span>
+        <span class="pp-blank"></span>
+      </span>`;
+  };
+
+  return printView(state, { list, factions: [faction], unitExtra });
 }
 
-function printView(state: AppState, override?: { list: SavedList; factions: Faction[] }): string {
+function printView(
+  state: AppState,
+  override?: {
+    list: SavedList;
+    factions: Faction[];
+    /**
+     * Extra markup for one unit, printed under its name in the roster and in
+     * its card. A Junkspace ship is a hull AND a pilot, and the pilot's
+     * abilities are the half of it a stat line cannot carry.
+     */
+    unitExtra?: (unitId: string) => string;
+  },
+): string {
   const list = override?.list ?? activeList(state);
   if (!list) return `${topbar()}<main class="empty-state"><p>That fleet was not found.</p></main>`;
   const customs = override ? [...state.customFactions, ...override.factions] : state.customFactions;
@@ -2149,6 +2210,7 @@ function printView(state: AppState, override?: { list: SavedList; factions: Fact
           ${showClass ? `<span class="pr-unit-class">${escapeHtml(ship.name)}${list.freePlay ? `, ${escapeHtml(r.owner.name)}` : ""}</span>` : ""}
           ${named.length ? `<span class="pr-unit-ships">${escapeHtml(named.join(" / "))}</span>` : ""}
           ${notes ? `<span class="pr-unit-notes">${escapeHtml(notes)}</span>` : ""}
+          ${override?.unitExtra?.(u.id) ?? ""}
         </td>
         <td class="pr-num">${prNum("stat-mass", String(ship.mass))}</td>
         <td class="pr-num">${prNum("stat-thrust", `${ship.thrust}"`)}</td>
@@ -2218,6 +2280,7 @@ function printView(state: AppState, override?: { list: SavedList; factions: Fact
           <div class="pc-weapons-col">${cardWeapons(ship)}</div>
         </div>
         ${named.length ? `<p class="pc-ships">${escapeHtml(named.join(" / "))}</p>` : ""}
+        ${override?.unitExtra?.(u.id) ?? ""}
         ${carried.length ? `<p class="pc-carry">Carrying: ${escapeHtml(carried.join("; "))}</p>` : ""}
         ${
           opts.jumpTrackers
@@ -2247,15 +2310,11 @@ function printView(state: AppState, override?: { list: SavedList; factions: Fact
 
   const cardBlocks = unitCards ? `<div class="print-cards">${unitCards}</div>` : "";
 
-  // A small tracker strip (command tokens, credit balance) for at-table use,
-  // shown only when trackers are enabled.
-  const cmdCount = faction ? Number(faction.cmdTokens) : NaN;
-  const trackerStrip = opts.trackers
-    ? `<section class="print-track-strip">
-        <div class="pts-item"><span class="pts-label">Command tokens</span>${Number.isFinite(cmdCount) && cmdCount > 0 ? hpBoxes(cmdCount) : `<span class="pts-blank"></span>`}</div>
-        <div class="pts-item"><span class="pts-label">${list.mode === "hypergrowth" || list.mode === "management-training" ? "Credit balance" : "Reserve / notes"}</span><span class="pts-blank"></span></div>
-      </section>`
-    : "";
+  // NO COMMAND-TOKEN STRIP. "Damage trackers" printed one, plus a credit
+  // balance or a reserve line, which is three unrelated things behind one
+  // checkbox: you tick it to get HP boxes on your ships and it also staples a
+  // CMD counter and a blank rule to the top of the sheet. A toggle does the
+  // thing it is named after.
 
   // No carrier line. The roster above has an HVP column per unit, which is where
   // the assignment is actually written and amended; repeating it here (or, worse,
@@ -2423,7 +2482,6 @@ function printView(state: AppState, override?: { list: SavedList; factions: Fact
           : ""
       }
 
-      ${trackerStrip}
 
       ${
         opts.format === "guide" && guideAvailable

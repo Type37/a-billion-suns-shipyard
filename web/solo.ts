@@ -350,7 +350,7 @@ function outfitTab(o: SavedOutfit): string {
               the app counting to three for you, every time you look at it. The
               cap only matters at the moment it stops you, so it only speaks
               then. */ ""}
-        <h3 class="roster-section">Ships${full ? ` <span class="roster-warn">Outfit full &mdash; ${OUTFIT_MAX_SHIPS} ships is the berthing limit</span>` : ""}</h3>
+        <h3 class="roster-section">Ships${full ? ` <span class="roster-warn">Outfit full</span>` : ""}</h3>
         ${shipRows || ""}
         ${over ? '<div class="inspection fail"><p class="issue-error">Over budget by ' + ck(-remaining) + ".</p></div>" : ""}
         <div class="roster-actions">

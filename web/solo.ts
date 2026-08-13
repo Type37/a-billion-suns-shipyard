@@ -259,6 +259,50 @@ function soloShipCatalog(): string {
   ).join("");
 }
 
+/*
+ * What a pilot has earned, and the control that grants them another.
+ *
+ * This lived on the Campaign tab, one screen away from the pilot it belonged
+ * to. A perk is not a campaign fact like the debt or the game count - it is
+ * part of what a ship DOES, sitting directly under the class ability it is
+ * bought alongside. So it goes where the pilot is.
+ *
+ * "No duplicates" (p.213): a perk this pilot already has is still listed,
+ * marked and unselectable, so the class list stays whole and you can see what
+ * is left rather than watching options quietly disappear.
+ *
+ * A taken perk prints its rule in full. The name on its own meant reaching for
+ * the book every time it mattered, which is the one thing this screen exists to
+ * save you.
+ */
+function perkBlock(o: SavedOutfit, sh: SavedOutfit["ships"][number]): string {
+  const list = PERKS_BY_CLASS[sh.pilotClass] ?? [];
+  const has = new Set(o.perks.filter((p) => p.shipId === sh.id).map((p) => p.perk));
+  const opts = list
+    .map(
+      (p) =>
+        `<option value="${escapeHtml(p.name)}"${has.has(p.name) ? " disabled" : ""}>${p.n}. ${escapeHtml(p.name)}${has.has(p.name) ? " (taken)" : ""}</option>`,
+    )
+    .join("");
+  const taken = o.perks
+    .map((p, i) => ({ p, i }))
+    .filter((x) => x.p.shipId === sh.id)
+    .map(({ p, i }) => {
+      const def = list.find((x) => x.name === p.perk);
+      return `<li><div class="perk-taken">
+          <p class="perk-taken-head"><b>${escapeHtml(p.perk)}</b></p>
+          ${def ? `<p class="perk-taken-text">${ruleText(def.text)}</p>` : ""}
+        </div>
+        <button class="ghost-btn danger" data-action="remove-perk" data-index="${i}" aria-label="Remove ${escapeHtml(p.perk)}" title="Remove">${icon("close", 12)}</button></li>`;
+    })
+    .join("");
+  const who = sh.pilotName || sh.shipName || `${sh.pilotClass} pilot`;
+  return `<div class="perk-block">
+      ${taken ? `<ul class="perk-list">${taken}</ul>` : ""}
+      <select class="perk-select" data-action="assign-perk" data-ship="${sh.id}" aria-label="Grant a perk to ${escapeHtml(who)}"><option value="">Grant a perk&hellip;</option>${opts}</select>
+    </div>`;
+}
+
 function outfitTab(o: SavedOutfit): string {
   const cost = outfitCost(o);
   const remaining = budgetK(o) - cost;
@@ -322,6 +366,7 @@ function outfitTab(o: SavedOutfit): string {
               <input class="pilot-name-input" type="text" value="${escapeHtml(s.pilotName ?? "")}" placeholder="Call sign" aria-label="Pilot name" data-action="outfit-pilot-name" data-ship="${s.id}" />
             </div>
             <div class="pilot-abilities">${abilities}</div>
+            ${perkBlock(o, s)}
           </div>
         </div>
       </article>`;
@@ -351,6 +396,7 @@ function outfitTab(o: SavedOutfit): string {
               cap only matters at the moment it stops you, so it only speaks
               then. */ ""}
         <h3 class="roster-section">Ships${full ? ` <span class="roster-warn">Outfit full</span>` : ""}</h3>
+        <p class="panel-note">For each ¢1k earned in a game, a surviving pilot may take a Perk from their class list (no duplicates).</p>
         ${shipRows || ""}
         ${over ? '<div class="inspection fail"><p class="issue-error">Over budget by ' + ck(-remaining) + ".</p></div>" : ""}
         <div class="roster-actions">
@@ -521,7 +567,6 @@ function playTab(state: AppState, o: SavedOutfit): string {
         <h3 class="roster-section">Alert Level rules</h3>
         <ul class="rule-list small">${SOLO_ALERT_RULES.map((r) => `<li>${ruleText(r)}</li>`).join("")}</ul>
       </section>
-    </div>
   </div>`;
 }
 
@@ -540,63 +585,6 @@ function campaignTab(o: SavedOutfit): string {
 
   const log = o.gameLog
     .map((g) => `<tr><td>Game ${g.game}</td><td class="cell-num">${ck(g.earnedK)}</td><td>${escapeHtml(g.note ?? "")}</td></tr>`)
-    .join("");
-
-  // A perk belongs to a pilot, so it is shown under that pilot - what they have
-  // already taken, then the control that grants them another. It used to be two
-  // disconnected lists: five "Grant a perk" dropdowns, and somewhere below them
-  // a flat roll of "Osip: Goblin" lines you had to match back up by name.
-  //
-  // And a taken perk prints its rule in full. The name on its own meant reaching
-  // for the book every time it mattered, which is the one thing this screen
-  // exists to save you.
-  const takenFor = (shipId: string): string =>
-    o.perks
-      .map((p, i) => ({ p, i }))
-      .filter((x) => x.p.shipId === shipId)
-      .map(({ p, i }) => {
-        const ship = o.ships.find((s) => s.id === p.shipId);
-        const def = ship ? PERKS_BY_CLASS[ship.pilotClass].find((x) => x.name === p.perk) : undefined;
-        return `<li>
-          <div class="perk-taken">
-            <p class="perk-taken-head"><b>${escapeHtml(p.perk)}</b></p>
-            ${def ? `<p class="perk-taken-text">${ruleText(def.text)}</p>` : ""}
-          </div>
-          <button class="ghost-btn danger" data-action="remove-perk" data-index="${i}" aria-label="Remove ${escapeHtml(p.perk)}" title="Remove">${icon("close", 12)}</button>
-        </li>`;
-      })
-      .join("");
-
-  const perkPilots = o.ships
-    .map((s) => {
-      const list = PERKS_BY_CLASS[s.pilotClass];
-      const has = new Set(o.perks.filter((p) => p.shipId === s.id).map((p) => p.perk));
-      // "no duplicates" (p.213): a perk this pilot already has is still listed,
-      // marked and unselectable, so the class list stays whole and you can see
-      // what is left rather than watching options quietly disappear.
-      const opts = list
-        .map(
-          (p) =>
-            `<option value="${escapeHtml(p.name)}"${has.has(p.name) ? " disabled" : ""}>${p.n}. ${escapeHtml(p.name)}${has.has(p.name) ? " (taken)" : ""}</option>`,
-        )
-        .join("");
-      const who = s.pilotName || s.shipName || `${s.pilotClass} pilot`;
-      const taken = takenFor(s.id);
-      // One row per pilot. This was four stacked blocks each - a name line, a
-      // "No perks taken." line, a "Grant a perk" label and a full-width select -
-      // so five pilots came to seven hundred pixels of mostly nothing, and the
-      // one thing you came to this tab to do was five screens apart from
-      // itself. Name and class on the left, what they have taken beside it, the
-      // control on the right, one line high when a pilot has no perks.
-      return `<article class="perk-pilot">
-        <span class="perk-pilot-who">
-          <span class="perk-pilot-name">${escapeHtml(who)}</span>
-          <span class="perk-pilot-class">${s.pilotClass}</span>
-        </span>
-        <span class="perk-pilot-has">${taken ? `<ul class="perk-list">${taken}</ul>` : '<span class="perk-pilot-none">&mdash;</span>'}</span>
-        <select class="perk-select" data-action="assign-perk" data-ship="${s.id}" aria-label="Grant a perk to ${escapeHtml(who)}"><option value="">Grant a perk&hellip;</option>${opts}</select>
-      </article>`;
-    })
     .join("");
 
   // Perks left behind by a ship that has since been removed from the outfit.
@@ -628,14 +616,9 @@ function campaignTab(o: SavedOutfit): string {
       <button class="cta-btn" data-action="log-game">${icon("plus", 16)} Log a completed game</button>
     </div>
   </section>
-  <div class="solo-split">
-    <section class="solo-card solo-card-primary">
-      <h3 class="roster-section">Pilot perks</h3>
-      <p class="panel-note">For each ¢1k earned in a game, a surviving pilot may take a Perk from their class list (no duplicates).</p>
-      ${o.ships.length ? `<div class="perk-pilots">${perkPilots}</div>` : '<p class="muted">Add ships to your outfit first.</p>'}
-      ${orphanPerks ? `<div class="perk-pilot perk-pilot-orphans"><p class="perk-pilot-head"><span class="perk-pilot-name">Pilots no longer with the outfit</span></p><ul class="perk-list">${orphanPerks}</ul></div>` : ""}
-    </section>
+  <div class="solo-split solo-split-solo">
     <div class="solo-ref">
+      ${orphanPerks ? `<section class="solo-card solo-card-quiet"><h3 class="roster-section">Perks with no pilot</h3><ul class="perk-list">${orphanPerks}</ul></section>` : ""}
       <section class="solo-card solo-card-quiet">
         <h3 class="roster-section">Game log</h3>
         ${

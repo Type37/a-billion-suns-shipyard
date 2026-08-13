@@ -1565,7 +1565,11 @@ button { font-family: inherit; }
    narrow there. Whichever view you print, the numbers and the guns now look
    like the same numbers and guns. */
 .pcw-name { font-family: var(--narrow); font-size: 10px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.15; color: var(--ink); }
-.pcw-fig { font-family: var(--narrow); font-size: 9.5px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; color: var(--ink-2); white-space: nowrap; }
+/* The condensed face is for NAMES that have to fit a box and for small caps
+   labels. Not for numbers: a figure set condensed reads as a different figure
+   from the same figure set in the sans two lines up, and the sheet has both.
+   Numbers are the sans with tabular-nums, everywhere. */
+.pcw-fig { font-family: var(--sans); font-size: 9.5px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; color: var(--ink-2); white-space: nowrap; }
 .pc-carry { font-size: 9px; font-style: italic; color: var(--ink-2); margin-top: 2px; }
 .pc-track { margin-top: 5px; padding-top: 4px; border-top: 1px solid var(--hair-soft); display: flex; flex-direction: column; gap: 1px; }
 .pc-track-h { font-family: var(--display); font-weight: 800; font-size: 9px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-2); margin: 0 0 3px; }
@@ -1795,7 +1799,7 @@ button { font-family: inherit; }
    So the table is not one face, deliberately: it is the sans for figures, the
    narrow where width is genuinely scarce, and Archivo for the row's title. The
    column HEADS are all one face, which is what actually needed unifying. */
-.print-roster tbody td.pr-weap { font-family: var(--narrow); letter-spacing: -0.01em; }
+.print-roster tbody td.pr-weap { letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
 .print-roster tbody td.pr-num, .print-roster tbody td.pr-cost { font-family: var(--sans); letter-spacing: 0; }
 .print-roster tbody td.pr-weap { font-weight: 600; font-size: 10px; line-height: 1.25; white-space: nowrap; }
 /* A notch smaller once a tracker column is on. Turning on damage and jump
@@ -1815,8 +1819,8 @@ button { font-family: inherit; }
 .pr-jump-head, .pr-jump-ship { display: flex; align-items: center; gap: 2px; }
 .pr-jump-ship { margin-bottom: 1px; }
 .pr-jump-ship:last-child { margin-bottom: 0; }
-.pr-jump-n { width: 7px; flex: none; font-family: var(--narrow); font-size: 7px; font-weight: 700; color: var(--ink-3); }
-.pr-jump-hl { width: 11px; flex: none; text-align: center; font-family: var(--narrow); font-size: 7px; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--ink-3); }
+.pr-jump-n { width: 8px; flex: none; font-size: 7px; font-weight: 700; color: var(--ink-3); }
+.pr-jump-hl { width: 12px; flex: none; text-align: center; font-size: 7px; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--ink-3); }
 .pr-jump-box { display: inline-block; width: 11px; height: 11px; flex: none; border: 1px solid var(--ink-3); }
 /* The header cell says it in full once; the mini-labels under it line the boxes
    up. On a phone the full wording is what survives. */
@@ -2455,18 +2459,6 @@ button { font-family: inherit; }
 .gb-clock .inspection-pass, .gb-clock .issue-error { max-width: 46ch; }
 .gb-act { display: flex; justify-content: flex-end; }
 
-/* One block per pilot: what they have taken, then how to give them more. */
-.perk-pilots { display: flex; flex-direction: column; gap: 4px; }
-.perk-pilot { border-top: 1px solid var(--hair-soft); padding: 11px 0 13px; }
-.perk-pilot:first-child { border-top: none; padding-top: 2px; }
-.perk-pilot-head { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; margin-bottom: 6px; }
-.perk-pilot-name { font-family: var(--display); font-weight: 800; font-size: 15px; color: var(--ink); }
-.perk-pilot-class { font-family: var(--sans); font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
-.perk-pilot-none { font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-3); margin-bottom: 8px; }
-.perk-pilot .perk-list { margin-bottom: 9px; }
-.perk-pilot .inline-field { width: 100%; }
-.perk-pilot .inline-field select { width: 100%; }
-.perk-pilot-orphans { border-top: 2px solid var(--hair); margin-top: 10px; }
 
 /* -------------------------------------------------------------- act / refer
 
@@ -2705,38 +2697,27 @@ button { font-family: inherit; }
 .pr-pilot-row .pp-perk { max-width: 92ch; }
 .pr-pilot-row .pp-room { height: 22px; }
 
-/* ------------------------------------------------ campaign tab, tightened
-   Five pilots came to seven hundred pixels of mostly nothing: each was a name
-   line, a "No perks taken." line, a "Grant a perk" label and a full-width
-   select, stacked. One row each now, one line high when a pilot has taken
-   nothing, so the whole crew fits on a screen with the debt and the log. */
-.perk-pilots { display: grid; gap: 1px; background: var(--hair-soft); border: 1px solid var(--hair-soft); }
-.perk-pilot {
-  display: grid; grid-template-columns: minmax(120px, 1.1fr) minmax(0, 2fr) minmax(150px, 1fr);
-  align-items: center; gap: 12px;
-  padding: 7px 11px; background: var(--paper);
-}
-.perk-pilot-who { display: flex; align-items: baseline; gap: 7px; min-width: 0; }
-.perk-pilot-name { font-weight: 700; color: var(--ink); }
-.perk-pilot-class {
-  font-family: var(--narrow); font-size: 10.5px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3);
-}
-.perk-pilot-has { min-width: 0; font-size: 13px; color: var(--ink-2); }
-.perk-pilot-none { color: var(--ink-3); }
-.perk-pilot-has .perk-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; }
-.perk-select { width: 100%; min-height: var(--tap); }
-@media (max-width: 700px) {
-  .perk-pilot { grid-template-columns: minmax(0, 1fr); gap: 5px; }
-}
-
+/* The perk block, in the ship card under the class ability.
+   A perk is not a campaign fact like the debt or the game count - it is part
+   of what a ship DOES, bought alongside the class ability and read in the same
+   breath. It was a screen away on the Campaign tab, five dropdowns matched
+   back to five pilots by name. */
+.perk-block { display: flex; flex-direction: column; gap: 5px; margin-top: 5px; }
+.perk-block .perk-list { gap: 4px; }
+.perk-block .perk-list li { padding-bottom: 4px; }
+.perk-block .perk-taken-head b { font-size: 12.5px; }
+.perk-block .perk-taken-text { font-size: 12px; line-height: 1.4; }
+.perk-block .ghost-btn.danger { padding: 1px 5px; flex: none; }
+/* Not full width: a select that runs the whole card reads as the card's
+   subject rather than one more thing you may do to the pilot. */
+.perk-select { max-width: 230px; font-size: 12.5px; padding: 4px 6px; }
 /* The log is a story, so an entry is a line of it: which game, what it paid,
    when, and what happened. */
 .game-log { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
 .game-log-row { display: grid; gap: 2px; }
 .glr-head { display: flex; align-items: baseline; gap: 10px; }
 .glr-n { font-family: var(--display); font-weight: 800; font-size: 13.5px; color: var(--ink); }
-.glr-earned { font-family: var(--narrow); font-weight: 700; color: var(--blue); }
+.glr-earned { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--blue); }
 .glr-date { margin-left: auto; font-size: 11.5px; color: var(--ink-3); }
 /* Never clipped: the note is the only part of a campaign the app remembers. */
 .glr-note { font-size: 13px; line-height: 1.45; color: var(--ink-2); }

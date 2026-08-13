@@ -2604,6 +2604,40 @@ button { font-family: inherit; }
 }
 .sheet.is-solo .print-cards { gap: 14px; }
 
+/* ONE LEFT EDGE, AND FEWER LINES.
+   The card was six things on six rows, each starting at a different x: the
+   stats wrapped into a 2x2 block, the weapons sat in their own column beside
+   it, the pilot mark had a row to itself with one word next to it, and each
+   perk began a fresh paragraph. Half the card was the gaps between them.
+
+   Everything below the title now hangs off the same left edge and takes as
+   few rows as it can: four stat chips across one line, a weapon per line
+   beside its arc, the pilot on one line with the class, and the perks run on
+   from there. */
+.sheet.is-solo .pc-body { display: block; }
+.sheet.is-solo .pc-stats-chips {
+  display: flex; flex-wrap: nowrap; gap: 12px; margin-bottom: 3px;
+}
+.sheet.is-solo .pc-weapons-col { margin-top: 2px; }
+.sheet.is-solo .pc-head { align-items: baseline; margin-bottom: 5px; }
+.sheet.is-solo .pp { margin-top: 7px; }
+.sheet.is-solo .pp-who { gap: 7px; margin-bottom: 2px; }
+/* The mark carries the class, so the word beside it is a caption on a caption
+   whenever the pilot has a name. Kept when there is no name, because then it
+   is the only thing identifying the crew. */
+.sheet.is-solo .pp-who .pp-name + .pp-class { display: none; }
+.sheet.is-solo .pp-ico { width: 22px; height: 22px; }
+.sheet.is-solo .pp-perk { margin-top: 1px; }
+/* Room to write, but not a third of the card. */
+.sheet.is-solo .pp-room { height: 16px; }
+/* The pilot mark rides the title line. It had a row to itself with one word
+   beside it, which cost a line and put the crew halfway down the card away
+   from the ship they fly. */
+.pc-pilot-badge { display: inline-flex; align-items: center; gap: 5px; flex: none; margin-right: 7px; }
+.sheet.is-solo .pc-head { gap: 0; }
+.sheet.is-solo .pc-pilot-badge .pp-ico { width: 20px; height: 20px; }
+.sheet.is-solo .pp-who { margin-bottom: 1px; }
+
 /* ------------------------------------------------ the pilot, on the sheet
    A Junkspace ship is half hull and half crew. The stat columns carry the
    hull; this carries the pilot - the mark, the class, and every ability in

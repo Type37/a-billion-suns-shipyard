@@ -2000,25 +2000,42 @@ function outfitPrintView(state: AppState): string {
     const earned = o.perks
       .filter((p) => p.shipId === sh.id)
       .map((p) => {
-        const found = PERKS_BY_CLASS[sh.pilotClass]?.find((x) => x.name === p.perk);
+        // Look through EVERY class list, not just this pilot's. A perk granted
+        // from another class's list - which the app allows, and which the
+        // Snapfire and Turbo-Spanner duplicates make ordinary - was not found
+        // here, so it printed its name with no rule under it: "Killer
+        // Instincts" and nothing else, which is the one thing a printed perk
+        // must never be.
+        const found = Object.values(PERKS_BY_CLASS)
+          .flat()
+          .find((x) => x.name === p.perk);
         return `<span class="pp-perk"><b>${escapeHtml(p.perk)}</b> ${found ? ruleText(found.text) : ""}</span>`;
       })
       .join("");
     const mark = PRINT_PILOT_ICON[sh.pilotClass];
     return `
       <span class="pp">
-        <span class="pp-who">
-          ${mark ? `<img class="pp-ico" src="${mark}" alt="" />` : ""}
-          ${sh.pilotName?.trim() ? `<span class="pp-name">${escapeHtml(sh.pilotName.trim())}</span>` : ""}
-          <span class="pp-class">${escapeHtml(sh.pilotClass)}</span>
-        </span>
+        ${
+          sh.pilotName?.trim()
+            ? `<span class="pp-who"><span class="pp-name">${escapeHtml(sh.pilotName.trim())}</span></span>`
+            : ""
+        }
         ${base ? `<span class="pp-perk pp-perk-base"><b>${escapeHtml(base.perkName)}</b> ${ruleText(base.text)}</span>` : ""}
         ${earned}
         <span class="pp-room"></span>
       </span>`;
   };
 
-  return printView(state, { list, factions: [faction], unitExtra });
+  const unitBadge = (unitId: string): string => {
+    const sh = o.ships.find((x) => x.id === unitId);
+    if (!sh) return "";
+    const mark = PRINT_PILOT_ICON[sh.pilotClass];
+    return `<span class="pc-pilot-badge">${
+      mark ? `<img class="pp-ico" src="${mark}" alt="" />` : ""
+    }<span class="pp-class">${escapeHtml(sh.pilotClass)}</span></span>`;
+  };
+
+  return printView(state, { list, factions: [faction], unitExtra, unitBadge });
 }
 
 function printView(
@@ -2032,6 +2049,9 @@ function printView(
      * abilities are the half of it a stat line cannot carry.
      */
     unitExtra?: (unitId: string) => string;
+    /** A mark for the card's title line. The pilot belongs beside the ship's
+     *  name, not on a row of its own halfway down the card. */
+    unitBadge?: (unitId: string) => string;
   },
 ): string {
   const list = override?.list ?? activeList(state);
@@ -2278,6 +2298,7 @@ function printView(
       return `
       <article class="print-card">
         <header class="pc-head">
+          ${override?.unitBadge?.(u.id) ?? ""}
           <span class="pc-name">${escapeHtml(title)}${u.count > 1 ? ` <span class="pc-x">&times;${u.count}</span>` : ""}</span>
           <span class="pc-cost">${money(ship.cost * u.count)}</span>
         </header>

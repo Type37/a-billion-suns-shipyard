@@ -4836,6 +4836,15 @@ a .icon,
 .learn-dg .dg-jp-core { fill: var(--blue); }
 .learn-dg .dg-jp-ring { fill: none; stroke: var(--blue); stroke-width: 2; }
 
+/* One ship, labelled. The base ring is dashed because p.12 has it there and
+   ignored for measuring; the Position dot sits on top of it in the accent red
+   as the thing that IS measured from. */
+.learn-dg .dg-base-ring { fill: none; stroke: var(--hair-soft); stroke-width: 1.5; stroke-dasharray: 4 4; }
+.learn-dg .dg-position-dot { fill: var(--red); }
+.learn-dg .dg-heading line { stroke: var(--blue); stroke-width: 1.6; }
+.learn-dg .dg-heading path { fill: var(--blue); }
+.learn-dg .dg-leader line { stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 2 3; }
+
 @keyframes dg-roll { 0% { transform: translateY(-26px) rotate(-140deg); opacity: 0; } 55% { opacity: 1; } 70% { transform: translateY(3px) rotate(6deg); } 100% { transform: translateY(0) rotate(0); opacity: 1; } }
 /* No 1.12 overshoot: it read as a toy. Straight to size. */
 @keyframes dg-pop { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
@@ -6240,7 +6249,14 @@ main.play-body .roster-section::before { content: none; }
 .ltp-subtab.on .ltp-subtab-n { background: var(--red-deep); }
 /* The step's own heading, straight under the rail: no top rule, because the
    rail is already the divider. */
-.ltp-h3-step { margin-top: 0; padding-top: 0; border-top: 0; }
+/* The rail IS the divider, so whatever follows it does not draw a second one.
+   This was .ltp-h3-step, on a heading printed under the rail with the current
+   step's name in it; that heading is gone (it said the same thing as the lit
+   tab above it), and the first block of the page now sits directly under the
+   rail instead. Matching the sibling rather than a class means it works whether
+   that block is a heading or a quote. */
+.ltp-subrail + .ltp-h3 { margin-top: 0; padding-top: 0; border-top: 0; }
+.ltp-subrail + .ltp-quote { margin-top: 0; }
 /* Never clipped: the label is the whole point of the tab. */
 .ltp-tab-l { white-space: nowrap; }
 /* The step number is for the landscape-phone bar, where the icon alone is
@@ -6679,6 +6695,54 @@ main.play-body .roster-section::before { content: none; }
   /* Definitions run to forty words. They wrap and the box grows; nothing here
      is ever clipped or trimmed to fit. */
   white-space: normal;
+}
+
+/* --------------------------------------------------------------- ship stats
+   Six rows, each the stat's own icon and name against the rulebook's
+   definition of it. Same hairline-grid construction as .ltp-steps below, and
+   deliberately so: both are "a set of named things, in the book's order", and a
+   reader who has learnt one grid reads the other for free.
+
+   The icons are the marks the builder and the compendium print beside every
+   number. That is the point of the row - somebody reading here meets them next
+   on a ship card. */
+.ltp-stats {
+  margin: 0 0 16px; padding: 0;
+  display: flex; flex-direction: column; gap: 1px;
+  background: var(--hair-soft); border: 1px solid var(--hair-soft);
+}
+.ltp-stat { display: flex; gap: 14px; padding: 11px 13px; background: var(--paper); }
+.ltp-stat-k {
+  /* Wide enough for SILHOUETTE, the longest of the six, with air after it. */
+  flex: none; width: 128px;
+  display: flex; align-items: baseline; gap: 8px;
+}
+.ltp-stat-ico { flex: none; color: var(--blue); align-self: center; }
+/* Cost has no icon in the stat set - it is a number of credits, printed as a
+   number everywhere in the app - so it carries the currency mark instead, sized
+   and coloured to sit in the same 19px slot as the five real icons. */
+.ltp-stat-ico-cr {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 19px; height: 19px;
+  font-family: var(--display); font-weight: 800; font-size: 12px;
+  letter-spacing: 0.02em; color: var(--blue);
+}
+.ltp-stat-n {
+  font-family: var(--display); font-weight: 800; font-size: 13px;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--blue-deep);
+}
+.ltp-stat-d { margin: 0; min-width: 0; }
+/* The definition is the book talking, so it is set as the book's text is set
+   everywhere else on these pages - only the first paragraph loses its top
+   margin, so the first line sits level with the stat's name. */
+.ltp-stat-d .ltp-p { font-size: 15.5px; }
+.ltp-stat-d .ltp-p:first-child { margin-top: 0; }
+.ltp-stat-d .ltp-p:last-child { margin-bottom: 0; }
+@media (max-width: 560px) {
+  /* 128px of label beside 40 characters of definition is a column of two-word
+     lines on a phone. Stack instead. */
+  .ltp-stat { flex-direction: column; gap: 5px; }
+  .ltp-stat-k { width: auto; }
 }
 
 .ltp-steps {

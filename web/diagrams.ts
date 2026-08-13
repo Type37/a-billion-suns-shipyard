@@ -835,7 +835,61 @@ function jumpStrainDiagram(): string {
   </svg>`;
 }
 
+/**
+ * One ship, labelled: Position, Heading, and where its stats come from.
+ *
+ * Position and Heading are the two properties on p.25 that are geometry rather
+ * than a number, and they are the two the book cannot draw for you - "the
+ * centrepoint of the model's base (likely its flight peg)" and "the direction
+ * in which the model is pointing" are both sentences you have to build a
+ * picture from before you can measure anything. Every measurement in the game
+ * starts at one and runs along the other, so they go first and they go together.
+ *
+ * The hull is drawn at 3x the size the other diagrams use, because this is the
+ * only one where the ship is the subject rather than a counter being moved
+ * around, and the base ring under it is dashed: p.12 says ship bases are
+ * ignored for the purposes of measuring, so the ring is drawn as the thing that
+ * is there and does not count, with the Position dot on top of it as the thing
+ * that does.
+ */
+function shipAnatomyDiagram(): string {
+  const CX = 150, CY = 118;
+  return `
+  <svg class="learn-dg" viewBox="0 0 320 208" role="img"
+       aria-label="One ship, labelled: its Position is the centrepoint of the model's base, its Heading is the direction the model points, and its stats come from its ship class.">
+    ${LABEL(160, 17, "Position and Heading", "dg-title")}
+
+    <!-- The base, dashed: it is there, and it is ignored when measuring. -->
+    <circle class="dg-base-ring" cx="${CX}" cy="${CY}" r="27"/>
+
+    <!-- Heading: a ray out of the nose, along the direction the hull points. -->
+    <g class="dg-heading">
+      <line x1="${CX}" y1="${CY - 30}" x2="${CX}" y2="52"/>
+      <path d="M${CX - 5} 59 L${CX} 49 L${CX + 5} 59 Z"/>
+    </g>
+    ${LABEL(CX, 42, "Heading", "dg-measure-text")}
+
+    ${SHIP(CX, CY, 0, "dg-ship", 2.1)}
+
+    <!-- Position: the dot ON the centrepoint, with a leader out to its label so
+         the dot itself is not obscured by the word. -->
+    <g class="dg-leader">
+      <line x1="${CX + 4}" y1="${CY}" x2="238" y2="${CY}"/>
+    </g>
+    <circle class="dg-position-dot" cx="${CX}" cy="${CY}" r="3.5"/>
+    ${LABEL(262, CY - 6, "Position", "dg-measure-text")}
+    ${LABEL(262, CY + 10, "(the flight peg)", "dg-measure-text")}
+
+    <g class="dg-leader">
+      <line x1="${CX - 27}" y1="${CY + 14}" x2="66" y2="176"/>
+    </g>
+    ${LABEL(58, 190, "base — ignored", "dg-measure-text")}
+    ${LABEL(58, 202, "when measuring", "dg-measure-text")}
+  </svg>`;
+}
+
 const DIAGRAMS: Record<string, () => string> = {
+  "ship-anatomy": shipAnatomyDiagram,
   deployment: deploymentMap,
   "gravity-well": gravityWellDiagram,
   "jump-strain": jumpStrainDiagram,

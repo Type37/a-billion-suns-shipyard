@@ -556,6 +556,146 @@ const fold = (label: string, body: string, note?: string): string => `
     <div class="ltp-fold-body">${body}</div>
   </details>`;
 
+/**
+ * One row of the stat sheet: the app's own icon for the stat, the stat's name,
+ * and the rulebook's definition of it.
+ *
+ * The icons are the ones the builder and the compendium already print beside
+ * every number, which is the whole reason this table is shaped like this rather
+ * than as six more paragraphs: somebody reading here will next see these exact
+ * marks on a ship card, and the point of the section is that they recognise
+ * them when they do. Cost has no icon in that set - it is a number of credits,
+ * printed as a number everywhere in the app - so its cell carries the same
+ * currency mark the builder uses and the row lines up with the rest.
+ */
+const statRow = (ico: string | null, name: string, body: string): string => `
+  <div class="ltp-stat">
+    <div class="ltp-stat-k">
+      ${ico ? icon(ico, 19, "ltp-stat-ico") : `<span class="ltp-stat-ico ltp-stat-ico-cr">cr</span>`}
+      <span class="ltp-stat-n">${escapeHtml(name)}</span>
+    </div>
+    <div class="ltp-stat-d">${body}</div>
+  </div>`;
+
+/**
+ * What a ship is, and what every number on it means. pp.24-28, verbatim.
+ *
+ * This page told you to bring miniatures and then sent you to the Command
+ * Phase, so the first time a reader met the word Silhouette it was inside a
+ * rule that assumed they already knew it - and Silhouette is the one stat in
+ * this game that is three rules at once (what hits you, what your HP is, and
+ * how much you can take). Six stats, three of them doing something a reader
+ * cannot guess from the name, and none of them explained anywhere on these
+ * pages: that is the hole this fills.
+ *
+ * Position and Heading come first and get the diagram, because they are the two
+ * that are geometry rather than a number and every measurement in the game
+ * starts from one and runs along the other.
+ *
+ * Every word of it is the book's, from the Spaceships chapter (pp.24-28). The
+ * "See Combat, page XX" cross-references are dropped throughout - the book ships
+ * with them unresolved, and a live "page XX" is worse than no citation.
+ */
+function sectionSpaceships(): string {
+  return `
+    ${h(3, "Your ships")}
+    ${quote(
+      // p.24, verbatim.
+      `${p("You control a Fleet of Ships, organised into Units.")}
+       ${p("The units in your fleet will tend to begin the game in your Reserves area. Ships in reserve are out of play, but you should have the miniatures nearby, ready to jump into the action.")}
+       ${p("Each ship has a Position and a Heading, and ships are arranged into units during play. A ship&rsquo;s stats are defined by its Ship Class.")}`,
+    )}
+    ${learnDiagram("ship-anatomy")}
+    ${quote(
+      // p.25, verbatim.
+      `${p("<b>Position.</b> A ship&rsquo;s Position is the location of the centrepoint of the model&rsquo;s base (likely its flight peg), or the centrepoint of the model if it has no base.")}
+       ${p("<b>Heading.</b> A ship&rsquo;s Heading is the direction in which the model is pointing. While spaceships may have any number of weird and exotic designs, it must always be clear during play in which direction the ship is facing, for the purposes of determining its heading. If it isn&rsquo;t obvious from the shape of the miniature, a little mark on the model&rsquo;s base can help to indicate its heading.")}
+       ${p("<b>Ship Classes.</b> Each ship has a Ship Class, which defines the statistics for that ship. The available ship classes vary by faction.")}`,
+    )}
+
+    ${h(3, "Ship stats")}
+    ${quote(
+      // p.26, verbatim - the one line that introduces the set.
+      p("Ships are defined by a set of stats."),
+    )}
+    <div class="ltp-stats">
+      ${statRow(
+        null,
+        "Cost",
+        // p.26, verbatim.
+        p("The cost in (billions of) credits of one ship of this class. This is used during fleet building or when jumping in new ships, depending on the Game Mode."),
+      )}
+      ${statRow(
+        "stat-mass",
+        "Mass",
+        // p.26, verbatim.
+        `${p("A broad description of the size and bulk of a ship. Throughout the rules, when you see the icon ⓜ, replace it with the numerical value of the mass of the unit&rsquo;s ship class. If a rule refers to the Combined Mass of ships, sum the ⓜ of all the individual related ships to form a total.")}
+         ${p("Occasionally, when encountering the ⓜ icon, it may be unclear which ship&rsquo;s mass to apply. As a general rule, use the mass of the ship that is actively doing the thing, rather than the ship having the thing done to them.")}`,
+      )}
+      ${statRow(
+        "stat-thrust",
+        "Thrust",
+        // p.27, verbatim.
+        p("The maximum number of inches this ship can travel in a single move."),
+      )}
+      ${statRow(
+        "stat-silhouette",
+        "Silhouette",
+        // p.27, verbatim. Three paragraphs and all three stay: this stat is
+        // three separate rules wearing one name, and any one of them cut leaves
+        // a reader who thinks Silhouette is only the other two.
+        `${p("Silhouette represents both the physical size of the ship as well as the brightness of its energy signature. The larger and &lsquo;louder&rsquo; the ship, the easier it is for enemy vessels to track, target and hit it, but the more punishment it can withstand.")}
+         ${p("A ship&rsquo;s Silhouette value is the highest roll on any attack die that will be considered a hit.")}
+         ${p("Each ship enters play with Hull Points (HP) equal to its Silhouette. A ship&rsquo;s HP value is the number of damage tokens required to remove the ship from play.")}`,
+      )}
+      ${statRow(
+        "stat-shields",
+        "Shields",
+        // p.27, verbatim.
+        `${p("Most larger ships are equipped with kinetic field generators, used to absorb and disperse the energy of incoming attacks. A ship&rsquo;s Shields value indicates the strength and sophistication of the defensive shields it possesses.")}
+         ${p("A ship&rsquo;s Shields value determines the highest die roll that counts as a successful saving throw when defending against attacks.")}`,
+      )}
+      ${statRow(
+        "arc-primary",
+        "Weapons",
+        // p.27, verbatim.
+        p("The weapons this ship is carrying and in what quantity. Ships may have Primary and/or Auxiliary weapon systems. Weapon systems have a Range (Minimum and Maximum), a number and type of Attack Dice, and a damage value."),
+      )}
+    </div>
+
+    ${h(3, "Units")}
+    ${quote(
+      // p.28, verbatim.
+      `${p("All the ships in a fleet are composed into Units. A unit can only contain ships of one class. Units can contain up to 3 ships, except for Mass 3 units, which always contain just a single ship.")}
+       <figure class="ltp-fig">
+         <table class="ltp-table">
+           <caption>Unit size table</caption>
+           <thead><tr><th scope="col">Mass</th><th scope="col">Maximum Unit Size</th></tr></thead>
+           <tbody>
+             <tr><td><b>0&ndash;2</b></td><td>3</td></tr>
+             <tr><td><b>3</b></td><td>1</td></tr>
+           </tbody>
+         </table>
+       </figure>
+       ${p("<b>Unit Coherence.</b> After a unit jumps in, and at the end of its movement step, all the ships in the unit must be within 6&rdquo; of all other ships in that unit.")}`,
+    )}
+
+    ${h(4, "Squadrons")}
+    ${quote(
+      // p.28, verbatim. The Scramble Squadrons action is quoted on the Action
+      // Step page, where the actions are, and not repeated here.
+      `${p("Ships of Mass 0 represent small groups of tiny attack craft or starfighters rather than a single starship. Mass 0 ships are also referred to as Squadrons, and can be carried into battle in the bellies of larger ships.")}
+       ${p("A unit can carry a number of Squadrons up to twice its Combined Mass. (E.g. a unit of one Mass 2 ship can carry up to 4 Squadrons, a single Mass 3 ship can carry up to 6 Squadrons, and a unit of three Mass 2 ships can carry up to 12.) Those carried Squadrons can be arranged into any number of units.")}
+       ${p("For reasons of abstraction and simplicity, Squadrons are carried by &rsquo;the unit&lsquo;, not by an individual ship, and are always considered to be carried by the last surviving ship in the unit. You don&rsquo;t have to destroy the carried Squadrons until the last ship in the carrying unit is destroyed.")}`,
+    )}
+
+    ${h(4, "Naming your fleet")}
+    ${cool(
+      // p.24, verbatim - the author's aside under Fleets.
+      `<p>When you create your fleet, give it a name. It could be your corporation&rsquo;s name (&lsquo;YouSpace ExoHome Terraforming Inc&lsquo;, rather than &rsquo;Heavy Industries&lsquo;) or the name of your task force or regiment (&lsquo;Grenadine Peacekeepers Precinct 219&lsquo; for a Unity fleet). I&rsquo;ve left you a space on your Fleet Roster for you to name your fleet.</p>`,
+    )}`;
+}
+
 function sectionPrepare(): string {
   return `
     ${h(3, "What you will need to play")}
@@ -581,6 +721,8 @@ function sectionPrepare(): string {
       // p.12, verbatim.
       `${p("A Billion Suns is designed to be played with spaceship miniatures of any scale, from any manufacturer, mounted on any shape or size of base. During play, ship bases are ignored for the purposes of measuring.")}`,
     )}
+
+    ${sectionSpaceships()}
 
     ${h(3, "The play area")}
     ${quote(
@@ -875,6 +1017,14 @@ const TACTICAL_PAGES: Record<string, () => string> = {
   // by every unit in the group before the next step starts. That is the frame
   // the other four pages hang off, and a frame is no use arriving last.
   select: () => `
+    ${quote(
+      // p.31, verbatim. Split from the sentence that follows it, which stayed
+      // down by the Drag to Select procedure it introduces. This one is the
+      // frame for the whole phase - whose turn it is and in what order - and it
+      // has to be read before the steps of an activation, not after them.
+      p("In the Tactical Phase, players take turns to activate battlegroups, clockwise from the player with Initiative."),
+    )}
+
     ${h(3, "An activation, step by step")}
     ${quote(
       // p.35, verbatim.
@@ -888,14 +1038,11 @@ const TACTICAL_PAGES: Record<string, () => string> = {
     )}
 
     ${quote(
-      // No heading over this. The page is already titled "Drag to Select a
-      // battlegroup" by the sub-rail, and a second heading saying the same
-      // three words twenty lines under the first is furniture. The paragraph
-      // itself ("you Drag to Select a battlegroup and activate the units in
-      // that battlegroup") is the bridge back from the overview above.
-      // p.31, verbatim.
-      `${p("In the Tactical Phase, players take turns to activate battlegroups, clockwise from the player with Initiative.")}
-       ${p("On your turn, you Drag to Select a battlegroup and activate the units in that battlegroup.")}`,
+      // No heading over this. The sub-rail above the page already has the Select
+      // tab lit, and this sentence is its own introduction: it names the gesture
+      // and hands straight over to the procedure under it.
+      // p.31, verbatim - the second half of the pair split at the top of this page.
+      p("On your turn, you Drag to Select a battlegroup and activate the units in that battlegroup."),
     )}
 
     ${quote(
@@ -1116,11 +1263,19 @@ function tacticalRail(active: string): string {
   </nav>`;
 }
 
+// No heading between the rail and the page.
+//
+// It printed the current step's full name under the rail, which was a third
+// telling of the same thing: the rail is directly above it with that step's tab
+// lit and numbered, and the body copy names the step again in its own first
+// line ("Movement Step: Move all the units in the battlegroup..."). On Drag to
+// Select it had become actively wrong - a heading saying "Drag to Select a
+// battlegroup" sitting on top of a section headed "An activation, step by
+// step", which is about something else.
 function sectionTactical(sub?: string): string {
   const at = TACTICAL_SUBS.find((t) => t.id === sub) ?? TACTICAL_SUBS[0]!;
   return `
     ${tacticalRail(at.id)}
-    <h3 class="ltp-h3 ltp-h3-step">${escapeHtml(at.label)}</h3>
     ${TACTICAL_PAGES[at.id]!()}`;
 }
 

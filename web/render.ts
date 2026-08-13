@@ -1990,8 +1990,10 @@ function outfitPrintView(state: AppState): string {
    * page beside the word because the three classes are told apart at a glance
    * in the app and should be on paper too.
    *
-   * Two blank rules under each pilot. Perks arrive between games, one per ¢1k
-   * earned, and a sheet you cannot add to is a sheet you reprint every game.
+   * One ruled line under the abilities. Perks arrive between games, one per
+   * ¢1k earned, and a sheet you cannot add to is a sheet you reprint every
+   * game. A line rather than blank space: blank space under the last ability
+   * is just the bottom of the card and nobody writes into it.
    */
   const unitExtra = (unitId: string): string => {
     const sh = o.ships.find((x) => x.id === unitId);

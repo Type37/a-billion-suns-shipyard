@@ -2642,8 +2642,18 @@ button { font-family: inherit; }
 .sheet.is-solo .pp-who .pp-name + .pp-class { display: none; }
 .sheet.is-solo .pp-ico { width: 22px; height: 22px; }
 .sheet.is-solo .pp-perk { margin-top: 1px; }
-/* Room to write, but not a third of the card. */
-.sheet.is-solo .pp-room { height: 16px; }
+/* Room to write, and a rule saying so. Blank space under the last ability is
+   just the bottom of the card: nobody writes into it. One short line does the
+   whole job - it says a perk goes here and that more will follow, without the
+   card carrying five empty rules for perks that may never be earned. Junkspace
+   only, because it is the only mode where a ship gains abilities between
+   games (p.213). */
+.sheet.is-solo .pp-room {
+  /* Height above the rule, not below it: you write ON a line, so the clearance
+     a blank one needs is the space over it. */
+  height: 11px; width: 46%; margin-top: 3px;
+  border-bottom: 1px solid var(--hair);
+}
 /* The pilot mark rides the title line. It had a row to itself with one word
    beside it, which cost a line and put the crew halfway down the card away
    from the ship they fly. */

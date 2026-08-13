@@ -2633,7 +2633,11 @@ button { font-family: inherit; }
 /* The pilot mark rides the title line. It had a row to itself with one word
    beside it, which cost a line and put the crew halfway down the card away
    from the ship they fly. */
-.pc-pilot-badge { display: inline-flex; align-items: center; gap: 5px; flex: none; margin-right: 7px; }
+/* Ship name, then a dash, then the crew: mark, class, pilot. One line, read
+   left to right, which is how you find the right card on a table. */
+.pc-pilot-badge { display: inline-flex; align-items: center; gap: 5px; flex: 1; min-width: 0; margin-left: 8px; }
+.pc-pilot-badge::before { content: "4"; color: var(--ink-3); margin-right: 3px; }
+.pc-pilot-badge .pp-name { font-weight: 700; color: var(--ink); }
 .sheet.is-solo .pc-head { gap: 0; }
 .sheet.is-solo .pc-pilot-badge .pp-ico { width: 20px; height: 20px; }
 .sheet.is-solo .pp-who { margin-bottom: 1px; }

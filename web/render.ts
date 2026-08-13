@@ -2015,24 +2015,25 @@ function outfitPrintView(state: AppState): string {
     const mark = PRINT_PILOT_ICON[sh.pilotClass];
     return `
       <span class="pp">
-        ${
-          sh.pilotName?.trim()
-            ? `<span class="pp-who"><span class="pp-name">${escapeHtml(sh.pilotName.trim())}</span></span>`
-            : ""
-        }
         ${base ? `<span class="pp-perk pp-perk-base"><b>${escapeHtml(base.perkName)}</b> ${ruleText(base.text)}</span>` : ""}
         ${earned}
         <span class="pp-room"></span>
       </span>`;
   };
 
+  // The card's title line, in full: the ship, then its crew. A ship and its
+  // pilot are one thing in Junkspace and reading them on one line is how you
+  // find the right card on a table.
   const unitBadge = (unitId: string): string => {
     const sh = o.ships.find((x) => x.id === unitId);
     if (!sh) return "";
     const mark = PRINT_PILOT_ICON[sh.pilotClass];
-    return `<span class="pc-pilot-badge">${
-      mark ? `<img class="pp-ico" src="${mark}" alt="" />` : ""
-    }<span class="pp-class">${escapeHtml(sh.pilotClass)}</span></span>`;
+    const name = sh.pilotName?.trim();
+    return `<span class="pc-pilot-badge">
+      ${mark ? `<img class="pp-ico" src="${mark}" alt="" />` : ""}
+      <span class="pp-class">${escapeHtml(sh.pilotClass)}</span>
+      ${name ? `<span class="pp-name">${escapeHtml(name)}</span>` : ""}
+    </span>`;
   };
 
   return printView(state, { list, factions: [faction], unitExtra, unitBadge });
@@ -2298,8 +2299,8 @@ function printView(
       return `
       <article class="print-card">
         <header class="pc-head">
-          ${override?.unitBadge?.(u.id) ?? ""}
           <span class="pc-name">${escapeHtml(title)}${u.count > 1 ? ` <span class="pc-x">&times;${u.count}</span>` : ""}</span>
+          ${override?.unitBadge?.(u.id) ?? ""}
           <span class="pc-cost">${money(ship.cost * u.count)}</span>
         </header>
         ${extras ? `<p class="pc-sub">${extras}</p>` : ""}

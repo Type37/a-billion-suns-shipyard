@@ -86,15 +86,23 @@ const LEARN_LAST_STEP = 3;
 const LEARN_TAB_IDS = ["eras", "prepare"] as const;
 const RULES_TAB_IDS = ["command", "jump", "tactical", "end"] as const;
 /**
- * The Tactical Phase is five pages, not one.
+ * The Tactical Phase is four pages, not one - one per step of an activation.
  *
- * It is longer than the other three phases put together - select, move, get
- * shot at, act, and the whole of combat - and reading it meant scrolling past
- * four things to reach the fifth. A third segment splits it: #/rules/tactical
- * is the first of them, #/rules/tactical/shoot is the one you open mid-game to
- * settle an argument about duds.
+ * It is longer than the other three phases put together and reading it meant
+ * scrolling past three things to reach the fourth, so a third path segment
+ * splits it: #/rules/tactical/passive is the one you open mid-game to settle an
+ * argument about duds.
+ *
+ * There WAS a fifth, "shoot", holding the whole Combat chapter. It is folded
+ * into passive now. Combat is not a step of an activation - it is what happens
+ * inside two of them - and giving it a stop on a rail that otherwise reads
+ * select, move, passive, act made it look like a fifth thing you do in order.
+ * The Passive Attacks Step is where the round first resolves an attack, so it
+ * is where the attack sequence belongs. Old #/rules/tactical/shoot links land
+ * on the first page of the Tactical Phase rather than 404ing, since `sub` falls
+ * back when it does not match.
  */
-const TACTICAL_SUB_IDS = ["select", "move", "passive", "action", "shoot"] as const;
+const TACTICAL_SUB_IDS = ["select", "move", "passive", "action"] as const;
 
 export function parseRoute(hash: string): Route {
   const h = hash.replace(/^#/, "");

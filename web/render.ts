@@ -551,7 +551,11 @@ function homeView(state: AppState): string {
         ${row("#/solo", "Solo Play", "Play the Junkspace in solo/campaign mode.")}
         ${row("#/ships", "Ship Compendium", "Compare all ships and stats.")}
         ${row("#/learn", "Learn to Play", "If you&rsquo;re new, come here to learn how the game works.")}
-        ${row("#/rules", "The Rules", "A round, phase by phase. The book&rsquo;s own words.")}
+        ${/* No row for #/rules. The route still exists and its four phase pages
+              are on the rail inside Learn to Play, but the home menu has one
+              door to the walkthrough, not two: this row was added unprompted
+              alongside the route split and read as a second, separate feature
+              when it is the back half of the one above it. */ ""}
         ${row("#/foundry", "Custom Rules", "Customize your own factions. Make &rsquo;em Your Guys!")}
       </nav>
     </div>

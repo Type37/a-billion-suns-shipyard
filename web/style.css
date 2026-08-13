@@ -5286,17 +5286,26 @@ a .icon,
   62%       { stroke-dashoffset: 0; opacity: 1; }
   76%, 100% { stroke-dashoffset: 0; opacity: 0; }
 }
+/* The ring is DRAWN AROUND the unit, not thrown outwards from it.
+   It was a pulse - radius 4 to 30, fading as it went - and a pulse is a blast
+   wave: it says something went off at that spot. The ring is not an explosion,
+   it is the attack finding its target, and the target is the three miniatures
+   together. So the stroke sweeps once round a circle that never changes size,
+   the way you would draw a lasso round them with a finger. pathLength on the
+   circle normalises the circumference to 100 so this one keyframe works
+   whatever radius the clump ends up needing. */
 @keyframes dg-passive-hit {
-  0%, 38%   { r: 4; opacity: 0; }
-  44%       { r: 8; opacity: 0.9; }
-  70%       { r: 30; opacity: 0; }
-  100%      { r: 30; opacity: 0; }
+  0%, 38%   { stroke-dashoffset: 100; opacity: 0; }
+  42%       { stroke-dashoffset: 100; opacity: 1; }
+  64%       { stroke-dashoffset: 0; opacity: 1; }
+  80%       { stroke-dashoffset: 0; opacity: 1; }
+  92%, 100% { stroke-dashoffset: 0; opacity: 0; }
 }
 .learn-dg .dg-passive-shots line {
   animation: dg-passive-fire 3200ms linear infinite;
   stroke-dasharray: 100;
 }
-.learn-dg .dg-pshot-hit { fill: none; stroke: var(--red); stroke-width: 2; }
+.learn-dg .dg-pshot-hit { fill: none; stroke: var(--red); stroke-width: 2; stroke-dasharray: 100; stroke-linecap: round; }
 .learn-dg .dg-pshot-hit-1, .learn-dg .dg-pshot-hit-2 { animation: dg-passive-hit 3200ms ease-out infinite; }
 /* The second shooter is a beat behind, so two attacks read as two attacks
    being resolved one after the other rather than as one wide flash. */

@@ -535,9 +535,12 @@ function doubleMoveDiagram(): string {
  * the enemy at the right, as the worked example. The others are a hull, a
  * heading and a verdict, which is all they need once the shape has been shown.
  *
- * The two that fail, fail for the two different reasons and neither needs its
- * failure spelled out: one is pointed straight at you from the far side of the
- * table, the other is close enough to touch with its nose pointing away.
+ * The one that fails carries no caption. It is pale, close to your ships and
+ * pointed away from them, beside two in full colour with their fire landing,
+ * which is the whole difference without a word spent on it. An earlier version
+ * had a second failure as well, an enemy far out to the left that was in arc
+ * and nowhere near in range. It went: two negatives spend half a picture
+ * proving what cannot happen.
  *
  * The shot is a line out of the firing hull that lands as a RING around the
  * whole battlegroup, not as a hit on the hull it happens to reach. An attack is
@@ -581,7 +584,7 @@ function passiveDiagram(): string {
 
   return `
   <svg class="learn-dg" viewBox="0 0 340 230" role="img"
-       aria-label="Passive Attacks Step: your battlegroup has finished moving and four passive enemies are around it. The one on the right has its auxiliary envelope drawn - a 180 degree arc out to maximum range - and your ships are inside it, so it fires. The one below also has them in range and arc and fires too. The one far to the left is pointed straight at you but is nowhere near close enough. The one beside your ships is close enough but is pointing away, so your ships are behind it.">
+       aria-label="Passive Attacks Step: your battlegroup has finished moving and three passive enemies are around it. The one on the right has its auxiliary envelope drawn - a 180 degree arc out to maximum range - and your ships are inside it, so it fires. The one below also has them in range and arc and fires too. The third is close enough to your ships but is pointing away, so they are behind it and it does not fire.">
     <style>
       .learn-dg .dgp-arc-edge { fill: none; stroke: var(--red); stroke-width: 1; stroke-opacity: 0.55; }
       .learn-dg .dgp-arc-dia { stroke: var(--red); stroke-width: 1.2; stroke-opacity: 0.8; }
@@ -600,17 +603,13 @@ function passiveDiagram(): string {
     ${enemy(120, 198, 120, true)}
     ${LABEL(120, 222, "fires", "dg-mini dg-mini-arc")}
 
-    ${/* Pointed straight at you from the other side of the table. Far enough
-          out that the distance is the whole explanation - it is nearly twice
-          the radius of the envelope drawn on the right. */ ""}
-    ${enemy(16, 118, 180, false)}
-    ${LABEL(36, 142, "out of range", "dg-mini dg-mini-out")}
-
-    ${/* Close enough to touch, nose pointing the other way. */ ""}
+    ${/* Close enough to touch, nose pointing the other way, and UNLABELLED.
+          It was captioned "behind it", and the caption was the weakest thing in
+          the picture: this hull is drawn pale and pointing away from your
+          battlegroup, next to two drawn in full colour with their fire
+          arriving. The difference is already on the page. A label under it only
+          named what you had just seen. */ ""}
     ${enemy(120, 150, 0, false)}
-    ${/* Above its hull, not below: the second shooter's line runs up past this
-          ship and a caption underneath sat directly on it. */ ""}
-    ${LABEL(112, 134, "behind it", "dg-mini dg-mini-out")}
 
     ${SHIP(A[0], A[1], 78, "dg-ship")}
     ${SHIP(B[0], B[1], 78, "dg-ship")}
@@ -622,8 +621,15 @@ function passiveDiagram(): string {
     <g class="dg-passive-shots">
       ${shot(1, [222, 120])}
       ${shot(2, [120, 198])}
-      <circle class="dg-pshot-hit dg-pshot-hit-1" cx="${HUB[0]}" cy="${HUB[1]}" r="0"/>
-      <circle class="dg-pshot-hit dg-pshot-hit-2" cx="${HUB[0]}" cy="${HUB[1]}" r="0"/>
+      ${/* Each ring is DRAWN around the group rather than thrown outwards from
+            it. pathLength normalises the circumference to 100 so one dash
+            keyframe sweeps it, and the rotation starts each sweep at the point
+            its own shot arrives: an SVG circle begins at 3 o'clock and runs
+            clockwise, which is already where the shot from the right lands, so
+            only the second one needs turning. */ ""}
+      <circle class="dg-pshot-hit dg-pshot-hit-1" pathLength="100" cx="${HUB[0]}" cy="${HUB[1]}" r="${HIT_R}"/>
+      <circle class="dg-pshot-hit dg-pshot-hit-2" pathLength="100" cx="${HUB[0]}" cy="${HUB[1]}" r="${HIT_R}"
+              transform="rotate(120 ${HUB[0]} ${HUB[1]})"/>
     </g>
   </svg>`;
 }

@@ -136,7 +136,17 @@ const ol = (items: string[]): string =>
  * below for where they land.
  */
 const GLOSSARY: [string, string][] = [
-  ["ship", "One miniature, with its own Mass, Thrust, HP, weapons and arcs of fire. Ships are what you move, and what takes damage."],
+  // "Ships are what you move, and what takes damage" was the first wording, and
+  // it was loose in the half that matters. An attack is aimed at a UNIT - you
+  // roll to hit against the unit's Silhouette and its controller rolls the
+  // saves - and then the undeflected hits are assigned to individual ships
+  // inside it, one at a time, against each ship's own HP (p.46). So a unit is
+  // what gets shot at and a ship is what is damaged and destroyed, which is
+  // exactly the distinction somebody reading a glossary needs.
+  [
+    "ship",
+    "One miniature, with its own Mass, Thrust, HP, weapons and arcs of fire. Ships are what you move, one at a time. An attack targets the whole unit, but every hit that gets through is assigned to one ship, comes off that ship&rsquo;s HP, and destroys that ship at 0.",
+  ],
   [
     "unit",
     "One to three ships, grouped when the fleet is built (or when they are requisitioned mid-game) and kept together from then on. A unit moves in one step, all of its ships take the same action, and at the end of its movement they must all be within 6&rdquo; of each other. A Mass 3 ship is always a unit of one.",
@@ -307,6 +317,38 @@ const cmdCard = (name: string, text: string): string => `
       <p class="ltp-cmd-text">${massGlyphs(text)}</p>
     </div>
   </div>`;
+
+/**
+ * One action, in the same card a Command gets.
+ *
+ * The book prints the five basic actions twice: once as a boxed rule in the
+ * Action Step's list ("Open Fire (action): Attack with all this ship's weapon
+ * systems.") and once as its own headed section a page later with the detail.
+ * The Action Step page used to carry only the first of those - five bullets and
+ * nothing else - so Scan's four paragraphs about what each ship in the unit may
+ * scan, and Scramble Squadrons' three timing rulings, were simply absent from
+ * this app. Each action now gets its section, headed by the boxed rule so the
+ * thing you look up mid-game is the first thing on it.
+ */
+const actionCard = (name: string, text: string): string => `
+  <div class="ltp-cmds ltp-cmds-inline">
+    <div class="ltp-cmd ltp-cmd-action">
+      <p class="ltp-cmd-name">${escapeHtml(name)} <span class="ltp-cmd-cost">action</span></p>
+      <p class="ltp-cmd-text">${massGlyphs(text)}</p>
+    </div>
+  </div>`;
+
+/**
+ * A rider on the rule above it, set smaller: the book's own boxed notes and
+ * asides, and the passages that are examples rather than the rule.
+ *
+ * Squadron carrying capacity is the case that forced it. "Twice its Combined
+ * Mass" is the rule and the rest of that paragraph is a worked example in
+ * brackets, followed by two sentences of bookkeeping about which ship in a unit
+ * notionally holds them - all of it set at the same weight as the rule it
+ * qualifies, which is three screens of equal-looking prose for one number.
+ */
+const aside = (body: string): string => `<div class="ltp-aside">${body}</div>`;
 
 // ---------------------------------------------------------------------------
 // 1. Pick an era
@@ -684,8 +726,14 @@ function sectionSpaceships(): string {
     ${quote(
       // p.28, verbatim. The Scramble Squadrons action is quoted on the Action
       // Step page, where the actions are, and not repeated here.
-      `${p("Ships of Mass 0 represent small groups of tiny attack craft or starfighters rather than a single starship. Mass 0 ships are also referred to as Squadrons, and can be carried into battle in the bellies of larger ships.")}
-       ${p("A unit can carry a number of Squadrons up to twice its Combined Mass. (E.g. a unit of one Mass 2 ship can carry up to 4 Squadrons, a single Mass 3 ship can carry up to 6 Squadrons, and a unit of three Mass 2 ships can carry up to 12.) Those carried Squadrons can be arranged into any number of units.")}
+      p("Ships of Mass 0 represent small groups of tiny attack craft or starfighters rather than a single starship. Mass 0 ships are also referred to as Squadrons, and can be carried into battle in the bellies of larger ships."),
+    )}
+    ${aside(
+      // p.28, verbatim, and set as a rider rather than as rule text. One number
+      // ("twice its Combined Mass") with a bracketed worked example after it and
+      // two sentences of bookkeeping about which ship notionally holds them -
+      // all of it previously set at the same weight as the rule it qualifies.
+      `${p("A unit can carry a number of Squadrons up to twice its Combined Mass. (E.g. a unit of one Mass 2 ship can carry up to 4 Squadrons, a single Mass 3 ship can carry up to 6 Squadrons, and a unit of three Mass 2 ships can carry up to 12.) Those carried Squadrons can be arranged into any number of units.")}
        ${p("For reasons of abstraction and simplicity, Squadrons are carried by &rsquo;the unit&lsquo;, not by an individual ship, and are always considered to be carried by the last surviving ship in the unit. You don&rsquo;t have to destroy the carried Squadrons until the last ship in the carrying unit is destroyed.")}`,
     )}
 
@@ -919,9 +967,15 @@ function turnPicker(): string {
       body: `${learnDiagram("jump-in")}
         ${quote(
           // p.30 and p.33, verbatim.
+          // The coherence sentence is p.36's, quoted here because the diagram
+          // beside this card draws the 6" tie between the ships and this card
+          // was the only place on the page that did not say why it is there.
+          // An audit found it: a diagram may illustrate a rule the text states
+          // and must not be the only thing asserting one.
           `${p("<b>Jump In:</b> Deploy a unit from Reserve.")}
            ${p("During the Jump Phase, you can use your turn to Jump In a single unit from your Reserves area.")}
-           ${p("To Jump In a unit, deploy all ships from that unit within 6&rdquo; of a friendly Jump Point.")}`,
+           ${p("To Jump In a unit, deploy all ships from that unit within 6&rdquo; of a friendly Jump Point.")}
+           ${p("<b>Unit Coherence.</b> After a unit jumps in, and at the end of its movement step, all the ships in the unit must be within 6&rdquo; of all other ships in that unit.")}`,
         )}`,
     },
     {
@@ -1008,41 +1062,22 @@ export const TACTICAL_SUBS: { id: string; label: string; short: string }[] = [
 ];
 
 const TACTICAL_PAGES: Record<string, () => string> = {
-  // The shape of an activation goes FIRST, above the gesture that starts one.
+  // The page reads in the order you do the thing: whose turn it is, how you
+  // draw a battlegroup, and only then what activating one puts that battlegroup
+  // through. The two p.31 sentences are one block again - they are one thought,
+  // and the heading that briefly sat between them made the second read as the
+  // start of a new topic when it is the second half of the first.
   //
-  // It used to close this page, four screens down, which had the five pages of
-  // the Tactical Phase reading as five unrelated procedures: you learnt how to
-  // draw a battlegroup, then how to move, then how passive attacks work, and
-  // only at the very end were you told the three of them are one sequence run
-  // by every unit in the group before the next step starts. That is the frame
-  // the other four pages hang off, and a frame is no use arriving last.
+  // "So what is Mass?" is gone from here. Getting Prepared now carries the
+  // whole stat sheet, Mass included, from p.26 - this was the same rule quoted
+  // from p.20 four screens into the Tactical Phase, which is a strange place to
+  // meet a stat for the first time and a redundant one to meet it for the
+  // second.
   select: () => `
     ${quote(
-      // p.31, verbatim. Split from the sentence that follows it, which stayed
-      // down by the Drag to Select procedure it introduces. This one is the
-      // frame for the whole phase - whose turn it is and in what order - and it
-      // has to be read before the steps of an activation, not after them.
-      p("In the Tactical Phase, players take turns to activate battlegroups, clockwise from the player with Initiative."),
-    )}
-
-    ${h(3, "An activation, step by step")}
-    ${quote(
-      // p.35, verbatim.
-      `<p>When you activate a battlegroup, you activate all the units in that battlegroup, completing each step with all units before starting the next step:</p>
-       ${ol([
-         "<b>Movement Step:</b> Move all the units in the battlegroup, one unit at a time, in any order.",
-         "<b>Passive Attacks Step:</b> The battlegroup suffers passive attacks.",
-         "<b>Action Step:</b> Choose one action for each unit in the battlegroup. (You can choose different actions for different units.) Each ship in the unit takes that action. Resolve all the actions from one unit before starting the next unit.",
-       ])}
-       ${p("After activating a unit, give it an Activated token.")}`,
-    )}
-
-    ${quote(
-      // No heading over this. The sub-rail above the page already has the Select
-      // tab lit, and this sentence is its own introduction: it names the gesture
-      // and hands straight over to the procedure under it.
-      // p.31, verbatim - the second half of the pair split at the top of this page.
-      p("On your turn, you Drag to Select a battlegroup and activate the units in that battlegroup."),
+      // p.31, verbatim.
+      `${p("In the Tactical Phase, players take turns to activate battlegroups, clockwise from the player with Initiative.")}
+       ${p("On your turn, you Drag to Select a battlegroup and activate the units in that battlegroup.")}`,
     )}
 
     ${quote(
@@ -1058,11 +1093,16 @@ const TACTICAL_PAGES: Record<string, () => string> = {
     )}
     ${learnDiagram("drag-select")}
 
-    ${h(4, "So what is Mass?")}
+    ${h(3, "An activation, step by step")}
     ${quote(
-      // p.20 and p.26, verbatim.
-      `${p("Mass is a broad measure of the size and bulk of a ship. Throughout the rules, when you see the icon ⓜ, replace it with the numerical value of the Mass of the unit&rsquo;s ship class. If a rule refers to the Combined Mass of ships, sum the ⓜ of all the related individual ships to form a total.")}
-       ${p("Occasionally, when encountering the ⓜ icon, it may be unclear which ship&rsquo;s mass to apply. As a general rule, use the mass of the ship that is actively doing the thing, rather than the ship having the thing done to them.")}`,
+      // p.35, verbatim.
+      `<p>When you activate a battlegroup, you activate all the units in that battlegroup, completing each step with all units before starting the next step:</p>
+       ${ol([
+         "<b>Movement Step:</b> Move all the units in the battlegroup, one unit at a time, in any order.",
+         "<b>Passive Attacks Step:</b> The battlegroup suffers passive attacks.",
+         "<b>Action Step:</b> Choose one action for each unit in the battlegroup. (You can choose different actions for different units.) Each ship in the unit takes that action. Resolve all the actions from one unit before starting the next unit.",
+       ])}
+       ${p("After activating a unit, give it an Activated token.")}`,
     )}`,
   move: () => `
     ${quote(
@@ -1095,15 +1135,7 @@ const TACTICAL_PAGES: Record<string, () => string> = {
 
     ${h(4, "Doubling your move")}
     ${cmdCard("Power to Engines", "At the start of a friendly unit&rsquo;s movement step, spend 1 CMD token to move twice during this movement step (pivoting and moving ahead both times).")}
-    ${learnDiagram("double-move")}
-
-    ${h(3, "Leaving by jump")}
-    ${quote(
-      // p.33, verbatim.
-      `${p("<b>Jump Hop.</b> A unit can use the Jump Hop action during their activation to teleport between two sectors. If all the ships in this unit are within 6&rdquo; of a friendly Jump Point, take the Jump Hop action to remove all the ships in this unit from play and set them up within 6&rdquo; of a friendly Jump Point in another Sector.")}
-       ${p("Jump Hop is exclusively for Jumping between sectors. In a game with only a single Sector (such as Combat Training), the Jump Hop action is of no use.")}
-       ${p("<b>Jump Out.</b> A unit can use the Jump Out action during their activation to leave play and go into your Reserves area. When a unit Jumps Out into reserve, it keeps all its tokens, both game tokens and asset tokens. At the end of the game, asset tokens carried by ships in your reserves area will count towards revenue and victory conditions: they are safely returned to base.")}`,
-    )}`,
+    ${learnDiagram("double-move")}`,
   passive: () => `
     ${quote(
       // p.38, verbatim.
@@ -1120,27 +1152,77 @@ const TACTICAL_PAGES: Record<string, () => string> = {
     )}
     ${learnDiagram("action")}
 
-    ${h(3, "The other actions")}
+    ${h(3, "Open Fire")}
+    ${actionCard("Open Fire", "Attack with all this ship&rsquo;s weapon systems.")}
     ${quote(
-      // p.38-39, verbatim.
-      `${ul([
-        "<b>Open Fire (action):</b> Attack with all this ship&rsquo;s weapon systems.",
-        "<b>Scan (action):</b> Scan a single object or ship within 3&rdquo; or collect any/all Free-floating asset tokens within 3&rdquo;.",
-        "<b>Scramble Squadrons (action):</b> Select one Mass 0 unit carried by the unit and deploy it wholly within 6&rdquo;. The scrambled unit takes one action and then receives an Activated token.",
-        "<b>Jump Hop (action):</b> If all the ships in this unit are within 6&rdquo; of a friendly Jump Point, remove all the ships in this unit from play and set them up within 6&rdquo; of a friendly Jump Point in another Sector.",
-        "<b>Jump Out (action):</b> If all the ships in this unit are within 6&rdquo; of a friendly Jump Point, remove all the ships in this unit from play and place them into your Reserves area.",
-      ])}
-       ${p("<b>Scan.</b> Scanning requires no arc of fire; it can target any object or ship within range in any direction. Scan has no built-in effect but might be required to fulfil a contract or some other special rule. When scanning, you must declare a single purpose for that scan.")}`,
+      // p.39, verbatim.
+      p("When a ship takes the Open Fire action, it attacks with all of its weapon systems."),
     )}
 
-    ${h(3, "Carrying fighters")}
+    ${h(3, "Scan")}
+    ${actionCard("Scan", "Scan a single object or ship within 3&rdquo; or collect any/all Free-floating asset tokens within 3&rdquo;.")}
     ${quote(
-      // p.28, verbatim.
-      `${p("Ships of Mass 0 represent small groups of tiny attack craft or starfighters rather than a single starship. Mass 0 ships are also referred to as Squadrons, and can be carried into battle in the bellies of larger ships.")}
-       ${p("A unit can carry a number of Squadrons up to twice its Combined Mass. (E.g. a unit of one Mass 2 ship can carry up to 4 Squadrons, a single Mass 3 ship can carry up to 6 Squadrons, and a unit of three Mass 2 ships can carry up to 12.) Those carried Squadrons can be arranged into any number of units.")}
-       ${p("For reasons of abstraction and simplicity, Squadrons are carried by &rsquo;the unit&lsquo;, not by an individual ship, and are always considered to be carried by the last surviving ship in the unit. You don&rsquo;t have to destroy the carried Squadrons until the last ship in the carrying unit is destroyed.")}
-       ${p("A unit that is carrying Squadrons can take the Scramble Squadrons action to deploy a unit of Squadrons.")}`,
-    )}`,
+      // p.39, verbatim. All four paragraphs: the last two say what happens when
+      // a UNIT scans rather than a ship, which is the case you actually have at
+      // the table and the one this app never printed.
+      `${p("When a ship takes the Scan action, it either scans a single object or ship within 3&rdquo; or collects any/all Free-floating asset tokens within 3&rdquo;.")}
+       ${p("Scanning requires no arc of fire; it can target any object or ship within range in any direction. Scan has no built-in effect but might be required to fulfil a contract or some other special rule. When scanning, you must declare a single purpose for that scan.")}
+       ${p("When you take the Scan action with a unit, each ship in that unit scans once. The ships in the unit can choose to scan different objects, or the same object for different purposes.")}
+       ${p("When you use the Scan action to collect Free-floating asset tokens, all the ships in the unit do that (and cannot scan other things). You collect any or all asset tokens within 3&rdquo; of the unit.")}`,
+    )}
+
+    ${h(3, "Scramble Squadrons")}
+    ${actionCard(
+      "Scramble Squadrons",
+      "Select one Mass 0 unit carried by the unit and deploy it wholly within 6&rdquo;. The scrambled unit takes one action and then receives an Activated token.",
+    )}
+    ${quote(
+      // p.39, verbatim, including the three timing rulings - which are the whole
+      // reason this section exists, since every one of them is a question that
+      // comes up the first time somebody scrambles anything.
+      `${p("When a ship takes the Scramble Squadrons action, you select one unit of Squadrons carried by the unit and deploy it wholly within 6&rdquo; of the active unit. Take one action with the newly scrambled unit and then give it an Activated token.")}
+       <p>To confirm some timing points:</p>
+       ${ul([
+         "After scrambling Squadrons, you complete the scrambled unit&rsquo;s action before getting the chance to use All Hands to take a second action with the unit that scrambled them.",
+         "The scrambled unit can use All Hands to take a second action after being scrambled.",
+         "As Squadrons get scrambled in the Action Step, they won&rsquo;t suffer Passive Attacks this round.",
+       ])}`,
+    )}
+
+    ${h(3, "Jump Hop")}
+    ${actionCard(
+      "Jump Hop",
+      "If all the ships in this unit are within 6&rdquo; of a friendly Jump Point, remove all the ships in this unit from play and set them up within 6&rdquo; of a friendly Jump Point in another Sector.",
+    )}
+    ${quote(
+      // p.40, verbatim. This lived on the Movement Step page, which was the
+      // wrong page by the rule's own words - "a unit can use the Jump Hop
+      // action during their activation" - and a reader who met it under
+      // Movement could reasonably conclude that jumping is something you do
+      // instead of moving rather than instead of firing.
+      `${p("If all the ships in this unit are within 6&rdquo; of a friendly Jump Point, take the Jump Hop action to remove all the ships in this unit from play and set them up within 6&rdquo; of a friendly Jump Point in another Sector.")}
+       ${p("Jump Hop is exclusively for Jumping between sectors. In a game with only a single Sector (such as Combat Training), the Jump Hop action is of no use.")}`,
+    )}
+
+    ${h(3, "Jump Out")}
+    ${actionCard(
+      "Jump Out",
+      "If all the ships in this unit are within 6&rdquo; of a friendly Jump Point, remove all the ships in this unit from play and place them into your Reserves area.",
+    )}
+    ${quote(
+      // p.40, verbatim.
+      `${p("If all the ships in this unit are within 6&rdquo; of a friendly Jump Point, take the Jump Out action to remove all the ships in this unit from play and place them into your Reserves area.")}
+       ${p("When a unit Jumps Out into reserve, it keeps all its tokens, both game tokens and asset tokens. At the end of the game, asset tokens carried by ships in your reserves area count towards revenue and victory conditions: they are safely returned to base.")}
+       ${p("If a ship jumps out after using Red Alert, it isn&rsquo;t reduced to 0HP (and is saved from destruction) but cannot return to play.")}`,
+    )}
+    ${aside(
+      // p.40, the boxed Jump Strain rule. It governs both jump actions above, so
+      // it sits under the pair rather than inside either one.
+      p("<b>Jump Strain:</b> each unit can only jump once per round. A unit that Jumped In during this round cannot Jump Hop or Jump Out later in the same round, and so on."),
+    )}
+
+    ${h(3, "A second action")}
+    ${cmdCard("All Hands", "After a friendly unit takes its first action in the Action Step, spend 1 CMD token to take a second (different) action with it.")}`,
   shoot: () => `
     ${cool(
       // p.41, verbatim - the vignette that heads the Combat chapter.

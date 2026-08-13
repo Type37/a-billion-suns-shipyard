@@ -4797,17 +4797,45 @@ a .icon,
    Flat vector, one accent, motion only where the thing being explained IS a
    movement. Everything settles on its end state, so the reduced-motion block at
    the bottom can simply switch the animation off and leave a readable still. */
-.learn-dg { display: block; width: 100%; max-width: 420px; margin: 10px auto 0; height: auto; }
+/* ------------------------------------------------------------- diagram size
+   The cap was 420px in an 800px reading column, so every figure sat at barely
+   half the width of the text explaining it. It is 700 now - two and three
+   quarter times the area - and centred in the column as before.
+   Type inside an SVG scales with the box, which is the whole problem with
+   growing one: the labels are in user units, so a 10px label in a 320-unit
+   viewBox renders at 10px when the box is 320 wide and at 22px when it is 700.
+   Sized for the desktop cap they vanish on a phone; sized for the phone they
+   shout on a desktop. So every text size in every diagram is multiplied by
+   --dgf, and --dgf is the only thing the breakpoints below change: about 14px
+   of rendered label at both ends of the range, and no diagram-by-diagram
+   overrides to keep in step. */
+.learn-dg {
+  display: block; width: 100%; max-width: 700px; margin: 14px auto 2px; height: auto;
+  --dgf: 1.3;
+}
+/* Column ~520-700px: the box is growing but has not hit the cap. */
+@media (min-width: 561px) { .learn-dg { --dgf: 0.85; } }
+/* Column is at the 700px cap and stays there, so the scale is fixed at 2.19. */
+@media (min-width: 760px) { .learn-dg { --dgf: 0.72; } }
+
+/* The deployment map is the one diagram not drawn in a 320-unit box: it is a
+   table seen from above, so its viewBox is ~518 wide and it therefore renders
+   at 0.62 of every other diagram's scale in the same slot. Left on the common
+   multiplier its labels come out around 8px while everything else is at 15.
+   Same three breakpoints, each multiplied by 518/320. */
+.learn-map { --dgf: 2.1; }
+@media (min-width: 561px) { .learn-map { --dgf: 1.38; } }
+@media (min-width: 760px) { .learn-map { --dgf: 1.17; } }
 .learn-dg .dg-ship { fill: var(--ink); }
 .learn-dg .dg-enemy { fill: var(--red); }
 .learn-dg .dg-lead { fill: var(--blue); }
 .learn-dg .dg-outside { fill: var(--ink-3); opacity: 0.45; }
-.learn-dg .dg-title { font-family: var(--sans); font-size: 11px; font-weight: 700; fill: var(--ink-2); text-anchor: middle; text-transform: uppercase; letter-spacing: 0.05em; }
-.learn-dg .dg-mini { font-family: var(--narrow); font-size: 10px; font-weight: 700; fill: var(--ink-3); text-anchor: middle; text-transform: uppercase; letter-spacing: 0.04em; }
+.learn-dg .dg-title { font-family: var(--sans); font-size: calc(11px * var(--dgf)); font-weight: 700; fill: var(--ink-2); text-anchor: middle; text-transform: uppercase; letter-spacing: 0.05em; }
+.learn-dg .dg-mini { font-family: var(--narrow); font-size: calc(10px * var(--dgf)); font-weight: 700; fill: var(--ink-3); text-anchor: middle; text-transform: uppercase; letter-spacing: 0.04em; }
 .learn-dg .dg-mini-out { fill: var(--ink-3); }
 .learn-dg .dg-range { fill: var(--blue); fill-opacity: 0.07; stroke: var(--blue); stroke-width: 1; stroke-dasharray: 4 4; }
 .learn-dg .dg-measure line { stroke: var(--ink-3); stroke-width: 1; }
-.learn-dg .dg-measure-text { font-family: var(--narrow); font-size: 10px; font-weight: 700; fill: var(--ink-3); text-anchor: middle; }
+.learn-dg .dg-measure-text { font-family: var(--narrow); font-size: calc(10px * var(--dgf)); font-weight: 700; fill: var(--ink-3); text-anchor: middle; }
 .learn-dg .dg-track { fill: none; stroke: var(--hair); stroke-width: 1.5; stroke-dasharray: 5 5; }
 /* The pivot is a rotation marker sitting on the start line, not a curved path
    across the diagram - a curve read as though the ship travelled an arc. */
@@ -5019,7 +5047,7 @@ a .icon,
    marker's transform is relative to that centre. */
 .learn-dg .dg-turn-ring { fill: none; stroke: var(--hair-soft); stroke-width: 1.5; stroke-dasharray: 3 5; }
 .learn-dg .dg-seat circle { fill: var(--paper); stroke: var(--blue); stroke-width: 1.8; }
-.learn-dg .dg-seat-l { font-family: var(--narrow); font-size: 11px; font-weight: 700; fill: var(--blue); text-anchor: middle; }
+.learn-dg .dg-seat-l { font-family: var(--narrow); font-size: calc(11px * var(--dgf)); font-weight: 700; fill: var(--blue); text-anchor: middle; }
 .learn-dg .dg-turn-dot { fill: var(--red); }
 .learn-dg .dg-seat-1 { animation: dg-seat-pass 5200ms steps(1, end) infinite; }
 .learn-dg .dg-turn-mark { animation: dg-turn 5200ms steps(1, end) infinite; }
@@ -5202,20 +5230,20 @@ a .icon,
 .learn-dg .dg-jp-dot { fill: var(--blue); }
 .learn-dg .dg-them .dg-jp-dot { fill: var(--red); }
 .learn-dg .dg-obj-core { fill: var(--ink); }
-.learn-dg .dg-map-lbl { font-family: var(--narrow); font-size: 9px; font-weight: 700; fill: var(--ink-3); text-anchor: middle; text-transform: uppercase; letter-spacing: 0.04em; }
+.learn-dg .dg-map-lbl { font-family: var(--narrow); font-size: calc(9px * var(--dgf)); font-weight: 700; fill: var(--ink-3); text-anchor: middle; text-transform: uppercase; letter-spacing: 0.04em; }
 /* Same label, anchored off its leader line rather than centred. Separate classes
    because a CSS text-anchor beats the SVG attribute, so it cannot be set inline. */
 .learn-dg .dg-map-lbl-s,
-.learn-dg .dg-map-lbl-e { font-family: var(--narrow); font-size: 9px; font-weight: 700; fill: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }
+.learn-dg .dg-map-lbl-e { font-family: var(--narrow); font-size: calc(9px * var(--dgf)); font-weight: 700; fill: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }
 .learn-dg .dg-map-lbl-s { text-anchor: start; }
 .learn-dg .dg-map-lbl-e { text-anchor: end; }
-.learn-dg .dg-map-note { font-family: var(--narrow); font-size: 9px; font-weight: 700; fill: var(--red); text-anchor: middle; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.8; }
-.learn-dg .dg-map-edge { font-family: var(--narrow); font-size: 10px; font-weight: 700; fill: var(--ink-2); text-anchor: middle; text-transform: uppercase; letter-spacing: 0.06em; }
+.learn-dg .dg-map-note { font-family: var(--narrow); font-size: calc(9px * var(--dgf)); font-weight: 700; fill: var(--red); text-anchor: middle; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.8; }
+.learn-dg .dg-map-edge { font-family: var(--narrow); font-size: calc(10px * var(--dgf)); font-weight: 700; fill: var(--ink-2); text-anchor: middle; text-transform: uppercase; letter-spacing: 0.06em; }
 .learn-dg .dg-leader { stroke: var(--ink-3); stroke-width: 0.8; }
 /* Dimension lines read as measurements, so they are blue like every other
    measured thing in these diagrams rather than another shade of grey. */
 .learn-dg .dg-dim line { stroke: var(--blue); stroke-width: 1; }
-.learn-dg .dg-dim-t { font-family: var(--narrow); font-size: 11px; font-weight: 700; fill: var(--blue); text-anchor: middle; }
+.learn-dg .dg-dim-t { font-family: var(--narrow); font-size: calc(11px * var(--dgf)); font-weight: 700; fill: var(--blue); text-anchor: middle; }
 .learn-dg .dg-dim-t-s { text-anchor: start; }
 
 /* Sub-steps hang vertically off "The round", joined by a rail. */
@@ -5229,24 +5257,27 @@ a .icon,
 .learn-substep b { font-family: var(--display); font-weight: 800; font-size: 13px; }
 .learn-substep span { font-size: 12px; color: var(--ink-3); }
 
-/* Passive attacks: the mover runs down its path and the shots only land once it
-   is inside the arc, so the timing of the two animations is the explanation. */
+/* Passive attacks. The unit is drawn WHERE IT ENDED UP and stays there: the
+   step is a check on final positions, not on a journey, and an animation of a
+   ship sliding into an arc was quietly teaching that crossing the line is what
+   triggers it. (A unit that started inside the arc and never moved is shot at
+   just the same.) So the only thing that moves is the shots - one salvo, at
+   every active ship the enemy has in range and arc, which is the part of the
+   rule a still picture cannot carry. */
 .learn-dg .dg-arc-aux { fill: var(--red); fill-opacity: 0.11; }
 .learn-dg .dg-path { fill: none; stroke: var(--hair); stroke-width: 1.5; stroke-dasharray: 5 4; }
 .learn-dg .dg-enemy-away { opacity: 0.5; }
 .learn-dg .dg-mini-arc { fill: var(--red); }
-@keyframes dg-passive-move {
-  0%, 10% { transform: translate(300px, 150px); }
-  55%, 100% { transform: translate(134px, 104px); }
-}
 @keyframes dg-passive-fire {
-  0%, 52% { opacity: 0; }
-  60% { opacity: 1; }
+  0%, 34% { opacity: 0; }
+  44%, 82% { opacity: 1; }
   92%, 100% { opacity: 0; }
 }
-.learn-dg .dg-passive-mover { animation: dg-passive-move 3200ms ease-in-out infinite; }
 .learn-dg .dg-passive-shots line { animation: dg-passive-fire 3200ms linear infinite; stroke-dasharray: none; }
-.learn-dg .dg-pshot-2 { animation-delay: 120ms; }
+/* Staggered by a frame or two so the three read as one salvo being resolved
+   rather than as three separate attacks. */
+.learn-dg .dg-pshot-2 { animation-delay: 110ms; }
+.learn-dg .dg-pshot-3 { animation-delay: 220ms; }
 
 /* ------------------------------------------------------------ play mode layout
 
@@ -5509,8 +5540,8 @@ main.play-body .roster-section::before { content: none; }
 /* Name hard left, qualifier hard right, inside a full-width row. Anchoring to
    the two ends rather than centring is what guarantees the two can never
    collide however long either string gets. */
-.learn-dg .dg-strain-t { font-family: var(--display); font-size: 13px; font-weight: 800; fill: var(--ink); text-anchor: start; }
-.learn-dg .dg-strain-s { font-family: var(--narrow); font-size: 10px; font-weight: 700; fill: var(--ink-3); text-anchor: end; text-transform: uppercase; letter-spacing: 0.04em; }
+.learn-dg .dg-strain-t { font-family: var(--display); font-size: calc(13px * var(--dgf)); font-weight: 800; fill: var(--ink); text-anchor: start; }
+.learn-dg .dg-strain-s { font-family: var(--narrow); font-size: calc(10px * var(--dgf)); font-weight: 700; fill: var(--ink-3); text-anchor: end; text-transform: uppercase; letter-spacing: 0.04em; }
 @keyframes dg-strain-cycle { 0%, 22% { stroke: var(--blue); stroke-width: 2.5; } 33%, 100% { stroke: var(--hair); stroke-width: 1.5; } }
 .learn-dg .dg-strain-1 .dg-strain-box { animation: dg-strain-cycle 3600ms ease-in-out infinite; }
 .learn-dg .dg-strain-2 .dg-strain-box { animation: dg-strain-cycle 3600ms ease-in-out infinite; animation-delay: 1200ms; }
@@ -6622,6 +6653,26 @@ main.play-body .roster-section::before { content: none; }
 .ltp-cmds-inline .ltp-cmd { padding: 9px 12px; }
 .ltp-cmds-inline .ltp-cmd-name { font-size: 15px; }
 .ltp-cmds-inline .ltp-cmd-text { font-size: 14.5px; }
+/* An action, in the same card an action gets in the book: same shell as a
+   Command, but the corner reads "action" rather than a CMD cost and there is no
+   delta mark, because an action is the free thing you do every activation and a
+   Command is the one you pay for. Keeping the shells alike is deliberate - both
+   are "a named thing you may do, and its one-line rule". */
+.ltp-cmd-action .ltp-cmd-cost { background: var(--ink-3); }
+
+/* ------------------------------------------------------------------- asides
+   A rider on the rule above it: the book's boxed notes, and the passages that
+   are a worked example or bookkeeping rather than the rule itself. Set smaller
+   and indented behind a hairline, so it reads as attached to what it follows
+   instead of as the next thing to learn. Still full text, never trimmed. */
+.ltp-aside {
+  margin: -4px 0 16px;
+  padding: 2px 0 2px 13px;
+  border-left: 2px solid var(--hair);
+}
+.ltp-aside .ltp-p { font-size: 14px; line-height: 1.5; color: var(--ink-3); }
+.ltp-aside .ltp-p:first-child { margin-top: 0; }
+.ltp-aside .ltp-p:last-child { margin-bottom: 0; }
 
 /* ------------------------------------------------------- lettered procedure
    A, B, C for sequences where the ORDER is the rule. The Movement Step was

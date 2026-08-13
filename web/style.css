@@ -1318,7 +1318,10 @@ button { font-family: inherit; }
    any flex row (stats above it), so it never has to share a track. */
 .weap-lines { margin-top: 5px; display: flex; flex-direction: column; gap: 3px; flex-basis: 100%; }
 .weap-line { margin: 0; font-family: var(--sans); font-size: 13px; line-height: 1.45; color: var(--ink); }
-.wl-arc { color: var(--blue); font-weight: 800; white-space: nowrap; }
+/* Pri: and Aux: are different widths in this face, so the weapon names started
+   at two different x down a block whose whole job is to be read as a pair.
+   One track for the label and the names line up. */
+.wl-arc { display: inline-block; min-width: 52px; color: var(--blue); font-weight: 800; white-space: nowrap; }
 .wl-arc svg { vertical-align: -2px; margin-right: 3px; }
 .wl-name { font-weight: 600; }
 .wl-fig { color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -2655,7 +2658,6 @@ button { font-family: inherit; }
 /* Ship name, then a dash, then the crew: mark, class, pilot. One line, read
    left to right, which is how you find the right card on a table. */
 .pc-pilot-badge { display: inline-flex; align-items: center; gap: 5px; flex: 1; min-width: 0; margin-left: 8px; }
-.pc-pilot-badge::before { content: "4"; color: var(--ink-3); margin-right: 3px; }
 .pc-pilot-badge .pp-name { font-weight: 700; color: var(--ink); }
 .sheet.is-solo .pc-head { gap: 0; }
 .sheet.is-solo .pc-pilot-badge .pp-ico { width: 20px; height: 20px; }
@@ -4924,11 +4926,40 @@ button { font-family: inherit; }
 .mf-yard .mf-h { margin-top: 22px; }
 .mf-yard .mf-h:first-child { margin-top: 0; }
 
+/* The outfit card goes two-wide once the column can carry it.
+   Stacked, the card is head / spec / pilot / ability - four bands down a
+   column that is 845px on a desktop, of which the spec uses about 400 and the
+   rest is white. Five ships of that is a page of scrolling to read forty
+   numbers. Side by side it is head across the top and two columns under it,
+   and the card loses a third of its height without losing a word.
+   The container is the SHEET: .roster-unit is a container itself (for the
+   weapons table) and a container query cannot style its own container. */
+.roster-sheet { container: outfit / inline-size; }
+/* 840, not 700: below it the pilot track drops under 400px, the three class
+   buttons wrap to a second row and the two-column card is TALLER than the
+   stacked one (measured 227 against 171 at a 732px sheet). */
+@container outfit (min-width: 840px) {
+  .roster-sheet .roster-unit {
+    grid-template-columns: minmax(0, 400px) minmax(0, 1fr);
+    grid-template-areas: "head head" "spec tools";
+  }
+  /* The class picker and the call sign share a line in the pilot column, so the
+     column is two lines (who is flying it, what that gets you) against the
+     spec's two. Measured: the picker needs 315px and wrapping it to its own row
+     cost 36px of card height on every ship in the outfit. */
+  .roster-sheet .roster-unit .pilot-name-input { flex: 1 1 78px; min-width: 78px; }
+}
+
+/* Remove sits with the cost now, not under the pilot. Keep it inside the height
+   the name and the cost already need, or moving it up buys nothing. */
+.roster-sheet .roster-unit-head .ghost-btn.danger { padding: 1px 7px; font-size: 11px; flex: none; white-space: nowrap; }
+.roster-sheet .roster-unit-head .roster-unit-cost { min-width: 0; }
+
 /* Solo roster row areas (see .roster-sheet .roster-unit above). */
 .roster-sheet .roster-unit > .roster-unit-head { grid-area: head; display: flex; align-items: center; gap: 8px; }
 .roster-sheet .roster-unit > .ru-spec { grid-area: spec; min-width: 0; }
 .roster-sheet .roster-unit > .roster-unit-tools { grid-area: tools; margin-top: 0; align-items: flex-end; flex-direction: row; flex-wrap: wrap; gap: 5px 12px; }
-.roster-sheet .roster-unit > .roster-unit-tools .pilot-field { flex: 1 1 260px; min-width: 0; }
+.roster-sheet .roster-unit > .roster-unit-tools .pilot-field { flex: 1 1 100%; min-width: 0; }
 .roster-sheet .roster-unit .pilot-ability { max-width: 60ch; }
 
 

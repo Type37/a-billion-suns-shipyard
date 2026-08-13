@@ -2566,13 +2566,14 @@ function printView(
       ${commandsSection}
 
       ${(() => {
+        // Junkspace has no score table at all. It was asked for twice: no VP
+        // tracker in solo, and it came back as a "Credits earned" row, which is
+        // the same five empty boxes wearing a different word. A solo game is
+        // logged on the Campaign tab, with a date and notes, where the number
+        // actually does something.
+        if (list.mode === "junkspace") return "";
         const maxRound = list.mode === "management-training" ? 3 : 4;
-        // Junkspace has no victory points and no opponent: you earn credits from
-        // Jobs and take them off your Debt (p.211). A VP row and an Opponent row
-        // on a solo sheet are two rows nobody can fill in.
-        const isCredits =
-          list.mode === "hypergrowth" || list.mode === "management-training" || list.mode === "junkspace";
-        const isSolo = list.mode === "junkspace";
+        const isCredits = list.mode === "hypergrowth" || list.mode === "management-training";
         const roundNames = ["Round One", "Round Two", "Round Three", "Round Four"].slice(0, maxRound);
         const cells = roundNames.map(() => "<td></td>").join("");
         return `
@@ -2580,7 +2581,7 @@ function printView(
         <thead><tr><th></th>${roundNames.map((n) => `<th>${n}</th>`).join("")}<th>Final</th></tr></thead>
         <tbody>
           <tr><th>${isCredits ? "Credits earned" : "Victory points"}</th>${cells}<td></td></tr>
-          ${isSolo ? "" : `<tr><th>Opponent</th>${cells}<td></td></tr>`}
+          <tr><th>Opponent</th>${cells}<td></td></tr>
           <tr><th>Notes</th>${cells}<td></td></tr>
         </tbody>
       </table>`;

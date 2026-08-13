@@ -299,6 +299,7 @@ function outfitTab(o: SavedOutfit): string {
           ${def ? "" : `<span class="roster-unit-glyph">${icon("warning", 20)}</span>`}
           <input class="unit-name-input" type="text" value="${escapeHtml(s.shipName ?? "")}" placeholder="${escapeHtml(def?.name ?? "Ship")}" aria-label="${escapeHtml(def?.name ?? "Ship")}" data-action="outfit-ship-name" data-ship="${s.id}" />
           <span class="roster-unit-cost">${ck(def?.cost ?? 0)}</span>
+          <button class="ghost-btn danger" data-action="outfit-remove-ship" data-ship="${s.id}">${icon("trash", 14)} Remove</button>
         </div>
         ${
           // Same stat chips and weapons table the catalogue uses, so a ship
@@ -322,7 +323,6 @@ function outfitTab(o: SavedOutfit): string {
             </div>
             <div class="pilot-abilities">${abilities}</div>
           </div>
-          <button class="ghost-btn danger" data-action="outfit-remove-ship" data-ship="${s.id}">${icon("trash", 14)} Remove</button>
         </div>
       </article>`;
     })

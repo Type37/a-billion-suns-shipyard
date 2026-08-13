@@ -238,7 +238,7 @@ export function soloListView(state: AppState): string {
 function tabBar(o: SavedOutfit, tab: SoloTab): string {
   const t = (id: SoloTab, label: string) =>
     `<button class="solo-tab ${tab === id ? "selected" : ""}" data-action="solo-tab" data-tab="${id}">${label}</button>`;
-  return `<nav class="solo-tabs">${t("outfit", "Outfit")}${t("play", "Play & Roller")}${t("campaign", "Campaign")}</nav>`;
+  return `<nav class="solo-tabs">${t("outfit", "Outfit")}${t("play", "Play")}${t("campaign", "Campaign")}</nav>`;
 }
 
 function soloShipCatalog(): string {
@@ -578,12 +578,19 @@ function campaignTab(o: SavedOutfit): string {
         .join("");
       const who = s.pilotName || s.shipName || `${s.pilotClass} pilot`;
       const taken = takenFor(s.id);
+      // One row per pilot. This was four stacked blocks each - a name line, a
+      // "No perks taken." line, a "Grant a perk" label and a full-width select -
+      // so five pilots came to seven hundred pixels of mostly nothing, and the
+      // one thing you came to this tab to do was five screens apart from
+      // itself. Name and class on the left, what they have taken beside it, the
+      // control on the right, one line high when a pilot has no perks.
       return `<article class="perk-pilot">
-        <p class="perk-pilot-head"><span class="perk-pilot-name">${escapeHtml(who)}</span> <span class="perk-pilot-class">${s.pilotClass}</span></p>
-        ${taken ? `<ul class="perk-list">${taken}</ul>` : '<p class="perk-pilot-none">No perks taken.</p>'}
-        <label class="inline-field">Grant a perk
-          <select data-action="assign-perk" data-ship="${s.id}"><option value="">Grant a perk&hellip;</option>${opts}</select>
-        </label>
+        <span class="perk-pilot-who">
+          <span class="perk-pilot-name">${escapeHtml(who)}</span>
+          <span class="perk-pilot-class">${s.pilotClass}</span>
+        </span>
+        <span class="perk-pilot-has">${taken ? `<ul class="perk-list">${taken}</ul>` : '<span class="perk-pilot-none">&mdash;</span>'}</span>
+        <select class="perk-select" data-action="assign-perk" data-ship="${s.id}" aria-label="Grant a perk to ${escapeHtml(who)}"><option value="">Grant a perk&hellip;</option>${opts}</select>
       </article>`;
     })
     .join("");
@@ -620,14 +627,39 @@ function campaignTab(o: SavedOutfit): string {
   <div class="solo-split">
     <section class="solo-card solo-card-primary">
       <h3 class="roster-section">Pilot perks</h3>
-      <p class="panel-note">For each ¢1k earned in a game, a surviving pilot may take a Perk from their class list (no duplicates). Roll a D12 in the roller, or grant one directly.</p>
+      <p class="panel-note">For each ¢1k earned in a game, a surviving pilot may take a Perk from their class list (no duplicates).</p>
       ${o.ships.length ? `<div class="perk-pilots">${perkPilots}</div>` : '<p class="muted">Add ships to your outfit first.</p>'}
       ${orphanPerks ? `<div class="perk-pilot perk-pilot-orphans"><p class="perk-pilot-head"><span class="perk-pilot-name">Pilots no longer with the outfit</span></p><ul class="perk-list">${orphanPerks}</ul></div>` : ""}
     </section>
     <div class="solo-ref">
       <section class="solo-card solo-card-quiet">
         <h3 class="roster-section">Game log</h3>
-        ${log ? `<table class="dock-table"><thead><tr><th></th><th>Earned</th><th>Notes</th></tr></thead><tbody>${log}</tbody></table>` : '<p class="muted">No games logged yet.</p>'}
+        ${
+          o.gameLog.length
+            ? `<ol class="game-log">${o.gameLog
+                .map(
+                  (g) => `<li class="game-log-row">
+                    <span class="glr-head">
+                      <span class="glr-n">Game ${g.game}</span>
+                      <span class="glr-earned">${ck(g.earnedK)}</span>
+                      ${g.date ? `<span class="glr-date">${escapeHtml(formatDate(g.date))}</span>` : ""}
+                    </span>
+                    ${g.note ? `<span class="glr-note">${escapeHtml(g.note)}</span>` : ""}
+                  </li>`,
+                )
+                .join("")}</ol>`
+            : '<p class="muted">No games logged yet.</p>'
+        }
+      </section>
+      ${/* Somewhere to write down what the Junkspace did to you. A campaign is
+            a story told over eight games and the app recorded three integers of
+            it. Uncontrolled, and saved on blur: routing every keystroke through
+            the store would re-render the textarea and drop the caret. */ ""}
+      <section class="solo-card solo-card-quiet">
+        <h3 class="roster-section">Campaign notes</h3>
+        <textarea class="outfit-notes" data-action="outfit-notes" rows="6"
+                  placeholder="Who you lost, who owes you, what is waiting out there."
+                  aria-label="Campaign notes">${escapeHtml(o.notes ?? "")}</textarea>
       </section>
     </div>
   </div>`;

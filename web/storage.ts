@@ -246,6 +246,9 @@ export function persistCustomFactions(factions: Faction[]): void {
 export interface OutfitGameLog {
   game: number;
   earnedK: number;
+  /** ISO date the game was played. Absent on entries logged before it existed. */
+  date?: string;
+  /** What happened. A campaign is a story and the log was three numbers. */
   note?: string;
 }
 
@@ -276,6 +279,8 @@ export interface SavedOutfit {
   gamesLimit?: number;
   gamesPlayed: number;
   gameLog: OutfitGameLog[];
+  /** Campaign notes. The one place to write down what the Junkspace did to you. */
+  notes?: string;
   /** Freeform perk tracking: which perk each pilot has taken. */
   perks: { shipId: string; perk: string }[];
   /** Live game tracking. */

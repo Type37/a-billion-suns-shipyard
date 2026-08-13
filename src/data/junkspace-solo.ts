@@ -53,22 +53,44 @@ export interface Perk {
 // The round, in solo play (p.205-206)
 // ---------------------------------------------------------------------------
 
+/**
+ * The round in Junkspace, pp.205-206, VERBATIM.
+ *
+ * Every one of these four was a paraphrase and each lost something:
+ *
+ *   Command Phase turned "As your outfit gains experience, this number can
+ *   increase" into a bracketed aside.
+ *
+ *   Jump Phase read "Only you act in the Jump Phase. The Hostiles arrive via
+ *   Blip markers RATHER THAN JUMPING IN" - the last four words are not in the
+ *   book, and they are a rules claim.
+ *
+ *   Tactical Phase compressed "If there are multiple ships that match these
+ *   criteria, pick the one closest to your ships. If still tied, randomise
+ *   between them" into "(ties: closest to your ships, then random)", which
+ *   reads as one tie-break where the book gives two in order.
+ *
+ *   End Phase dropped "(it starts the game at 1)" and ADDED "Then check whether
+ *   the game has ended", which is not in the End Phase list. Ending the game is
+ *   its own rule further down p.206, and the difference matters: it is checked
+ *   at the end of a Round, not as a step of the End Phase.
+ */
 export const SOLO_PHASES: { name: string; text: string }[] = [
   {
     name: "Command Phase",
-    text: "You gain 5 CMD tokens (this can rise as your outfit gains experience). You do not make an Initiative Check: the Hostiles activate the first ship.",
+    text: "Command Tokens: You gain 5 CMD tokens. As your outfit gains experience, this number can increase. You do not make an Initiative Check: the Hostiles activate the first ship.",
   },
   {
     name: "Jump Phase",
-    text: "Only you act in the Jump Phase. The Hostiles arrive via Blip markers rather than jumping in.",
+    text: "Only you act in the Jump Phase: the Hostiles arrive via Blip markers.",
   },
   {
     name: "Tactical Phase",
-    text: "Alternate activating battlegroups, starting with the Hostiles. You form battlegroups as normal; the Hostiles do not, activating one ship at a time. When it is the Hostiles' turn, activate the unactivated Hostile ship with the largest Silhouette (ties: closest to your ships, then random). New command available: Seize Initiative (1 CMD), Junkspace only. At the start of the Tactical Phase, spend 1 CMD to activate the first battlegroup before the Hostiles get a chance to activate a unit.",
+    text: "The Tactical Phase works as normal, alternating the activation of battlegroups, starting with the Hostiles. You are free to form battlegroups as normal, but the Hostiles don't form battlegroups, activating one ship at a time. When it is the Hostiles' turn to activate, you activate the unactivated Hostile ship with the largest Silhouette. If there are multiple ships that match these criteria, pick the one closest to your ships. If still tied, randomise between them. During games of Junkspace, you have access to a new command. Seize Initiative (1 CMD): Junkspace only. At the start of the Tactical Phase, spend 1 CMD token to activate the first battlegroup, before the Hostiles get a chance to activate a unit.",
   },
   {
     name: "End Phase",
-    text: "Increase the Alert Level by 1. Glitch the Blips (roll on the D6 table for each). Then check whether the game has ended.",
+    text: "The End Phase has some new rules in Junkspace: Increase the Alert Level by 1 (it starts the game at 1). Glitch the Blips (rolling on the D6 table for each).",
   },
 ];
 

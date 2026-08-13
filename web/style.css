@@ -2561,7 +2561,18 @@ button { font-family: inherit; }
    The perks get their own row spanning the table rather than a cell, because a
    pilot with eight of them is a paragraph and a paragraph in a cell stretches
    that ship's stat line to the height of the paragraph. */
-.po-pilot { width: 14%; }
+.po-pilot { width: 16%; }
+/* The pilot mark, on paper. It is the only thing on this sheet that is a
+   character rather than a number, and printing "GUNNER" in 9.5px caps beside
+   four stat columns of 9.5px caps loses that. print-color-adjust so a browser
+   set to drop backgrounds still puts the mark on the page - it is content
+   here, not decoration. */
+.po-pilot-id { display: flex; align-items: center; gap: 6px; }
+.po-pilot-ico {
+  width: 22px; height: 22px; flex: none; object-fit: contain;
+  print-color-adjust: exact; -webkit-print-color-adjust: exact;
+}
+.po-pilot-text { min-width: 0; }
 .po-pilot-name { display: block; font-weight: 700; color: var(--ink); }
 .po-pilot-class {
   display: block; font-family: var(--narrow); font-size: 9.5px; font-weight: 700;
@@ -2577,6 +2588,49 @@ button { font-family: inherit; }
 .po-after { display: grid; gap: 9px; max-width: 62%; }
 .po-after-line { display: flex; align-items: baseline; gap: 10px; margin: 0; font-size: 10.5px; color: var(--ink-2); }
 .po-rule { flex: 1; border-bottom: 1px solid var(--hair); height: 12px; }
+
+/* ------------------------------------------------ campaign tab, tightened
+   Five pilots came to seven hundred pixels of mostly nothing: each was a name
+   line, a "No perks taken." line, a "Grant a perk" label and a full-width
+   select, stacked. One row each now, one line high when a pilot has taken
+   nothing, so the whole crew fits on a screen with the debt and the log. */
+.perk-pilots { display: grid; gap: 1px; background: var(--hair-soft); border: 1px solid var(--hair-soft); }
+.perk-pilot {
+  display: grid; grid-template-columns: minmax(120px, 1.1fr) minmax(0, 2fr) minmax(150px, 1fr);
+  align-items: center; gap: 12px;
+  padding: 7px 11px; background: var(--paper);
+}
+.perk-pilot-who { display: flex; align-items: baseline; gap: 7px; min-width: 0; }
+.perk-pilot-name { font-weight: 700; color: var(--ink); }
+.perk-pilot-class {
+  font-family: var(--narrow); font-size: 10.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3);
+}
+.perk-pilot-has { min-width: 0; font-size: 13px; color: var(--ink-2); }
+.perk-pilot-none { color: var(--ink-3); }
+.perk-pilot-has .perk-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; }
+.perk-select { width: 100%; min-height: var(--tap); }
+@media (max-width: 700px) {
+  .perk-pilot { grid-template-columns: minmax(0, 1fr); gap: 5px; }
+}
+
+/* The log is a story, so an entry is a line of it: which game, what it paid,
+   when, and what happened. */
+.game-log { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.game-log-row { display: grid; gap: 2px; }
+.glr-head { display: flex; align-items: baseline; gap: 10px; }
+.glr-n { font-family: var(--display); font-weight: 800; font-size: 13.5px; color: var(--ink); }
+.glr-earned { font-family: var(--narrow); font-weight: 700; color: var(--blue); }
+.glr-date { margin-left: auto; font-size: 11.5px; color: var(--ink-3); }
+/* Never clipped: the note is the only part of a campaign the app remembers. */
+.glr-note { font-size: 13px; line-height: 1.45; color: var(--ink-2); }
+
+.outfit-notes {
+  width: 100%; min-height: 120px; padding: 10px 12px;
+  border: 1px solid var(--hair); background: var(--paper);
+  font-family: var(--sans); font-size: 14px; line-height: 1.5; color: var(--ink);
+  resize: vertical;
+}
 
 /* ---------------------------------------------------------------------- Blips
    Eight markers, facedown, and the one piece of hidden information a solo game

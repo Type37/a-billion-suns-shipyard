@@ -9,6 +9,18 @@ import {
   DEBT_CLEAR_GAMES,
 } from "../src/data/junkspace.ts";
 import { PERKS_BY_CLASS } from "../src/data/junkspace-solo.ts";
+// The three pilot marks the outfit builder draws. A Gunner, a Hauler and a
+// Junker are the one thing on a crew sheet that is a CHARACTER rather than a
+// number, and on paper the class was a word in 9.5px caps like everything else.
+import gunnerIcon from "./pilots/gunner.png";
+import haulerIcon from "./pilots/hauler.png";
+import junkerIcon from "./pilots/junker.png";
+
+const PRINT_PILOT_ICON: Record<string, string> = {
+  Gunner: gunnerIcon,
+  Hauler: haulerIcon,
+  Junker: junkerIcon,
+};
 import { TRAINING_FLEET } from "../src/data/training-fleet.ts";
 import { ACTIVATION_STEPS, CORE_ACTIONS, CORE_COMMANDS, ROUND_PHASES } from "../src/data/commands.ts";
 import { deriveCommandEffects, effectiveCost } from "../src/command-effects.ts";
@@ -1950,8 +1962,13 @@ function outfitPrintView(state: AppState): string {
           ${s.shipName?.trim() && s.shipName.trim() !== def.name ? `<span class="pr-unit-class">${escapeHtml(def.name)}</span>` : ""}
         </td>
         <td class="po-pilot">
-          <span class="po-pilot-name">${escapeHtml(s.pilotName?.trim() || "—")}</span>
-          <span class="po-pilot-class">${escapeHtml(s.pilotClass)}</span>
+          <span class="po-pilot-id">
+            ${PRINT_PILOT_ICON[s.pilotClass] ? `<img class="po-pilot-ico" src="${PRINT_PILOT_ICON[s.pilotClass]}" alt="" />` : ""}
+            <span class="po-pilot-text">
+              <span class="po-pilot-name">${escapeHtml(s.pilotName?.trim() || "—")}</span>
+              <span class="po-pilot-class">${escapeHtml(s.pilotClass)}</span>
+            </span>
+          </span>
         </td>
         <td class="pr-num">${def.mass}</td>
         <td class="pr-num">${def.thrust}"</td>

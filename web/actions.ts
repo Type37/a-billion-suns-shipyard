@@ -1780,21 +1780,30 @@ function dispatchAction(target: HTMLElement): void {
       break;
     }
 
-    // What you earned, typed in. There is nothing for the app to add up: the
-    // Jobs are three playing cards on the table beside you, and their payouts
-    // are counted off the models once the game is over, so the one number that
-    // reaches the campaign is the one you worked out.
+    // A game is an event, not an integer. It had one prompt() for the credits
+    // and the log printed "Game 2  ¢2k", which is the least interesting third
+    // of what happened - a campaign is eight games of a story and the app was
+    // keeping the receipts and throwing away the story.
     case "log-game": {
       const raw = prompt("Credits earned this game (in thousands, ¢k):", "0");
       if (raw === null) return;
       const earnedK = Math.max(0, Math.round(Number(raw) || 0));
+      const note = prompt("What happened? (optional)", "") ?? "";
       editOutfit((o) => {
         const debtK = Math.max(0, o.debtK - earnedK);
         return {
           ...o,
           debtK,
           gamesPlayed: o.gamesPlayed + 1,
-          gameLog: [...o.gameLog, { game: o.gamesPlayed + 1, earnedK }],
+          gameLog: [
+            ...o.gameLog,
+            {
+              game: o.gamesPlayed + 1,
+              earnedK,
+              date: new Date().toISOString(),
+              ...(note.trim() ? { note: note.trim() } : {}),
+            },
+          ],
           // The next game starts at whatever the NEW debt says, not at 1. The
           // campaign is supposed to get harder as you pay it off (p.195), and
           // this was hardcoded to 1, so it never did.
@@ -2450,6 +2459,13 @@ function handleChange(e: Event): void {
     }
 
     // ---- Solo / Junkspace -------------------------------------------------
+    // In handleChange with the rest of the text fields, so it saves on blur
+    // rather than on every keystroke: a keystroke here would re-render the page
+    // and take the caret with it.
+    case "outfit-notes": {
+      editOutfit((o) => ({ ...o, notes: inputValue }));
+      break;
+    }
     case "outfit-name": {
       editOutfit((o) => ({ ...o, name: inputValue }));
       break;

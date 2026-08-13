@@ -2243,7 +2243,7 @@ function printView(
             page, and this sheet is read at a table with a row under a finger.
           -->
           <th class="pr-num">Mass</th><th class="pr-num">Thr</th><th class="pr-num">Sil</th><th class="pr-num">Shd</th>
-          <th class="pr-weap">Primary weapons</th><th class="pr-weap">Auxiliary weapons</th><th class="pr-cost">Cost</th>${isShipyard ? '<th class="pr-req">Req’d</th>' : ""}${opts.trackers ? '<th class="pr-track">Hull tracker</th>' : ""}${opts.jumpTrackers ? `<th class="pr-jump">${isShipyard ? "Jumped in / in reserve" : "Jumped in"}${jumpHead}</th>` : ""}${fieldsHvp ? '<th class="pr-hvp-slot">HVP carried</th>' : ""}
+          <th class="pr-weap">Primary weapons</th><th class="pr-weap">Auxiliary weapons</th><th class="pr-cost">Cost</th>${isShipyard ? '<th class="pr-req">Req’d</th>' : ""}${opts.trackers ? '<th class="pr-track">Hull</th>' : ""}${opts.jumpTrackers ? `<th class="pr-jump">${isShipyard ? "Jumped in / in reserve" : "Jumped in"}${jumpHead}</th>` : ""}${fieldsHvp ? '<th class="pr-hvp-slot">HVP carried</th>' : ""}
         </tr>
       </thead>
       <tbody>${unitRows}</tbody>
@@ -2291,7 +2291,7 @@ function printView(
         ${carried.length ? `<p class="pc-carry">Carrying: ${escapeHtml(carried.join("; "))}</p>` : ""}
         ${
           opts.jumpTrackers
-            ? `<div class="pc-track pc-jump"><p class="pc-track-h">${isShipyard ? "Jumped in / in reserve" : "Jumped in"}</p>${jumpHead}${jumpBoxes(u.count)}</div>`
+            ? `<div class="pc-track pc-jump">${jumpHead}${jumpBoxes(u.count)}</div>`
             : ""
         }
         ${
@@ -2302,7 +2302,6 @@ function printView(
           // now, and each ship's row is numbered so you can tell them apart.
           opts.trackers
             ? `<div class="pc-track">
-                 <p class="pc-track-h">Damage <span class="pc-track-sub">one box per HP, cross off as taken</span></p>
                  ${Array.from(
                    { length: u.count },
                    (_, i) =>

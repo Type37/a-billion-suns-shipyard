@@ -559,7 +559,7 @@ function passiveDiagram(): string {
   // has the unit comfortably inside its range and still cannot shoot.
   const R = 76;
   const EX = 268, EY = 120; // fires
-  const BX = 140, BY = 84; // facing away
+  const BX = 156, BY = 96; // facing away, and close enough to have them in range
 
   // An exact half-disc. Both endpoints are (0, -R) and (0, +R) in the ship's own
   // frame, so the chord between them is the vertical diameter: dead straight,
@@ -569,11 +569,20 @@ function passiveDiagram(): string {
   // degenerate and either value gives the same semicircle.
   const disc = `M0 -${R} A${R} ${R} 0 0 0 0 ${R} Z`;
 
-  // One active unit of three, all inside the firing enemy's half-disc.
-  // Distances from it, checked: 63, 43 and 66 against a radius of 76.
-  const A: [number, number] = [212, 92];
-  const B: [number, number] = [230, 140];
-  const C: [number, number] = [210, 152];
+  // One active unit of three, all WELL inside the firing enemy's half-disc.
+  //
+  // "Inside" has to be legible, not merely true. The first placement put them
+  // 11 to 15 units in from a curved boundary 76 units out - arithmetically
+  // inside and, on the page, three hulls sitting on the line, which is the one
+  // reading this picture cannot afford. They are 23 to 46 units in now.
+  // Distances from the enemy: 58, 39 and 55 against a radius of 76.
+  //
+  // None of the three sits on y = EY either, because that is where the max
+  // range measure runs; a measurement drawn through the thing it is not
+  // measuring reads as an attack line.
+  const A: [number, number] = [226, 80];
+  const B: [number, number] = [246, 152];
+  const C: [number, number] = [222, 150];
   // A is 72 from the facing-away enemy - inside its 76 too, and still safe,
   // because being in range is not being in arc.
   const LEG: [number, number] = [-58, 12];
@@ -581,7 +590,7 @@ function passiveDiagram(): string {
     `<line class="dg-path" x1="${x + LEG[0]}" y1="${y + LEG[1]}" x2="${x}" y2="${y}"/>`;
 
   return `
-  <svg class="learn-dg" viewBox="0 0 340 216" role="img"
+  <svg class="learn-dg" viewBox="0 0 340 222" role="img"
        aria-label="Passive Attacks Step: once the battlegroup has finished moving, every passive enemy that has an active unit inside the range and 180 degree auxiliary arc of its weapons attacks once. Here a unit of three ships has ended its move inside one enemy's arc and that enemy fires. The second enemy has the same ships well inside its range, but they are behind it and outside its arc, so it does not.">
     <style>
       .learn-dg .dgp-arc-edge { fill: none; stroke: var(--red); stroke-width: 1; stroke-opacity: 0.55; }
@@ -601,8 +610,10 @@ function passiveDiagram(): string {
       <line class="dgp-arc-dia" x1="0" y1="-${R}" x2="0" y2="${R}"/>
       ${SHIP(0, 0, -90, "dg-ship dg-enemy")}
     </g>
-    ${LABEL(248, 54, "aux 180°", "dg-mini dg-mini-arc")}
-    ${LABEL(268, 206, "passive — fires", "dg-mini")}
+    ${LABEL(246, 58, "aux 180°", "dg-mini dg-mini-arc")}
+    ${/* Beside the hull, outside the disc. Under it, this caption shared a line
+          with the active unit's caption and the two read as one sentence. */ ""}
+    ${LABEL(300, 124, "passive — fires", "dg-mini")}
     <!-- The measure runs along y = EY, which threads between the top ship and
          the middle one; nothing sits on it. -->
     <g class="dg-measure" transform="translate(${EX} ${EY})">
@@ -627,8 +638,8 @@ function passiveDiagram(): string {
       <path class="dgp-arc-away-edge" d="${disc}"/>
       ${SHIP(0, 0, -90, "dg-ship dg-enemy dg-enemy-away")}
     </g>
-    ${LABEL(96, 176, "passive — in range, but they are", "dg-mini dg-mini-out")}
-    ${LABEL(96, 188, "behind it, so no shot", "dg-mini dg-mini-out")}
+    ${LABEL(84, 196, "passive — in range, but", "dg-mini dg-mini-out")}
+    ${LABEL(84, 208, "they are behind it", "dg-mini dg-mini-out")}
 
     <!-- One unit of three, where it ended up. Three parallel straight legs,
          because that is what a unit's movement step looks like: p.36 is pivot,
@@ -637,10 +648,7 @@ function passiveDiagram(): string {
     ${SHIP(A[0], A[1], 78, "dg-ship")}
     ${SHIP(B[0], B[1], 78, "dg-ship")}
     ${SHIP(C[0], C[1], 78, "dg-ship")}
-    ${/* Centred at 150, not 196: at 196 its right end ran into "passive — fires"
-          under the other ship, and two captions sharing a line is two captions
-          nobody reads. */ ""}
-    ${LABEL(150, 202, "your unit ends its move here", "dg-mini")}
+    ${LABEL(222, 202, "your unit ends its move here", "dg-mini")}
 
     <!-- One salvo, converging on the unit. The enemy unit attacks ONCE and the
          attack is aimed at a unit, not at a hull, so the three lines are one

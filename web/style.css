@@ -4810,7 +4810,7 @@ a .icon,
    of rendered label at both ends of the range, and no diagram-by-diagram
    overrides to keep in step. */
 .learn-dg {
-  display: block; width: 100%; max-width: 700px; margin: 14px auto 2px; height: auto;
+  display: block; width: 100%; max-width: 700px; margin: 8px auto 0; height: auto;
   --dgf: 1.3;
 }
 /* Column ~520-700px: the box is growing but has not hit the cap. */
@@ -6295,35 +6295,45 @@ main.play-body .roster-section::before { content: none; }
 .ltp-tab-n { display: none; }
 .ltp-tabs--bottom { display: none; }
 
-/* ------------------------------------------------------------------ layout */
-.ltp-body { padding-top: 8px; }
-.ltp-sec { padding: 28px 0 8px; }
+/* ------------------------------------------------------------------ layout
+   TIGHTENED, AUGUST 2026. The Passive Attacks page ran to 4,546px on a desktop
+   and Getting Prepared to 3,576 - three and a half screens of a page whose
+   longest paragraph is four lines, because every gap was set for a page with
+   less on it. The rhythm below is what the same content measures at now:
+   passive 3,650, prepare 2,870. Nothing was cut to get there and no type got
+   smaller; the air between things did.
+
+   Only the gaps moved. Body copy stays at 17px, the quoted rules stay at their
+   size, and the phone breakpoints further down still bump both - a rule about
+   scrolling on a 1265px desktop must not make a 375px screen harder to read. */
+.ltp-body { padding-top: 6px; }
+.ltp-sec { padding: 18px 0 6px; }
 /* The back-of-the-box pitch, first page only. Set a step above body copy and a
    step below the section title: it is the first thing read, but it is not the
    heading, and it should not compete with "Pick an era" sitting under it. */
 .ltp-pitch {
   font-family: var(--sans); font-size: 17px; line-height: 1.55; font-weight: 500;
-  color: var(--ink-2); margin: 0 0 26px; max-width: 62ch;
+  color: var(--ink-2); margin: 0 0 16px; max-width: 62ch;
 }
 /* The one-line summary sits tight to the scope note under it: they are one
    thought - here is what it is, here is how far this guide takes you. */
-.ltp-pitch-2 { margin-bottom: 14px; }
+.ltp-pitch-2 { margin-bottom: 10px; }
 /* What this guide is and is not, said before anybody has spent time on it.
    Bold, full ink, red rule down the side: it has to survive being skimmed past
    on the way to the era cards, because somebody who reads all eight pages and
    only then learns they still need the book has been wasted. Not a warning
    colour - it is not an error, it is the honest scope of the thing. */
 .ltp-scope {
-  max-width: 62ch; margin: 0 0 26px; padding: 14px 0 14px 16px;
+  max-width: 62ch; margin: 0 0 18px; padding: 10px 0 10px 16px;
   border-left: 3px solid var(--red);
   font-family: var(--sans); font-size: 16px; line-height: 1.5; font-weight: 700;
   color: var(--ink);
 }
-.ltp-scope p { margin: 0 0 10px; }
+.ltp-scope p { margin: 0 0 7px; }
 .ltp-scope p:last-child { margin-bottom: 0; }
 .ltp-scope a { color: var(--blue); text-decoration: underline; text-underline-offset: 2px; }
 .ltp-scope a:hover { color: var(--red-deep); }
-.ltp-sec-head { margin-bottom: 14px; }
+.ltp-sec-head { margin-bottom: 10px; }
 .ltp-sec-title {
   font-family: var(--display); font-weight: 800; font-size: 34px; line-height: 1.1;
   letter-spacing: -0.02em; margin: 0; color: var(--ink);
@@ -6331,21 +6341,21 @@ main.play-body .roster-section::before { content: none; }
 
 .ltp-h3 {
   font-family: var(--display); font-weight: 800; font-size: 22px; line-height: 1.2;
-  letter-spacing: -0.01em; margin: 30px 0 8px; color: var(--ink);
-  padding-top: 10px; border-top: 1px solid var(--hair-soft);
+  letter-spacing: -0.01em; margin: 20px 0 6px; color: var(--ink);
+  padding-top: 8px; border-top: 1px solid var(--hair-soft);
 }
 .ltp-h4 {
   font-family: var(--sans); font-weight: 800; font-size: 16px;
-  letter-spacing: 0.02em; margin: 24px 0 7px; color: var(--blue);
+  letter-spacing: 0.02em; margin: 16px 0 5px; color: var(--blue);
 }
 .ltp-lede {
   font-family: var(--sans); font-size: 18px; line-height: 1.5; font-weight: 500;
-  color: var(--ink); margin: 0 0 16px;
+  color: var(--ink); margin: 0 0 12px;
 }
-.ltp-p { font-size: 17px; line-height: 1.62; color: var(--ink); margin: 0 0 12px; }
+.ltp-p { font-size: 17px; line-height: 1.55; color: var(--ink); margin: 0 0 9px; }
 .ltp-p-note { font-size: 15px; color: var(--ink-2); }
-.ltp-list { margin: 0 0 12px; padding-left: 24px; font-size: 17px; line-height: 1.6; color: var(--ink); }
-.ltp-list li { margin-bottom: 5px; }
+.ltp-list { margin: 0 0 9px; padding-left: 24px; font-size: 17px; line-height: 1.5; color: var(--ink); }
+.ltp-list li { margin-bottom: 3px; }
 .ltp-list-num { list-style: decimal; }
 
 /* -------------------------------------------------------- quoted rules text
@@ -6362,8 +6372,44 @@ main.play-body .roster-section::before { content: none; }
    serif (.ltp-cool, the section ledes), which reads as "someone is talking to
    you" everywhere else in the app too. So plain sans is the rulebook, italic
    serif is us, and no furniture is needed to say so. */
-.ltp-quote { margin: 0 0 16px; padding: 0; }
+.ltp-quote { margin: 0 0 11px; padding: 0; }
 .ltp-quote > :last-child { margin-bottom: 0; }
+
+/* ------------------------------------------------- desktop reads shorter
+   A phone shows one column of a fixed width and the page is as long as it is.
+   A desktop shows the same column with 400px of paper either side of it, and
+   every gap tuned to feel right at 375px reads as slack at 1265 - the Passive
+   Attacks page came to three and a half screens of a page whose longest
+   paragraph is four lines.
+
+   So the gaps close again above 900px, and only the gaps. No type gets smaller
+   and no line gets longer: the measure stays where it is because a wider column
+   would trade scrolling for a line length nobody can track back from. */
+@media (min-width: 900px) {
+  .ltp-sec { padding-top: 12px; }
+  .ltp-sec-head { margin-bottom: 8px; }
+  .ltp-p { margin-bottom: 7px; line-height: 1.5; }
+  .ltp-list { margin-bottom: 7px; line-height: 1.45; }
+  .ltp-list li { margin-bottom: 2px; }
+  .ltp-quote { margin-bottom: 9px; }
+  .ltp-h3 { margin: 15px 0 5px; padding-top: 7px; }
+  .ltp-h4 { margin: 12px 0 4px; }
+  .ltp-stat { padding: 7px 13px; }
+  .ltp-step { padding: 7px 13px; }
+  .ltp-stats, .ltp-steps { margin-bottom: 9px; }
+  .ltp-cmds { gap: 8px; margin-bottom: 10px; }
+  /* Capped by HEIGHT as well as width, and the height cap is the one that
+     bites. A 700px-wide box around a 320x208 viewBox is 455px tall - over half
+     a laptop screen for one small figure, and the two requests here (draw them
+     bigger, scroll less) meet exactly at that number. An inline SVG with a
+     viewBox honours a height cap by scaling its drawing down and centring it,
+     so this costs width rather than clipping anything: the widest diagram
+     renders about 590px across instead of 700, still half again what the old
+     420px cap allowed. */
+  .learn-dg { margin: 6px auto 0; max-height: 400px; }
+  .ltp-cool { margin-bottom: 10px; }
+  .ltp-fold, .ltp-src-acc { margin-bottom: 8px; }
+}
 .ltp-cite {
   display: block; margin-top: 8px;
   font-family: var(--sans); font-size: 11px; font-weight: 700;
@@ -6666,7 +6712,7 @@ main.play-body .roster-section::before { content: none; }
    and indented behind a hairline, so it reads as attached to what it follows
    instead of as the next thing to learn. Still full text, never trimmed. */
 .ltp-aside {
-  margin: -4px 0 16px;
+  margin: -2px 0 12px;
   padding: 2px 0 2px 13px;
   border-left: 2px solid var(--hair);
 }
@@ -6758,11 +6804,11 @@ main.play-body .roster-section::before { content: none; }
    number. That is the point of the row - somebody reading here meets them next
    on a ship card. */
 .ltp-stats {
-  margin: 0 0 16px; padding: 0;
+  margin: 0 0 12px; padding: 0;
   display: flex; flex-direction: column; gap: 1px;
   background: var(--hair-soft); border: 1px solid var(--hair-soft);
 }
-.ltp-stat { display: flex; gap: 14px; padding: 11px 13px; background: var(--paper); }
+.ltp-stat { display: flex; gap: 14px; padding: 8px 13px; background: var(--paper); }
 .ltp-stat-k {
   /* Wide enough for SILHOUETTE, the longest of the six, with air after it. */
   flex: none; width: 132px;
@@ -6805,11 +6851,11 @@ main.play-body .roster-section::before { content: none; }
 }
 
 .ltp-steps {
-  list-style: none; margin: 0 0 14px; padding: 0;
+  list-style: none; margin: 0 0 10px; padding: 0;
   display: flex; flex-direction: column; gap: 1px;
   background: var(--hair-soft); border: 1px solid var(--hair-soft);
 }
-.ltp-step { display: flex; gap: 12px; padding: 11px 13px; background: var(--paper); }
+.ltp-step { display: flex; gap: 12px; padding: 8px 13px; background: var(--paper); }
 /* The letter is generated, not typed, so a step cannot be renumbered by hand
    into disagreeing with its position. */
 .ltp-steps { counter-reset: ltp-step; }

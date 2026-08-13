@@ -40,14 +40,8 @@ import {
   updateList,
   updateOutfit,
 } from "./state.ts";
-import type { AppState, LastRoll, PrintOpts, ShipFilter } from "./state.ts";
-import {
-  RANDOM_BEHAVIOUR,
-  GLITCH_BLIP,
-  JUNKSPACE_JOBS,
-  BLIP_COUNT,
-  type RollRow,
-} from "../src/data/junkspace-solo.ts";
+import type { AppState, PrintOpts, ShipFilter } from "./state.ts";
+import { JUNKSPACE_JOBS, BLIP_COUNT } from "../src/data/junkspace-solo.ts";
 import { EXAMPLE_FACTIONS, EXAMPLE_FACTION_IDS } from "./example-factions.ts";
 import { renderMarkdown } from "./richtext.ts";
 import { LIB_PAGE, libraryIcon, randomIconId } from "./emblems.ts";
@@ -68,6 +62,26 @@ import { fleetToMarkdown } from "./export-text.ts";
  * cleared: tinting is gone, and leaving a stale colour in storage would keep it
  * in exported and shared fleets long after nothing reads it.
  */
+/**
+ * Fisher-Yates, and it has to be a real shuffle rather than sort(() => rnd).
+ *
+ * The eight Blip markers are the only hidden information a solo game has
+ * (p.197): they are shuffled facedown and the numbers stay unknown until one is
+ * flipped. A comparator-based shuffle is biased, which for a bag of eight means
+ * some arrangements are quietly more likely than others, and the player has no
+ * way to notice.
+ */
+function shuffle<T>(items: T[]): T[] {
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const a = out[i]!, b = out[j]!;
+    out[i] = b;
+    out[j] = a;
+  }
+  return out;
+}
+
 function libFields(lib: string): { emblemLib: string; emblemImage: undefined; emblemColor: undefined } {
   return { emblemLib: lib, emblemImage: undefined, emblemColor: undefined };
 }
@@ -89,61 +103,6 @@ function d(sides: number): number {
   return Math.floor(Math.random() * sides) + 1;
 }
 
-function rowFor(rows: RollRow[], v: number): RollRow | undefined {
-  return rows.find((r) => {
-    const nums = r.roll.includes("-") ? r.roll.split("-").map(Number) : [Number(r.roll)];
-    const lo = nums[0] ?? NaN;
-    const hi = nums[1] ?? lo;
-    return v >= lo && v <= hi;
-  });
-}
-
-/**
- * Fisher-Yates, and it has to be a real shuffle rather than sort(() => rnd).
- *
- * Both of the things this deals are physically shuffled objects in the rules -
- * one suit of thirteen playing cards for the Jobs (p.203) and eight facedown
- * markers for the Blips (p.197) - and the Blips in particular are the game's
- * only hidden information. A comparator-based shuffle is biased, which for a
- * bag of eight markers means some arrangements are simply more likely, and the
- * player has no way to know.
- */
-function shuffle<T>(items: T[]): T[] {
-  const out = [...items];
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    const a = out[i]!, b = out[j]!;
-    out[i] = b;
-    out[j] = a;
-  }
-  return out;
-}
-
-/** Three Jobs, dealt without replacement from the thirteen (p.203). */
-function dealJobs(): string[] {
-  return shuffle(JUNKSPACE_JOBS.map((j) => j.key)).slice(0, 3);
-}
-
-function rollTable(table: string): LastRoll {
-  switch (table) {
-    case "behaviour": {
-      const v = d(6);
-      const row = rowFor(RANDOM_BEHAVIOUR, v);
-      return { table: "Hostile behaviour (D6)", value: v, result: row?.result ?? "" };
-    }
-    case "glitch": {
-      const v = d(6);
-      const row = rowFor(GLITCH_BLIP, v);
-      return { table: "Glitch a Blip (D6)", value: v, result: row?.result ?? "", detail: row?.detail };
-    }
-    // No "initiative", "scatter" or "perk" cases. Those three were a D6, a D10
-    // and a D12 whose result was the number itself, so the button only told you
-    // what the die in your hand already says. The two above earn their place by
-    // looking a roll up on a table.
-    default:
-      return { table, value: d(6), result: "" };
-  }
-}
 
 function currentOutfitId(): string | null {
   const r = store.getState().route;
@@ -1755,20 +1714,36 @@ function dispatchAction(target: HTMLElement): void {
       editOutfit((o) => ({ ...o, round: Math.max(1, o.round + delta) }));
       break;
     }
-    // Deal a game. Three Jobs off one shuffled suit (p.203) and eight shuffled
-    // Blip markers (p.197), which is the whole of the per-game setup the app
-    // can honestly do - the board, the scatter and the objective spacing all
-    // happen on a table it cannot see.
-    case "solo-deal": {
+    // You deal the cards, the app writes down what you drew.
+    //
+    // This dealt the three Jobs itself for one build, and dealing is the one
+    // job here the app has no business doing: the rule is "get a deck of
+    // standard playing cards and shuffle all the cards of one suit together"
+    // (p.203), and a player following that already knows their three. An app
+    // that deals a DIFFERENT three is either overriding the cards on the table
+    // or asking you to ignore them.
+    case "solo-job-pick": {
+      const key = target.dataset["key"] ?? "";
+      editOutfit((o) => {
+        const jobs = o.jobs ?? [];
+        const already = jobs.some((j) => j.key === key);
+        if (already) return { ...o, jobs: jobs.filter((j) => j.key !== key) };
+        if (jobs.length >= 3) return o;
+        return { ...o, jobs: [...jobs, { key, earnedK: 0 }] };
+      });
+      break;
+    }
+    // The bag of markers, though, IS the app's to hold: the numbers have to be
+    // decided facedown and stay unknown (p.197), which is the one piece of
+    // hidden information a solo game has and the one thing a player cannot
+    // keep from themselves.
+    case "solo-shuffle-blips": {
       editOutfit((o) => ({
         ...o,
-        jobs: dealJobs().map((key) => ({ key, earnedK: 0 })),
         blips: shuffle(Array.from({ length: BLIP_COUNT }, (_, i) => i + 1)).map((n) => ({
           n,
           revealed: false,
         })),
-        alertLevel: startingAlertLevel(o.debtK),
-        round: 1,
       }));
       break;
     }
@@ -1798,12 +1773,6 @@ function dispatchAction(target: HTMLElement): void {
       break;
     }
 
-    case "solo-roll": {
-      const table = target.dataset["table"] ?? "behaviour";
-      const roll = rollTable(table);
-      store.setState((s) => ({ ...s, ui: { ...s.ui, lastRoll: roll } }));
-      break;
-    }
     // Settling the game. The earnings are the sum of what the three dealt Jobs
     // paid, so there is nothing to type in: a prompt() asking "credits earned
     // this game" was the app admitting it had not been watching. Outfits with

@@ -26,6 +26,9 @@ import {
   PERKS_BY_CLASS,
   JUNKSPACE_JOBS,
   BLIP_TO_PIRATE,
+  RANDOM_BEHAVIOUR,
+  GLITCH_BLIP,
+  type RollRow,
 } from "../src/data/junkspace-solo.ts";
 import { escapeHtml, formatDate, ruleText } from "./format.ts";
 import { icon, statChips } from "./icons.ts";
@@ -321,45 +324,19 @@ function alertPips(level: number): string {
   return `<div class="alert-pips" role="img" aria-label="Alert Level ${on} of 10">${pips}</div>`;
 }
 
-function rollerPanel(state: AppState): string {
-  const last = state.ui.lastRoll;
-  const btn = (table: string, label: string) =>
-    `<button class="bar-btn" data-action="solo-roll" data-table="${table}">${label}</button>`;
-  // The result sits BELOW the buttons and its slot is always there, empty or
-  // not. Both halves of that matter: reading order is press-then-read, and a
-  // result that appears out of nothing would shove the button you just pressed
-  // out from under your finger every time you rolled.
-  return `
-  <section class="solo-card solo-card-primary roller-card">
-    <h3 class="roster-section">The roller</h3>
-    <!--
-      Two buttons, not five. The initiative die, the setup scatter and the perk
-      D12 were all here and all removed: they are a plain D6/D10/D12 with the
-      result read straight off the die, so pressing a button in the app to be
-      told the number you would have read anyway is a worse version of picking
-      up a die. What is left is the pair that DO something a die cannot - look
-      a roll up on a table you would otherwise have to find in the book.
-    -->
-    <div class="roller-buttons">
-      ${btn("behaviour", "Hostile behaviour (D6)")}
-      ${btn("glitch", "Glitch a Blip (D6)")}
-    </div>
-    <div class="roll-slot">
-      ${
-        last
-          ? `<div class="roll-result">
-              <div class="roll-die">${last.value}</div>
-              <div class="roll-body">
-                <p class="roll-table">${escapeHtml(last.table)}</p>
-                <p class="roll-headline">${ruleText(last.result)}</p>
-                ${last.detail ? `<p class="roll-detail">${ruleText(last.detail)}</p>` : ""}
-              </div>
-            </div>`
-          : '<p class="roll-empty">No roll yet. Pick a table above.</p>'
-      }
-    </div>
-  </section>`;
-}
+// No dice roller here any more.
+//
+// It had two buttons, Hostile behaviour and Glitch a Blip, that rolled a D6 and
+// printed the row you landed on. Both tables are three rows of a D6 you are
+// already holding: the player rolls the die on the table beside the models,
+// reads the row, and moves a ship. A button that rolls it again in a browser
+// asks which of the two results counts, and the honest answer is neither -
+// nothing in the app's state depended on the roll, so it was a die that could
+// not affect the game printing an answer to a question already answered.
+//
+// The tables themselves stay, in the reference column, which is what you want
+// mid-game: the row, not a second die.
+
 
 // The two numbers you touch between every activation are the Alert Level and
 // the Round, so they are the whole of the band across the top - the same shape
@@ -386,12 +363,26 @@ function rollerPanel(state: AppState): string {
  */
 function jobsPanel(o: SavedOutfit): string {
   const dealt = o.jobs ?? [];
-  if (!dealt.length) {
+  // No Deal button. p.203 tells YOU to shuffle a suit and flip three, so the
+  // three Jobs already exist on the table before the app hears about them;
+  // this records which three, it does not choose them.
+  if (dealt.length < 3) {
+    const picks = JUNKSPACE_JOBS.map((j) => {
+      const on = dealt.some((d) => d.key === j.key);
+      return `<button class="job-pick ${on ? "is-on" : ""}" data-action="solo-job-pick" data-key="${escapeHtml(j.key)}"
+                aria-pressed="${on}" title="${escapeHtml(j.name)}">
+          <span class="job-pick-rank">${escapeHtml(j.key)}</span>
+          <span class="job-pick-name">${escapeHtml(j.name)}</span>
+        </button>`;
+    }).join("");
     return `
     <section class="solo-card solo-jobs">
-      <h3 class="roster-section">Jobs</h3>
-      <p class="solo-empty">Three Jobs are dealt from one suit of playing cards at the start of each game.</p>
-      <button class="primary-btn" data-action="solo-deal">${icon("shuffle", 16)} Deal a game</button>
+      <div class="jobs-head">
+        <h3 class="roster-section">Jobs</h3>
+        <span class="jobs-total">${dealt.length} of 3 drawn</span>
+      </div>
+      <p class="job-pick-note">Shuffle one suit of a standard deck and flip three cards. Tap the three you drew.</p>
+      <div class="job-pick-grid">${picks}</div>
     </section>`;
   }
   const total = dealt.reduce((sum, j) => sum + j.earnedK, 0);
@@ -429,7 +420,7 @@ function jobsPanel(o: SavedOutfit): string {
       <div class="jobs-head">
         <h3 class="roster-section">Jobs</h3>
         <span class="jobs-total">${ck(total)} this game</span>
-        <button class="ghost-btn" data-action="solo-deal">${icon("shuffle", 14)} Redeal</button>
+        <button class="ghost-btn" data-action="solo-job-pick" data-key="${escapeHtml(dealt[0]?.key ?? "")}">${icon("close", 14)} Change a Job</button>
       </div>
       <div class="job-grid">${cards}</div>
     </section>`;
@@ -454,7 +445,16 @@ function jobsPanel(o: SavedOutfit): string {
  */
 function blipsPanel(o: SavedOutfit): string {
   const blips = o.blips ?? [];
-  if (!blips.length) return "";
+  if (!blips.length) {
+    return `
+    <section class="solo-card solo-blips">
+      <div class="jobs-head">
+        <h3 class="roster-section">Blips</h3>
+      </div>
+      <p class="job-pick-note">Eight markers, numbered 1 to 8, shuffled facedown into the Hostile half.</p>
+      <button class="primary-btn" data-action="solo-shuffle-blips">${icon("shuffle", 16)} Shuffle the bag</button>
+    </section>`;
+  }
   const left = blips.filter((b) => !b.revealed).length;
   const markers = blips
     .map(
@@ -471,8 +471,32 @@ function blipsPanel(o: SavedOutfit): string {
       <div class="jobs-head">
         <h3 class="roster-section">Blips</h3>
         <span class="jobs-total">${left} still face down</span>
+        <button class="ghost-btn" data-action="solo-shuffle-blips">${icon("shuffle", 14)} Reshuffle</button>
       </div>
       <div class="blip-grid">${markers}</div>
+    </section>`;
+}
+
+/**
+ * A roll table, printed. You bring the die.
+ *
+ * Three rows against a D6 is a thing you read, not a thing you press. Printed
+ * whole, the player rolls once and looks along the row; behind a button, the
+ * same three rows are invisible until the app rolls its own die, which is a
+ * second die nobody asked for.
+ */
+function rollTableCard(name: string, die: string, rows: RollRow[]): string {
+  const body = rows
+    .map(
+      (r) => `<tr><td class="rt-roll">${escapeHtml(r.roll)}</td><td>${ruleText(r.result)}${
+        r.detail ? `<span class="rt-detail">${ruleText(r.detail)}</span>` : ""
+      }</td></tr>`,
+    )
+    .join("");
+  return `
+    <section class="solo-card solo-card-quiet">
+      <h3 class="roster-section">${escapeHtml(name)} <span class="muted">${escapeHtml(die)}</span></h3>
+      <table class="roll-table"><tbody>${body}</tbody></table>
     </section>`;
 }
 
@@ -524,8 +548,7 @@ function playTab(state: AppState, o: SavedOutfit): string {
   </section>
   ${jobsPanel(o)}
   ${blipsPanel(o)}
-  <div class="solo-split">
-    ${rollerPanel(state)}
+  <div class="solo-split solo-split-solo">
     <div class="solo-ref">
       <section class="solo-card solo-card-quiet">
         <h3 class="roster-section">The round</h3>
@@ -535,6 +558,8 @@ function playTab(state: AppState, o: SavedOutfit): string {
         <h3 class="roster-section">Alert Level rules</h3>
         <ul class="rule-list small">${SOLO_ALERT_RULES.map((r) => `<li>${ruleText(r)}</li>`).join("")}</ul>
       </section>
+      ${rollTableCard("Hostile behaviour", "D6", RANDOM_BEHAVIOUR)}
+      ${rollTableCard("Glitch a Blip", "D6", GLITCH_BLIP)}
     </div>
   </div>`;
 }

@@ -204,12 +204,6 @@ export interface ShipFilter {
 
 export type SoloTab = "outfit" | "play" | "campaign" | "reference";
 
-export interface LastRoll {
-  table: string;
-  value: number;
-  result: string;
-  detail?: string;
-}
 
 // ---------------------------------------------------------------------------
 // App state
@@ -294,7 +288,6 @@ export interface AppState {
     /** Active tab within a solo outfit workspace. */
     soloTab?: SoloTab;
     /** Result of the most recent solo dice roll, shown in the roller. */
-    lastRoll?: LastRoll;
     /** Filters on the ship compendium. */
     shipFilter?: ShipFilter;
     /** The new-fleet panel is open on the Fleets page. */

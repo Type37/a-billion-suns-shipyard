@@ -9,9 +9,27 @@ export interface RollRow {
 }
 
 export interface SoloJob {
+  /** Playing-card rank. Three are drawn from one shuffled suit each game (p.203). */
   key: string;
   name: string;
   text: string;
+  /**
+   * The most this Job can pay, in thousands of Juran credits.
+   *
+   * All thirteen cap at 3, which the book never states as a general rule - it
+   * falls out of reading every Job. Recorded per Job anyway: a homebrew Job or
+   * an erratum breaks the coincidence, and a hardcoded 3 in the tracker would
+   * then be silently wrong.
+   */
+  capK: number;
+  /**
+   * When the money arrives. An "end" Job is scored once the game is over and
+   * you count what survived; a "game" Job pays the moment something happens at
+   * the table and cannot be un-earned.
+   */
+  pays: "end" | "game";
+  /** What this Job does to the Alert Level, if anything. */
+  alert?: string;
 }
 
 export interface Aggressor {
@@ -107,31 +125,67 @@ export const BEHAVIOUR_ROUTINES = [
 // ---------------------------------------------------------------------------
 
 export const JUNKSPACE_JOBS: SoloJob[] = [
-  { key: "A", name: "Hired Hit", text: "At the end of the game: for each Hostile Mass 2-3 ship you have destroyed (to a maximum of three) you earn ¢1k. If you have revealed and destroyed all the Hostile Mass 2-3 ships, you earn ¢3k instead." },
-  { key: "2", name: "Clean Them Out", text: "At the end of the game: earn ¢1k for each Hostile Mass 0-1 ship you destroyed during this game, less ¢1k for each revealed Hostile Mass 0-1 ship still in play at the end of the game. This Job can earn you a minimum of ¢0k and a maximum of ¢3k." },
-  { key: "3", name: "Full Sector Sweep", text: "When you reveal the last unrevealed Blip marker: if the Alert Level is 5 or less, earn ¢3k; if the Alert Level is 6 or 7, earn ¢2k; if the Alert Level is 8+, earn ¢1k." },
-  { key: "4", name: "Shut Them Down", text: "Set up a Hostile Derelict Facility (Mass 4, Silhouette 7, Shields 3, Laser Turrets 3D6 0-6\") in the centre of the board. The first time each Round that you successfully scan the Derelict Facility: earn ¢1k. This job can earn you a maximum of ¢3k." },
-  { key: "5", name: "Destroy the Derelict Facility", text: "Set up a Hostile Derelict Facility in the centre of the board. The first time in the game you cause damage to the Derelict Facility: raise the Alert Level by 1. If the Derelict Facility is destroyed, you earn ¢3k. (If several jobs refer to a Derelict Facility, use a single shared one.)" },
-  { key: "6", name: "Reclamation", text: "Set up 5 Asteroids (Silhouette 9, no Shields) on the Hostile half of the table, each at least 7\" from any other objective. If one of your ships successfully scans an asteroid that has not yet produced a Loot token, place a Loot asset token on that ship. At the end of the game: for each Loot token carried by a friendly ship, earn ¢1k. Maximum ¢3k. (Share one set of Asteroids across jobs.)" },
-  { key: "7", name: "Hack the System", text: "If you successfully scan a Hostile Mass 2-3 ship, place a 'Loot Cache Location Data' asset token on the scanning ship and increase the current Alert Level by 2. At the end of the game: if that token is carried by a friendly ship, earn ¢3k." },
-  { key: "8", name: "Break Out", text: "Set up a Secure Facility (Silhouette 7, Shields 3) exactly 12\" from the Exit point and at least 7\" from any other Objective. The first time you successfully scan it, increase the Alert Level by 1. The second time you scan it, place a Prisoner asset token on the scanning ship. At the end of the game: if the Prisoner token is carried by a friendly ship, earn ¢3k." },
-  { key: "9", name: "Call In Trouble", text: "Set up an Old Unity ComSat exactly 12\" from the Exit point and at least 7\" from any other Objective. If you successfully scan it, you have called in the Peacekeepers: place two Hostile Gunships exactly 2\" from the Exit Jump Point and as close to the scanning ship as possible. At the end of the game: if the Peacekeepers were called, for each of your ships that jumped out through the Exit point, earn ¢1k. Maximum ¢3k." },
-  { key: "10", name: "Shake Down", text: "When you successfully scan a Hostile ship that has not yet produced a Loot token, place a Loot asset token on the scanning ship. At the end of the game: for each Loot token carried by a friendly ship, earn ¢1k. Maximum ¢3k." },
-  { key: "J", name: "Demolition Contract", text: "Set up 5 Asteroids (Silhouette 9, no Shields) on the Hostile half of the table, each at least 7\" from any other Objective. At the end of the game: if you have destroyed 2 or 3 asteroids, earn ¢1k; 4 asteroids, ¢2k; all 5 asteroids, ¢3k. (Share one set of Asteroids across jobs.)" },
-  { key: "Q", name: "Hack the ComSats", text: "Set up 3 ComSats in the Hostile half of the table, each at least 7\" from any other Objective. The first time during the game that each ComSat is scanned, you earn ¢1k and increase the current Alert Level by 1." },
-  { key: "K", name: "Breakthrough", text: "At the end of the game: earn ¢1k for each friendly ship that jumped out through the Exit point. This Job can earn you a maximum of ¢3k." },
+  { key: "A", name: "Hired Hit", text: "At the end of the game: for each Hostile Mass 2-3 ship you have destroyed (to a maximum of three) you earn ¢1k. If you have revealed and destroyed all the Hostile Mass 2-3 ships, you earn ¢3k instead.", capK: 3, pays: "end" },
+  { key: "2", name: "Clean Them Out", text: "At the end of the game: earn ¢1k for each Hostile Mass 0-1 ship you destroyed during this game, less ¢1k for each revealed Hostile Mass 0-1 ship still in play at the end of the game. This Job can earn you a minimum of ¢0k and a maximum of ¢3k.", capK: 3, pays: "end" },
+  { key: "3", name: "Full Sector Sweep", text: "When you reveal the last unrevealed Blip marker: if the Alert Level is 5 or less, earn ¢3k; if the Alert Level is 6 or 7, earn ¢2k; if the Alert Level is 8+, earn ¢1k.", capK: 3, pays: "game" },
+  { key: "4", name: "Shut Them Down", text: "Set up a Hostile Derelict Facility (Mass 4, Silhouette 7, Shields 3, Laser Turrets 3D6 0-6\") in the centre of the board. The first time each Round that you successfully scan the Derelict Facility: earn ¢1k. This job can earn you a maximum of ¢3k.", capK: 3, pays: "game" },
+  { key: "5", name: "Destroy the Derelict Facility", text: "Set up a Hostile Derelict Facility in the centre of the board. The first time in the game you cause damage to the Derelict Facility: raise the Alert Level by 1. If the Derelict Facility is destroyed, you earn ¢3k. (If several jobs refer to a Derelict Facility, use a single shared one.)", capK: 3, pays: "end", alert: "+1 the first time you damage the Derelict Facility" },
+  { key: "6", name: "Reclamation", text: "Set up 5 Asteroids (Silhouette 9, no Shields) on the Hostile half of the table, each at least 7\" from any other objective. If one of your ships successfully scans an asteroid that has not yet produced a Loot token, place a Loot asset token on that ship. At the end of the game: for each Loot token carried by a friendly ship, earn ¢1k. Maximum ¢3k. (Share one set of Asteroids across jobs.)", capK: 3, pays: "end" },
+  { key: "7", name: "Hack the System", text: "If you successfully scan a Hostile Mass 2-3 ship, place a 'Loot Cache Location Data' asset token on the scanning ship and increase the current Alert Level by 2. At the end of the game: if that token is carried by a friendly ship, earn ¢3k.", capK: 3, pays: "end", alert: "+2 when you scan a Hostile Mass 2-3 ship" },
+  { key: "8", name: "Break Out", text: "Set up a Secure Facility (Silhouette 7, Shields 3) exactly 12\" from the Exit point and at least 7\" from any other Objective. The first time you successfully scan it, increase the Alert Level by 1. The second time you scan it, place a Prisoner asset token on the scanning ship. At the end of the game: if the Prisoner token is carried by a friendly ship, earn ¢3k.", capK: 3, pays: "end", alert: "+1 the first time you scan the Secure Facility" },
+  { key: "9", name: "Call In Trouble", text: "Set up an Old Unity ComSat exactly 12\" from the Exit point and at least 7\" from any other Objective. If you successfully scan it, you have called in the Peacekeepers: place two Hostile Gunships exactly 2\" from the Exit Jump Point and as close to the scanning ship as possible. At the end of the game: if the Peacekeepers were called, for each of your ships that jumped out through the Exit point, earn ¢1k. Maximum ¢3k.", capK: 3, pays: "end" },
+  { key: "10", name: "Shake Down", text: "When you successfully scan a Hostile ship that has not yet produced a Loot token, place a Loot asset token on the scanning ship. At the end of the game: for each Loot token carried by a friendly ship, earn ¢1k. Maximum ¢3k.", capK: 3, pays: "end" },
+  { key: "J", name: "Demolition Contract", text: "Set up 5 Asteroids (Silhouette 9, no Shields) on the Hostile half of the table, each at least 7\" from any other Objective. At the end of the game: if you have destroyed 2 or 3 asteroids, earn ¢1k; 4 asteroids, ¢2k; all 5 asteroids, ¢3k. (Share one set of Asteroids across jobs.)", capK: 3, pays: "end" },
+  { key: "Q", name: "Hack the ComSats", text: "Set up 3 ComSats in the Hostile half of the table, each at least 7\" from any other Objective. The first time during the game that each ComSat is scanned, you earn ¢1k and increase the current Alert Level by 1.", capK: 3, pays: "game", alert: "+1 the first time each ComSat is scanned" },
+  { key: "K", name: "Breakthrough", text: "At the end of the game: earn ¢1k for each friendly ship that jumped out through the Exit point. This Job can earn you a maximum of ¢3k.", capK: 3, pays: "end" },
 ];
 
 // ---------------------------------------------------------------------------
 // Aggressors (p.211). The Blip number reveals a single ship of this class.
 // ---------------------------------------------------------------------------
 
+// CORRECTED AGAINST THE RENDERED PAGE, August 2026. Every weapon on this table
+// was one column out.
+//
+// p.211's table has a Primary and an Auxiliary column, and the Pirate
+// Starfighter has nothing in Primary - so a plain text extraction of that row
+// yields one weapon with no way to tell which column it came from, and drops it
+// in the first. That shunted Stub Blasters onto the Starfighter's primary,
+// pushed Shred Cannons up into the Starfighter's auxiliary, and left the
+// Frigate and the Cruiser with NO auxiliary weapons at all.
+//
+// Which is not cosmetic. Passive attacks are made with auxiliary weapons only
+// (p.38), and Take No Prisoners below re-rolls the first miss "when attacking
+// with auxiliary weapons" - so under the old data the two biggest pirates in
+// the game could never make a passive attack and never used their own faction
+// rule. The Starfighter really does have no primary weapon.
 export const JUNKSPACE_PIRATES: Aggressor[] = [
-  { blip: "1-4", name: "Pirate Starfighter", mass: 0, thrust: 6, silhouette: 3, shields: 0, primary: "Stub Blasters [2D6, 0-3\"]", auxiliary: "Shred Cannons [3D6, 0-5\"]" },
-  { blip: "5-6", name: "Pirate Gunship", mass: 1, thrust: 6, silhouette: 4, shields: 1, primary: "Blasters [2D6, 0-6\"]", auxiliary: "Blasters [2D6, 0-6\"]" },
-  { blip: "7", name: "Pirate Frigate", mass: 2, thrust: 6, silhouette: 6, shields: 2, primary: "Light Railguns [2D8, 9-18\"]", auxiliary: "" },
-  { blip: "8", name: "Pirate Cruiser", mass: 3, thrust: 6, silhouette: 8, shields: 4, primary: "Plasma Torpedoes [2D10, 6-12\"]", auxiliary: "" },
+  { blip: "1-4", name: "Pirate Starfighter", mass: 0, thrust: 6, silhouette: 3, shields: 0, primary: "", auxiliary: "Stub Blasters [2D6, 0-3\"]" },
+  { blip: "5-6", name: "Pirate Gunship", mass: 1, thrust: 6, silhouette: 4, shields: 1, primary: "Blasters [2D6, 0-6\"]", auxiliary: "Stub Blasters [2D6, 0-3\"]" },
+  { blip: "7", name: "Pirate Frigate", mass: 2, thrust: 6, silhouette: 6, shields: 2, primary: "Light Railguns [2D8, 9-18\"]", auxiliary: "Shred Cannons [3D6, 0-5\"]" },
+  { blip: "8", name: "Pirate Cruiser", mass: 3, thrust: 6, silhouette: 8, shields: 4, primary: "Plasma Torpedoes [2D10, 6-12\"]", auxiliary: "Shred Cannons [3D6, 0-5\"]" },
 ];
+
+/**
+ * Which pirate a Blip number turns out to be (p.211).
+ *
+ * The table prints the mapping as a range inside a column ("1-4"), which is how
+ * you read it off the page and useless as a lookup. Eight entries, keyed by the
+ * number printed on the marker.
+ */
+export const BLIP_TO_PIRATE: Record<number, string> = {
+  1: "Pirate Starfighter",
+  2: "Pirate Starfighter",
+  3: "Pirate Starfighter",
+  4: "Pirate Starfighter",
+  5: "Pirate Gunship",
+  6: "Pirate Gunship",
+  7: "Pirate Frigate",
+  8: "Pirate Cruiser",
+};
+
+/** Eight markers, numbered 1 to 8 (p.197). */
+export const BLIP_COUNT = 8;
 
 export const PIRATE_RULE =
   "Take No Prisoners: Pirate ships re-roll the first miss when attacking with auxiliary weapons. (You are free to invent your own sets of enemy ships: borrow ship classes from the main factions and a special rule from an HVP.)";

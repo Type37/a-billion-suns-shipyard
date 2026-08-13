@@ -268,6 +268,24 @@ export interface SavedOutfit {
   /** Live game tracking. */
   alertLevel: number;
   round: number;
+  /**
+   * The three Jobs dealt for the game in progress, and what each has earned.
+   *
+   * Optional because every outfit saved before this existed has no game dealt,
+   * and an outfit between games has none either - "no jobs" and "a game with
+   * three jobs on the table" are different states and the tracker shows a Deal
+   * button for the first.
+   */
+  jobs?: { key: string; earnedK: number }[];
+  /**
+   * The eight Blip markers, in the order they were shuffled into (p.197).
+   *
+   * `n` is the number printed on the marker's face, which the player is not
+   * supposed to know until it is revealed - the app holds it because it IS the
+   * bag of markers, and the whole point of shuffling facedown is that the
+   * number is decided before you get near it.
+   */
+  blips?: { n: number; revealed: boolean }[];
   createdAt: string;
   updatedAt: string;
 }

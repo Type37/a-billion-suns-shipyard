@@ -41,7 +41,13 @@ import {
   updateOutfit,
 } from "./state.ts";
 import type { AppState, LastRoll, PrintOpts, ShipFilter } from "./state.ts";
-import { RANDOM_BEHAVIOUR, GLITCH_BLIP, type RollRow } from "../src/data/junkspace-solo.ts";
+import {
+  RANDOM_BEHAVIOUR,
+  GLITCH_BLIP,
+  JUNKSPACE_JOBS,
+  BLIP_COUNT,
+  type RollRow,
+} from "../src/data/junkspace-solo.ts";
 import { EXAMPLE_FACTIONS, EXAMPLE_FACTION_IDS } from "./example-factions.ts";
 import { renderMarkdown } from "./richtext.ts";
 import { LIB_PAGE, libraryIcon, randomIconId } from "./emblems.ts";
@@ -90,6 +96,32 @@ function rowFor(rows: RollRow[], v: number): RollRow | undefined {
     const hi = nums[1] ?? lo;
     return v >= lo && v <= hi;
   });
+}
+
+/**
+ * Fisher-Yates, and it has to be a real shuffle rather than sort(() => rnd).
+ *
+ * Both of the things this deals are physically shuffled objects in the rules -
+ * one suit of thirteen playing cards for the Jobs (p.203) and eight facedown
+ * markers for the Blips (p.197) - and the Blips in particular are the game's
+ * only hidden information. A comparator-based shuffle is biased, which for a
+ * bag of eight markers means some arrangements are simply more likely, and the
+ * player has no way to know.
+ */
+function shuffle<T>(items: T[]): T[] {
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const a = out[i]!, b = out[j]!;
+    out[i] = b;
+    out[j] = a;
+  }
+  return out;
+}
+
+/** Three Jobs, dealt without replacement from the thirteen (p.203). */
+function dealJobs(): string[] {
+  return shuffle(JUNKSPACE_JOBS.map((j) => j.key)).slice(0, 3);
 }
 
 function rollTable(table: string): LastRoll {
@@ -1723,16 +1755,69 @@ function dispatchAction(target: HTMLElement): void {
       editOutfit((o) => ({ ...o, round: Math.max(1, o.round + delta) }));
       break;
     }
+    // Deal a game. Three Jobs off one shuffled suit (p.203) and eight shuffled
+    // Blip markers (p.197), which is the whole of the per-game setup the app
+    // can honestly do - the board, the scatter and the objective spacing all
+    // happen on a table it cannot see.
+    case "solo-deal": {
+      editOutfit((o) => ({
+        ...o,
+        jobs: dealJobs().map((key) => ({ key, earnedK: 0 })),
+        blips: shuffle(Array.from({ length: BLIP_COUNT }, (_, i) => i + 1)).map((n) => ({
+          n,
+          revealed: false,
+        })),
+        alertLevel: startingAlertLevel(o.debtK),
+        round: 1,
+      }));
+      break;
+    }
+    case "solo-job-earn": {
+      const index = Number(target.dataset["index"]);
+      const delta = Number(target.dataset["delta"]);
+      editOutfit((o) => ({
+        ...o,
+        jobs: (o.jobs ?? []).map((j, i) => {
+          if (i !== index) return j;
+          const cap = JUNKSPACE_JOBS.find((x) => x.key === j.key)?.capK ?? 3;
+          return { ...j, earnedK: Math.max(0, Math.min(cap, j.earnedK + delta)) };
+        }),
+      }));
+      break;
+    }
+    // Flipping a marker over. The number was decided when the game was dealt,
+    // so this reveals it rather than rolling for it - which is the difference
+    // between a bag of markers and a random table, and the reason a Recon
+    // Ship's Long-Range Scan can peek at one without revealing it.
+    case "solo-blip-reveal": {
+      const index = Number(target.dataset["index"]);
+      editOutfit((o) => ({
+        ...o,
+        blips: (o.blips ?? []).map((b, i) => (i === index ? { ...b, revealed: !b.revealed } : b)),
+      }));
+      break;
+    }
+
     case "solo-roll": {
       const table = target.dataset["table"] ?? "behaviour";
       const roll = rollTable(table);
       store.setState((s) => ({ ...s, ui: { ...s.ui, lastRoll: roll } }));
       break;
     }
+    // Settling the game. The earnings are the sum of what the three dealt Jobs
+    // paid, so there is nothing to type in: a prompt() asking "credits earned
+    // this game" was the app admitting it had not been watching. Outfits with
+    // no game dealt still get the prompt, because there is nothing to sum.
     case "log-game": {
-      const raw = prompt("Credits earned this game (in thousands, ¢k):", "0");
-      if (raw === null) return;
-      const earnedK = Math.max(0, Math.round(Number(raw) || 0));
+      const dealt = activeOutfit(store.getState())?.jobs;
+      let earnedK: number;
+      if (dealt?.length) {
+        earnedK = dealt.reduce((sum, j) => sum + j.earnedK, 0);
+      } else {
+        const raw = prompt("Credits earned this game (in thousands, ¢k):", "0");
+        if (raw === null) return;
+        earnedK = Math.max(0, Math.round(Number(raw) || 0));
+      }
       editOutfit((o) => {
         const debtK = Math.max(0, o.debtK - earnedK);
         return {
@@ -1745,6 +1830,11 @@ function dispatchAction(target: HTMLElement): void {
           // this was hardcoded to 1, so it never did.
           alertLevel: startingAlertLevel(debtK),
           round: 1,
+          // The Jobs and the markers belong to the game just finished. Clearing
+          // them puts the tracker back to its between-games state, which is the
+          // state that offers to deal the next one.
+          jobs: undefined,
+          blips: undefined,
         };
       });
       break;

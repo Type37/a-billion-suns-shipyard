@@ -20,7 +20,13 @@ import {
 const BASE_PERK: Record<string, { perkName: string; text: string }> = Object.fromEntries(
   PILOT_PERKS.map((p) => [p.class, { perkName: p.perkName, text: p.text }]),
 );
-import { SOLO_PHASES, SOLO_ALERT_RULES, PERKS_BY_CLASS } from "../src/data/junkspace-solo.ts";
+import {
+  SOLO_PHASES,
+  SOLO_ALERT_RULES,
+  PERKS_BY_CLASS,
+  JUNKSPACE_JOBS,
+  BLIP_TO_PIRATE,
+} from "../src/data/junkspace-solo.ts";
 import { escapeHtml, formatDate, ruleText } from "./format.ts";
 import { icon, statChips } from "./icons.ts";
 import { emblemView, weaponsTable } from "./render.ts";
@@ -365,6 +371,111 @@ function rollerPanel(state: AppState): string {
 // repeat(auto-fit) grid, so a wall of rules text sat at exactly the same weight
 // as the +1 button you press every End Phase, and the game's clock was one of
 // three things competing for the top of the screen.
+/**
+ * The three Jobs on the table, and what each has earned so far.
+ *
+ * This is the whole scoring system of Junkspace and the app did not have it.
+ * You earned credits by completing Jobs (p.211), and the tracker's only way to
+ * hear about that was a prompt() at the end of the game asking you to type in a
+ * number - which is not tracking, it is a receipt. Three Jobs are dealt from
+ * one shuffled suit at the start of a game (p.203); each caps at 3, and the sum
+ * of the three is what comes off the Debt.
+ *
+ * Each Job carries its own text in full, because a Job is a rule you are
+ * reading mid-game to decide whether the thing you just did counts.
+ */
+function jobsPanel(o: SavedOutfit): string {
+  const dealt = o.jobs ?? [];
+  if (!dealt.length) {
+    return `
+    <section class="solo-card solo-jobs">
+      <h3 class="roster-section">Jobs</h3>
+      <p class="solo-empty">Three Jobs are dealt from one suit of playing cards at the start of each game.</p>
+      <button class="primary-btn" data-action="solo-deal">${icon("shuffle", 16)} Deal a game</button>
+    </section>`;
+  }
+  const total = dealt.reduce((sum, j) => sum + j.earnedK, 0);
+  const cards = dealt
+    .map((entry, i) => {
+      const job = JUNKSPACE_JOBS.find((x) => x.key === entry.key);
+      if (!job) return "";
+      const cap = job.capK;
+      const pips = Array.from(
+        { length: cap },
+        (_, n) => `<span class="job-pip ${n < entry.earnedK ? "is-earned" : ""}"></span>`,
+      ).join("");
+      return `
+      <article class="job-card ${entry.earnedK >= cap ? "is-maxed" : ""}">
+        <header class="job-head">
+          <span class="job-rank">${escapeHtml(job.key)}</span>
+          <span class="job-name">${escapeHtml(job.name)}</span>
+          <span class="job-when">${job.pays === "game" ? "pays in play" : "pays at the end"}</span>
+        </header>
+        <p class="job-text">${ruleText(job.text)}</p>
+        ${job.alert ? `<p class="job-alert">${icon("bolt", 13)} Alert Level ${escapeHtml(job.alert)}</p>` : ""}
+        <div class="job-earn">
+          <button class="stepper-btn" data-action="solo-job-earn" data-index="${i}" data-delta="-1"
+                  aria-label="Less earned from ${escapeHtml(job.name)}">${icon("minus", 15)}</button>
+          <span class="job-pips" role="img" aria-label="${entry.earnedK} of ${cap} earned">${pips}</span>
+          <span class="job-earned">${ck(entry.earnedK)}</span>
+          <button class="stepper-btn" data-action="solo-job-earn" data-index="${i}" data-delta="1"
+                  aria-label="More earned from ${escapeHtml(job.name)}">${icon("plus", 15)}</button>
+        </div>
+      </article>`;
+    })
+    .join("");
+  return `
+    <section class="solo-card solo-jobs">
+      <div class="jobs-head">
+        <h3 class="roster-section">Jobs</h3>
+        <span class="jobs-total">${ck(total)} this game</span>
+        <button class="ghost-btn" data-action="solo-deal">${icon("shuffle", 14)} Redeal</button>
+      </div>
+      <div class="job-grid">${cards}</div>
+    </section>`;
+}
+
+/**
+ * The bag of eight Blip markers.
+ *
+ * The numbers are decided when the game is dealt and hidden until a marker is
+ * flipped, which is the rule: you "deploy them facedown (without looking at the
+ * numbers on them)" (p.197) and only find out what a Blip is when one of your
+ * ships gets within 6" of it. So the app holds the shuffled bag and flips on
+ * demand, rather than rolling a random pirate at reveal time - those are
+ * different games. Rolling at reveal means the eight markers are not a fixed
+ * force of four Starfighters, two Gunships, a Frigate and a Cruiser, and it
+ * makes a Recon Ship's Long-Range Scan - "peek at the number on one Blip marker
+ * within 12" without revealing it" (p.202) - impossible to model at all.
+ *
+ * Flipping is reversible because a Blip can be revealed by mistake faster than
+ * a rule can be looked up, and nothing is lost: the marker's number does not
+ * change.
+ */
+function blipsPanel(o: SavedOutfit): string {
+  const blips = o.blips ?? [];
+  if (!blips.length) return "";
+  const left = blips.filter((b) => !b.revealed).length;
+  const markers = blips
+    .map(
+      (b, i) => `
+      <button class="blip ${b.revealed ? "is-revealed" : ""}" data-action="solo-blip-reveal" data-index="${i}"
+              aria-label="${b.revealed ? `Blip ${b.n}, ${BLIP_TO_PIRATE[b.n]}. Turn back over.` : "Face-down Blip marker. Reveal."}">
+        <span class="blip-n">${b.revealed ? b.n : "?"}</span>
+        <span class="blip-what">${b.revealed ? escapeHtml(BLIP_TO_PIRATE[b.n] ?? "") : "face down"}</span>
+      </button>`,
+    )
+    .join("");
+  return `
+    <section class="solo-card solo-blips">
+      <div class="jobs-head">
+        <h3 class="roster-section">Blips</h3>
+        <span class="jobs-total">${left} still face down</span>
+      </div>
+      <div class="blip-grid">${markers}</div>
+    </section>`;
+}
+
 function playTab(state: AppState, o: SavedOutfit): string {
   const alert = o.alertLevel;
   // Why this game is harder than the last one. The starting Alert Level climbs
@@ -411,6 +522,8 @@ function playTab(state: AppState, o: SavedOutfit): string {
       </div>
     </div>
   </section>
+  ${jobsPanel(o)}
+  ${blipsPanel(o)}
   <div class="solo-split">
     ${rollerPanel(state)}
     <div class="solo-ref">

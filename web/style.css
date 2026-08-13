@@ -2507,6 +2507,83 @@ button { font-family: inherit; }
 .solo-card-primary .roster-section { color: var(--blue); }
 .solo-card-quiet .roster-section { color: var(--ink-3); }
 .solo-card-quiet .panel-note, .solo-card-quiet .rule-list { color: var(--ink-3); }
+/* ------------------------------------------------------------ Jobs and Blips
+   The two things a game of Junkspace actually consists of, and neither had a
+   home in the tracker before: you earn credits by completing Jobs (p.211), and
+   the opposition arrives out of eight facedown markers (p.197).
+
+   The Jobs sit above the dice roller because they are the score. Each is a
+   card, because three Jobs dealt off a suit ARE cards, and because each one
+   carries a paragraph of rule you re-read mid-game to decide whether what you
+   just did counts. */
+.solo-jobs .jobs-head, .solo-blips .jobs-head {
+  display: flex; align-items: baseline; gap: 12px; padding-bottom: 10px;
+  border-bottom: none; margin-bottom: 10px;
+}
+.solo-jobs .jobs-head .roster-section, .solo-blips .jobs-head .roster-section {
+  padding: 0; margin: 0; border: none; flex: none;
+}
+.jobs-total {
+  font-family: var(--narrow); font-size: 13px; font-weight: 700;
+  color: var(--blue); margin-right: auto; font-variant-numeric: tabular-nums;
+}
+.job-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(238px, 1fr)); gap: 10px; }
+.job-card {
+  display: flex; flex-direction: column; gap: 7px;
+  padding: 11px 13px 10px; border: 1px solid var(--hair-soft); background: var(--paper);
+}
+/* Maxed out, not finished: a Job at its cap can earn nothing more, which is
+   worth seeing at a glance when you are deciding what to do with a round. */
+.job-card.is-maxed { border-color: var(--blue); }
+.job-head { display: flex; align-items: baseline; gap: 8px; }
+.job-rank {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height: 22px; padding: 0 5px;
+  background: var(--ink); color: var(--paper);
+  font-family: var(--display); font-weight: 800; font-size: 13px;
+}
+.job-name { font-family: var(--display); font-weight: 800; font-size: 15px; color: var(--ink); }
+.job-when {
+  margin-left: auto; font-family: var(--narrow); font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3); white-space: nowrap;
+}
+/* Never clipped. A Job is a rule, and the longest of them runs to sixty words. */
+.job-text { margin: 0; font-size: 13.5px; line-height: 1.45; color: var(--ink-2); }
+.job-alert {
+  margin: 0; display: flex; align-items: center; gap: 5px;
+  font-family: var(--narrow); font-size: 12px; font-weight: 700; color: var(--red-deep);
+}
+.job-earn { display: flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 4px; }
+.job-pips { display: inline-flex; gap: 4px; }
+.job-pip { width: 13px; height: 13px; border: 1px solid var(--hair); background: var(--paper); }
+.job-pip.is-earned { background: var(--blue); border-color: var(--blue); }
+.job-earned {
+  margin-left: auto; font-family: var(--display); font-weight: 800; font-size: 15px;
+  color: var(--ink); font-variant-numeric: tabular-nums;
+}
+
+/* Eight markers, face down until something of yours gets within 6" of one.
+   Square and identical on purpose: they are indistinguishable from each other
+   when turned over (p.197), and the moment one is not, the bag is spoiled. */
+.blip-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); gap: 8px; }
+.blip {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  min-height: var(--tap); padding: 9px 6px;
+  border: 1px solid var(--hair); background: var(--paper); cursor: pointer;
+  font: inherit; color: var(--ink-3); text-align: center;
+}
+.blip:hover { border-color: var(--ink); }
+.blip.is-revealed { border-color: var(--red); color: var(--ink); }
+.blip-n {
+  font-family: var(--display); font-weight: 800; font-size: 19px; line-height: 1;
+  color: var(--ink-3);
+}
+.blip.is-revealed .blip-n { color: var(--red); }
+.blip-what {
+  font-family: var(--narrow); font-size: 10.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.03em;
+}
+
 .solo-readout { margin: 12px 0 0; }
 .solo-readout.over { border-color: var(--red); }
 

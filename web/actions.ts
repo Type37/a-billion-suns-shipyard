@@ -1598,17 +1598,20 @@ function dispatchAction(target: HTMLElement): void {
     case "solo-new-outfit-cancel":
       store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined, newOutfit: undefined } }));
       break;
+    // Stepped, not chosen from two. Clamped only to keep the campaign coherent:
+    // a debt you cannot owe and a run of no games are not harder settings, they
+    // are broken ones.
     case "new-outfit-debt":
     case "new-outfit-games": {
-      const v = Number(target.dataset["value"]);
-      const key = action === "new-outfit-debt" ? "debtStartK" : "gamesLimit";
-      store.setState((st) => ({
-        ...st,
-        ui: {
-          ...st.ui,
-          newOutfit: { emblem: "delta", ...(st.ui.newOutfit ?? {}), [key]: v },
-        },
-      }));
+      const delta = Number(target.dataset["delta"]);
+      store.setState((st) => {
+        const d = st.ui.newOutfit ?? { emblem: "delta" };
+        const next =
+          action === "new-outfit-debt"
+            ? { debtStartK: Math.max(5, Math.min(200, (d.debtStartK ?? STARTING_DEBT_K) + delta)) }
+            : { gamesLimit: Math.max(1, Math.min(30, (d.gamesLimit ?? DEBT_CLEAR_GAMES) + delta)) };
+        return { ...st, ui: { ...st.ui, newOutfit: { ...d, ...next } } };
+      });
       break;
     }
     case "solo-new-outfit-create": {

@@ -51,6 +51,7 @@ export type Route =
   | { view: "fleets" }
   | { view: "builder"; listId: string }
   | { view: "print"; listId: string }
+  | { view: "print-outfit"; outfitId: string }
   | { view: "foundry"; factionId?: string }
   | { view: "solo" }
   | { view: "solo-outfit"; outfitId: string }
@@ -109,6 +110,7 @@ export function parseRoute(hash: string): Route {
   const parts = h.split("/").filter(Boolean);
   if (parts[0] === "fleets") return { view: "fleets" };
   if (parts[0] === "list" && parts[1]) return { view: "builder", listId: parts[1] };
+  if (parts[0] === "print-outfit" && parts[1]) return { view: "print-outfit", outfitId: parts[1] };
   if (parts[0] === "print" && parts[1]) return { view: "print", listId: parts[1] };
   if (parts[0] === "foundry") return parts[1] ? { view: "foundry", factionId: parts[1] } : { view: "foundry" };
   if (parts[0] === "solo") return parts[1] ? { view: "solo-outfit", outfitId: parts[1] } : { view: "solo" };
@@ -170,6 +172,8 @@ export function routeHash(route: Route): string {
       return `#/list/${route.listId}`;
     case "print":
       return `#/print/${route.listId}`;
+    case "print-outfit":
+      return `#/print-outfit/${route.outfitId}`;
     case "foundry":
       return route.factionId ? `#/foundry/${route.factionId}` : "#/foundry";
     case "solo":

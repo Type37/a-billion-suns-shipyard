@@ -2,7 +2,13 @@ import type { Era, Faction, FleetHvp, FleetUnit, GameMode, Hvp, ShipClass, Weapo
 import { ALLIANCE_SPECIES, MODE_BUILDER_SHAPE } from "../src/types.ts";
 import { validateFleet, type ValidationIssue } from "../src/validation.ts";
 import { GENERIC_HVP } from "../src/data/index.ts";
-import { JUNKSPACE_SHIPS } from "../src/data/junkspace.ts";
+import {
+  JUNKSPACE_SHIPS,
+  PILOT_PERKS,
+  STARTING_DEBT_K,
+  DEBT_CLEAR_GAMES,
+} from "../src/data/junkspace.ts";
+import { PERKS_BY_CLASS } from "../src/data/junkspace-solo.ts";
 import { TRAINING_FLEET } from "../src/data/training-fleet.ts";
 import { ACTIVATION_STEPS, CORE_ACTIONS, CORE_COMMANDS, ROUND_PHASES } from "../src/data/commands.ts";
 import { deriveCommandEffects, effectiveCost } from "../src/command-effects.ts";
@@ -1872,6 +1878,161 @@ function shipReferenceModal(state: AppState): string {
 // Print
 // ---------------------------------------------------------------------------
 
+/**
+ * One weapon cell of a printed roster. Module level, because the Junkspace
+ * crew sheet prints the same two columns and should not draw them differently.
+ */
+const prWeapCell = (ship: ShipClass, arc: "primary" | "aux"): string => {
+  const glyph = icon(arc === "primary" ? "arc-primary" : "arc-aux", 10, "prw-mark slot-arc");
+  const list = arc === "primary" ? ship.primary : ship.auxiliary;
+  const lines = list.length
+    ? list.map((w) => escapeHtml(formatWeapon(w)))
+    : [escapeHtml(arc === "primary" ? primarySlotText(ship) : auxSlotText(ship))];
+  // The gutter is always emitted, with or without a glyph in it. "None" gets
+  // no arc - there is no arc to mark, and the glyph beside it read as a weapon
+  // struck through - but it still gets the space, so the Primary column and
+  // the Auxiliary column agree about where their text starts on a given row.
+  return lines
+    .map(
+      (s) =>
+        `<span class="prw"><span class="prw-ico">${s === "None" ? "" : glyph}</span><span class="prw-t">${s}</span></span>`,
+    )
+    .join("");
+};
+
+/**
+ * The printed crew sheet for a Junkspace outfit.
+ *
+ * The Print button on the outfit page used to be window.print() on the live
+ * tracker, which puts the whole app on paper: the tab bar, the alert pips, the
+ * blip grid mid-flip. This app has a real print route and an outfit is a roster
+ * like any other, so it gets a sheet of its own on the same paper, in the same
+ * shell, with the same viewport preview.
+ *
+ * It is NOT the fleet sheet with different data. A Junkspace outfit is at most
+ * five single-ship units (p.195) whose interesting column is the pilot: a class,
+ * a starting perk, and up to eight earned ones that change how that ship plays.
+ * There is no unit count, no HVP, no credits limit and no legality to check.
+ * What a player needs at the table is the stat line, the weapons, an HP row to
+ * cross off, and every perk that pilot has earned, printed in full.
+ */
+function outfitPrintView(state: AppState): string {
+  const o = state.outfits.find((x) => x.id === (state.route as { outfitId: string }).outfitId);
+  if (!o) return `${topbar()}<main class="empty-state"><p>That outfit was not found.</p></main>`;
+  const opts = state.ui.print ?? DEFAULT_PRINT;
+  const paper = PAPER[opts.paper] ?? PAPER.letter;
+  const byId = new Map(JUNKSPACE_SHIPS.map((s) => [s.id, s]));
+  const debtStart = o.debtStartK ?? STARTING_DEBT_K;
+  const games = o.gamesLimit ?? DEBT_CLEAR_GAMES;
+
+  const hpBoxes = (hp: number) =>
+    `<span class="pr-hp">${Array.from({ length: hp }, () => '<span class="pr-hp-box"></span>').join("")}</span>`;
+
+  const rows = o.ships
+    .map((s) => {
+      const def = byId.get(s.shipClassId);
+      if (!def) return "";
+      const base = PILOT_PERKS.find((p) => p.class === s.pilotClass);
+      // Every perk this pilot has, printed whole. A perk changes how the ship
+      // plays and the name alone ("Backstab", "Grav Anchor") tells you nothing
+      // at the table, which is the whole reason it is on the sheet.
+      const earned = o.perks
+        .filter((p) => p.shipId === s.id)
+        .map((p) => {
+          const found = PERKS_BY_CLASS[s.pilotClass]?.find((x) => x.name === p.perk);
+          return `<span class="po-perk"><b>${escapeHtml(p.perk)}</b>${found ? ` ${ruleText(found.text)}` : ""}</span>`;
+        })
+        .join("");
+      return `
+      <tr>
+        <td class="pr-unit">
+          <span class="pr-unit-name">${escapeHtml(s.shipName?.trim() || def.name)}</span>
+          ${s.shipName?.trim() && s.shipName.trim() !== def.name ? `<span class="pr-unit-class">${escapeHtml(def.name)}</span>` : ""}
+        </td>
+        <td class="po-pilot">
+          <span class="po-pilot-name">${escapeHtml(s.pilotName?.trim() || "—")}</span>
+          <span class="po-pilot-class">${escapeHtml(s.pilotClass)}</span>
+        </td>
+        <td class="pr-num">${def.mass}</td>
+        <td class="pr-num">${def.thrust}"</td>
+        <td class="pr-num">${def.silhouette}</td>
+        <td class="pr-num">${def.shields}</td>
+        <td class="pr-weap">${prWeapCell(def, "primary")}</td>
+        <td class="pr-weap">${prWeapCell(def, "aux")}</td>
+        <td class="pr-track">${hpBoxes(def.silhouette)}</td>
+      </tr>
+      <tr class="po-perkrow">
+        <td colspan="9">
+          <span class="po-perks">
+            ${base ? `<span class="po-perk po-perk-base"><b>${escapeHtml(base.perkName)}</b> ${ruleText(base.text)}</span>` : ""}
+            ${earned}
+          </span>
+        </td>
+      </tr>`;
+    })
+    .join("");
+
+  return `
+  ${topbar()}
+  <main class="print-page ${opts.inkSaver ? "is-inksaver" : ""}">
+    <div class="print-toolbar">
+      <a class="bar-btn" href="#/solo/${o.id}">${icon("chevronRight", 15, "flip-x")} Back to the outfit</a>
+      <div class="print-opts">
+        <span class="segment" role="group" aria-label="Paper size">
+          <button class="${opts.paper === "letter" ? "selected" : ""}" data-action="print-paper" data-paper="letter">Letter</button>
+          <button class="${opts.paper === "a4" ? "selected" : ""}" data-action="print-paper" data-paper="a4">A4</button>
+        </span>
+        <label class="print-toggle" title="Drops the solid fills and heavy rules"><input type="checkbox" data-action="print-inksaver" ${opts.inkSaver ? "checked" : ""} /> Ink saver</label>
+      </div>
+      <div class="print-go">
+        <button class="cta-btn" data-action="do-print">${icon("print", 17)} Print</button>
+      </div>
+    </div>
+
+    <div class="sheet-viewport">
+    <article class="sheet" data-print-sheet data-paper-label="${paper.label}" style="--page-w:${paper.w}px;--page-h:${paper.h}px">
+      <header class="sheet-head">
+        <div class="sheet-emblem">${emblemView(o, 52)}</div>
+        <div class="sheet-title-block">
+          <h1 class="sheet-title">${escapeHtml(o.name || "Unnamed outfit")}</h1>
+          <p class="sheet-subtitle">Junkspace outfit</p>
+        </div>
+        <div class="sheet-totals">
+          <p class="sheet-total-line">¢${Math.max(0, o.debtK)}k owed of ¢${debtStart}k</p>
+          <p class="sheet-count">Game ${Math.min(o.gamesPlayed + 1, games)} of ${games}</p>
+        </div>
+      </header>
+
+      ${
+        o.ships.length
+          ? `<table class="print-roster po-roster">
+        <thead>
+          <tr>
+            <th class="pr-unit">Ship</th><th class="po-pilot">Pilot</th>
+            <th class="pr-num">Mass</th><th class="pr-num">Thr</th><th class="pr-num">Sil</th><th class="pr-num">Shd</th>
+            <th class="pr-weap">Primary weapons</th><th class="pr-weap">Auxiliary weapons</th>
+            <th class="pr-track">Hull</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`
+          : '<p class="print-note">No ships in this outfit.</p>'
+      }
+
+      ${/* The two numbers that carry between games, with room to write the new
+            ones in. A campaign sheet that cannot be updated at the table is a
+            snapshot of a campaign you have already moved past. */ ""}
+      <h2 class="sheet-section">After the game</h2>
+      <div class="po-after">
+        <p class="po-after-line"><span>Earned this game</span><span class="po-rule"></span></p>
+        <p class="po-after-line"><span>Debt remaining</span><span class="po-rule"></span></p>
+        <p class="po-after-line"><span>Perks taken</span><span class="po-rule"></span></p>
+      </div>
+    </article>
+    </div>
+  </main>`;
+}
+
 function printView(state: AppState): string {
   const list = activeList(state);
   if (!list) return `${topbar()}<main class="empty-state"><p>That fleet was not found.</p></main>`;
@@ -1995,23 +2156,6 @@ function printView(state: AppState): string {
    */
   const prNum = (name: string, value: string): string =>
     `<span class="prn">${icon(name, 10, `prn-ico stat-ico stat-ico-${name.replace("stat-", "")}`)}<span class="prn-v">${value}</span></span>`;
-  const prWeapCell = (ship: ShipClass, arc: "primary" | "aux"): string => {
-    const glyph = icon(arc === "primary" ? "arc-primary" : "arc-aux", 10, "prw-mark slot-arc");
-    const list = arc === "primary" ? ship.primary : ship.auxiliary;
-    const lines = list.length
-      ? list.map((w) => escapeHtml(formatWeapon(w)))
-      : [escapeHtml(arc === "primary" ? primarySlotText(ship) : auxSlotText(ship))];
-    // The gutter is always emitted, with or without a glyph in it. "None" gets
-    // no arc - there is no arc to mark, and the glyph beside it read as a weapon
-    // struck through - but it still gets the space, so the Primary column and
-    // the Auxiliary column agree about where their text starts on a given row.
-    return lines
-      .map(
-        (s) =>
-          `<span class="prw"><span class="prw-ico">${s === "None" ? "" : glyph}</span><span class="prw-t">${s}</span></span>`,
-      )
-      .join("");
-  };
 
   const unitRows = printUnits
     .map((u) => {
@@ -4449,6 +4593,8 @@ export function render(state: AppState): string {
         return builderView(state);
       case "print":
         return printView(state);
+      case "print-outfit":
+        return outfitPrintView(state);
       case "foundry":
         return state.route.factionId ? foundryEditView(state, state.route.factionId) : foundryListView(state);
       case "solo":

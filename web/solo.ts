@@ -27,10 +27,8 @@ import {
   SOLO_ALERT_RULES,
   PERKS_BY_CLASS,
   BLIP_TO_PIRATE,
-  RANDOM_BEHAVIOUR,
-  GLITCH_BLIP,
-  BEHAVIOUR_ROUTINES,
-  type RollRow,
+  JUNKSPACE_PIRATES,
+  PIRATE_RULE,
 } from "../src/data/junkspace-solo.ts";
 import { escapeHtml, formatDate, ruleText } from "./format.ts";
 import { icon, statChips } from "./icons.ts";
@@ -101,6 +99,8 @@ export function newOutfitModal(state: AppState): string {
   const m = state.ui.modal;
   if (!m || m.kind !== "new-outfit") return "";
   const draft = state.ui.newOutfit ?? { emblem: "delta" };
+  const debt = draft.debtStartK ?? STARTING_DEBT_K;
+  const games = draft.gamesLimit ?? DEBT_CLEAR_GAMES;
 
   return `
   <div class="modal-root">
@@ -124,25 +124,29 @@ export function newOutfitModal(state: AppState): string {
             <input class="new-outfit-name" type="text" placeholder="Unnamed outfit" value="${escapeHtml(draft.name ?? "")}" autocomplete="off" autofocus />
           </label>
         </div>
+        ${/* Two numbers you step, not two pairs of buttons.
+              The book gives one standard game and one harder one - "clear your
+              debt in 6 games or increase your debt to ¢45k" (p.201) - and a
+              two-button segment turns that into the only two campaigns there
+              are. They are just numbers; the note explaining that they were
+              independent was three lines of prose doing a job the two steppers
+              do by existing. The book's harder values are where the readout
+              turns red, so the dial still says which way is up. */ ""}
         <div class="no-dials">
-          <p class="no-dials-note">Two dials, and they are independent: the book offers the harder game as
-            "clear your debt in 6 games <em>or</em> increase your debt to ¢45k" (p.201). Pull either, or both.</p>
           <div class="no-dial">
             <span class="control-label">Debt</span>
-            <div class="seg">
-              <button class="seg-btn ${(draft.debtStartK ?? STARTING_DEBT_K) === STARTING_DEBT_K ? "on" : ""}"
-                      data-action="new-outfit-debt" data-value="${STARTING_DEBT_K}">${ck(STARTING_DEBT_K)}</button>
-              <button class="seg-btn ${draft.debtStartK === HARD_DEBT_K ? "on" : ""}"
-                      data-action="new-outfit-debt" data-value="${HARD_DEBT_K}">${ck(HARD_DEBT_K)}</button>
+            <div class="dial">
+              <button class="stepper-btn" data-action="new-outfit-debt" data-delta="-5" aria-label="Less debt">${icon("minus", 15)}</button>
+              <span class="dial-val ${debt >= HARD_DEBT_K ? "is-hard" : ""}">${ck(debt)}</span>
+              <button class="stepper-btn" data-action="new-outfit-debt" data-delta="5" aria-label="More debt">${icon("plus", 15)}</button>
             </div>
           </div>
           <div class="no-dial">
             <span class="control-label">Games to clear it</span>
-            <div class="seg">
-              <button class="seg-btn ${(draft.gamesLimit ?? DEBT_CLEAR_GAMES) === DEBT_CLEAR_GAMES ? "on" : ""}"
-                      data-action="new-outfit-games" data-value="${DEBT_CLEAR_GAMES}">${DEBT_CLEAR_GAMES}</button>
-              <button class="seg-btn ${draft.gamesLimit === HARD_CLEAR_GAMES ? "on" : ""}"
-                      data-action="new-outfit-games" data-value="${HARD_CLEAR_GAMES}">${HARD_CLEAR_GAMES}</button>
+            <div class="dial">
+              <button class="stepper-btn" data-action="new-outfit-games" data-delta="-1" aria-label="Fewer games">${icon("minus", 15)}</button>
+              <span class="dial-val ${games <= HARD_CLEAR_GAMES ? "is-hard" : ""}">${games}</span>
+              <button class="stepper-btn" data-action="new-outfit-games" data-delta="1" aria-label="More games">${icon("plus", 15)}</button>
             </div>
           </div>
         </div>
@@ -408,18 +412,33 @@ function blipsPanel(o: SavedOutfit): string {
   // it. Rendering only the current face meant "Pirate Starfighter" appearing
   // where "face down" had been, the row growing a line, and every marker below
   // it jumping down the page at the exact moment you were looking at one.
+  // What a marker turns out to be, in the app's own stat format rather than
+  // the book's table: the same four chips every ship in the app wears, then the
+  // weapon systems. p.211 prints these as a row in a table with the Blip
+  // numbers down the side, which is how you read it off a page and not how you
+  // want it when you have just flipped one marker over mid-turn.
+  const byName = new Map(JUNKSPACE_PIRATES.map((p) => [p.name, p]));
   const markers = blips
-    .map(
-      (b, i) => `
+    .map((b, i) => {
+      const name = BLIP_TO_PIRATE[b.n] ?? "";
+      const p = byName.get(name);
+      const weapons = p
+        ? [
+            p.primary ? `<span class="blip-w"><b>Pri</b> ${escapeHtml(p.primary)}</span>` : "",
+            p.auxiliary ? `<span class="blip-w"><b>Aux</b> ${escapeHtml(p.auxiliary)}</span>` : "",
+          ].join("")
+        : "";
+      return `
       <button class="blip ${b.revealed ? "is-revealed" : ""}" data-action="solo-blip-reveal" data-index="${i}"
-              aria-label="${b.revealed ? `Blip ${b.n}, ${escapeHtml(BLIP_TO_PIRATE[b.n] ?? "")}. Turn it back over.` : "Face-down Blip marker. Turn it over."}">
-        <span class="blip-face blip-back">${icon("logo", 22)}</span>
+              aria-label="${b.revealed ? `Blip ${b.n}, ${escapeHtml(name)}. Turn it back over.` : "Face-down Blip marker. Turn it over."}">
+        <span class="blip-face blip-back">${icon("logo", 26)}</span>
         <span class="blip-face blip-front">
-          <span class="blip-n">${b.n}</span>
-          <span class="blip-what">${escapeHtml(BLIP_TO_PIRATE[b.n] ?? "")}</span>
+          <span class="blip-head"><span class="blip-n">${b.n}</span><span class="blip-what">${escapeHtml(name)}</span></span>
+          ${p ? statChips(p, true) : ""}
+          <span class="blip-weapons">${weapons}</span>
         </span>
-      </button>`,
-    )
+      </button>`;
+    })
     .join("");
   return `
     <section class="solo-card solo-blips">
@@ -427,59 +446,7 @@ function blipsPanel(o: SavedOutfit): string {
         <button class="ghost-btn" data-action="solo-shuffle-blips">${icon("shuffle", 13)} Reshuffle</button>
       </h3>
       <div class="blip-grid">${markers}</div>
-    </section>`;
-}
-
-/**
- * A roll table, printed. You bring the die.
- *
- * Three rows against a D6 is a thing you read, not a thing you press. Printed
- * whole, the player rolls once and looks along the row; behind a button, the
- * same three rows are invisible until the app rolls its own die, which is a
- * second die nobody asked for.
- */
-/**
- * The Hostile behaviour routines, as terms you open one at a time.
- *
- * The D6 table above says "Engage Nearest Enemy, Attack Smartly" and those
- * three words are three separate procedures, each a paragraph long, each with
- * its own tie-breaks. Printed out in full they are a wall you scroll past; as
- * seven named terms they are what they actually are at the table - a thing you
- * look up in the middle of moving one ship, once, and then put down.
- *
- * The panel is absolutely positioned, so opening one does not push the tables
- * below it down the page.
- */
-function routinesPanel(open: string | undefined): string {
-  const chips = BEHAVIOUR_ROUTINES.map((r) => {
-    const on = open === r.term;
-    return `
-      <span class="solo-def-wrap">
-        <button class="solo-def ${on ? "is-open" : ""}" data-action="solo-def" data-term="${escapeHtml(r.term)}"
-                aria-expanded="${on}">${escapeHtml(r.term)}</button>
-        ${on ? `<span class="solo-def-pop" role="note">${ruleText(r.text)}</span>` : ""}
-      </span>`;
-  }).join("");
-  return `
-    <section class="solo-card solo-card-quiet">
-      <h3 class="roster-section">Hostile routines</h3>
-      <p class="blip-note">The behaviour table names these. Tap one to read it.</p>
-      <div class="solo-def-row">${chips}</div>
-    </section>`;
-}
-
-function rollTableCard(name: string, die: string, rows: RollRow[]): string {
-  const body = rows
-    .map(
-      (r) => `<tr><td class="rt-roll">${escapeHtml(r.roll)}</td><td>${ruleText(r.result)}${
-        r.detail ? `<span class="rt-detail">${ruleText(r.detail)}</span>` : ""
-      }</td></tr>`,
-    )
-    .join("");
-  return `
-    <section class="solo-card solo-card-quiet">
-      <h3 class="roster-section">${escapeHtml(name)} <span class="muted">${escapeHtml(die)}</span></h3>
-      <table class="roll-table"><tbody>${body}</tbody></table>
+      <p class="blip-rule">${ruleText(PIRATE_RULE)}</p>
     </section>`;
 }
 
@@ -491,7 +458,11 @@ function playTab(state: AppState, o: SavedOutfit): string {
   const startsAt = startingAlertLevel(o.debtK);
   const startNote =
     startsAt > ALERT_START
-      ? `<p class="alert-start-note">Under ${ck(LOW_DEBT_THRESHOLD_K)} of Debt left, so this game starts at ${startsAt}.</p>`
+      ? `<p class="alert-start-note">${
+          o.debtK <= 0
+            ? `No Debt left, so this game starts at ${startsAt}.`
+            : `Under ${ck(LOW_DEBT_THRESHOLD_K)} of Debt left, so this game starts at ${startsAt}.`
+        }</p>`
       : "";
   const phases = SOLO_PHASES.map((p) => `<li><strong>${escapeHtml(p.name)}.</strong> ${ruleText(p.text)}</li>`).join("");
   return `
@@ -536,9 +507,6 @@ function playTab(state: AppState, o: SavedOutfit): string {
         <h3 class="roster-section">Alert Level rules</h3>
         <ul class="rule-list small">${SOLO_ALERT_RULES.map((r) => `<li>${ruleText(r)}</li>`).join("")}</ul>
       </section>
-      ${rollTableCard("Hostile behaviour", "D6", RANDOM_BEHAVIOUR)}
-      ${routinesPanel(state.ui.soloDef)}
-      ${rollTableCard("Glitch a Blip", "D6", GLITCH_BLIP)}
     </div>
   </div>`;
 }
@@ -689,10 +657,12 @@ export function soloOutfitView(state: AppState): string {
         <div class="emblem-picker">${outfitEmblemPicker(o)}</div>
       </div>
       ${/* An outfit is a roster and every other roster in this app prints. This
-            one never had the button at all, so the only way to get a crew sheet
-            to the table was a browser menu. */ ""}
+            went to window.print() on the live tracker for one build, which puts
+            the tab bar, the alert pips and a half-flipped blip grid on paper;
+            it goes to the real print route now, same shell and same preview as
+            a Fleet List. */ ""}
       <div class="setup-actions">
-        <button class="bar-btn" data-action="do-print">${icon("print", 15)} Print</button>
+        <a class="bar-btn" href="#/print-outfit/${o.id}">${icon("print", 15)} Print</a>
       </div>
     </div>
   </section>

@@ -1944,7 +1944,9 @@ function outfitPrintView(state: AppState): string {
     name: "Junkspace",
     era: "Hypergrowth",
     tagline: "",
-    rule: { name: "The Rule of Hard Knocks", text: "In Junkspace, if you can't figure out precisely what the rules are telling you to do: choose the interpretation or outcome that disadvantages you the most." },
+    // Empty: the sheet only prints a rule block when there is a rule, and a
+    // crew sheet does not need a banner explaining how to adjudicate ties.
+    rule: { name: "", text: "" },
     // Strings and numbers where the real factions keep strings and numbers.
     // Initiative is rendered through escapeHtml, so a number here throws inside
     // the rule block rather than printing "0" - and these are the true values:
@@ -1973,7 +1975,6 @@ function outfitPrintView(state: AppState): string {
         shipClassId: sh.shipClassId,
         count: 1,
         ...(sh.shipName?.trim() ? { name: sh.shipName.trim() } : {}),
-        shipNames: [`${sh.pilotName?.trim() || sh.pilotClass} · ${sh.pilotClass}`],
       })),
       hvp: [],
     },
@@ -2007,7 +2008,7 @@ function outfitPrintView(state: AppState): string {
       <span class="pp">
         <span class="pp-who">
           ${mark ? `<img class="pp-ico" src="${mark}" alt="" />` : ""}
-          <span class="pp-name">${escapeHtml(sh.pilotName?.trim() || "Unnamed pilot")}</span>
+          ${sh.pilotName?.trim() ? `<span class="pp-name">${escapeHtml(sh.pilotName.trim())}</span>` : ""}
           <span class="pp-class">${escapeHtml(sh.pilotClass)}</span>
         </span>
         ${base ? `<span class="pp-perk pp-perk-base"><b>${escapeHtml(base.perkName)}</b> ${ruleText(base.text)}</span>` : ""}
@@ -2210,7 +2211,6 @@ function printView(
           ${showClass ? `<span class="pr-unit-class">${escapeHtml(ship.name)}${list.freePlay ? `, ${escapeHtml(r.owner.name)}` : ""}</span>` : ""}
           ${named.length ? `<span class="pr-unit-ships">${escapeHtml(named.join(" / "))}</span>` : ""}
           ${notes ? `<span class="pr-unit-notes">${escapeHtml(notes)}</span>` : ""}
-          ${override?.unitExtra?.(u.id) ?? ""}
         </td>
         <td class="pr-num">${prNum("stat-mass", String(ship.mass))}</td>
         <td class="pr-num">${prNum("stat-thrust", `${ship.thrust}"`)}</td>
@@ -2223,7 +2223,12 @@ function printView(
         ${trackCell}
         ${jumpCell}
         ${hvpCarrierCell(u)}
-      </tr>`;
+      </tr>
+      ${
+        override?.unitExtra
+          ? `<tr class="pr-pilot-row"><td colspan="99">${override.unitExtra(u.id)}</td></tr>`
+          : ""
+      }`;
     })
     .join("");
 
@@ -2539,7 +2544,12 @@ function printView(
 
       ${(() => {
         const maxRound = list.mode === "management-training" ? 3 : 4;
-        const isCredits = list.mode === "hypergrowth" || list.mode === "management-training";
+        // Junkspace has no victory points and no opponent: you earn credits from
+        // Jobs and take them off your Debt (p.211). A VP row and an Opponent row
+        // on a solo sheet are two rows nobody can fill in.
+        const isCredits =
+          list.mode === "hypergrowth" || list.mode === "management-training" || list.mode === "junkspace";
+        const isSolo = list.mode === "junkspace";
         const roundNames = ["Round One", "Round Two", "Round Three", "Round Four"].slice(0, maxRound);
         const cells = roundNames.map(() => "<td></td>").join("");
         return `
@@ -2547,7 +2557,7 @@ function printView(
         <thead><tr><th></th>${roundNames.map((n) => `<th>${n}</th>`).join("")}<th>Final</th></tr></thead>
         <tbody>
           <tr><th>${isCredits ? "Credits earned" : "Victory points"}</th>${cells}<td></td></tr>
-          <tr><th>Opponent</th>${cells}<td></td></tr>
+          ${isSolo ? "" : `<tr><th>Opponent</th>${cells}<td></td></tr>`}
           <tr><th>Notes</th>${cells}<td></td></tr>
         </tbody>
       </table>`;

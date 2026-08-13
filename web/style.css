@@ -1606,7 +1606,13 @@ button { font-family: inherit; }
    resolved to 10 on a phone and 16 on a desktop and left the preview's content
    column 12px wider on the phone: every column width, every wrap point and, at
    the margin, the page count came out different on the two. Flat 16. */
-.sheet { background: #fff; border: 1px solid var(--hair-soft); padding: 16px; }
+/* BIGGER. The sheet is read at arm's length on a table under a hand, not on a
+   screen at 60cm, and it had drifted down to sizes that only work on a screen:
+   9-9.5px for anything that was not a stat. A printed page has the room. */
+.sheet { background: #fff; border: 1px solid var(--hair-soft); padding: 16px; font-size: 12px; }
+.print-roster { font-size: 11.5px; }
+.print-card { font-size: 11.5px; }
+.print-score { font-size: 11.5px; }
 .sheet-head { display: flex; align-items: center; gap: 10px; padding-bottom: 4px; border-bottom: 1px solid var(--ink-3); }
 .sheet-emblem { color: var(--blue); flex-shrink: 0; }
 .sheet-title-block { flex: 1; }
@@ -2577,11 +2583,19 @@ button { font-family: inherit; }
   font-family: var(--narrow); font-size: 9px; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-3);
 }
-/* Full rule text, never trimmed. */
-.pp-perk { display: block; margin-top: 2px; font-size: 9px; line-height: 1.4; color: var(--ink-2); }
+/* Full rule text, never trimmed, and readable. 9px is the size the stat
+   columns use for a two-word label; a sentence set in it is a grey ribbon. */
+.pp-perk { display: block; margin-top: 3px; font-size: 11px; line-height: 1.45; color: var(--ink-2); }
 .pp-perk b { color: var(--ink); }
 .pp-perk-base b::after { content: " (starting)"; font-weight: 400; color: var(--ink-3); }
 .pp-blank { display: block; margin-top: 7px; border-bottom: 1px solid var(--hair-soft); height: 1px; }
+/* In the roster the pilot gets its own full-width row under the ship. Crammed
+   into the unit column it had about 120px to work in, so a two-line perk came
+   out as a nine-line ribbon and the row it belonged to grew to match. */
+.pr-pilot-row td { padding: 2px 0 9px 8px; border-top: none; }
+.pr-pilot-row .pp-who { margin-bottom: 2px; }
+.pr-pilot-row .pp-perk { max-width: 92ch; }
+.pr-pilot-row .pp-blank { max-width: 62ch; }
 
 /* ------------------------------------------------ campaign tab, tightened
    Five pilots came to seven hundred pixels of mostly nothing: each was a name

@@ -63,6 +63,7 @@ const VIEW_TITLE: Record<string, string> = {
   // Shipyard, the other eras build a Fleet List.
   builder: "Fleet List",
   print: "Print setup",
+  "print-outfit": "Print setup",
   foundry: "Custom Rules",
   solo: "Solo",
   "solo-outfit": "Outfit",

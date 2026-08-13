@@ -2553,41 +2553,11 @@ button { font-family: inherit; }
   font-size: 13.5px; line-height: 1.5; color: var(--ink-2);
 }
 
-/* ------------------------------------------------------- the crew sheet
-   A Junkspace outfit printed. It reuses the fleet sheet's shell and roster
-   table, so only the two columns it does not share need rules: the pilot, and
-   the perk row folded under each ship.
-
-   The perks get their own row spanning the table rather than a cell, because a
-   pilot with eight of them is a paragraph and a paragraph in a cell stretches
-   that ship's stat line to the height of the paragraph. */
-.po-pilot { width: 16%; }
-/* The pilot mark, on paper. It is the only thing on this sheet that is a
-   character rather than a number, and printing "GUNNER" in 9.5px caps beside
-   four stat columns of 9.5px caps loses that. print-color-adjust so a browser
-   set to drop backgrounds still puts the mark on the page - it is content
-   here, not decoration. */
-.po-pilot-id { display: flex; align-items: center; gap: 6px; }
-.po-pilot-ico {
-  width: 22px; height: 22px; flex: none; object-fit: contain;
-  print-color-adjust: exact; -webkit-print-color-adjust: exact;
+/* The ship cap, only when it bites. */
+.roster-warn {
+  font-family: var(--narrow); font-size: 11.5px; font-weight: 700;
+  text-transform: none; letter-spacing: 0; color: var(--red-deep);
 }
-.po-pilot-text { min-width: 0; }
-.po-pilot-name { display: block; font-weight: 700; color: var(--ink); }
-.po-pilot-class {
-  display: block; font-family: var(--narrow); font-size: 9.5px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-3);
-}
-.po-perkrow td { padding-top: 0; border-top: none; }
-.po-perks { display: flex; flex-wrap: wrap; gap: 3px 14px; }
-/* Full rule text on every perk. The name alone tells you nothing at a table,
-   which is the only place this sheet is ever read. */
-.po-perk { font-size: 9.5px; line-height: 1.4; color: var(--ink-2); max-width: 46ch; }
-.po-perk b { color: var(--ink); }
-.po-perk-base b::after { content: " (starting)"; font-weight: 400; color: var(--ink-3); }
-.po-after { display: grid; gap: 9px; max-width: 62%; }
-.po-after-line { display: flex; align-items: baseline; gap: 10px; margin: 0; font-size: 10.5px; color: var(--ink-2); }
-.po-rule { flex: 1; border-bottom: 1px solid var(--hair); height: 12px; }
 
 /* ------------------------------------------------ campaign tab, tightened
    Five pilots came to seven hundred pixels of mostly nothing: each was a name

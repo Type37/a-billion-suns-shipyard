@@ -346,7 +346,11 @@ function outfitTab(o: SavedOutfit): string {
           <div class="readout"><span class="readout-label">Spent</span><span class="readout-value">${ck(cost)}</span></div>
           <div class="readout"><span class="readout-label">Left</span><span class="readout-value ${over ? "negative" : ""}">${over ? "−" : ""}${ck(Math.abs(remaining))}</span></div>
         </div>
-        <h3 class="roster-section">Ships <span class="muted">${o.ships.length}/${OUTFIT_MAX_SHIPS}${full ? " &middot; outfit full" : ""}</span></h3>
+        ${/* No running count. "3/5" beside a list of three ships you can see is
+              the app counting to three for you, every time you look at it. The
+              cap only matters at the moment it stops you, so it only speaks
+              then. */ ""}
+        <h3 class="roster-section">Ships${full ? ` <span class="roster-warn">Outfit full &mdash; ${OUTFIT_MAX_SHIPS} ships is the berthing limit</span>` : ""}</h3>
         ${shipRows || ""}
         ${over ? '<div class="inspection fail"><p class="issue-error">Over budget by ' + ck(-remaining) + ".</p></div>" : ""}
         <div class="roster-actions">

@@ -2586,8 +2586,23 @@ button { font-family: inherit; }
 .sheet.is-solo .print-roster th { padding-bottom: 8px; }
 .sheet.is-solo .print-roster tbody tr td { padding-top: 10px; }
 .sheet.is-solo .sheet-head { padding-bottom: 14px; }
-.sheet.is-solo .print-card { padding: 0 0 18px; }
-.sheet.is-solo .print-cards { gap: 22px; }
+/* A card still has to be a card.
+   "No lines" stripped the outline off these too, and an outline is the whole
+   of what makes a card one - without it they are five paragraphs down a page.
+   So they get an edge made of tone rather than of rule: a pale ground and real
+   padding, which reads as a card from across a table and draws no keyline. Ink
+   saver drops the fill and puts the hairline back, because on that setting the
+   cheapest way to say "card" is one thin line. */
+.sheet.is-solo .print-card {
+  padding: 12px 14px 16px;
+  background: #f6f7f9;
+  print-color-adjust: exact; -webkit-print-color-adjust: exact;
+}
+.is-inksaver .sheet.is-solo .print-card {
+  background: none;
+  border: 1px solid var(--hair-soft);
+}
+.sheet.is-solo .print-cards { gap: 14px; }
 
 /* ------------------------------------------------ the pilot, on the sheet
    A Junkspace ship is half hull and half crew. The stat columns carry the

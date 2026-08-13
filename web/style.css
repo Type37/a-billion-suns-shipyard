@@ -2565,6 +2565,30 @@ button { font-family: inherit; }
   text-transform: none; letter-spacing: 0; color: var(--red-deep);
 }
 
+/* A solo sheet has no rules on it. Not one.
+   A Junkspace outfit is five ships and their crews on one page, and every
+   border, keyline and row divider the fleet sheet uses to keep twenty units
+   apart is, at five, a box drawn round something that was already separate.
+   Space does the same job and leaves the page looking like paper. */
+.sheet.is-solo,
+.sheet.is-solo .print-roster,
+.sheet.is-solo .print-roster th,
+.sheet.is-solo .print-roster td,
+.sheet.is-solo .print-card,
+.sheet.is-solo .print-score,
+.sheet.is-solo .print-score th,
+.sheet.is-solo .print-score td,
+.sheet.is-solo .sheet-head,
+.sheet.is-solo .frule,
+.sheet.is-solo .pr-pilot-row td {
+  border: none;
+}
+.sheet.is-solo .print-roster th { padding-bottom: 8px; }
+.sheet.is-solo .print-roster tbody tr td { padding-top: 10px; }
+.sheet.is-solo .sheet-head { padding-bottom: 14px; }
+.sheet.is-solo .print-card { padding: 0 0 18px; }
+.sheet.is-solo .print-cards { gap: 22px; }
+
 /* ------------------------------------------------ the pilot, on the sheet
    A Junkspace ship is half hull and half crew. The stat columns carry the
    hull; this carries the pilot - the mark, the class, and every ability in
@@ -2573,9 +2597,9 @@ button { font-family: inherit; }
    Two blank rules at the end. Perks arrive between games, one per ¢1k earned,
    and a sheet you cannot write on is a sheet you reprint after every game. */
 .pp { display: block; margin-top: 4px; }
-.pp-who { display: flex; align-items: center; gap: 5px; }
+.pp-who { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
 .pp-ico {
-  width: 17px; height: 17px; flex: none; object-fit: contain;
+  width: 30px; height: 30px; flex: none; object-fit: contain;
   print-color-adjust: exact; -webkit-print-color-adjust: exact;
 }
 .pp-name { font-weight: 700; color: var(--ink); }
@@ -2587,15 +2611,17 @@ button { font-family: inherit; }
    columns use for a two-word label; a sentence set in it is a grey ribbon. */
 .pp-perk { display: block; margin-top: 3px; font-size: 11px; line-height: 1.45; color: var(--ink-2); }
 .pp-perk b { color: var(--ink); }
-.pp-perk-base b::after { content: " (starting)"; font-weight: 400; color: var(--ink-3); }
-.pp-blank { display: block; margin-top: 7px; border-bottom: 1px solid var(--hair-soft); height: 1px; }
+/* Room to write, not a ruled line. Two hairlines under every pilot read as
+   part of the design and boxed the card in; blank space takes a pen just as
+   well and looks like the page it is. */
+.pp-room { display: block; height: 26px; }
 /* In the roster the pilot gets its own full-width row under the ship. Crammed
    into the unit column it had about 120px to work in, so a two-line perk came
    out as a nine-line ribbon and the row it belonged to grew to match. */
 .pr-pilot-row td { padding: 2px 0 9px 8px; border-top: none; }
 .pr-pilot-row .pp-who { margin-bottom: 2px; }
 .pr-pilot-row .pp-perk { max-width: 92ch; }
-.pr-pilot-row .pp-blank { max-width: 62ch; }
+.pr-pilot-row .pp-room { height: 22px; }
 
 /* ------------------------------------------------ campaign tab, tightened
    Five pilots came to seven hundred pixels of mostly nothing: each was a name

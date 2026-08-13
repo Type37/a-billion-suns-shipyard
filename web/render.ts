@@ -1944,9 +1944,10 @@ function outfitPrintView(state: AppState): string {
     name: "Junkspace",
     era: "Hypergrowth",
     tagline: "",
-    // Empty: the sheet only prints a rule block when there is a rule, and a
-    // crew sheet does not need a banner explaining how to adjudicate ties.
-    rule: { name: "", text: "" },
+    rule: {
+      name: "The Rule of Hard Knocks",
+      text: "In Junkspace, if you can't figure out precisely what the rules are telling you to do: choose the interpretation or outcome that disadvantages you the most.",
+    },
     // Strings and numbers where the real factions keep strings and numbers.
     // Initiative is rendered through escapeHtml, so a number here throws inside
     // the rule block rather than printing "0" - and these are the true values:
@@ -2013,8 +2014,7 @@ function outfitPrintView(state: AppState): string {
         </span>
         ${base ? `<span class="pp-perk pp-perk-base"><b>${escapeHtml(base.perkName)}</b> ${ruleText(base.text)}</span>` : ""}
         ${earned}
-        <span class="pp-blank"></span>
-        <span class="pp-blank"></span>
+        <span class="pp-room"></span>
       </span>`;
   };
 
@@ -2208,7 +2208,6 @@ function printView(
       <tr>
         <td class="pr-unit">
           <span class="pr-unit-name">${escapeHtml(title)}${countSuffix}</span>
-          ${showClass ? `<span class="pr-unit-class">${escapeHtml(ship.name)}${list.freePlay ? `, ${escapeHtml(r.owner.name)}` : ""}</span>` : ""}
           ${named.length ? `<span class="pr-unit-ships">${escapeHtml(named.join(" / "))}</span>` : ""}
           ${notes ? `<span class="pr-unit-notes">${escapeHtml(notes)}</span>` : ""}
         </td>
@@ -2271,7 +2270,10 @@ function printView(
       // case, because the auto-name pluralises - "Taurus Assault Wings" over
       // "Taurus Assault Wing" printed on every multi-ship card too, not just in
       // the table. Roster and cards now say it or stay quiet together.
-      const classLine = u.name?.trim() && u.name.trim() !== ship.name ? escapeHtml(ship.name) : "";
+      // NO CLASS REMINDER. If you named a unit Paris, the sheet printed
+      // "Corvette" under it in every view, every time, forever - the app
+      // correcting your own roster back at you. You know what you built.
+      const classLine = "";
       const extras = [classLine, u.species ? escapeHtml(u.species) : ""].filter(Boolean).join(" · ");
       return `
       <article class="print-card">
@@ -2464,7 +2466,7 @@ function printView(
     }
 
     <div class="sheet-viewport">
-    <article class="sheet" data-print-sheet data-paper-label="${paper.label}" style="--page-w:${paper.w}px;--page-h:${paper.h}px">
+    <article class="sheet ${list.mode === "junkspace" ? "is-solo" : ""}" data-print-sheet data-paper-label="${paper.label}" style="--page-w:${paper.w}px;--page-h:${paper.h}px">
       <header class="sheet-head">
         <div class="sheet-emblem">${listEmblem(list, 52)}</div>
         <div class="sheet-title-block">

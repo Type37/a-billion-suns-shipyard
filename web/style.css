@@ -2615,6 +2615,14 @@ button { font-family: inherit; }
 .pp-who { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
 .pp-ico {
   width: 30px; height: 30px; flex: none; object-fit: contain;
+  /* Dark grey on the sheet. The three pilot marks are full-colour artwork,
+     which is right in the builder and wrong on a printed page where they sit
+     beside a stat line and a paragraph of black text - a colour illustration
+     there reads as the loudest thing on the card. Desaturated and darkened
+     they read as a mark. print-color-adjust so a browser told to drop colour
+     still prints them, since the filter output is what matters, not the
+     source. */
+  filter: grayscale(1) brightness(0.45) contrast(1.35);
   print-color-adjust: exact; -webkit-print-color-adjust: exact;
 }
 .pp-name { font-weight: 700; color: var(--ink); }

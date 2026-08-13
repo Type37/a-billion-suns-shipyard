@@ -2507,46 +2507,101 @@ button { font-family: inherit; }
 .solo-card-primary .roster-section { color: var(--blue); }
 .solo-card-quiet .roster-section { color: var(--ink-3); }
 .solo-card-quiet .panel-note, .solo-card-quiet .rule-list { color: var(--ink-3); }
-/* ------------------------------------------------------------ Jobs and Blips
-   The two things a game of Junkspace actually consists of, and neither had a
-   home in the tracker before: you earn credits by completing Jobs (p.211), and
-   the opposition arrives out of eight facedown markers (p.197).
+/* The Outfit tab's standing note about the budget, and the campaign dials in
+   the new-outfit dialog. Both exist for the same misreading: the credit total
+   looks like a points limit you rebuild against every game, and it is a loan
+   you spent once (p.201). */
+.outfit-budget-note {
+  margin: 6px 0 0; max-width: 46ch;
+  font-size: 13px; line-height: 1.45; color: var(--ink-3);
+}
+.setup-actions { display: flex; align-items: flex-end; gap: 8px; }
 
-   The Jobs sit above the dice roller because they are the score. Each is a
-   card, because three Jobs dealt off a suit ARE cards, and because each one
-   carries a paragraph of rule you re-read mid-game to decide whether what you
-   just did counts. */
-.solo-jobs .jobs-head, .solo-blips .jobs-head {
-  display: flex; align-items: baseline; gap: 12px; padding-bottom: 10px;
-  border-bottom: none; margin-bottom: 10px;
+.no-dials { margin-top: 16px; display: grid; gap: 12px; }
+.no-dials-note { margin: 0; font-size: 13px; line-height: 1.45; color: var(--ink-3); max-width: 54ch; }
+.no-dial { display: flex; align-items: center; gap: 12px; }
+.no-dial .control-label { flex: none; min-width: 128px; }
+.seg { display: inline-flex; border: 1px solid var(--hair); }
+.seg-btn {
+  min-height: var(--tap); padding: 6px 16px;
+  border: none; border-right: 1px solid var(--hair); background: var(--paper);
+  font-family: var(--display); font-weight: 800; font-size: 14px; color: var(--ink-3);
+  cursor: pointer;
 }
-.solo-jobs .jobs-head .roster-section, .solo-blips .jobs-head .roster-section {
-  padding: 0; margin: 0; border: none; flex: none;
-}
-.jobs-total {
-  font-family: var(--narrow); font-size: 13px; font-weight: 700;
-  color: var(--blue); margin-right: auto; font-variant-numeric: tabular-nums;
-}
-/* Picking the three you drew. Thirteen small targets, one per card rank, and
-   the rank does the identifying: you are matching a card in your hand, so the
-   rank has to be the biggest thing on the button. */
-.job-pick-note { margin: 0 0 10px; font-size: 13.5px; line-height: 1.45; color: var(--ink-3); max-width: 62ch; }
-.job-pick-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(112px, 1fr)); gap: 6px; }
-.job-pick {
-  display: flex; align-items: baseline; gap: 7px;
-  min-height: var(--tap); padding: 8px 10px;
+.seg-btn:last-child { border-right: none; }
+.seg-btn.on { background: var(--blue); color: #fff; }
+
+/* One routine open at a time, in a panel that does NOT push the tables below it
+   down the page - the whole point of reading one mid-activation is that the
+   thing you were looking at stays where it was. */
+.solo-def-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.solo-def-wrap { position: relative; display: inline-flex; }
+.solo-def {
+  min-height: var(--tap); padding: 6px 12px;
   border: 1px solid var(--hair); background: var(--paper);
-  font: inherit; color: var(--ink-2); text-align: left; cursor: pointer;
+  font-family: var(--narrow); font-size: 13px; font-weight: 700;
+  color: var(--ink-2); cursor: pointer;
 }
-.job-pick:hover { border-color: var(--ink); color: var(--ink); }
-.job-pick.is-on { border-color: var(--blue); background: var(--blue-wash); color: var(--ink); }
-.job-pick-rank {
-  flex: none; font-family: var(--display); font-weight: 800; font-size: 14px; color: var(--ink);
-  min-width: 18px;
+.solo-def:hover { border-color: var(--ink); color: var(--ink); }
+.solo-def.is-open { background: var(--blue); border-color: var(--blue); color: #fff; }
+.solo-def-pop {
+  position: absolute; top: calc(100% + 7px); left: 0; z-index: 40;
+  width: max-content; max-width: min(360px, calc(100vw - 32px));
+  padding: 11px 13px;
+  background: var(--paper); border: 1px solid var(--ink);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.14);
+  font-size: 13.5px; line-height: 1.5; color: var(--ink-2);
 }
-.job-pick.is-on .job-pick-rank { color: var(--blue-deep); }
-/* Never truncated: the name is how you know which Job the rank is. */
-.job-pick-name { font-family: var(--narrow); font-size: 12.5px; font-weight: 700; line-height: 1.25; }
+
+/* ---------------------------------------------------------------------- Blips
+   Eight markers, facedown, and the one piece of hidden information a solo game
+   has. The Jobs board that used to share this block is gone: three cards of
+   rules text the player is already holding in their hand.
+
+   THE GRID DOES NOT MOVE WHEN YOU FLIP ONE. Every tile carries both faces at
+   once and swaps which is visible, so the tile is already as tall as its
+   tallest state before you touch it. Rendering only the current face meant
+   "Pirate Starfighter" appearing where "face down" had been, that row growing
+   a line, and every marker below it jumping down the page at the exact moment
+   you were looking at one. Two faces in one grid cell costs nothing and the
+   layout is settled from first paint.
+
+   No count heading either. "8 still face down" is a number you can get by
+   looking at the eight markers, which are right there. */
+.blip-note { margin: 0 0 10px; font-size: 13.5px; line-height: 1.45; color: var(--ink-3); max-width: 62ch; }
+.blip-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 8px; }
+.blip {
+  display: grid; place-items: center;
+  min-height: 62px; padding: 8px 6px;
+  border: 1px solid var(--hair); background: var(--paper);
+  font: inherit; color: var(--ink-3); text-align: center; cursor: pointer;
+  /* The flip. transform on a 3D-preserving button, so the two faces turn
+     together on one axis rather than cross-fading - a marker being turned over
+     is the physical act this is standing in for. */
+  perspective: 500px;
+}
+.blip:hover { border-color: var(--ink); }
+.blip.is-revealed { border-color: var(--red); color: var(--ink); }
+/* Both faces occupy the SAME cell. That is what stops the reflow. */
+.blip-face {
+  grid-area: 1 / 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  backface-visibility: hidden;
+  transition: transform 260ms cubic-bezier(0.2, 0.7, 0.3, 1), opacity 130ms linear 65ms;
+}
+.blip-back { color: var(--ink-3); transform: rotateY(0deg); opacity: 1; }
+.blip-front { transform: rotateY(-180deg); opacity: 0; }
+.blip.is-revealed .blip-back { transform: rotateY(180deg); opacity: 0; }
+.blip.is-revealed .blip-front { transform: rotateY(0deg); opacity: 1; }
+.blip-n {
+  font-family: var(--display); font-weight: 800; font-size: 19px; line-height: 1;
+  color: var(--red);
+}
+.blip-what { font-family: var(--narrow); font-size: 11px; font-weight: 700; line-height: 1.2; }
+@media (prefers-reduced-motion: reduce) {
+  .blip-face { transition: opacity 100ms linear; }
+  .blip-back, .blip-front, .blip.is-revealed .blip-back, .blip.is-revealed .blip-front { transform: none; }
+}
 
 /* A roll table you read, printed whole. Nothing rolls it - see the note in
    solo.ts where the roller used to be. */
@@ -2562,62 +2617,18 @@ button { font-family: inherit; }
 /* One column, now that the roller has gone from beside it. */
 .solo-split-solo { grid-template-columns: minmax(0, 1fr); }
 
-.job-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(238px, 1fr)); gap: 10px; }
-.job-card {
-  display: flex; flex-direction: column; gap: 7px;
-  padding: 11px 13px 10px; border: 1px solid var(--hair-soft); background: var(--paper);
+/* NO TRACKED-OUT CAPS ON THE SOLO PAGES.
+   The house label style (uppercase plus letter-spacing) is for a two-word
+   control label. On these pages it had spread onto section headings and
+   readouts, where a spaced-out capital line is slower to read than the thing
+   it labels and takes twice the width to say it. */
+.solo-outfit .roster-section,
+.solo-outfit .control-label,
+.solo-outfit .gb-note {
+  letter-spacing: 0; text-transform: none;
+  font-family: var(--sans); font-size: 12.5px; font-weight: 700;
 }
-/* Maxed out, not finished: a Job at its cap can earn nothing more, which is
-   worth seeing at a glance when you are deciding what to do with a round. */
-.job-card.is-maxed { border-color: var(--blue); }
-.job-head { display: flex; align-items: baseline; gap: 8px; }
-.job-rank {
-  flex: none; display: inline-flex; align-items: center; justify-content: center;
-  min-width: 22px; height: 22px; padding: 0 5px;
-  background: var(--ink); color: var(--paper);
-  font-family: var(--display); font-weight: 800; font-size: 13px;
-}
-.job-name { font-family: var(--display); font-weight: 800; font-size: 15px; color: var(--ink); }
-.job-when {
-  margin-left: auto; font-family: var(--narrow); font-size: 11px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3); white-space: nowrap;
-}
-/* Never clipped. A Job is a rule, and the longest of them runs to sixty words. */
-.job-text { margin: 0; font-size: 13.5px; line-height: 1.45; color: var(--ink-2); }
-.job-alert {
-  margin: 0; display: flex; align-items: center; gap: 5px;
-  font-family: var(--narrow); font-size: 12px; font-weight: 700; color: var(--red-deep);
-}
-.job-earn { display: flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 4px; }
-.job-pips { display: inline-flex; gap: 4px; }
-.job-pip { width: 13px; height: 13px; border: 1px solid var(--hair); background: var(--paper); }
-.job-pip.is-earned { background: var(--blue); border-color: var(--blue); }
-.job-earned {
-  margin-left: auto; font-family: var(--display); font-weight: 800; font-size: 15px;
-  color: var(--ink); font-variant-numeric: tabular-nums;
-}
-
-/* Eight markers, face down until something of yours gets within 6" of one.
-   Square and identical on purpose: they are indistinguishable from each other
-   when turned over (p.197), and the moment one is not, the bag is spoiled. */
-.blip-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); gap: 8px; }
-.blip {
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-  min-height: var(--tap); padding: 9px 6px;
-  border: 1px solid var(--hair); background: var(--paper); cursor: pointer;
-  font: inherit; color: var(--ink-3); text-align: center;
-}
-.blip:hover { border-color: var(--ink); }
-.blip.is-revealed { border-color: var(--red); color: var(--ink); }
-.blip-n {
-  font-family: var(--display); font-weight: 800; font-size: 19px; line-height: 1;
-  color: var(--ink-3);
-}
-.blip.is-revealed .blip-n { color: var(--red); }
-.blip-what {
-  font-family: var(--narrow); font-size: 10.5px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.03em;
-}
+.solo-outfit .roster-section { font-size: 13.5px; }
 
 .solo-readout { margin: 12px 0 0; }
 .solo-readout.over { border-color: var(--red); }

@@ -1,7 +1,14 @@
 import type { Faction, Fleet, FleetHvp, GameMode, Mass, PilotClass, Weapon } from "../src/types.ts";
 import { maxUnitSize } from "../src/validation.ts";
 import { MODE_BUILDER_SHAPE } from "../src/types.ts";
-import { JUNKSPACE_SHIPS, OUTFIT_MAX_SHIPS, recastAsOutfit, startingAlertLevel } from "../src/data/junkspace.ts";
+import {
+  JUNKSPACE_SHIPS,
+  OUTFIT_MAX_SHIPS,
+  STARTING_DEBT_K,
+  DEBT_CLEAR_GAMES,
+  recastAsOutfit,
+  startingAlertLevel,
+} from "../src/data/junkspace.ts";
 import { w } from "../src/data/_helpers.ts";
 import { randomFleetName } from "../src/fleet-names.ts";
 import { capitalShipName } from "../src/ship-names.ts";
@@ -1591,11 +1598,28 @@ function dispatchAction(target: HTMLElement): void {
     case "solo-new-outfit-cancel":
       store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined, newOutfit: undefined } }));
       break;
+    case "new-outfit-debt":
+    case "new-outfit-games": {
+      const v = Number(target.dataset["value"]);
+      const key = action === "new-outfit-debt" ? "debtStartK" : "gamesLimit";
+      store.setState((st) => ({
+        ...st,
+        ui: {
+          ...st.ui,
+          newOutfit: { emblem: "delta", ...(st.ui.newOutfit ?? {}), [key]: v },
+        },
+      }));
+      break;
+    }
     case "solo-new-outfit-create": {
       const draft = state.ui.newOutfit;
       const outfit: SavedOutfit = {
         ...createOutfit(),
         name: liveOutfitName(),
+        // The two campaign dials, chosen in the dialog before the outfit exists.
+        debtK: draft?.debtStartK ?? STARTING_DEBT_K,
+        debtStartK: draft?.debtStartK ?? STARTING_DEBT_K,
+        gamesLimit: draft?.gamesLimit ?? DEBT_CLEAR_GAMES,
         ...(draft
           ? {
               emblem: draft.emblem,
@@ -1714,23 +1738,16 @@ function dispatchAction(target: HTMLElement): void {
       editOutfit((o) => ({ ...o, round: Math.max(1, o.round + delta) }));
       break;
     }
-    // You deal the cards, the app writes down what you drew.
-    //
-    // This dealt the three Jobs itself for one build, and dealing is the one
-    // job here the app has no business doing: the rule is "get a deck of
-    // standard playing cards and shuffle all the cards of one suit together"
-    // (p.203), and a player following that already knows their three. An app
-    // that deals a DIFFERENT three is either overriding the cards on the table
-    // or asking you to ignore them.
-    case "solo-job-pick": {
-      const key = target.dataset["key"] ?? "";
-      editOutfit((o) => {
-        const jobs = o.jobs ?? [];
-        const already = jobs.some((j) => j.key === key);
-        if (already) return { ...o, jobs: jobs.filter((j) => j.key !== key) };
-        if (jobs.length >= 3) return o;
-        return { ...o, jobs: [...jobs, { key, earnedK: 0 }] };
-      });
+    // One routine open at a time, and pressing the open one closes it. These
+    // get read in the middle of moving a single ship - you are resolving
+    // Engage, not browsing six rules - and six panels open at once is the wall
+    // of text this replaced.
+    case "solo-def": {
+      const term = target.dataset["term"] ?? "";
+      store.setState((st) => ({
+        ...st,
+        ui: { ...st.ui, soloDef: st.ui.soloDef === term ? undefined : term },
+      }));
       break;
     }
     // The bag of markers, though, IS the app's to hold: the numbers have to be
@@ -1747,19 +1764,6 @@ function dispatchAction(target: HTMLElement): void {
       }));
       break;
     }
-    case "solo-job-earn": {
-      const index = Number(target.dataset["index"]);
-      const delta = Number(target.dataset["delta"]);
-      editOutfit((o) => ({
-        ...o,
-        jobs: (o.jobs ?? []).map((j, i) => {
-          if (i !== index) return j;
-          const cap = JUNKSPACE_JOBS.find((x) => x.key === j.key)?.capK ?? 3;
-          return { ...j, earnedK: Math.max(0, Math.min(cap, j.earnedK + delta)) };
-        }),
-      }));
-      break;
-    }
     // Flipping a marker over. The number was decided when the game was dealt,
     // so this reveals it rather than rolling for it - which is the difference
     // between a bag of markers and a random table, and the reason a Recon
@@ -1773,20 +1777,14 @@ function dispatchAction(target: HTMLElement): void {
       break;
     }
 
-    // Settling the game. The earnings are the sum of what the three dealt Jobs
-    // paid, so there is nothing to type in: a prompt() asking "credits earned
-    // this game" was the app admitting it had not been watching. Outfits with
-    // no game dealt still get the prompt, because there is nothing to sum.
+    // What you earned, typed in. There is nothing for the app to add up: the
+    // Jobs are three playing cards on the table beside you, and their payouts
+    // are counted off the models once the game is over, so the one number that
+    // reaches the campaign is the one you worked out.
     case "log-game": {
-      const dealt = activeOutfit(store.getState())?.jobs;
-      let earnedK: number;
-      if (dealt?.length) {
-        earnedK = dealt.reduce((sum, j) => sum + j.earnedK, 0);
-      } else {
-        const raw = prompt("Credits earned this game (in thousands, ¢k):", "0");
-        if (raw === null) return;
-        earnedK = Math.max(0, Math.round(Number(raw) || 0));
-      }
+      const raw = prompt("Credits earned this game (in thousands, ¢k):", "0");
+      if (raw === null) return;
+      const earnedK = Math.max(0, Math.round(Number(raw) || 0));
       editOutfit((o) => {
         const debtK = Math.max(0, o.debtK - earnedK);
         return {
@@ -1799,10 +1797,8 @@ function dispatchAction(target: HTMLElement): void {
           // this was hardcoded to 1, so it never did.
           alertLevel: startingAlertLevel(debtK),
           round: 1,
-          // The Jobs and the markers belong to the game just finished. Clearing
-          // them puts the tracker back to its between-games state, which is the
-          // state that offers to deal the next one.
-          jobs: undefined,
+          // The markers belong to the game just finished; the next one gets a
+          // fresh shuffle of the bag.
           blips: undefined,
         };
       });

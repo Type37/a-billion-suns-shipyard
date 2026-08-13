@@ -259,8 +259,21 @@ export interface SavedOutfit {
   emblemLib?: string;
   emblemColor?: "ink" | "blue" | "red";
   ships: OutfitShip[];
-  /** Remaining Debt in ¢k. Starts at 30; clearing it wins the campaign. */
+  /** Remaining Debt in ¢k. Clearing it wins the campaign. */
   debtK: number;
+  /**
+   * The two dials of the campaign, set once when the outfit is created.
+   *
+   * p.201 gives the standard game (¢30k over 8 games) and then, in a NOTE box,
+   * the harder one: "try to clear your debt in 6 games or increase your debt to
+   * ¢45k". Two separate levers, and the book says "or" - you can pull either or
+   * both. They were constants, so every campaign was the standard one.
+   *
+   * Optional, because outfits created before this exist and are all standard;
+   * everything that reads them falls back to 30 and 8.
+   */
+  debtStartK?: number;
+  gamesLimit?: number;
   gamesPlayed: number;
   gameLog: OutfitGameLog[];
   /** Freeform perk tracking: which perk each pilot has taken. */
@@ -268,15 +281,6 @@ export interface SavedOutfit {
   /** Live game tracking. */
   alertLevel: number;
   round: number;
-  /**
-   * The three Jobs dealt for the game in progress, and what each has earned.
-   *
-   * Optional because every outfit saved before this existed has no game dealt,
-   * and an outfit between games has none either - "no jobs" and "a game with
-   * three jobs on the table" are different states and the tracker shows a Deal
-   * button for the first.
-   */
-  jobs?: { key: string; earnedK: number }[];
   /**
    * The eight Blip markers, in the order they were shuffled into (p.197).
    *

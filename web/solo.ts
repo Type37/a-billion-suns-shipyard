@@ -10,6 +10,8 @@ import {
   OUTFIT_MAX_SHIPS,
   STARTING_DEBT_K,
   DEBT_CLEAR_GAMES,
+  HARD_DEBT_K,
+  HARD_CLEAR_GAMES,
   PILOT_PERKS,
   ALERT_START,
   LOW_DEBT_THRESHOLD_K,
@@ -24,10 +26,10 @@ import {
   SOLO_PHASES,
   SOLO_ALERT_RULES,
   PERKS_BY_CLASS,
-  JUNKSPACE_JOBS,
   BLIP_TO_PIRATE,
   RANDOM_BEHAVIOUR,
   GLITCH_BLIP,
+  BEHAVIOUR_ROUTINES,
   type RollRow,
 } from "../src/data/junkspace-solo.ts";
 import { escapeHtml, formatDate, ruleText } from "./format.ts";
@@ -46,6 +48,18 @@ import type { SavedOutfit } from "./storage.ts";
 const ck = (n: number): string => `¢${n}k`;
 
 const shipById = new Map<string, ShipClass>(JUNKSPACE_SHIPS.map((s) => [s.id, s]));
+
+/**
+ * The campaign's two dials, per outfit.
+ *
+ * p.201 sets the standard game at ¢30k over 8, then offers the harder one in a
+ * NOTE box: "try to clear your debt in 6 games or increase your debt to ¢45k".
+ * Two independent levers, and the book's "or" means either alone is a valid
+ * harder game. Outfits made before the dials existed have neither field, so
+ * both fall back to the standard.
+ */
+const debtStart = (o: SavedOutfit): number => o.debtStartK ?? STARTING_DEBT_K;
+const gamesLimit = (o: SavedOutfit): number => o.gamesLimit ?? DEBT_CLEAR_GAMES;
 
 export function outfitCost(o: SavedOutfit): number {
   return o.ships.reduce((sum, s) => sum + (shipById.get(s.shipClassId)?.cost ?? 0), 0);
@@ -110,6 +124,28 @@ export function newOutfitModal(state: AppState): string {
             <input class="new-outfit-name" type="text" placeholder="Unnamed outfit" value="${escapeHtml(draft.name ?? "")}" autocomplete="off" autofocus />
           </label>
         </div>
+        <div class="no-dials">
+          <p class="no-dials-note">Two dials, and they are independent: the book offers the harder game as
+            "clear your debt in 6 games <em>or</em> increase your debt to ¢45k" (p.201). Pull either, or both.</p>
+          <div class="no-dial">
+            <span class="control-label">Debt</span>
+            <div class="seg">
+              <button class="seg-btn ${(draft.debtStartK ?? STARTING_DEBT_K) === STARTING_DEBT_K ? "on" : ""}"
+                      data-action="new-outfit-debt" data-value="${STARTING_DEBT_K}">${ck(STARTING_DEBT_K)}</button>
+              <button class="seg-btn ${draft.debtStartK === HARD_DEBT_K ? "on" : ""}"
+                      data-action="new-outfit-debt" data-value="${HARD_DEBT_K}">${ck(HARD_DEBT_K)}</button>
+            </div>
+          </div>
+          <div class="no-dial">
+            <span class="control-label">Games to clear it</span>
+            <div class="seg">
+              <button class="seg-btn ${(draft.gamesLimit ?? DEBT_CLEAR_GAMES) === DEBT_CLEAR_GAMES ? "on" : ""}"
+                      data-action="new-outfit-games" data-value="${DEBT_CLEAR_GAMES}">${DEBT_CLEAR_GAMES}</button>
+              <button class="seg-btn ${draft.gamesLimit === HARD_CLEAR_GAMES ? "on" : ""}"
+                      data-action="new-outfit-games" data-value="${HARD_CLEAR_GAMES}">${HARD_CLEAR_GAMES}</button>
+            </div>
+          </div>
+        </div>
       </div>
       <footer class="modal-footer">
         <button class="bar-btn" data-action="close-modal">Cancel</button>
@@ -128,7 +164,7 @@ export function soloListView(state: AppState): string {
   const cards = outfits
     .map((o, i) => {
       const cleared = o.debtK <= 0;
-      const paid = Math.max(0, STARTING_DEBT_K - Math.max(0, o.debtK));
+      const paid = Math.max(0, debtStart(o) - Math.max(0, o.debtK));
       return `
       <article class="outfit-card" style="--i:${i}">
         <a class="outfit-card-main" href="#/solo/${o.id}">
@@ -139,8 +175,8 @@ export function soloListView(state: AppState): string {
           </span>
         </a>
         <div class="outfit-card-debt ${cleared ? "is-clear" : ""}">
-          <div class="ocd-line"><span>${cleared ? "Debt cleared" : `${ck(o.debtK)} still owed`}</span><span>${cleared ? "🏆 you win" : `${ck(paid)} paid`}</span></div>
-          ${gameTicks(o.gamesPlayed, DEBT_CLEAR_GAMES)}
+          <div class="ocd-line"><span>${ck(Math.max(0, o.debtK))} still owed</span><span>${ck(paid)} paid</span></div>
+          ${gameTicks(o.gamesPlayed, gamesLimit(o))}
         </div>
         <div class="outfit-card-actions">
           <a class="ghost-btn" href="#/solo/${o.id}">${icon("chevronRight", 15)} Continue</a>
@@ -338,93 +374,6 @@ function alertPips(level: number): string {
 // mid-game: the row, not a second die.
 
 
-// The two numbers you touch between every activation are the Alert Level and
-// the Round, so they are the whole of the band across the top - the same shape
-// the main game's Play mode uses, and for the same reason. Behind them the page
-// sorts by how often you reach for it: the roller (several times a round) in
-// the lead column, the rules (read once, then never) quiet on the right.
-//
-// Before this, Alert, Round and the roller were three equal cards in a
-// repeat(auto-fit) grid, so a wall of rules text sat at exactly the same weight
-// as the +1 button you press every End Phase, and the game's clock was one of
-// three things competing for the top of the screen.
-/**
- * The three Jobs on the table, and what each has earned so far.
- *
- * This is the whole scoring system of Junkspace and the app did not have it.
- * You earned credits by completing Jobs (p.211), and the tracker's only way to
- * hear about that was a prompt() at the end of the game asking you to type in a
- * number - which is not tracking, it is a receipt. Three Jobs are dealt from
- * one shuffled suit at the start of a game (p.203); each caps at 3, and the sum
- * of the three is what comes off the Debt.
- *
- * Each Job carries its own text in full, because a Job is a rule you are
- * reading mid-game to decide whether the thing you just did counts.
- */
-function jobsPanel(o: SavedOutfit): string {
-  const dealt = o.jobs ?? [];
-  // No Deal button. p.203 tells YOU to shuffle a suit and flip three, so the
-  // three Jobs already exist on the table before the app hears about them;
-  // this records which three, it does not choose them.
-  if (dealt.length < 3) {
-    const picks = JUNKSPACE_JOBS.map((j) => {
-      const on = dealt.some((d) => d.key === j.key);
-      return `<button class="job-pick ${on ? "is-on" : ""}" data-action="solo-job-pick" data-key="${escapeHtml(j.key)}"
-                aria-pressed="${on}" title="${escapeHtml(j.name)}">
-          <span class="job-pick-rank">${escapeHtml(j.key)}</span>
-          <span class="job-pick-name">${escapeHtml(j.name)}</span>
-        </button>`;
-    }).join("");
-    return `
-    <section class="solo-card solo-jobs">
-      <div class="jobs-head">
-        <h3 class="roster-section">Jobs</h3>
-        <span class="jobs-total">${dealt.length} of 3 drawn</span>
-      </div>
-      <p class="job-pick-note">Shuffle one suit of a standard deck and flip three cards. Tap the three you drew.</p>
-      <div class="job-pick-grid">${picks}</div>
-    </section>`;
-  }
-  const total = dealt.reduce((sum, j) => sum + j.earnedK, 0);
-  const cards = dealt
-    .map((entry, i) => {
-      const job = JUNKSPACE_JOBS.find((x) => x.key === entry.key);
-      if (!job) return "";
-      const cap = job.capK;
-      const pips = Array.from(
-        { length: cap },
-        (_, n) => `<span class="job-pip ${n < entry.earnedK ? "is-earned" : ""}"></span>`,
-      ).join("");
-      return `
-      <article class="job-card ${entry.earnedK >= cap ? "is-maxed" : ""}">
-        <header class="job-head">
-          <span class="job-rank">${escapeHtml(job.key)}</span>
-          <span class="job-name">${escapeHtml(job.name)}</span>
-          <span class="job-when">${job.pays === "game" ? "pays in play" : "pays at the end"}</span>
-        </header>
-        <p class="job-text">${ruleText(job.text)}</p>
-        ${job.alert ? `<p class="job-alert">${icon("bolt", 13)} Alert Level ${escapeHtml(job.alert)}</p>` : ""}
-        <div class="job-earn">
-          <button class="stepper-btn" data-action="solo-job-earn" data-index="${i}" data-delta="-1"
-                  aria-label="Less earned from ${escapeHtml(job.name)}">${icon("minus", 15)}</button>
-          <span class="job-pips" role="img" aria-label="${entry.earnedK} of ${cap} earned">${pips}</span>
-          <span class="job-earned">${ck(entry.earnedK)}</span>
-          <button class="stepper-btn" data-action="solo-job-earn" data-index="${i}" data-delta="1"
-                  aria-label="More earned from ${escapeHtml(job.name)}">${icon("plus", 15)}</button>
-        </div>
-      </article>`;
-    })
-    .join("");
-  return `
-    <section class="solo-card solo-jobs">
-      <div class="jobs-head">
-        <h3 class="roster-section">Jobs</h3>
-        <span class="jobs-total">${ck(total)} this game</span>
-        <button class="ghost-btn" data-action="solo-job-pick" data-key="${escapeHtml(dealt[0]?.key ?? "")}">${icon("close", 14)} Change a Job</button>
-      </div>
-      <div class="job-grid">${cards}</div>
-    </section>`;
-}
 
 /**
  * The bag of eight Blip markers.
@@ -448,31 +397,35 @@ function blipsPanel(o: SavedOutfit): string {
   if (!blips.length) {
     return `
     <section class="solo-card solo-blips">
-      <div class="jobs-head">
-        <h3 class="roster-section">Blips</h3>
-      </div>
-      <p class="job-pick-note">Eight markers, numbered 1 to 8, shuffled facedown into the Hostile half.</p>
+      <h3 class="roster-section">Blips</h3>
+      <p class="blip-note">Eight markers, numbered 1 to 8, shuffled facedown into the Hostile half.</p>
       <button class="primary-btn" data-action="solo-shuffle-blips">${icon("shuffle", 16)} Shuffle the bag</button>
     </section>`;
   }
-  const left = blips.filter((b) => !b.revealed).length;
+  // NOTHING MOVES WHEN A MARKER IS FLIPPED. Every tile carries both faces at
+  // once - the "?" and the pirate it turns out to be - stacked in the same grid
+  // cell, so the tile is already as tall as its tallest state before you touch
+  // it. Rendering only the current face meant "Pirate Starfighter" appearing
+  // where "face down" had been, the row growing a line, and every marker below
+  // it jumping down the page at the exact moment you were looking at one.
   const markers = blips
     .map(
       (b, i) => `
       <button class="blip ${b.revealed ? "is-revealed" : ""}" data-action="solo-blip-reveal" data-index="${i}"
-              aria-label="${b.revealed ? `Blip ${b.n}, ${BLIP_TO_PIRATE[b.n]}. Turn back over.` : "Face-down Blip marker. Reveal."}">
-        <span class="blip-n">${b.revealed ? b.n : "?"}</span>
-        <span class="blip-what">${b.revealed ? escapeHtml(BLIP_TO_PIRATE[b.n] ?? "") : "face down"}</span>
+              aria-label="${b.revealed ? `Blip ${b.n}, ${escapeHtml(BLIP_TO_PIRATE[b.n] ?? "")}. Turn it back over.` : "Face-down Blip marker. Turn it over."}">
+        <span class="blip-face blip-back">${icon("logo", 22)}</span>
+        <span class="blip-face blip-front">
+          <span class="blip-n">${b.n}</span>
+          <span class="blip-what">${escapeHtml(BLIP_TO_PIRATE[b.n] ?? "")}</span>
+        </span>
       </button>`,
     )
     .join("");
   return `
     <section class="solo-card solo-blips">
-      <div class="jobs-head">
-        <h3 class="roster-section">Blips</h3>
-        <span class="jobs-total">${left} still face down</span>
-        <button class="ghost-btn" data-action="solo-shuffle-blips">${icon("shuffle", 14)} Reshuffle</button>
-      </div>
+      <h3 class="roster-section">Blips
+        <button class="ghost-btn" data-action="solo-shuffle-blips">${icon("shuffle", 13)} Reshuffle</button>
+      </h3>
       <div class="blip-grid">${markers}</div>
     </section>`;
 }
@@ -485,6 +438,36 @@ function blipsPanel(o: SavedOutfit): string {
  * same three rows are invisible until the app rolls its own die, which is a
  * second die nobody asked for.
  */
+/**
+ * The Hostile behaviour routines, as terms you open one at a time.
+ *
+ * The D6 table above says "Engage Nearest Enemy, Attack Smartly" and those
+ * three words are three separate procedures, each a paragraph long, each with
+ * its own tie-breaks. Printed out in full they are a wall you scroll past; as
+ * seven named terms they are what they actually are at the table - a thing you
+ * look up in the middle of moving one ship, once, and then put down.
+ *
+ * The panel is absolutely positioned, so opening one does not push the tables
+ * below it down the page.
+ */
+function routinesPanel(open: string | undefined): string {
+  const chips = BEHAVIOUR_ROUTINES.map((r) => {
+    const on = open === r.term;
+    return `
+      <span class="solo-def-wrap">
+        <button class="solo-def ${on ? "is-open" : ""}" data-action="solo-def" data-term="${escapeHtml(r.term)}"
+                aria-expanded="${on}">${escapeHtml(r.term)}</button>
+        ${on ? `<span class="solo-def-pop" role="note">${ruleText(r.text)}</span>` : ""}
+      </span>`;
+  }).join("");
+  return `
+    <section class="solo-card solo-card-quiet">
+      <h3 class="roster-section">Hostile routines</h3>
+      <p class="blip-note">The behaviour table names these. Tap one to read it.</p>
+      <div class="solo-def-row">${chips}</div>
+    </section>`;
+}
+
 function rollTableCard(name: string, die: string, rows: RollRow[]): string {
   const body = rows
     .map(
@@ -508,11 +491,7 @@ function playTab(state: AppState, o: SavedOutfit): string {
   const startsAt = startingAlertLevel(o.debtK);
   const startNote =
     startsAt > ALERT_START
-      ? `<p class="alert-start-note">${
-          o.debtK <= 0
-            ? "Debt cleared, so the Junkspace is watching you: this game starts at 3."
-            : `Under ${ck(LOW_DEBT_THRESHOLD_K)} of Debt left, so this game starts at ${startsAt}.`
-        }</p>`
+      ? `<p class="alert-start-note">Under ${ck(LOW_DEBT_THRESHOLD_K)} of Debt left, so this game starts at ${startsAt}.</p>`
       : "";
   const phases = SOLO_PHASES.map((p) => `<li><strong>${escapeHtml(p.name)}.</strong> ${ruleText(p.text)}</li>`).join("");
   return `
@@ -546,7 +525,6 @@ function playTab(state: AppState, o: SavedOutfit): string {
       </div>
     </div>
   </section>
-  ${jobsPanel(o)}
   ${blipsPanel(o)}
   <div class="solo-split solo-split-solo">
     <div class="solo-ref">
@@ -559,6 +537,7 @@ function playTab(state: AppState, o: SavedOutfit): string {
         <ul class="rule-list small">${SOLO_ALERT_RULES.map((r) => `<li>${ruleText(r)}</li>`).join("")}</ul>
       </section>
       ${rollTableCard("Hostile behaviour", "D6", RANDOM_BEHAVIOUR)}
+      ${routinesPanel(state.ui.soloDef)}
       ${rollTableCard("Glitch a Blip", "D6", GLITCH_BLIP)}
     </div>
   </div>`;
@@ -574,8 +553,8 @@ function playTab(state: AppState, o: SavedOutfit): string {
 // you act on after a game (perks) and the thing you only read (the log).
 function campaignTab(o: SavedOutfit): string {
   const cleared = o.debtK <= 0;
-  const paid = STARTING_DEBT_K - Math.max(0, o.debtK);
-  const outOfGames = o.gamesPlayed >= DEBT_CLEAR_GAMES && !cleared;
+  const paid = debtStart(o) - Math.max(0, o.debtK);
+  const outOfGames = o.gamesPlayed >= gamesLimit(o) && !cleared;
 
   const log = o.gameLog
     .map((g) => `<tr><td>Game ${g.game}</td><td class="cell-num">${ck(g.earnedK)}</td><td>${escapeHtml(g.note ?? "")}</td></tr>`)
@@ -647,14 +626,13 @@ function campaignTab(o: SavedOutfit): string {
   return `
   <section class="game-bar debt-band ${cleared ? "won" : ""}">
     <div class="gb-debt">
-      <span class="control-label">${cleared ? "Debt" : "Still owed"}</span>
-      <p class="debt-figure">${cleared ? "Cleared" : ck(o.debtK)}</p>
-      <p class="gb-note">${ck(paid)} of ${ck(STARTING_DEBT_K)} paid down</p>
+      <span class="control-label">Still owed</span>
+      <p class="debt-figure">${ck(Math.max(0, o.debtK))}</p>
+      <p class="gb-note">${ck(paid)} of ${ck(debtStart(o))} paid down</p>
     </div>
     <div class="gb-clock">
       <span class="control-label">Campaign clock</span>
-      ${gameTicks(o.gamesPlayed, DEBT_CLEAR_GAMES)}
-      ${cleared ? '<p class="inspection-pass">You have cleared your debt. Campaign won.</p>' : ""}
+      ${gameTicks(o.gamesPlayed, gamesLimit(o))}
       ${outOfGames ? '<p class="issue-error">Eight games are up with debt remaining. Some very unpleasant people pay a visit: the campaign is lost.</p>' : ""}
     </div>
     <div class="gb-act">
@@ -688,20 +666,39 @@ export function soloOutfitView(state: AppState): string {
   else if (tab === "play") body = `<main class="solo-body">${playTab(state, o)}</main>`;
   else body = `<main class="solo-body">${campaignTab(o)}</main>`;
 
+  // solo-outfit on the wrapper is what the stylesheet hangs the page's own
+  // typography off - see the note there about tracked-out caps.
   return `
+  <div class="solo-outfit">
   <section class="setup-band solo-band">
     <div class="setup-head">
       <div class="setup-identity">
         <input class="fleet-name-input" type="text" value="${escapeHtml(o.name ?? "")}" placeholder="Name this outfit" aria-label="Outfit name" data-action="outfit-name" />
+        ${/* Beside the name on the Outfit tab, because the budget is the first
+              thing that confuses somebody arriving from the fleet builder: the
+              number is not a points limit you rebuy against each game, it is a
+              loan you spent once. p.201 buys the Outfit at the start of the
+              campaign and never mentions buying again. */ ""}
+        ${tab === "outfit"
+          ? `<p class="outfit-budget-note">You have credits equal to the loan you took out at the start of the game.
+             You don&rsquo;t buy more ships during these short Junkspace campaigns.</p>`
+          : ""}
       </div>
       <div class="control-group control-group-emblem">
         <span class="control-label">Emblem</span>
         <div class="emblem-picker">${outfitEmblemPicker(o)}</div>
       </div>
+      ${/* An outfit is a roster and every other roster in this app prints. This
+            one never had the button at all, so the only way to get a crew sheet
+            to the table was a browser menu. */ ""}
+      <div class="setup-actions">
+        <button class="bar-btn" data-action="do-print">${icon("print", 15)} Print</button>
+      </div>
     </div>
   </section>
   ${tabBar(o, tab)}
-  ${body}`;
+  ${body}
+  </div>`;
 }
 
 function outfitEmblemPicker(o: SavedOutfit): string {

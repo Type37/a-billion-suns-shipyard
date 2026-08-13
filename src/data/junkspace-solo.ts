@@ -110,14 +110,54 @@ export const GLITCH_BLIP: RollRow[] = [
   { roll: "5-6", result: "Push 3\" towards the Nearest Objective", detail: "Stop as soon as it is within 2\" of that Objective." },
 ];
 
-export const BEHAVIOUR_ROUTINES = [
-  "Strongest Enemy: your ship with the largest Silhouette value. If tied, the most expensive; if still tied, randomise.",
-  "Nearest Enemy: whichever of your ships is nearest the active Hostile ship. If tied, the highest cost; if still tied, randomise.",
-  "Engage a target: pivot to face it, push its Thrust value towards it (stop once in range of any of its weapons), suffer Passive Attacks, then Attack Smartly.",
-  "Defend Nearest Objective: push its Thrust value towards the nearest Objective (stop within 2\"), pivot to face the Strongest Enemy in range of a weapon, suffer Passive Attacks, then Attack Smartly.",
-  "Attack Smartly: for each primary and auxiliary weapon system, assign its attack dice to the Engage target, or the Strongest Enemy in range and arc if it cannot. Multiple valid targets: choose the ship with the most damage; if still tied, randomise.",
-  "Clipping: if a Hostile ship or Blip token would occupy the same position as another Hostile ship, Blip token or Objective, move it 2\" towards your Entry Jump Point.",
-  "Hostiles always make passive attacks if they can. With multiple passive targets they attack the Strongest Enemy. Hostile ships suffer Inertial Strain and Easy Target as normal.",
+export interface Routine {
+  term: string;
+  text: string;
+}
+
+/**
+ * The Hostile behaviour routines, p.200, VERBATIM.
+ *
+ * These were a paraphrase for one build - "Strongest Enemy: your ship with the
+ * largest Silhouette value. If tied, the most expensive" against the book's
+ * "Pick your ship with the largest Silhouette value. If tied, pick the most
+ * expensive ship." - which is exactly the kind of tightening that reads fine
+ * and loses an instruction. The paraphrase of Engage dropped "Suffer Passive
+ * Attacks" into a comma list where the book has it as its own numbered step,
+ * and the order of those steps is the whole rule.
+ *
+ * Each is a term you look up mid-activation, one at a time, which is why they
+ * are a term and a body rather than a bulleted wall.
+ */
+export const BEHAVIOUR_ROUTINES: Routine[] = [
+  {
+    term: "Strongest Enemy",
+    text: "Pick your ship with the largest Silhouette value. If tied, pick the most expensive ship. If still tied, randomise.",
+  },
+  {
+    term: "Nearest Enemy",
+    text: "Pick whichever of your ships is nearest to the active Hostile ship. If there's a tie, pick the tied ship with the highest cost. If still tied, randomise.",
+  },
+  {
+    term: "Engage",
+    text: "When instructed to 'Engage' a particular target: Pivot this ship to face the target. Push this ship its Thrust value towards the target (but stop as soon as the target is in range of any of the active ship's weapons). Suffer Passive Attacks. Attack Smartly.",
+  },
+  {
+    term: "Defend Nearest Objective",
+    text: "When instructed to 'Defend Nearest Objective': Push this ship its Thrust value towards the Objective nearest to it (but stop as soon as it is within 2\" of that Objective). Pivot to face the Strongest Enemy within range of one or more of its weapons (with the priority of bringing its primary weapon system to bear). Suffer Passive Attacks. Attack Smartly.",
+  },
+  {
+    term: "Attack Smartly",
+    text: "When instructed to 'Attack Smartly', for each of the active ship's primary and auxiliary weapon systems: assign the attack dice to its Engage target, or to the Strongest Enemy within range and arc if it cannot. If there are multiple equally valid targets, choose the ship with the most damage. If still tied, randomise.",
+  },
+  {
+    term: "Clipping",
+    text: "If a Hostile ship or Blip token wants to occupy the same position as another Hostile Ship, Blip token or Objective for any reason, move it 2\" towards your Entry Jump Point.",
+  },
+  {
+    term: "Passive attacks",
+    text: "Hostiles always make passive attacks if they can. If they have multiple passive targets, they attack the Strongest Enemy. Note: Hostile Ships suffer from Inertial Strain and Easy Target as normal.",
+  },
 ];
 
 // ---------------------------------------------------------------------------

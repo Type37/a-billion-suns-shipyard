@@ -78,6 +78,10 @@ export const STARTING_DEBT_K = 30;
 /** "If you clear your debt within 8 games, you have won the campaign." (p.201). */
 export const DEBT_CLEAR_GAMES = 8;
 
+/** The harder campaign offered in the NOTE box on p.201: fewer games, or a bigger hole. */
+export const HARD_DEBT_K = 45;
+export const HARD_CLEAR_GAMES = 6;
+
 /** "At the start of the game, your Alert Level is 1." (p.195). */
 export const ALERT_START = 1;
 

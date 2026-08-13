@@ -287,6 +287,8 @@ export interface AppState {
     showAllFactions: boolean;
     /** Active tab within a solo outfit workspace. */
     soloTab?: SoloTab;
+    /** Which Hostile-behaviour routine is open, if any. One at a time. */
+    soloDef?: string;
     /** Result of the most recent solo dice roll, shown in the roller. */
     /** Filters on the ship compendium. */
     shipFilter?: ShipFilter;
@@ -364,6 +366,9 @@ export interface AppState {
       emblemImage?: string;
       emblemLib?: string;
       emblemColor?: "ink" | "blue" | "red";
+      /** The two campaign dials, chosen before the outfit exists (p.201). */
+      debtStartK?: number;
+      gamesLimit?: number;
     };
     /**
      * An image waiting to be cropped, and where it is going once it is.

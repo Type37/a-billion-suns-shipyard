@@ -14,6 +14,23 @@ export interface CoreAction {
 /** Round phases, in order, matching the Play Mode phase track. */
 export const PHASE_COMMAND = { command: 0, jump: 1, tactical: 2, end: 3 } as const;
 
+/*
+ * Nothing reads `phases` (below) any more, and that is on purpose rather than an
+ * oversight waiting to be tidied.
+ *
+ * Play Mode used to filter the command list down to the current phase, on the
+ * reasoning that you should never scan a rulebook mid-turn for what applies.
+ * It was wrong about the rules: CMD tokens are a single free pool in 2E and can
+ * be spent on any command at any legal moment, and several commands - Red Alert
+ * and Power to Shields especially - are spent during an OPPONENT'S activation,
+ * so they never appeared under any phase of your own. Filtering hid options the
+ * player could legitimately take. The list is unfiltered now (playCommandsPanel
+ * in render.ts).
+ *
+ * The timings stay because they are transcribed from the Quick Reference and
+ * are true; they are just not a filter.
+ */
+
 export interface CoreCommand {
   name: string;
   /** CMD tokens to spend. */
@@ -26,7 +43,7 @@ export interface CoreCommand {
    * Play Mode phase track (0 Command, 1 Jump, 2 Tactical, 3 End). Derived from
    * each command's own timing wording in the Quick Reference - e.g. Requisition
    * says "on your Jump In turn", Power to Engines "at the start of a unit's
-   * movement step". Used to show only what's usable right now during play.
+   * movement step". Reference only; see the note above PHASE_COMMAND.
    */
   phases: number[];
 }

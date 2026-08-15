@@ -2111,8 +2111,6 @@ button { font-family: inherit; }
   border-left: 3px solid var(--blue); padding: 14px 18px;
   min-height: 227px;
 }
-.phase-checklist-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-bottom: 6px; }
-.phase-checklist-title { font-family: var(--display); font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink); }
 .phase-checklist-count { font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 .phase-check { display: flex; align-items: flex-start; gap: 10px; padding: 6px 2px; cursor: pointer; font-family: var(--serif); font-size: 14px; line-height: 1.45; color: var(--ink); }
 .phase-check input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--blue); cursor: pointer; flex-shrink: 0; }
@@ -5016,9 +5014,6 @@ a .icon,
 .print-hvp.is-generic p { color: var(--ink-3); }
 .print-hvp.is-generic { border-left-color: var(--hair); }
 
-/* The firing-arcs reference, below the controls rather than among them. */
-.play-arcs { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--hair-soft); }
-
 
 /* The all-available layout (.print-hvp-cols / -own / -shared) is gone with the
    code that built it: Age of Unity printed the faction's whole personnel roster
@@ -5673,6 +5668,33 @@ a .icon,
    same time. Left is what you are doing, right is what you are spending. */
 .play-cols { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 8px 18px; align-items: start; margin-top: 6px; }
 .play-col { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+/* The left column rides the scroll on a wide screen.
+
+   Moving the commands here balanced the two columns for a normal fleet, but a
+   fleet list is as long as it is: The Unity's starter is thirteen units, which
+   runs the right column to about 1,850px against a left column of 890. That is
+   a thousand pixels of blank paper down the left half of the page - not a
+   layout, a rendering fault, which is exactly how it reads.
+
+   Pinning it answers both halves of the problem with one rule. The blank stops
+   existing, because the column is never below the fold to be blank UNDER; and
+   the four things you consult between actions - where you are in the round, the
+   score, the faction rule and the command list - stay on screen while you scroll
+   a long roster, which is what this column is for.
+
+   align-items: start on the grid is what makes this work; a stretched grid item
+   is already full height and cannot stick. A left column taller than the window
+   scrolls inside itself rather than being cut off. */
+@media (min-width: 900px) {
+  .play-col-do {
+    position: sticky; top: 10px;
+    max-height: calc(100vh - 20px);
+    overflow-y: auto; overscroll-behavior: contain;
+    /* Room for the scrollbar when there is one, so a command card's right edge
+       is never sitting under it. */
+    padding-right: 4px;
+  }
+}
 /* Trimmed rather than restyled: every value in here is spacing, and on the one
    phase that carries the arc legend the screen was 28px short of fitting. */
 /* No min-height: it reserved 214px of empty box for a phase with two lines in
@@ -5706,20 +5728,8 @@ a .icon,
 /* Nothing decorative survives in Play Mode: the credits/links footer is a whole
    band of screen you cannot use with a fleet on the table in front of you. */
 main.play-body ~ .game-info-footer { display: none; }
-.play-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.play-actions .cta-btn { flex: 1 1 auto; justify-content: center; }
 .play-cols .pc-cmds { margin-top: 0; }
 .play-cols .play-counters { margin: 0; }
-.play-ref { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--hair-soft); display: flex; flex-direction: column; gap: 14px; }
-.play-ref:empty { display: none; }
-/* A two-line legend, not the arc diagram. The drawing was 355px tall and was the
-   single reason the Tactical Phase - the phase you sit on longest - was the only
-   one that made this screen scroll. Shrinking it did not help: at any size small
-   enough to fit, the cones were too small to read. So Play Mode states the two
-   arcs in words at 40px, and the diagram stays in Learn to Play where there is
-   room to draw it properly and where you are actually learning it. */
-.play-cols .play-arcs { margin-top: 4px; padding-top: 10px; border-top: 1px solid var(--hair-soft); display: flex; flex-direction: column; gap: 5px; }
-.play-arc-line { margin: 0; display: flex; align-items: center; gap: 8px; font-family: var(--serif); font-size: 12.5px; color: var(--ink-2); }
 
 /* One header line instead of a 137px masthead: where you are, which round (read
    and adjusted in the same control), and the once-a-game Reset. */
@@ -5729,10 +5739,10 @@ main.play-body ~ .game-info-footer { display: none; }
    the header - the round bar, phase track and CMD strip lay out exactly as if
    this wrapper were not here. It only becomes a real pinned block on a phone. */
 .play-sticky { display: contents; }
-/* Next phase used to live in each column's .play-actions, which meant it was
-   written twice and sat below the checklist. There is one now, next to the
-   phase track it drives. On a wide screen it is a normal block in the flow; on
-   a phone it joins the pinned header. */
+/* Next phase used to be written into each column separately and sat below the
+   checklist. There is one now, next to the phase track it drives. On a wide
+   screen it is a normal block in the flow; on a phone it joins the pinned
+   header, and on the last End Phase it becomes "End the game". */
 .play-sticky-next { margin: 6px 0 2px; }
 .play-sticky-next .cta-btn { justify-content: center; }
 
@@ -5777,7 +5787,6 @@ main.play-body .roster-section::before { content: none; }
 /* A credit total below zero is the normal state of early Hypergrowth, so it is
    marked rather than hidden: the player needs to see the debt they are in. */
 .round-value.is-debt { color: var(--red); }
-.play-debt-note { font-family: var(--serif); font-size: 12.5px; line-height: 1.45; color: var(--ink-2); margin: 8px 0 0; }
 .play-bar-of { font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }
 .play-bar-reset, .play-bar-print { flex: none; }
 /* The way out, and it looks like one. Solid where Reset and Print are ghosts,
@@ -5961,7 +5970,6 @@ main.play-body .roster-section::before { content: none; }
    and a hull tracker per ship. */
 .play-fleet { margin-top: 0; }
 .play-cols .play-fleet .pf-list { grid-template-columns: 1fr; }
-.pf-hint { font-family: var(--sans); font-size: 11px; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--ink-3); margin-left: 8px; }
 /* Play Mode is read at arm's length across a table mid-game, so it is stripped
    right back: no card boxes, a hairline between units instead, and the stats and
    guns on one line. Every unit that fits on screen is a unit you are not
@@ -5970,7 +5978,6 @@ main.play-body .roster-section::before { content: none; }
 .pf-unit { border: none; border-bottom: 1px solid var(--hair-soft); padding: 3px 0 4px; }
 .pf-unit:last-child { border-bottom: none; }
 .pf-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 1px; }
-.pf-glyph { color: var(--blue); display: inline-flex; }
 .pf-name { font-family: var(--display); font-weight: 800; font-size: 13.5px; }
 .pf-x { color: var(--blue); font-weight: 900; }
 .pf-data { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 14px; margin-bottom: 0; }
@@ -6013,6 +6020,69 @@ main.play-body .roster-section::before { content: none; }
 .pf-pos-opt.on { position: relative; z-index: 1; }
 .pf-pos-opt.on[data-to="reserve"] { background: var(--ground); border-color: var(--ink-3); color: var(--ink); }
 .pf-pos-opt.on[data-to="play"] { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+/* ------------------------------------------------ the Activated token
+   Beside the position control, not inside it: where a unit is and whether it
+   has gone are two separate facts about the same unit, and a three-segment
+   control would have made them look like three states of one.
+
+   Deliberately NOT blue. Blue is "jumped in" on the control 8px to its left,
+   and a row with two blue fills says nothing. Activated is the quiet state -
+   a unit that has had its turn is finished with, so it recedes; what you are
+   scanning for in the Tactical Phase is the units that have NOT gone. */
+.pf-controls { display: flex; flex-wrap: wrap; align-items: stretch; gap: 6px; margin: 3px 0 4px; }
+.pf-controls .pf-pos { margin: 0; flex: 0 1 230px; }
+.pf-acted {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  min-height: 34px; padding: 0 10px; cursor: pointer; flex: 0 0 auto;
+  border: 1px solid var(--hair); background: var(--paper); color: var(--ink-3);
+  font-family: var(--sans); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.pf-acted:hover { border-color: var(--ink-3); color: var(--ink); }
+.pf-acted.on { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.pf-acted .icon { margin: 0; }
+/* A unit that has activated dims its whole row, so "what is left to go" reads
+   off the roster at a glance without reading a single word of it. Not applied
+   to the controls: you have to be able to see and undo a mis-tap. */
+.pf-unit.is-acted .pf-name, .pf-unit.is-acted .pf-data, .pf-unit.is-acted .pf-carry { opacity: 0.5; }
+.pf-tally-n.is-acted { color: var(--ink); }
+/* Every unit in play has gone: the Tactical Phase's own end condition, met, so
+   it takes the same --go green the rest of the app uses for a cleared check. */
+.pf-tally-n.is-done { color: var(--go); }
+.pf-clear-acted {
+  flex: none; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+  min-height: 30px; padding: 0 9px; border: 1px solid var(--hair); background: var(--paper);
+  font-family: var(--sans); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2);
+}
+.pf-clear-acted:hover { border-color: var(--ink-3); color: var(--ink); }
+
+/* --------------------------------------------------------- the result
+   Where the phase steps were, once the last End Phase is closed out. It takes
+   the checklist's slot rather than adding a band of its own: the game is over,
+   so the steps of a phase you are no longer in are not what you want there. */
+.play-result { border: 2px solid var(--ink); padding: 14px 16px; background: var(--paper); }
+.play-result.is-win { border-color: var(--blue); }
+.play-result.is-loss { border-color: var(--hair); }
+.play-result-round {
+  margin: 0; font-family: var(--sans); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3);
+}
+.play-result-head { margin: 4px 0 0; font-family: var(--display); font-weight: 900; font-size: 26px; line-height: 1.1; color: var(--ink); }
+.play-result.is-win .play-result-head { color: var(--blue-deep); }
+.play-result-sub { margin: 3px 0 0; font-family: var(--sans); font-size: 14px; font-weight: 700; color: var(--ink-2); }
+.play-result-note { margin: 9px 0 0; font-family: var(--serif); font-size: 13px; line-height: 1.45; color: var(--ink-2); }
+.play-result-out {
+  margin: 10px 0 0; padding-top: 8px; border-top: 1px solid var(--hair-soft);
+  font-family: var(--sans); font-size: 12px; color: var(--ink-3);
+}
+/* The last press of the game says so. Same solid CTA, red rather than blue,
+   because it is the one press here that cannot be undone by pressing it again
+   (picking a phase is the way back, and the result block says so). */
+.cta-btn.play-next-final { background: var(--red); border-color: var(--red); }
+.cta-btn.play-next-final:hover { background: var(--red-deep); border-color: var(--red-deep); }
 
 /* ------------------------------------------------- Play Mode on a phone
    Play Mode is used standing at a table with the phone in one hand, and the

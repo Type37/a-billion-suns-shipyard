@@ -29,7 +29,7 @@ Assemble and print your fleet in this unofficial fleet builder for [A Billion Su
 ## Still to do
 
 - Solo mode is unfinished. The missing piece is a moddable Blip table for enemy encounters, not a fleet you assemble.
-- Play mode is a tracker only. Phase-filtered commands, per-ship damage and activation order are the real wins.
+- Play mode has no per-ship damage. Filtering commands by phase was tried and dropped: CMD is one free pool and reactive commands are spent in the opponent's turn, so it hid legal plays.
 - 88 of 153 library emblems sit loose in the root and land in the catch-all "General" folder.
 - The `chief-engineer` HVP id collides between The Unity and the generic list. Left alone: renaming an id changes what saved fleets carry.
 

@@ -48,7 +48,7 @@ import { imageSrc } from "./image-store.ts";
 import { FACTION_LORE } from "./faction-lore.ts";
 import type { AppState } from "./state.ts";
 import { activeList, activeOutfit, DEFAULT_PRINT, PAPER } from "./state.ts";
-import type { SavedList, UnitPosition } from "./storage.ts";
+import type { PlayState, SavedList, UnitPosition } from "./storage.ts";
 import { storageBytes } from "./storage.ts";
 import { FleetSync } from "./fleet-sync.ts";
 import { soloListView, soloOutfitView, newOutfitModal } from "./solo.ts";
@@ -2868,14 +2868,18 @@ function foundryEditView(state: AppState, factionId: string): string {
 
 // Each phase as a real checklist rather than a paragraph to read and
 // interpret yourself - the player ticks steps off as they do them at the
-// table. The Initiative step (index 1 of Command Phase) auto-ticks when the
-// player uses the Roll button below, since that's an unambiguous 1:1 link;
-// everything else is self-reported, because this is a physical miniatures
-// game and the app cannot see the table.
+// table. Steps are self-reported, with one exception: a step marked `clears`
+// changes the state it describes, because the app holds that state itself.
 /** A checklist step: the line to tick, plus an optional italic aside. */
 interface PhaseStep {
   text: string;
   note?: string;
+  /**
+   * This step also carries out its own instruction when ticked. Set only where
+   * the app holds the very thing the step tells you to change and the link is
+   * 1:1 - see the "acted" note in the End Phase below.
+   */
+  clears?: "acted";
 }
 /** A reference bullet (no checkbox), with optional nested sub-bullets. */
 interface PhaseRef {
@@ -2892,6 +2896,13 @@ interface PhaseGuide {
   /** True on the End Phase, where the mode's scoring reminders belong. */
   scoring?: boolean;
 }
+
+// The Initiative step is self-reported like every other one. An earlier version
+// of this comment said it auto-ticked "when the player uses the Roll button
+// below" - there has never been a Roll button on this screen, and the same
+// belief is why the compact faction block drops the Initiative value here (see
+// factionRuleBlock). Nothing on this screen rolls dice: it is a physical
+// miniatures game and the app cannot see the table.
 
 // Command Phase, verbatim (A and B). The +1-CMD-for-losers line is not in the
 // player's transcription, so it is not invented back in here.
@@ -2955,7 +2966,10 @@ const END_PHASE: PhaseGuide = {
   scoring: true,
   steps: [
     { text: "Check your mission(s) for anything you scored this round." },
-    { text: "Clear every Activated token." },
+    // The one step that does what it says: the fleet panel tracks Activated
+    // tokens now, so ticking this clears them rather than leaving the app
+    // showing a fleet still activated while the box beside it says otherwise.
+    { text: "Clear every Activated token.", clears: "acted" },
     { text: "Resolve any other End Phase effects your mission or faction calls for." },
     { text: "Discard any unused CMD tokens." },
     { text: "Start the next round." },
@@ -2992,44 +3006,108 @@ const SCORING_NOTES: Partial<Record<GameMode, string[]>> = {
 };
 
 /**
- * The commands you can actually spend CMD on *right now*: the core list filtered
- * to the current phase (the single highest-value in-game feature across the
- * trackers I looked at - you never scan a rulebook mid-turn to find what
- * applies). Requisition only exists in the Shipyard modes. Faction rules and
- * carried HVP can grant more or change the cost, so a standing note says so.
- */
-/**
- * The fleet, as a reference block for Play Mode: every unit with its stats and
- * weapons, because "I cannot see my fleet" was the single loudest complaint
- * about Play Mode - it tracked the round for you while hiding the ships the
- * round is about.
+ * What still has to be added to the scores before the result means anything.
  *
- * No hull tracker. The boxes were never wired to anything: you could not tick
- * one, and nothing read them, so they were a grid of dead squares that cost more
- * vertical space than every stat on the card put together. Damage belongs on the
- * printed sheet, where you can actually mark it.
+ * The app cannot see the table, and every mode's end-of-game scoring turns on
+ * something only the players can count - enemy HVP tokens in your hold, a
+ * mission's own end-of-game clause. So the result block prompts for that first
+ * and leaves the counters live while it does, rather than declaring a winner
+ * from a number it knows is incomplete.
  */
+const GAME_END_SCORING: Partial<Record<GameMode, string>> = {
+  "combat-simulator": "Add 2VP per enemy HVP token you are carrying before reading the result.",
+  armageddon:
+    "Add 2VP per enemy HVP token you are carrying, plus anything your chosen mission scores at game end.",
+  "age-of-unity": "Add whatever your two missions score at the end of the game, for both sides.",
+  hypergrowth: "Settle any Revenue still owed from your two missions.",
+  "management-training": "Count the Credits you finished on, including this round's Sectors and ComSats.",
+};
+
+/** How a tie is broken, where the rulebook says. Empty where it does not. */
+const GAME_END_TIE: Partial<Record<GameMode, string>> = {
+  hypergrowth: "Level on Credits goes to whoever is carrying the most HVP tokens.",
+  armageddon: "Level on VP: check your mission for its own tiebreak.",
+  "age-of-unity": "Level on VP: check your missions for their own tiebreak.",
+};
+
 /**
- * The fleet in Play Mode, with a position control on every unit.
+ * The result, once the last round's End Phase has been closed out.
  *
- * This panel used to be a read-only roster, which left the single most
- * bookkeeping-heavy thing in a game of A Billion Suns untracked. Units start in
- * Reserve and are jumped in through a Jump Point during the Jump Phase; a unit
- * that takes the Jump Out action goes straight back to Reserve. Two places, one
- * toggle, and a tally at the top so you can see the shape of your fleet without
- * reading every row.
+ * Play Mode used to hold both scores for four rounds and then say nothing:
+ * pressing Next phase on the final End Phase rolled quietly back to that same
+ * round's Command Phase, for ever. Every number needed to finish the game was
+ * on the screen and none of them were ever added up.
+ */
+function playResult(list: SavedList, play: PlayState, maxRound: number): string {
+  const isCredits = list.mode === "hypergrowth" || list.mode === "management-training";
+  const fmt = (n: number) => (isCredits ? credits(n) : String(n));
+  const noun = isCredits ? "Credits" : "VP";
+  const diff = play.vp - play.oppVp;
+  // `sub` is markup, not text: in the credit modes fmt() is credits(), which
+  // returns the rendered ¢ glyph. Escaping it prints the raw <svg> source on the
+  // screen, which is the same trap the Requisition button fell into.
+  const verdict =
+    diff > 0
+      ? { cls: "is-win", head: "You win", sub: `${fmt(play.vp)} to ${fmt(play.oppVp)}, ahead by ${fmt(Math.abs(diff))}.` }
+      : diff < 0
+        ? { cls: "is-loss", head: "Your opponent wins", sub: `${fmt(play.oppVp)} to ${fmt(play.vp)}, ahead by ${fmt(Math.abs(diff))}.` }
+        : { cls: "is-draw", head: `Level on ${noun}`, sub: `${fmt(play.vp)} each.` };
+  const tie = diff === 0 ? GAME_END_TIE[list.mode] : undefined;
+  const scoring = GAME_END_SCORING[list.mode];
+  return `
+    <section class="play-result ${verdict.cls}">
+      <p class="play-result-round">Round ${maxRound} complete &mdash; game over</p>
+      <h3 class="play-result-head">${escapeHtml(verdict.head)}</h3>
+      <p class="play-result-sub">${verdict.sub}</p>
+      ${scoring ? `<p class="play-result-note">${ruleText(scoring)} The counters below are still live.</p>` : ""}
+      ${tie ? `<p class="play-result-note">${ruleText(tie)}</p>` : ""}
+      <p class="play-result-out">Pick a phase above to carry on playing, or <b>End play</b> to put it away.</p>
+    </section>`;
+}
+
+/**
+ * The fleet in Play Mode: every unit with its stats and weapons, and the two
+ * things about it that change during a round.
+ *
+ * The panel exists at all because "I cannot see my fleet" was the loudest
+ * complaint about Play Mode - it tracked the round while hiding the ships the
+ * round is about. It has no hull tracker: those boxes were never wired to
+ * anything, so they were a grid of dead squares costing more height than every
+ * stat on the card put together. Damage belongs on the printed sheet, where you
+ * can mark it.
+ *
+ * WHERE a unit is. Units start in Reserve and are jumped in through a Jump
+ * Point during the Jump Phase; the Jump Out action puts one straight back. Two
+ * places, one toggle, and a tally so the shape of the fleet is a glance.
+ *
+ * WHETHER it has ACTIVATED. The Tactical Phase asks one question over and over
+ * - "the phase ends once every unit in play has activated" - and it was the one
+ * question this screen made you answer by looking at the table and counting
+ * tokens. Now the tally answers it, the End Phase step that clears the tokens
+ * actually clears them, and a unit reads as activated from its own row.
  *
  * Hypergrowth is deliberately not routed here - see playShipyardTracker, where
- * ships move Shipyard -> Reserves -> play and cost credits on the way out.
+ * ships move Shipyard -> Reserves -> play and cost credits on the way out, and
+ * where there are no units to activate until you requisition one.
  */
 function playFleetPanel(list: SavedList, faction: Faction | undefined, customs: Faction[]): string {
   const names = unitDisplayNames(list.fleet.units, faction, customs);
   const pos = list.play?.pos ?? {};
+  const acted = list.play?.acted ?? {};
   const units = unitsByMass(list.fleet.units, faction, customs);
   const posOf = (id: string): UnitPosition => pos[id] ?? "reserve";
 
   const tally = { reserve: 0, play: 0 };
-  for (const u of units) tally[posOf(u.id)] += 1;
+  // Activation is counted over units IN PLAY only, because that is exactly what
+  // the rule asks: "The phase ends once every unit in play has activated."
+  // A unit sitting in Reserve is not waiting for its turn, and counting it
+  // would mean the Tactical Phase could never read as finished.
+  let actedInPlay = 0;
+  for (const u of units) {
+    tally[posOf(u.id)] += 1;
+    if (posOf(u.id) === "play" && acted[u.id]) actedInPlay += 1;
+  }
+  const anyActed = units.some((u) => acted[u.id]);
 
   const PLACES: { key: UnitPosition; label: string }[] = [
     { key: "reserve", label: "Reserve" },
@@ -3043,24 +3121,43 @@ function playFleetPanel(list: SavedList, faction: Faction | undefined, customs: 
       const ship = r.ship;
       const title = u.name || names.get(u.id) || ship.name;
       const here = posOf(u.id);
+      const isActed = !!acted[u.id];
       const carried = list.fleet.hvp
         .filter((h) => h.assignedUnitId === u.id)
         .map((h) => hvpDisplayName(h, faction));
       const places = PLACES.map(
         (pl) => `<button class="pf-pos-opt ${here === pl.key ? "on" : ""}" data-action="play-pos" data-unit="${u.id}" data-to="${pl.key}" aria-pressed="${here === pl.key}">${pl.label}</button>`,
       ).join("");
+      // The Activated token stays pressable on a unit in Reserve rather than
+      // being disabled there: Jump Out is an ACTION, so the ordinary way a unit
+      // ends up in Reserve mid-round is by activating and jumping out, and a
+      // control that greys out the instant you record the move would be
+      // unreachable at exactly the moment you need it.
+      const actBtn = `<button class="pf-acted ${isActed ? "on" : ""}" data-action="play-acted" data-unit="${u.id}" aria-pressed="${isActed}" title="${isActed ? "Remove this unit's Activated token" : "Give this unit an Activated token"}">${isActed ? icon("check", 13) : ""}Activated</button>`;
       return `
-      <article class="pf-unit is-${here}">
+      <article class="pf-unit is-${here}${isActed ? " is-acted" : ""}">
         <header class="pf-head">
           <span class="pf-name">${escapeHtml(title)}${u.count > 1 ? ` <span class="pf-x">&times;${u.count}</span>` : ""}</span>
         </header>
-        <div class="pf-pos" role="group" aria-label="Where ${escapeHtml(title)} is">${places}</div>
+        <div class="pf-controls">
+          <div class="pf-pos" role="group" aria-label="Where ${escapeHtml(title)} is">${places}</div>
+          ${actBtn}
+        </div>
         <div class="pf-data">${statChips(ship, true)}${weaponsTable(ship)}</div>
         ${carried.length ? `<p class="pf-carry">Carrying: ${escapeHtml(carried.join("; "))}</p>` : ""}
       </article>`;
     })
     .join("");
   if (!rows) return "";
+  // Two facts, in the order the round asks for them: where the fleet is (Jump
+  // Phase) and how much of it has gone (Tactical Phase). The activation line
+  // only appears once something is on the table, since "0 of 0 activated"
+  // before the first Jump In is a sum about nothing.
+  const actLine =
+    tally.play > 0
+      ? `<span class="pf-tally-sep">·</span>
+         <span class="pf-tally-n ${actedInPlay === tally.play ? "is-done" : "is-acted"}">${actedInPlay}</span> of ${tally.play} activated`
+      : "";
   return `<section class="play-fleet">
     <div class="pf-panel-head">
       <h3 class="roster-section">Your fleet</h3>
@@ -3068,7 +3165,9 @@ function playFleetPanel(list: SavedList, faction: Faction | undefined, customs: 
         <span class="pf-tally-n is-play">${tally.play}</span> jumped in
         <span class="pf-tally-sep">·</span>
         <span class="pf-tally-n is-reserve">${tally.reserve}</span> in reserve
+        ${actLine}
       </p>
+      ${anyActed ? `<button class="pf-clear-acted" data-action="play-acted-clear">${icon("shuffle", 12)} Clear tokens</button>` : ""}
     </div>
     <div class="pf-list">${rows}</div>
   </section>`;
@@ -3076,10 +3175,18 @@ function playFleetPanel(list: SavedList, faction: Faction | undefined, customs: 
 
 // Hypergrowth's Play Mode fleet panel: not a damage tracker (nothing is printed
 // here) but a live Shipyard. Every class you own is always visible, with its
-// stats and weapons, and three moves per class: Deploy (requisition one out of
-// the Shipyard, struck off for good), Jumped out (a unit in play retreats to
-// Reserves), and Jump in (a unit in Reserves returns to play). yard = total in
-// the Shipyard still, play = in play, reserve = jumped out.
+// stats and weapons, and three moves per class: Requisition (one out of the
+// Shipyard, paid for in Credits and struck off for good), Jump out (a unit in
+// play retreats to Reserves), and Jump in (a unit in Reserves returns to play).
+// yard = total in the Shipyard still, play = in play, reserve = jumped out.
+//
+// Requisition costs 1 CMD token as well as the Credits, and the button charges
+// only the Credits. That is not an oversight: the CMD pile above is the one
+// place tokens are spent, so a button reaching in to take one would mean tokens
+// leaving the pile from two places - and it would be wrong as often as right,
+// because Squadron units carried by the first one are requisitioned with it for
+// no extra token. Credits are arithmetic the app can do exactly; the token is a
+// judgement the player makes, and the button's tooltip says so.
 function playShipyardTracker(list: SavedList, faction: Faction | undefined, customs: Faction[]): string {
   // No Limit: any ship in the faction can be requisitioned, in any quantity, so
   // the tracker lists the whole faction with no Shipyard cap. Otherwise it lists
@@ -3101,12 +3208,17 @@ function playShipyardTracker(list: SavedList, faction: Faction | undefined, cust
   }
   const req = list.play?.req ?? {};
 
-  // Ledger: the full activity log - every Deploy / Jumped out / Jump in, newest
-  // first, with the Credit cost of each requisition and a running total spent.
-  // It sits to the RIGHT of the heading and opens on a tap.
+  // Ledger: the full activity log - every Requisition / Jump out / Jump in,
+  // newest first, with the Credit cost of each requisition and a running total
+  // spent. It sits to the RIGHT of the heading and opens on a tap.
   const logEntries = list.play?.log ?? [];
   const totalSpent = logEntries.filter((e) => e.kind === "deploy").reduce((n, e) => n + e.cost, 0);
-  const logVerb = { deploy: "Deployed", jumpout: "Jumped out", jumpin: "Jumped in" } as const;
+  // "Requisitioned", not "Deployed". The `deploy` key is what the saved state
+  // has always called it and renaming it would break every game in progress,
+  // but the word on screen is the rulebook's: Requisition is a named command
+  // with a printed cost, and it was being called by a different name eight
+  // pixels from the command card that names it properly.
+  const logVerb = { deploy: "Requisitioned", jumpout: "Jumped out", jumpin: "Jumped in" } as const;
   const logHtml = logEntries.length
     ? `<ul class="sy-ledger-list">${[...logEntries]
         .reverse()
@@ -3131,9 +3243,10 @@ function playShipyardTracker(list: SavedList, faction: Faction | undefined, cust
       const inPlay = req[cid]?.play ?? 0;
       const reserve = req[cid]?.reserve ?? 0;
       const yard = total === Infinity ? Infinity : Math.max(0, total - inPlay - reserve);
-      // `html` is trusted markup (a rendered glyph); `label` is plain text and
-      // gets escaped. The Deploy button carries the credits glyph, so it uses the
-      // html form - escaping it was printing the raw <svg> source on the button.
+      // `label` is plain text and gets escaped. The Requisition button carries
+      // the credits glyph, which is trusted markup, so it is written out below
+      // rather than going through here - escaping it printed the raw <svg>
+      // source on the button.
       const btn = (act: string, label: string, on: boolean) =>
         `<button class="sy-req-btn" data-action="${act}" data-ship="${cid}" ${on ? "" : "disabled"}>${escapeHtml(label)}</button>`;
       const yardLabel = yard === Infinity ? "∞" : String(yard);
@@ -3144,9 +3257,19 @@ function playShipyardTracker(list: SavedList, faction: Faction | undefined, cust
           <span class="sy-req-tally"><span class="sy-req-yard">${yardLabel}</span> yard <span class="sy-req-sep">·</span> ${inPlay} in play <span class="sy-req-sep">·</span> ${reserve} reserve</span>
         </header>
         <div class="pf-data">${statChips(ship, true)}${weaponsTable(ship)}</div>
+        <!--
+          Three buttons, three verbs the rulebook uses, all in the same
+          imperative. They read "Deploy / Jumped out / Jump in" before: one
+          invented word for a named command, one past tense in a row of
+          instructions, and a player left to work out that the button called
+          Deploy was the command called Requisition on the card beside it.
+
+          The tally above says what has already happened; a button says what
+          pressing it will do.
+        -->
         <div class="sy-req-acts">
-          <button class="sy-req-btn" data-action="play-deploy" data-ship="${cid}" ${yard > 0 ? "" : "disabled"}>Deploy · ${credits(ship.cost)}</button>
-          ${btn("play-jumpout", "Jumped out", inPlay > 0)}
+          <button class="sy-req-btn" data-action="play-deploy" data-ship="${cid}" ${yard > 0 ? "" : "disabled"} title="Requisition one from the Shipyard: pay its cost in Credits and strike it off. Costs 1 CMD token &mdash; spend it above.">Requisition · ${credits(ship.cost)}</button>
+          ${btn("play-jumpout", "Jump out", inPlay > 0)}
           ${btn("play-jumpin", "Jump in", reserve > 0)}
         </div>
       </article>`;
@@ -3162,6 +3285,10 @@ function playShipyardTracker(list: SavedList, faction: Faction | undefined, cust
   </section>`;
 }
 
+/**
+ * Every command in the fleet's list, with what the faction and the carried HVP
+ * do to each one's cost. Requisition only exists in the Shipyard modes.
+ */
 function playCommandsPanel(list: SavedList, cmdLeft: number, faction: Faction | undefined): string {
   const isShipyard = MODE_BUILDER_SHAPE[list.mode] === "shipyard";
   const effects = commandEffectsFor(list, faction);
@@ -3244,6 +3371,11 @@ function playView(state: AppState): string {
   const scoreLabel = isCredits ? "Credits" : "Victory points";
   const PHASES = phasesFor(list.mode);
   const currentPhase = PHASES[play.phase];
+  // Over: the last round's End Phase has been closed out. The phase track stays
+  // live so picking a phase resumes (see the play-phase handler), but the
+  // checklist and Next phase give way to the result.
+  const isOver = play.over === true;
+  const atLastPhase = play.round >= maxRound && play.phase >= 3;
   const checks = play.checks ?? [];
   const stepCount = currentPhase?.steps?.length ?? 0;
   const doneCount = checks.filter(Boolean).length;
@@ -3286,7 +3418,7 @@ function playView(state: AppState): string {
         .map(
           (step, i) => `
     <label class="phase-check ${checks[i] ? "done" : ""}">
-      <input type="checkbox" data-action="play-check-step" data-index="${i}" ${checks[i] ? "checked" : ""} />
+      <input type="checkbox" data-action="play-check-step" data-index="${i}"${step.clears ? ` data-clears="${step.clears}"` : ""} ${checks[i] ? "checked" : ""} />
       <span>${ruleText(step.text)}${step.note ? `<em class="phase-check-note">${ruleText(step.note)}</em>` : ""}</span>
     </label>`,
         )
@@ -3352,7 +3484,11 @@ function playView(state: AppState): string {
 
   // On a phone the phase steps fold behind a tap so the play screen fits; on
   // desktop the toggle disappears and they are always shown (see .phase-fold).
-  const checklistBlock = `<details class="phase-fold" data-persist="phase-fold">
+  // A finished game shows the result in its place: the steps of a phase you are
+  // no longer in are not what you want to read at that moment.
+  const checklistBlock = isOver
+    ? playResult(list, play, maxRound)
+    : `<details class="phase-fold" data-persist="phase-fold">
       <summary class="phase-fold-summary">
         ${icon("chevronDown", 15, "phase-fold-caret")}
         <span class="phase-fold-label">${currentPhase?.reference ? "This phase" : "Steps"}</span>
@@ -3453,9 +3589,21 @@ function playView(state: AppState): string {
       </header>
       <div class="phase-track">${phaseBtns}</div>
       ${cmdStrip}
-      <div class="play-sticky-next">
-        <button class="cta-btn" data-action="play-next">${icon("chevronRight", 16)} Next phase</button>
-      </div>
+      <!--
+        One button, three states. "Next phase" all the way to the last End
+        Phase, where it says what it is actually about to do - a game ends
+        without ceremony otherwise, and "Next phase" pointing at no next phase
+        is how it used to loop back round in silence. Once the game is over the
+        button goes: there is nothing to advance to, and the result below says
+        how to carry on if that was a mis-tap.
+      -->
+      ${
+        isOver
+          ? ""
+          : `<div class="play-sticky-next">
+        <button class="cta-btn${atLastPhase ? " play-next-final" : ""}" data-action="play-next">${icon(atLastPhase ? "flag" : "chevronRight", 16)} ${atLastPhase ? "End the game" : "Next phase"}</button>
+      </div>`
+      }
     </div>
     ${
       isShipyard
@@ -3478,8 +3626,24 @@ function playView(state: AppState): string {
         ${playShipyardTracker(list, faction, customs)}
       </div>
     </div>`
-        : // Fleet-List layout (unchanged): left is the checklist and faction rule,
-          // right is the counters, the fleet with its damage tracker, then commands.
+        : // Fleet-List layout, now the same shape as the Shipyard one above:
+          // left is what you are doing and what you can spend CMD on, right is
+          // the fleet.
+          //
+          // Commands used to sit under the fleet in the RIGHT column, which put
+          // every one of them below a roster nine to thirteen units long. Two
+          // things were wrong with that. On a desktop the columns are laid out
+          // from the top (align-items: start) and the left one ran out after the
+          // checklist, the two counters and the faction rule - measured at 680px
+          // against a 1,895px page in Armageddon and 530 against 2,667 in Age of
+          // Unity, so between a third and four fifths of the left half of the
+          // screen was blank paper. On a phone the columns stack in source
+          // order, which put the command list - the thing you check most often
+          // mid-turn, and the one thing here you cannot read off the table -
+          // 2,069px down a 2,764px page.
+          //
+          // Moving it left fixes both at once and makes the two layouts one
+          // idea rather than two.
           `<div class="play-cols">
       <div class="play-col play-col-do">
         ${checklistBlock}
@@ -3488,12 +3652,12 @@ function playView(state: AppState): string {
           ${counter("Opponent " + scoreLabel.toLowerCase(), play.oppVp, "play-oppvp", scoreStep, scoreFmt)}
         </div>
         ${factionBlock ? `<div class="play-notes">${factionBlock}</div>` : ""}
+        ${commandsPanel}
       </div>
 
       <div class="play-col play-col-spend">
         ${playHvpAssign}
         ${playFleetPanel(list, faction, customs)}
-        ${commandsPanel}
       </div>
     </div>`
     }

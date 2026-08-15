@@ -19,6 +19,7 @@ import {
   clearAllData,
   exportAllData,
   importAllData,
+  isTrainingMode,
   loadLists,
   newId,
   persistCustomFactions,
@@ -27,6 +28,7 @@ import {
   persistSettings,
   persistPrintOpts,
   persistOutfits,
+  persistTrainingGame,
   setStorageFullHook,
 } from "./storage.ts";
 import type { SavedOutfit } from "./storage.ts";
@@ -666,6 +668,9 @@ function dispatchAction(target: HTMLElement): void {
       store.setState((s) => {
         const lists = s.lists.filter((l) => l.id !== id);
         persistLists(lists);
+        // A deleted training scenario has to lose its own saved copy too, or it
+        // walks back in at the next reload.
+        if (isTrainingMode(doomed.mode)) persistTrainingGame(undefined);
         return { ...s, lists };
       });
       if (currentListId() === id) location.hash = "#/";
@@ -1973,11 +1978,13 @@ function dispatchAction(target: HTMLElement): void {
       const mode = target.dataset["mode"] as "combat-simulator" | "management-training";
       const list = createTrainingList(mode);
       store.setState((s) => {
-        // The training list lives in memory for this session so the builder and
-        // Play Mode can run, but it is never written to storage - it is not a
-        // saved fleet you can load again.
-        const lists = [...s.lists, list];
-        persistLists(lists.filter((l) => l.mode !== "combat-simulator" && l.mode !== "management-training"));
+        // A training scenario is not a saved fleet you can load again, so it
+        // never joins the registry (persistLists filters it out). It is saved,
+        // though - on its own key, one at a time - so a game in progress
+        // survives a reload. Starting another tutorial replaces it.
+        const lists = [...s.lists.filter((l) => !isTrainingMode(l.mode)), list];
+        persistLists(lists);
+        persistTrainingGame(list);
         // Taking a tutorial retires the suggestion.
         const onboarding = { ...s.onboarding, tutorialsDismissed: true };
         persistOnboarding(onboarding);
@@ -1993,8 +2000,9 @@ function dispatchAction(target: HTMLElement): void {
       const faction = findFaction(list.fleet.factionId, state.customFactions);
       const played = { ...list, play: freshPlayState(faction) };
       store.setState((s) => {
-        const lists = [...s.lists, played];
-        persistLists(lists.filter((l) => l.mode !== "combat-simulator" && l.mode !== "management-training"));
+        const lists = [...s.lists.filter((l) => !isTrainingMode(l.mode)), played];
+        persistLists(lists);
+        persistTrainingGame(played);
         const onboarding = { ...s.onboarding, tutorialsDismissed: true };
         persistOnboarding(onboarding);
         return { ...s, lists, onboarding, ui: { ...s.ui, modal: undefined } };
@@ -2010,6 +2018,8 @@ function dispatchAction(target: HTMLElement): void {
     case "play-cmd":
     case "play-cmd-set":
     case "play-pos":
+    case "play-acted":
+    case "play-acted-clear":
     case "play-vp":
     case "play-oppvp":
     case "play-reset": {
@@ -2019,7 +2029,7 @@ function dispatchAction(target: HTMLElement): void {
         action === "play-reset" &&
         needsConfirm(target, {
           title: "Reset this game?",
-          body: "The round, the phase, your CMD tokens, both scores and where every unit is all go back to the start. Your fleet is untouched.",
+          body: "The round, the phase, your CMD tokens, both scores, which units have activated and where every unit is all go back to the start. Your fleet is untouched.",
           confirmLabel: "Reset game",
           danger: true,
         })
@@ -2034,20 +2044,38 @@ function dispatchAction(target: HTMLElement): void {
           const maxRound = l.mode === "management-training" ? 3 : 4;
           switch (action) {
             // Each phase is its own checklist walkthrough, not a running log,
-            // so moving to a (possibly different) phase clears the ticks.
-            case "play-phase":
-              return { ...l, play: { ...p, phase: Math.max(0, Math.min(3, phaseTo)), checks: [] } };
+            // so MOVING to a different phase clears the ticks.
+            //
+            // Landing on the phase you are already in does not, which is not a
+            // nicety: the phase track is four buttons across a phone, you press
+            // them with a thumb over a table, and re-tapping the current one
+            // used to silently wipe a checklist you were halfway through. A
+            // no-op has to stay a no-op.
+            //
+            // Picking a phase also un-ends a finished game - "over" is reached
+            // by one button and a mis-tap should not need Reset to undo.
+            case "play-phase": {
+              const to = Math.max(0, Math.min(3, phaseTo));
+              if (to === p.phase && !p.over) return l;
+              return { ...l, play: { ...p, phase: to, over: false, checks: to === p.phase ? (p.checks ?? []) : [] } };
+            }
             case "play-next": {
               // Advancing past the End Phase rolls into the next round. Unspent
               // CMD tokens are discarded at the end of the round and you gain
               // your faction's value again, so the pool refills to the faction
               // number rather than carrying over - including any +1 you took
               // for losing the Initiative Check, which is re-rolled each round.
+              // Activated tokens clear with it, per the End Phase.
               if (p.phase >= 3) {
+                // The last round's End Phase ends the GAME rather than rolling
+                // into a round that does not exist. This used to loop back to
+                // the same round's Command Phase for ever, so the one screen
+                // holding both scores never said the game was over.
+                if (p.round >= maxRound) return { ...l, play: { ...p, over: true, checks: [] } };
                 const base = faction ? Number(faction.cmdTokens) || (p.cmdMax ?? p.cmd) : (p.cmdMax ?? p.cmd);
                 return {
                   ...l,
-                  play: { ...p, phase: 0, round: Math.min(maxRound, p.round + 1), cmd: base, cmdMax: base, checks: [] },
+                  play: { ...p, phase: 0, round: p.round + 1, cmd: base, cmdMax: base, checks: [], acted: {} },
                 };
               }
               return { ...l, play: { ...p, phase: p.phase + 1, checks: [] } };
@@ -2080,6 +2108,23 @@ function dispatchAction(target: HTMLElement): void {
               if (!unit || (to !== "reserve" && to !== "play")) return l;
               return { ...l, play: { ...p, pos: { ...(p.pos ?? {}), [unit]: to } } };
             }
+            // The Activated token, per unit. Kept separate from where the unit
+            // is: Jump Out is an action, so a unit can have activated AND be
+            // back in Reserve, and only units in play are counted towards "the
+            // phase ends once every unit in play has activated".
+            case "play-acted": {
+              const unit = target.dataset["unit"];
+              if (!unit) return l;
+              const acted = { ...(p.acted ?? {}) };
+              if (acted[unit]) delete acted[unit];
+              else acted[unit] = true;
+              return { ...l, play: { ...p, acted } };
+            }
+            // "Clear every Activated token" is an End Phase step, and this is
+            // the button that does it in one press instead of untapping every
+            // unit in the fleet.
+            case "play-acted-clear":
+              return { ...l, play: { ...p, acted: {} } };
             // Hypergrowth is played in credits, and you requisition ships out of
             // your Shipyard before you have earned anything: "You start with 0
             // credits, and recover that expenditure by earning credits from the
@@ -2109,7 +2154,14 @@ function dispatchAction(target: HTMLElement): void {
           const p = l.play ?? freshPlayState(faction);
           const checks = [...(p.checks ?? [])];
           checks[index] = !checks[index];
-          return { ...l, play: { ...p, checks } };
+          // A step can carry out its own instruction where the link is
+          // unambiguous and 1:1. Only "Clear every Activated token" does: the
+          // step IS the clearing, and leaving the app's own tokens standing
+          // while you tick a box saying you cleared them is a screen arguing
+          // with itself. Un-ticking does not put them back - you cannot
+          // un-clear tokens at a table either.
+          const acted = target.dataset["clears"] === "acted" && checks[index] ? {} : p.acted;
+          return { ...l, play: { ...p, checks, acted } };
         }),
       );
       break;

@@ -62,6 +62,35 @@ export interface PlayState {
    * Hypergrowth unit is not formed until the moment you requisition it.
    */
   pos?: Record<string, UnitPosition>;
+  /**
+   * Fleet-list modes: which units have an Activated token, keyed by unit id.
+   * "Activate every unit in that battlegroup... The phase ends once every unit
+   * in play has activated" (core rules, Tactical Phase), and the End Phase
+   * clears every Activated token. That end condition is the one question the
+   * Tactical Phase asks over and over, and it was the one thing on this screen
+   * you had to answer by looking at the table and counting.
+   *
+   * Independent of `pos` rather than folded into it: a unit that takes the Jump
+   * Out action has activated AND is in Reserve, which is two facts. Only units
+   * in play are counted, so a jumped-out unit correctly leaves both sides of
+   * "n of m activated" without its token being a lie.
+   *
+   * Hypergrowth is excluded for the same reason it gets no HVP carrier picker:
+   * `req` is a ledger of ship CLASSES, not units, and a Hypergrowth unit does
+   * not exist until you requisition one (p.122). An "activated" flag per class
+   * would be marking something the rules do not have.
+   */
+  acted?: Record<string, boolean>;
+  /**
+   * The game is over: the End Phase of the last round (Round 4, or Round 3 in
+   * Management Training) has been closed out. Play Mode used to roll silently
+   * back to that same round's Command Phase forever, which meant the one screen
+   * holding both scores never said the game had finished or who had won.
+   *
+   * Set by Next phase on the final End Phase, cleared by picking any phase (a
+   * mis-tap is not the end of a game) and by Reset.
+   */
+  over?: boolean;
 }
 
 /** Where a unit is. Absent from `pos` means "reserve". */
@@ -171,9 +200,58 @@ export function setListsWrittenHook(fn: () => void): void {
 }
 
 export function persistLists(lists: SavedList[]): void {
-  write(LISTS_KEY, lists);
+  // Training scenarios are filtered on the way OUT, not just on the way back in
+  // (see loadTrainingGame below). They were being written to the registry and
+  // then discarded at load, which is the same result by a longer road and left
+  // every call site having to remember the filter for itself.
+  write(LISTS_KEY, lists.filter((l) => !isTrainingMode(l.mode)));
   onListsWritten?.();
   sweepOrphanImages();
+}
+
+export function isTrainingMode(mode: GameMode): boolean {
+  return mode === "combat-simulator" || mode === "management-training";
+}
+
+/*
+ * The training game in progress, saved on its own away from the fleet registry.
+ *
+ * Combat Simulator and Management Training are deliberately not saved fleets:
+ * they are pre-built tutorial scenarios, and a browser that had run one used to
+ * carry it on the Fleets page for ever, which is why they are filtered out of
+ * the registry on both read and write.
+ *
+ * That is still right, and it had a cost nobody had priced. Those two are the
+ * modes a new player is most likely to be running at an actual table on an
+ * actual phone - Learn to Play ends by dropping you straight into Play Mode
+ * with one - and "not a saved fleet" was being enforced by not saving it at
+ * all. Lock the phone, let Safari evict the tab, and the round, the phase, the
+ * CMD pool and both scores were gone with no warning that they were never being
+ * kept.
+ *
+ * So exactly one training game is held here, in its own key, and it never joins
+ * the registry: it is not loadable from Fleets, it does not sync, and starting
+ * another tutorial replaces it. It survives a reload, which is the only thing it
+ * ever needed to do.
+ */
+const TRAINING_GAME_KEY = "abs2.trainingGame.v1";
+
+export function loadTrainingGame(): SavedList | undefined {
+  const l = read<SavedList | null>(TRAINING_GAME_KEY, null);
+  if (!l || !isTrainingMode(l.mode)) return undefined;
+  return l;
+}
+
+export function persistTrainingGame(list: SavedList | undefined): void {
+  if (!list) {
+    try {
+      localStorage.removeItem(TRAINING_GAME_KEY);
+    } catch {
+      /* blocked or unavailable storage; nothing was going to persist anyway */
+    }
+    return;
+  }
+  write(TRAINING_GAME_KEY, list);
 }
 /*
  * Drop stored pictures nothing points at any more.

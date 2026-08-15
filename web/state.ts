@@ -7,11 +7,14 @@ import {
   loadOnboarding,
   loadPrintOpts,
   loadOutfits,
+  loadTrainingGame,
+  isTrainingMode,
   newId,
   persistCustomFactions,
   persistLists,
   persistOnboarding,
   persistOutfits,
+  persistTrainingGame,
 } from "./storage.ts";
 import type { Onboarding, SavedList, SavedOutfit, Settings } from "./storage.ts";
 
@@ -420,12 +423,14 @@ export function initialState(): AppState {
   const onboarding = loadOnboarding();
   onboarding.visits += 1;
   persistOnboarding(onboarding);
+  // A training scenario is not a saved fleet, so it never comes back from the
+  // registry - but the ONE that has a game running comes back from its own key,
+  // because a tutorial being played at a table is exactly the thing a locked
+  // phone or an evicted tab used to throw away. See persistTrainingGame.
+  const training = loadTrainingGame();
   return {
     route: parseRoute(location.hash),
-    // Training lists are ephemeral: any left over in storage from before they
-    // became "their own thing" are dropped on load, so they never reappear as
-    // loadable fleets.
-    lists: loadLists().filter((l) => l.mode !== "combat-simulator" && l.mode !== "management-training"),
+    lists: [...loadLists().filter((l) => !isTrainingMode(l.mode)), ...(training ? [training] : [])],
     customFactions: loadCustomFactions(),
     outfits: loadOutfits(),
     settings: loadSettings(),
@@ -526,6 +531,11 @@ export function updateList(state: AppState, listId: string, fn: (l: SavedList) =
     l.id === listId ? { ...fn(l), updatedAt: new Date().toISOString() } : l,
   );
   persistLists(lists);
+  // persistLists keeps training scenarios out of the registry, so the one with
+  // a game in it is saved here instead - every Play Mode action lands in this
+  // function, which makes it the one place that has to remember.
+  const edited = lists.find((l) => l.id === listId);
+  if (edited && isTrainingMode(edited.mode)) persistTrainingGame(edited);
   return { ...state, lists };
 }
 

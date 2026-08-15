@@ -1454,9 +1454,21 @@ function sectionEnd(): string {
        ${p("I recommend you play the Combat Simulator scenario first, to learn the basics of moving and shooting, then play the Management Training scenario next, to learn how to manage jumping in and reinforcing your fleet.")}`,
     )}
     ${learnDiagram("deployment")}
+    <!--
+      Both Basic Training scenarios, because the paragraph directly above tells
+      you to play both and recommends the order. Management Training had a
+      working handler (new-training) and no button anywhere in the app to fire
+      it - it has never been reachable - so the app was naming a mission it
+      would not set up, and the whole Shipyard half of Play Mode was
+      unreachable outside a Hypergrowth fleet you had built yourself.
+
+      Combat Simulator keeps the filled button and goes first: that is the order
+      the quote recommends, and it is the one that teaches moving and shooting.
+    -->
     <div class="ltp-launch">
       <button class="ltp-btn ltp-btn-go" data-action="learn-launch">${icon("flag", 17)} Set up the Combat Simulator</button>
-      <p class="ltp-launch-note">Builds the Training Fleet for you and drops you straight into Play Mode, with the phase tracker running.</p>
+      <button class="ltp-btn ltp-btn-alt" data-action="new-training" data-mode="management-training">${icon("flag", 17)} Set up Management Training</button>
+      <p class="ltp-launch-note">Combat Simulator builds the Training Fleet and drops you straight into Play Mode with the phase tracker running. Management Training opens on its setup brief first &mdash; it is played across two Sectors and starts the same hulls in a Shipyard, to requisition as you go &mdash; and has its own Play Mode button on the roster.</p>
     </div>
 
     ${biggerGames()}

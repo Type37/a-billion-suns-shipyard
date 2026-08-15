@@ -36,19 +36,30 @@ export interface PlayState {
    * time the phase changes - it is a per-phase walkthrough, not a log. */
   checks?: boolean[];
   /**
-   * Hypergrowth requisition tracker, keyed by ship-class id: how many of that
-   * class are currently in play and how many sit in Reserves (jumped out). The
-   * rest of the class's total are still in the Shipyard (yard = total - play -
-   * reserve). Once deployed a ship is struck from the Shipyard for good, so the
-   * yard figure only ever falls.
+   * Shipyard requisition tracker, keyed by ship-class id: how many of that
+   * class are currently in play, how many sit in Reserves (jumped out), and how
+   * many have been destroyed and cannot come back. The rest of the class's
+   * total are still in the Shipyard: yard = total - play - reserve - lost.
+   *
+   * `lost` is what makes the two Shipyard modes differ, and they really do.
+   * Hypergrowth strikes a requisitioned ship off for good ("you cannot
+   * requisition it again"), so a destroyed one is counted here and the yard
+   * never sees it again. Management Training says the opposite in as many
+   * words - "when a ship is destroyed, it returns to your Shipyard and can be
+   * requisitioned again as a reinforcement" (p.65) - so nothing is added to
+   * `lost` there and the hull flows straight back into the yard figure, ready
+   * to be paid for a second time.
+   *
+   * Optional so play states saved before destroyed ships were trackable still
+   * load - read it as `lost ?? 0`.
    */
-  req?: Record<string, { play: number; reserve: number }>;
+  req?: Record<string, { play: number; reserve: number; lost?: number }>;
   /**
    * Append-only activity log for the Shipyard: every Deploy / Jumped out / Jump
    * in, newest last. Feeds the ledger so you can see the whole history of what
    * you moved in, out and to Reserves, with the Credit cost of each requisition.
    */
-  log?: { kind: "deploy" | "jumpout" | "jumpin"; ship: string; cost: number }[];
+  log?: { kind: "deploy" | "jumpout" | "jumpin" | "lost"; ship: string; cost: number }[];
   /**
    * Fleet-list modes (Armageddon, Age of Unity): where each unit is, keyed by
    * unit id. "The units in your Fleet start the game in Reserve and must be

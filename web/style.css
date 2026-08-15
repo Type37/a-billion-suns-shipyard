@@ -5855,9 +5855,18 @@ main.play-body .roster-section::before { content: none; }
 .sy-req-btn:not(:disabled):hover { background: var(--blue); border-color: var(--blue); color: #fff; }
 .sy-req-btn:not(:disabled):active { transform: scale(0.94); }
 .sy-req-btn:disabled { color: var(--ink-off); border-color: var(--ink-off); cursor: default; }
-/* The Deploy button (first) is the primary move: fill it so it reads as the CTA. */
+/* Requisition (first) is the primary move: fill it so it reads as the CTA. */
 .sy-req-btn:first-child:not(:disabled) { background: var(--blue); border-color: var(--blue); color: #fff; }
 .sy-req-btn:first-child:not(:disabled):hover { background: var(--blue-deep); }
+/* Destroyed is the one move in this row you would not press by accident, so it
+   carries the damage red on its edge - loud enough to find, quiet enough not to
+   compete with Requisition for the eye. It does not need a confirm: pressing
+   Requisition again is the undo in Management Training, and in Hypergrowth the
+   ledger records exactly what happened and when. */
+.sy-req-lost-btn:not(:disabled) { border-color: var(--red); color: var(--red-deep); }
+.sy-req-lost-btn:not(:disabled):hover { background: var(--red); border-color: var(--red); color: #fff; }
+.sy-req-lost { color: var(--red-deep); font-weight: 700; }
+.sy-log-lost .sy-log-verb { color: var(--red-deep); }
 /* Each class shows its unit cost by the name; Deploy repeats it on the button. */
 .sy-req-cost { font-family: var(--display); font-weight: 800; font-size: 13px; color: var(--blue); font-variant-numeric: tabular-nums; }
 

@@ -3192,6 +3192,9 @@ function playShipyardTracker(list: SavedList, faction: Faction | undefined, cust
   // the tracker lists the whole faction with no Shipyard cap. Otherwise it lists
   // the classes actually stocked in the Shipyard, capped at what you hold.
   const unlimited = list.unlimitedShipyards === true;
+  // Management Training reinforces: a destroyed ship goes back to the Shipyard
+  // to be requisitioned (and paid for) again. Hypergrowth strikes it off.
+  const reinforce = list.mode === "management-training";
   const byClass = new Map<string, number>();
   const order: string[] = [];
   // Lightest Mass first either way, matching every other view.
@@ -3218,13 +3221,19 @@ function playShipyardTracker(list: SavedList, faction: Faction | undefined, cust
   // but the word on screen is the rulebook's: Requisition is a named command
   // with a printed cost, and it was being called by a different name eight
   // pixels from the command card that names it properly.
-  const logVerb = { deploy: "Requisitioned", jumpout: "Jumped out", jumpin: "Jumped in" } as const;
+  const logVerb = { deploy: "Requisitioned", jumpout: "Jumped out", jumpin: "Jumped in", lost: "Destroyed" } as const;
   const logHtml = logEntries.length
     ? `<ul class="sy-ledger-list">${[...logEntries]
         .reverse()
         .map(
           (e) =>
-            `<li class="sy-log sy-log-${e.kind}"><span class="sy-log-verb">${logVerb[e.kind]}</span> <span class="sy-log-ship">${escapeHtml(e.ship)}</span>${e.kind === "deploy" ? `<span class="sy-ledger-cost">${credits(e.cost)}</span>` : `<span class="sy-log-move">${e.kind === "jumpout" ? "to reserve" : "to play"}</span>`}</li>`,
+            `<li class="sy-log sy-log-${e.kind}"><span class="sy-log-verb">${logVerb[e.kind]}</span> <span class="sy-log-ship">${escapeHtml(e.ship)}</span>${
+              e.kind === "deploy"
+                ? `<span class="sy-ledger-cost">${credits(e.cost)}</span>`
+                : `<span class="sy-log-move">${
+                    e.kind === "jumpout" ? "to reserve" : e.kind === "jumpin" ? "to play" : reinforce ? "back to yard" : "struck off"
+                  }</span>`
+            }</li>`,
         )
         .join("")}</ul>
        <p class="sy-ledger-sum">Total requisitioned <span>${credits(totalSpent)}</span></p>`
@@ -3242,7 +3251,8 @@ function playShipyardTracker(list: SavedList, faction: Faction | undefined, cust
       const total = byClass.get(cid) ?? 0;
       const inPlay = req[cid]?.play ?? 0;
       const reserve = req[cid]?.reserve ?? 0;
-      const yard = total === Infinity ? Infinity : Math.max(0, total - inPlay - reserve);
+      const lost = req[cid]?.lost ?? 0;
+      const yard = total === Infinity ? Infinity : Math.max(0, total - inPlay - reserve - lost);
       // `label` is plain text and gets escaped. The Requisition button carries
       // the credits glyph, which is trusted markup, so it is written out below
       // rather than going through here - escaping it printed the raw <svg>
@@ -3254,7 +3264,9 @@ function playShipyardTracker(list: SavedList, faction: Faction | undefined, cust
       <article class="pf-unit sy-req" data-roster-key="req-${cid}">
         <header class="pf-head">
           <span class="pf-name">${escapeHtml(ship.name)} <span class="sy-req-cost">${credits(ship.cost)}</span>${total !== Infinity && total > 1 ? ` <span class="pf-x">&times;${total}</span>` : ""}</span>
-          <span class="sy-req-tally"><span class="sy-req-yard">${yardLabel}</span> yard <span class="sy-req-sep">·</span> ${inPlay} in play <span class="sy-req-sep">·</span> ${reserve} reserve</span>
+          <span class="sy-req-tally"><span class="sy-req-yard">${yardLabel}</span> yard <span class="sy-req-sep">·</span> ${inPlay} in play <span class="sy-req-sep">·</span> ${reserve} reserve${
+            lost ? ` <span class="sy-req-sep">·</span> <span class="sy-req-lost">${lost} lost</span>` : ""
+          }</span>
         </header>
         <div class="pf-data">${statChips(ship, true)}${weaponsTable(ship)}</div>
         <!--
@@ -3271,6 +3283,11 @@ function playShipyardTracker(list: SavedList, faction: Faction | undefined, cust
           <button class="sy-req-btn" data-action="play-deploy" data-ship="${cid}" ${yard > 0 ? "" : "disabled"} title="Requisition one from the Shipyard: pay its cost in Credits and strike it off. Costs 1 CMD token &mdash; spend it above.">Requisition · ${credits(ship.cost)}</button>
           ${btn("play-jumpout", "Jump out", inPlay > 0)}
           ${btn("play-jumpin", "Jump in", reserve > 0)}
+          <button class="sy-req-btn sy-req-lost-btn" data-action="play-lost" data-ship="${cid}" ${inPlay > 0 ? "" : "disabled"} title="${
+            reinforce
+              ? "Destroyed. It returns to your Shipyard and can be requisitioned again as a reinforcement &mdash; you pay for it a second time."
+              : "Destroyed. Struck off for good; it cannot be requisitioned again."
+          }">Destroyed</button>
         </div>
       </article>`;
     })
@@ -3303,7 +3320,15 @@ function playCommandsPanel(list: SavedList, cmdLeft: number, faction: Faction | 
     return {
       name: c.name,
       cost,
-      text: c.text,
+      // Requisition's text opens "*Hypergrowth only*", which is true of the
+      // three eras and false on the screen it was being printed on: Management
+      // Training is the Hypergrowth tutorial and requisitions exactly the same
+      // way ("spend a CMD token to use the Requisition command, check off the
+      // ships from your Roster Sheet", p.65). So the card sat in a Management
+      // Training game telling the player the command they had just been told to
+      // use did not apply to them. The qualifier is dropped in that mode rather
+      // than rewritten, because the rest of the sentence is the rule verbatim.
+      text: list.mode === "management-training" ? c.text.replace(/^\*Hypergrowth only\*\.\s*/, "") : c.text,
       base: c.cost,
       change,
       notes: effects.notes.filter((n) => n.command === c.name),

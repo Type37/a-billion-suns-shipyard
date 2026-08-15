@@ -2166,12 +2166,22 @@ function dispatchAction(target: HTMLElement): void {
       );
       break;
     }
-    // Hypergrowth requisition tracker. A ship moves Shipyard -> In play (Deploy),
-    // In play -> Reserves (Jumped out), and Reserves -> In play (Jump in). yard =
-    // total - play - reserve, and Deploy is one-way (struck off the Shipyard).
+    // Shipyard requisition tracker. A ship moves Shipyard -> In play
+    // (Requisition), In play -> Reserves (Jump out), Reserves -> In play (Jump
+    // in), and In play -> gone (Destroyed). yard = total - play - reserve - lost.
+    //
+    // Where a destroyed ship GOES is the one place the two Shipyard modes part
+    // company, and it is not a detail: Hypergrowth strikes a requisitioned ship
+    // off for good, so a loss is counted in `lost` and never returns; Management
+    // Training sends it back to the Shipyard to be requisitioned again as a
+    // reinforcement (p.65), so it is simply removed from play and the yard
+    // figure rises to meet it. Without this the tracker could only ever count
+    // down, and Management Training's central rule - keep paying, keep flying -
+    // had nowhere to be recorded at all.
     case "play-deploy":
     case "play-jumpout":
-    case "play-jumpin": {
+    case "play-jumpin":
+    case "play-lost": {
       const id = currentListId();
       const shipId = target.dataset["ship"];
       if (!id || !shipId) return;
@@ -2185,15 +2195,16 @@ function dispatchAction(target: HTMLElement): void {
             ? Infinity
             : l.fleet.units.filter((u) => u.shipClassId === shipId).reduce((n, u) => n + u.count, 0);
           const req = { ...(p.req ?? {}) };
-          const cur = req[shipId] ?? { play: 0, reserve: 0 };
+          const cur = req[shipId] ?? { play: 0, reserve: 0, lost: 0 };
           let { play, reserve } = cur;
+          let lost = cur.lost ?? 0;
           let vp = p.vp;
-          const yard = total - play - reserve;
+          const yard = total - play - reserve - lost;
           const log = [...(p.log ?? [])];
           const name = ship?.name ?? shipId;
-          // Deploying (Requisition) pays the ship's Credit cost - Credits drop,
-          // usually into debt. Jumping out to Reserves or back In costs nothing
-          // more; you already paid when you requisitioned. Every move is logged.
+          // Requisition pays the ship's Credit cost - Credits drop, usually into
+          // debt. Jumping out to Reserves or back In costs nothing more; you
+          // already paid when you requisitioned. Every move is logged.
           if (action === "play-deploy" && yard > 0) {
             play += 1;
             vp -= ship?.cost ?? 0;
@@ -2206,8 +2217,15 @@ function dispatchAction(target: HTMLElement): void {
             reserve -= 1;
             play += 1;
             log.push({ kind: "jumpin", ship: name, cost: 0 });
+          } else if (action === "play-lost" && play > 0) {
+            play -= 1;
+            // Hypergrowth: struck off, counted, never seen again. Management
+            // Training: not counted, so `yard` picks it straight back up and it
+            // can be requisitioned (and paid for) a second time.
+            if (l.mode !== "management-training") lost += 1;
+            log.push({ kind: "lost", ship: name, cost: 0 });
           } else return l;
-          req[shipId] = { play, reserve };
+          req[shipId] = { play, reserve, lost };
           return { ...l, play: { ...p, req, vp, log } };
         }),
       );

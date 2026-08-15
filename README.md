@@ -8,7 +8,7 @@
 
 </div>
 
-Assemble and print your fleet in this unofficial fleet builder for [A Billion Suns](https://planetsmashergames.com/a-billion-suns/), published by Osprey Games. Unofficial builder by WarLore.
+Assemble and print your fleet in this unofficial fleet builder for [A Billion Suns](https://planetsmashergames.com/a-billion-suns/), published by Osprey Games. This web app was designed by WarLore.
 
 ## What it does
 

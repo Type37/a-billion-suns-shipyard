@@ -15,12 +15,21 @@ import { TRIBUTE_NAMES } from "./tributes.ts";
 
 export type Rand = () => number;
 
-/** A d100 name table: three columns of people, one of places. */
+/**
+ * A name table: columns of given names, one of family names, and - on the d100
+ * tables - one of places.
+ *
+ * The d100 tables split their given names by gender and carry fifty places.
+ * A table can instead give one unisex `given` column and no places at all, in
+ * which case it only ever produces given + surname.
+ */
 export interface NameTable {
-  male: string[];
-  female: string[];
+  male?: string[];
+  female?: string[];
+  /** A unisex column, used when male/female are absent. */
+  given?: string[];
   surname: string[];
-  place: string[];
+  place?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -28,6 +37,46 @@ export interface NameTable {
 // ---------------------------------------------------------------------------
 
 export const TABLES: Record<string, NameTable> = {
+  // The supplied unisex table: one column of given names, one of family names,
+  // no gender split and no places. Two columns is all it is, and two columns is
+  // all it needs - 128 x 154 is more combinations than any other culture here.
+  mixed: {
+    given: [
+      "Ada", "Ade", "Air", "Al", "Ann", "Ardi", "Arla", "Armand", "Bear", "Becks", "Ben",
+      "Bina", "Bob", "Bon", "Brace", "Brad", "Brendan", "Brent", "Brian", "Brick", "Call",
+      "Carl", "Carmen", "Chase", "Chris", "Clona", "Coby", "Cyro", "Dean", "Doug", "Drea",
+      "Drew", "Ed", "Erik", "Erin", "Fela", "Flori", "Ford", "Frank", "Fred", "Free",
+      "Gan", "Gold", "Greg", "Gun", "Hans", "Hugh", "Ilfa", "Isa", "Jab", "Jace", "Jax",
+      "Jeff", "Jen", "Jerr", "Jim", "Jodi", "Jon", "Jona", "Juli", "Kar", "Kat", "Kem",
+      "Ken", "Kev", "Kima", "Kyla", "Laur", "Leah", "Lessa", "Lex", "Lin", "Luke", "Mal",
+      "Marius", "Matt", "Max", "Meem", "Mick", "Mike", "Mill", "Mir", "Mon", "Mura",
+      "Nand", "Nat", "Neek", "Nela", "Ner", "Nez", "Niki", "Nu", "Or", "Pace", "Pam",
+      "Pat", "Path", "Paul", "Pete", "Plata", "Pru", "Red", "Reen", "Ria", "Rikki", "Rona",
+      "Sara", "Sheel", "Shun", "Sof", "Sonia", "Steve", "Stone", "Storm", "Su", "Tai",
+      "Tam", "Than", "Tim", "Tone", "Trace", "Trey", "Usa", "Wal", "Wen", "Yann", "Zack",
+      "Zena",
+    ],
+    surname: [
+      "Arbor", "Badur", "Bell", "Bernard", "Berts", "Biton", "Black", "Blake", "Blue",
+      "Boat", "Brennan", "Brock", "Brown", "Burn", "Burnett", "Camp", "Campbell", "Chan",
+      "Chand", "Cherkam", "Choi", "Chu", "Cohen", "Cote", "Cruz", "Curtis", "Davis",
+      "Dunbar", "Dubois", "England", "Ferna", "Ferra", "Fisher", "Fong", "Freedom",
+      "French", "Fury", "Gagnon", "Garz", "German", "Gibson", "Grange", "Green", "Grube",
+      "Hart", "Hatt", "Hernan", "Hiko", "Hoff", "Horvat", "Huber", "Ito", "Ivans",
+      "Jaffrey", "Jakes", "Jansen", "Japan", "Jenner", "Jones", "Jong", "Kazan", "Keane",
+      "Kelly", "Khan", "Kran", "Kubu", "Kuzni", "Lam", "Larsen", "Leo", "Levi", "Lew",
+      "Li", "Lopez", "Lorr", "Luca", "Martin", "Mehta", "Mendo", "Merritt", "Miner",
+      "Minez", "Mizra", "Mora", "Morez", "Morock", "Muller", "Murphy", "Newman", "Ng",
+      "Niera", "Nimson", "Novak", "Okada", "Olsen", "Orka", "Owen", "Park", "Patel",
+      "Penik", "Peretz", "Perez", "Peters", "Pham", "Pilo", "Popov", "Reed", "Reyes",
+      "Richard", "Rico", "Roberts", "Rodd", "Rome", "Rossi", "Russo", "Sadir", "Sanchez",
+      "Sand", "Sang", "Santos", "Sato", "Schmidt", "Shida", "Singh", "Smirnov", "Smith",
+      "Sposi", "Starr", "Striker", "Sun", "Tan", "Tana", "Taylor", "Tenz", "Thailand",
+      "Thomas", "Tran", "Tremblay", "Tyre", "Van", "Veck", "Vega", "Wagner", "Wang",
+      "Watta", "Welsh", "Wilson", "Wood", "Wright", "Yama", "Yang", "Zang", "Zoet", "Zuki",
+    ],
+  },
+
   arabic: {
     male: [
       "Aamir", "Ayub", "Binyamin", "Efraim", "Ibrahim", "Ilyas", "Ismail", "Jibril",
@@ -493,6 +542,8 @@ export const CULTURE_WEIGHT: Record<string, number> = {
   japanese: 8,
   indian: 8,
   russian: 6,
+  // The two-column table: above the faction rosters, below the d100 tables.
+  mixed: 6,
   tribute: 2,
 };
 const ROSTER_WEIGHT = 4;
@@ -539,7 +590,9 @@ export function rollName(rand: Rand = Math.random): string {
   if (list) return pick(list, rand);
 
   const t = TABLES[culture]!;
-  const given = pick(rand() < 0.5 ? t.male : t.female, rand);
+  const given = pick(t.given ?? (rand() < 0.5 ? t.male! : t.female!), rand);
+  // No place column, no place shapes: a two-column table has one thing to say.
+  if (!t.place) return `${given} ${pick(t.surname, rand)}`;
   const shape = rand();
   if (shape < 0.7) return `${given} ${pick(t.surname, rand)}`;
   if (shape < 0.9) return `${given} ${pick(t.place, rand)}`;

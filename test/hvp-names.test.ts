@@ -39,7 +39,9 @@ test("a roll only ever returns names that came from the tables", () => {
   const known = new Set<string>();
   for (const names of Object.values(NAME_LISTS)) for (const n of names) known.add(n);
   for (const t of Object.values(TABLES)) {
-    for (const col of [t.male, t.female, t.surname, t.place]) for (const n of col) known.add(n);
+    for (const col of [t.male, t.female, t.given, t.surname, t.place]) {
+      for (const n of col ?? []) known.add(n);
+    }
   }
   for (let i = 0; i < 2000; i++) {
     const rolled = rollName();

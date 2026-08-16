@@ -27,7 +27,7 @@ import { ACTIVATION_STEPS, CORE_ACTIONS, CORE_COMMANDS, ROUND_PHASES } from "../
 import { deriveCommandEffects, effectiveCost } from "../src/command-effects.ts";
 import type { CommandCostChange, CommandEffects, RuleSource } from "../src/command-effects.ts";
 import { allFactions, factionsByEra, findFaction, makeCatalog, ERA_ORDER } from "./catalog.ts";
-import { auxSlotText, credits, escapeHtml, formatDate, formatWeapon, pluralise, primarySlotText, ruleText } from "./format.ts";
+import { auxSlotText, costBreakdown, credits, escapeHtml, formatDate, formatWeapon, pluralise, primarySlotText, ruleText } from "./format.ts";
 import { markdownEditor, renderMarkdown } from "./richtext.ts";
 import {
   commandRow,
@@ -924,7 +924,7 @@ function shipyardShipRow(s: ShipClass, count: number): string {
   <article class="sy-ship" data-roster-key="syship-${s.id}">
     <div class="sy-ship-head">
       <h4 class="sy-ship-name">${escapeHtml(s.name)}</h4>
-      <span class="sy-ship-cost">${credits(s.cost)}</span>
+      <span class="sy-ship-cost">${costBreakdown(count, s.cost)}</span>
       <span class="stepper sy-qty">
         <button data-action="sy-dec" data-ship="${s.id}" ${zero ? 'aria-disabled="true"' : ""} aria-label="One fewer ${escapeHtml(s.name)}" title="One fewer">${icon("minus", 14)}</button>
         <span class="stepper-count ${zero ? "is-zero" : ""}">${count}</span>
@@ -1564,7 +1564,7 @@ function builderView(state: AppState): string {
       <article class="sy-ship sy-unit ${r ? "" : "unresolved"}" data-roster-key="${u.id}">
         <div class="sy-ship-head">
           <span class="sy-unit-id">${r ? "" : `<span class="roster-unit-glyph">${icon("warning", 18)}</span>`}${nameCell}</span>
-          <span class="sy-ship-cost">${credits(cost)}</span>
+          <span class="sy-ship-cost">${r ? costBreakdown(u.count, r.ship.cost) : credits(cost)}</span>
           ${control}
         </div>
         ${carried.length || showSpecies ? `<div class="sy-unit-sub">${carryMarkup}${showSpecies ? speciesSelect(u) : ""}</div>` : ""}
@@ -2096,6 +2096,9 @@ function printView(
    */
   const defersHvp = isUnity || list.mode === "hypergrowth";
   const printAllHvp = opts.allHvp && defersHvp;
+  // Credits ARE the score in these two: you spend to requisition and earn from
+  // objectives, and the winner is the highest credits score (p.126).
+  const isCreditsMode = list.mode === "hypergrowth" || list.mode === "management-training";
 
   // The printed sheet doubles as the legality check, so the header says whether
   // this list is legal. Same mode-aware relaxations the builder applies (null =
@@ -2257,7 +2260,7 @@ function printView(
         <td class="pr-num">${prNum("stat-shields", String(ship.shields))}</td>
         <td class="pr-weap">${prWeapCell(ship, "primary")}</td>
         <td class="pr-weap">${prWeapCell(ship, "aux")}</td>
-        <td class="pr-num pr-cost">${money(ship.cost * u.count)}</td>
+        <td class="pr-num pr-cost">${costBreakdown(u.count, ship.cost, money)}</td>
         ${reqCell}
         ${trackCell}
         ${jumpCell}
@@ -2320,7 +2323,7 @@ function printView(
         <header class="pc-head">
           <span class="pc-name">${escapeHtml(title)}${u.count > 1 ? ` <span class="pc-x">&times;${u.count}</span>` : ""}</span>
           ${override?.unitBadge?.(u.id) ?? ""}
-          <span class="pc-cost">${money(ship.cost * u.count)}</span>
+          <span class="pc-cost">${costBreakdown(u.count, ship.cost, money)}</span>
         </header>
         ${extras ? `<p class="pc-sub">${extras}</p>` : ""}
         <div class="pc-body">
@@ -2510,7 +2513,12 @@ function printView(
         </span>
         <label class="print-toggle" title="A row of HP boxes per ship, to cross off as damage lands"><input type="checkbox" data-action="print-trackers" ${opts.trackers ? "checked" : ""} /> Damage trackers</label>
         <label class="print-toggle" title="${isShipyard ? "A Jumped in and an In reserve box per ship" : "A Jumped in box per ship"}"><input type="checkbox" data-action="print-jumptrackers" ${opts.jumpTrackers ? "checked" : ""} /> Jump trackers</label>
-        <label class="print-toggle" title="Your faction's own rule, Initiative and CMD"><input type="checkbox" data-action="print-rules" ${opts.rules ? "checked" : ""} /> Rules</label>
+        <label class="print-toggle" title="Your faction's own rule, Initiative and CMD"><input type="checkbox" data-action="print-rules" ${opts.rules ? "checked" : ""} /> Faction rules</label>
+        ${
+          list.mode === "junkspace"
+            ? ""
+            : `<label class="print-toggle" title="${isCreditsMode ? "Credits spent, earned and profit per round, the opponent and a notes line" : "Victory points per round, the opponent and a notes line"}"><input type="checkbox" data-action="print-score" ${opts.score ? "checked" : ""} /> ${isCreditsMode ? "Credits tracker" : "Score table"}</label>`
+        }
         ${
           defersHvp
             ? `<label class="print-toggle" title="Every HVP you could take, with the ones you have chosen marked. You choose after the missions are rolled, so the sheet is the menu"><input type="checkbox" data-action="print-allhvp" ${opts.allHvp ? "checked" : ""} /> All personnel</label>`
@@ -2615,16 +2623,34 @@ function printView(
         // the same five empty boxes wearing a different word. A solo game is
         // logged on the Campaign tab, with a date and notes, where the number
         // actually does something.
-        if (list.mode === "junkspace") return "";
+        if (list.mode === "junkspace" || !opts.score) return "";
         const maxRound = list.mode === "management-training" ? 3 : 4;
-        const isCredits = list.mode === "hypergrowth" || list.mode === "management-training";
         const roundNames = ["Round One", "Round Two", "Round Three", "Round Four"].slice(0, maxRound);
         const cells = roundNames.map(() => "<td></td>").join("");
+        /*
+         * Credits are not victory points wearing a different word, and one row
+         * saying "Credits earned" made them look like they were.
+         *
+         * In the credits modes you START at zero and go into debt: ships cost
+         * credits when you requisition them in play, and you recover that by
+         * earning from the objectives (Hypergrowth p.124, Management Training
+         * p.65). So what a round produces is two figures and their difference,
+         * and the difference is what the game asks about at the end - the
+         * Hypergrowth results table (p.126) checks highest Credits AND whether
+         * you finished in profit, which are separate questions and can disagree.
+         *
+         * Three rows, in the order you fill them in: what you spent, what came
+         * back, what is left. Victory points have no equivalent - a VP is never
+         * spent - so those modes keep the single row.
+         */
+        const scoreRows = isCreditsMode
+          ? ["Credits spent", "Credits earned", "Round profit"]
+          : ["Victory points"];
         return `
       <table class="print-score">
         <thead><tr><th></th>${roundNames.map((n) => `<th>${n}</th>`).join("")}<th>Final</th></tr></thead>
         <tbody>
-          <tr><th>${isCredits ? "Credits earned" : "Victory points"}</th>${cells}<td></td></tr>
+          ${scoreRows.map((r) => `<tr><th>${r}</th>${cells}<td></td></tr>`).join("")}
           <tr><th>Opponent</th>${cells}<td></td></tr>
           <tr><th>Notes</th>${cells}<td></td></tr>
         </tbody>

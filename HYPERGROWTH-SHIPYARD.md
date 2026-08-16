@@ -92,7 +92,17 @@ see the source and the total together.
 
 Content, all of it always visible:
 
-- Name and cost, adjacent, on the first line.
+- Name and cost, adjacent, on the first line. Once you own two or more, the cost
+  shows its workings — `3× (¢10) = ¢30` — because the product alone is the one
+  figure you can always derive and never the one you are checking, and in a
+  Shipyard the per-class price is what you are shopping on. One ship prints the
+  plain price; `1× (¢10) = ¢10` is three ways of saying ¢10.
+  Below 700px the workings sit above the total rather than beside it: inline
+  they take the cost cell from 25px to 83px, and measured at 360 that wrapped
+  "Delivery Drone Wing" the moment a second ship was added. Stacked, the cell is
+  55px. Names of about 18 characters and up still wrap at 360 — nothing is
+  clipped, the row height does not change and nothing below moves (all three
+  measured), but that is the cost of the extra column.
 - Mass, thrust, silhouette, shields — each with its own icon, each in its own colour.
 - Primary and auxiliary weapon, each with an arc glyph (narrow wedge for 45°, half
   disc for 180°). An empty slot shows an em dash; a utility slot says Utility Bays.

@@ -73,6 +73,27 @@ export function creditsText(n: number): string {
   return `¢${n}`;
 }
 
+/**
+ * A cost that is a multiple, shown as the sum it is: 3× (¢10) = ¢30.
+ *
+ * Every place a count meets a price used to print the product alone, which is
+ * the one figure you can always work out and never the one you are checking.
+ * Reading ¢30 beside a stepper showing 3 tells you nothing about whether the
+ * hull is ¢10; changing the count reprints a number with no visible cause; and
+ * in the Shipyard, where you are pricing a pool rather than a fleet, the per-
+ * class price is the figure you are actually shopping on.
+ *
+ * One ship is not a multiplication, so it prints as the plain price - "1× (¢10)
+ * = ¢10" is three ways of saying ¢10.
+ *
+ * `fmt` is the money formatter, because Junkspace counts in ¢k rather than ¢bn
+ * (rules p.202) and the print sheet passes its own.
+ */
+export function costBreakdown(count: number, each: number, fmt: (n: number) => string = credits): string {
+  if (count <= 1) return fmt(each);
+  return `<span class="cost-mult">${count}&times; (${fmt(each)}) =</span> ${fmt(each * count)}`;
+}
+
 const ESCAPE_MAP: Record<string, string> = {
   "&": "&amp;",
   "<": "&lt;",

@@ -48,7 +48,13 @@ export function fleetToMarkdown(list: SavedList, customs: Faction[]): string {
       const ship = r?.ship;
       const name = u.name || `${ship?.name ?? u.shipClassId} unit`;
       const cost = ship ? ship.cost * u.count : 0;
-      lines.push(`- **${name}** — ${u.count}× ${ship?.name ?? u.shipClassId} (Mass ${ship?.mass ?? "?"}), ${creditsText(cost)}`);
+      // The line already opens with the count, so the sum reads "¢10 each = ¢30"
+      // rather than repeating the 3× the way the on-screen breakdown does.
+      const price =
+        ship && u.count > 1
+          ? `${creditsText(ship.cost)} each = ${creditsText(cost)}`
+          : creditsText(cost);
+      lines.push(`- **${name}** — ${u.count}× ${ship?.name ?? u.shipClassId} (Mass ${ship?.mass ?? "?"}), ${price}`);
       if (ship) {
         const weapons = [...ship.primary, ...ship.auxiliary].map(formatWeapon);
         for (const wline of weapons) lines.push(`    - ${wline}`);

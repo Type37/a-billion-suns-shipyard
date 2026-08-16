@@ -1536,6 +1536,10 @@ function dispatchAction(target: HTMLElement): void {
       patchPrint({ rules: !(store.getState().ui.print ?? DEFAULT_PRINT).rules });
       break;
     }
+    case "print-score": {
+      patchPrint({ score: !(store.getState().ui.print ?? DEFAULT_PRINT).score });
+      break;
+    }
     case "print-allhvp": {
       patchPrint({ allHvp: !(store.getState().ui.print ?? DEFAULT_PRINT).allHvp });
       break;

@@ -253,6 +253,14 @@ export interface PrintOpts {
    */
   actions: boolean;
   commands: boolean;
+  /**
+   * The table at the foot of the sheet: credits or victory points per round,
+   * the opponent, and a notes line. Default on - it has always printed, and a
+   * default that drops content is a default that loses work - but it is the one
+   * block on the sheet that is a scorepad rather than a record of your fleet,
+   * and a player who keeps score somewhere else was stuck with it.
+   */
+  score: boolean;
   /** Paper the preview is laid out at, and what the page count is based on. */
   paper: "letter" | "a4";
   /** No coloured fills or bars: survives "Background graphics: off" and saves toner. */
@@ -269,6 +277,7 @@ export const DEFAULT_PRINT: PrintOpts = {
   allHvp: false,
   actions: true,
   commands: true,
+  score: true,
   paper: "letter",
   inkSaver: false,
   excluded: [],

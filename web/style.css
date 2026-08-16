@@ -1762,8 +1762,16 @@ button { font-family: inherit; }
    short of room. */
 .pr-num { text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; width: 30px; }
 .print-roster tbody .pr-num { white-space: nowrap; }
-.pr-cost { color: var(--blue); width: 40px; }
+/* 40 -> 72px. The column was sized for "30" and now carries "3x (10) =" above
+   it: measured at 57px for the widest multiplication in the data, 62px for the
+   cell, and a column narrower than its content clips it on paper where there is
+   no scrollbar to rescue it. The 34px comes out of the weapon columns, which
+   wrap (.pr-weap max-width), so nothing else is squeezed into a clip. */
+.pr-cost { color: var(--blue); width: 72px; }
 .print-roster tbody .pr-cost { white-space: nowrap; }
+/* The multiplication above, the total below: on one line it is three times the
+   column's width, and the column is the whole roster's slack. */
+.print-roster tbody .pr-cost .cost-mult { display: block; }
 /* WEAPONS NEVER WRAP. The longest string in the game is 31 characters -
    `Bioplasm Ejectors [4D10, 0-12"]` - and at 11px Spectral in a 17% column it
    needed about 160px of a 119px cell, so most of the roster's gun columns ran
@@ -3505,6 +3513,20 @@ button { font-family: inherit; }
 .sy-ship-head { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 2px 12px; }
 .sy-ship-name { font-family: var(--display); font-weight: 700; font-size: clamp(15px, 3.4vw, 17px); letter-spacing: -0.01em; line-height: 1.15; margin: 0; min-width: 0; }
 .sy-ship-cost { font-family: var(--display); font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums; color: var(--blue); white-space: nowrap; }
+/* The workings, not the answer: lighter and a size down, so the total still
+   reads as the figure on the line and "3x (10) =" is the note beside it. */
+.sy-ship-cost .cost-mult { font-family: var(--sans); font-weight: 600; font-size: 11px; color: var(--ink-3); }
+/* Under the row's one-line breakpoint the workings go above the total instead
+   of beside it. Inline, they take the cost cell from 25px to 83px, and the name
+   column pays for it: measured at 360, "Delivery Drone Wing" wrapped to two
+   lines the moment a second ship was added. Nothing was clipped and nothing
+   below moved - the head row has the slack - but a ship name breaking in half
+   because you pressed plus is not a trade worth making on the viewport this app
+   is used at. Stacked, the cell is 55px and the name holds one line. */
+@media (max-width: 699px) {
+  .sy-ship-cost { text-align: right; line-height: 1.15; }
+  .sy-ship-cost .cost-mult { display: block; }
+}
 .sy-qty { flex-shrink: 0; }
 .sy-qty button { min-width: 32px; min-height: 30px; align-items: center; justify-content: center; transition: transform 0.08s var(--ease), background 0.1s ease; }
 .sy-qty button:not([aria-disabled="true"]):active { transform: scale(0.86); }

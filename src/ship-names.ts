@@ -146,42 +146,55 @@ export const UNSC_CAPITAL_SHIP_NAMES: string[] = [
 ];
 
 /**
- * The Covenant pool.
+ * The Covenant pool. 113 names, alphabetical, as Halopedia lists them.
  *
- * Transcribed from the Halo Encyclopedia (2022), which is organised by ship
- * CLASS rather than as a register, so named hulls are scarce in it: these are
- * every one the book names, found by pulling each phrase that follows a class
- * word ("the Covenant corvette Ardent Prayer") and then reading the sentence
- * around it. That last step is not optional - the same sweep turned up the
- * Revenant (a ground vehicle), Pervading Stone (a Prophet), and the Unyielding
- * Hierophant and the Ring of Mighty Abundance (both stations), none of which
- * are ships and none of which are here.
+ * Same source and same method as the UNSC pool above: Halopedia's ship
+ * category, transcribed. An earlier cut of this list was pulled out of the Halo
+ * Encyclopedia (2022) instead and ran to fourteen - the book is organised by
+ * ship CLASS rather than as a register, so it names a single example hull per
+ * class and no more. The category has the register.
  *
- * Fourteen names is a thin pool next to the UNSC's hundred and eight, but a
- * fleet fields one or two Mass 3 hulls, so it only shows if you build a dozen
- * Covenant fleets. Halopedia's ship category would top it up the way it did for
- * the UNSC list.
+ * Seven of the category's 120 entries are not names and are not here: two hull
+ * codes (CCS-U321, CCS-U624), three placeholders for ships the fiction never
+ * named ("Covenant cruiser at Longhorn Valley", "Unnamed Kig-Yar transport",
+ * "Var 'Gatanai's ship"), an index page, and the second Devotion, which is the
+ * same name twice with a disambiguator. Halopedia's other disambiguators are
+ * dropped rather than the entries - Penance, Revenant and Swordsman are the
+ * ships' actual names, and the "(ship)" is the wiki telling itself apart.
  *
- * Enduring Conviction is included though the book meets it in Banished hands:
- * it is a Covenant assault carrier, taken, not a Banished design.
+ * Unlike the UNSC list, single-word names stay. On the UNSC side those were
+ * nearly all places and read as stations; here they are Absolution, Pitiless,
+ * Lawgiver and Contrition, which is the Covenant naming a hull after a verdict.
  */
 export const COVENANT_CAPITAL_SHIP_NAMES: string[] = [
-  "Anodyne Spirit",
-  "Ardent Prayer",
-  "Ascendant Justice",
-  "Breath of Annihilation",
-  "Enduring Conviction",
-  "Hammer of Faith",
-  "Incorruptible",
-  "Long Night of Solace",
-  "Pious Inquisitor",
-  "Rapid Conversion",
-  "Shadow of Intent",
-  "Solemn Penance",
-  "Sublime Transcendence",
-  "Unrelenting",
+  "A Psalm Every Day", "Absolution", "Adherent", "Almighty Persuasion", "Ardent Prayer",
+  "Ascendant Justice", "Axiom", "Blameless Conceit", "Blight of the Profane",
+  "Bloodied Spirit", "Breath of Annihilation", "Brilliant Gift", "Burgeoning Fealty",
+  "Certain Prophecy", "Clarity of Faith", "Cleansing Truth", "Commitment and Patience",
+  "Contrition", "Dagger of Mercy", "Daggerboard", "Day of Jubilation", "Defender of Faith",
+  "Devotion", "Divine Breath", "Divine Whisper", "Doctrine’s Command", "Elegy’s Lament",
+  "Enduring Conviction", "Esteem", "Eternal Reward", "Far Sight Lost", "Far Vision",
+  "Fighter’s Blood", "Great Light", "Hammer of Faith", "Hammer of Fate", "Hammerstrike",
+  "Harbinger of Piety", "Heaven’s Brilliant Bier", "Heresy’s Sorrow", "Incorruptible",
+  "Indulgence of Conviction", "Infinite Sacrifice", "Infinite Spoils", "Infinite Succor",
+  "Journey’s Sustenance", "Lawgiver", "Long Night of Solace", "Mark of Prophecy", "Mayhem",
+  "Minor Transgression", "Panom’s Canticle", "Paragon", "Penance", "Perpetual Devotion",
+  "Piety", "Pious Inquisitor", "Pious Rampage", "Pitiless", "Pledge of Holiness",
+  "Proclamation’s Tithe", "Promised Redemption", "Promised Revelation", "Pure Resolve",
+  "Purifying Flame", "Purity of Spirit", "Purveyor of Serenity", "Purveyor of Virtue",
+  "Quiet Faith", "Radiant Arrow", "Radiant Perception", "Rampant Perdition",
+  "Rapid Conversion", "Rapturous Arc", "Reckless Pursuit", "Reprisal’s Fire",
+  "Resplendent Fervor", "Retribution’s Promise", "Retribution’s Thunder", "Revenant",
+  "Reverence", "Sacred Promise", "Sacred Whisper", "Sanctity of Purification",
+  "Seeker of Truth", "Serene Certainty", "Shadow of Intent", "Silent Truth",
+  "Solemn Penance", "Song of Retribution", "Song of Wrath", "Spear of Light",
+  "Splendid Intention", "Steadfast Strike", "Still Devotion", "Sublime Transcendence",
+  "Sundered Psalm", "Supplication of Purity", "Swordsman", "Tenebrous", "The Lookout",
+  "Transforming Splendor", "Triumphant Declaration", "Truth and Reconciliation",
+  "Twilight Compunction", "Undiminished Entelechy", "Unflinching Resolve", "Unrelenting",
+  "Upright Chalice", "Valorous Salvation", "Vengeful Deed", "Vengeful Vitality",
+  "Worthy Silence",
 ];
-
 /**
  * Capital-ship name pools, keyed by faction id.
  *

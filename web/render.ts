@@ -2,6 +2,7 @@ import type { Era, Faction, FleetHvp, FleetUnit, GameMode, Hvp, ShipClass, Weapo
 import { ALLIANCE_SPECIES, MODE_BUILDER_SHAPE } from "../src/types.ts";
 import { validateFleet, type ValidationIssue } from "../src/validation.ts";
 import { GENERIC_HVP } from "../src/data/index.ts";
+import { canRollName } from "../src/hvp-names.ts";
 import {
   JUNKSPACE_SHIPS,
   PILOT_PERKS,
@@ -997,16 +998,25 @@ function hvpDisplayName(sel: FleetHvp, faction: Faction | undefined): string {
  * handler can tell "they left it alone" from "they named somebody", and an
  * untouched person keeps no custom name at all.
  */
-function hvpNameLine(def: Hvp, selIndex: number, customName?: string, cls = "sy-hvp-name"): string {
+function hvpNameLine(def: Hvp, selIndex: number, factionId: string, customName?: string, cls = "sy-hvp-name"): string {
   if (selIndex < 0) return `<span class="${cls}">${escapeHtml(def.name)}</span>`;
+  // The die beside the field fills it in for you. Naming twelve people is the
+  // sort of job everyone means to do and nobody does, so the roll is one click
+  // and lands in the same field you would have typed into - not a separate
+  // mode, and everything it writes can be typed over.
+  //
+  // It is absent, not disabled, on personnel who take no human name: the four
+  // non-human factions and the handful of aliens, groups and relics inside the
+  // human ones (see canRollName). A die that refuses to work is worse than no
+  // die - the field is still there, and you can still type whatever you like
+  // into it, which is the right answer for a Brood-Mother.
+  const roll = canRollName(factionId, def.id)
+    ? `<button class="hvp-name-roll" data-action="hvp-roll-name" data-index="${selIndex}" data-hvp="${def.id}" title="Roll a name" aria-label="Roll a name for ${escapeHtml(def.name)}">${icon("die", 14)}</button>`
+    : "";
   // The job title IS the field's name, and the same string is its starting
   // value, so the row says the identical words whether or not you have touched
   // it. aria-label states it too: a value is not an accessible name.
-  // ...and the die beside it fills the field in for you. Naming twelve people
-  // is the sort of job everyone means to do and nobody does, so the roll is one
-  // click and lands in the same field you would have typed into - it is not a
-  // separate mode, and you can edit whatever it gives you.
-  return `<span class="${cls} is-nameable"><input class="hvp-name-input" type="text" value="${escapeHtml(customName ?? `${def.name} `)}" data-default="${escapeHtml(def.name)}" aria-label="${escapeHtml(def.name)}" data-action="hvp-name" data-index="${selIndex}" /><button class="hvp-name-roll" data-action="hvp-roll-name" data-index="${selIndex}" data-hvp="${def.id}" title="Roll a name" aria-label="Roll a name for ${escapeHtml(def.name)}">${icon("die", 14)}</button></span>`;
+  return `<span class="${cls} is-nameable"><input class="hvp-name-input" type="text" value="${escapeHtml(customName ?? `${def.name} `)}" data-default="${escapeHtml(def.name)}" aria-label="${escapeHtml(def.name)}" data-action="hvp-name" data-index="${selIndex}" />${roll}</span>`;
 }
 
 // One person: their name line and its verbatim rule, then a single square
@@ -1015,7 +1025,7 @@ function hvpNameLine(def: Hvp, selIndex: number, customName?: string, cls = "sy-
 // aria-disabled so a tap is visibly refused. The square is a fixed box whether
 // it shows a plus or a tick, so toggling it never changes the row's width. Once
 // chosen, the name line opens a field for naming them - see hvpNameLine.
-function shipyardHvpRow(h: Hvp, sel: FleetHvp | undefined, selIndex: number, atCap: boolean, generic = false): string {
+function shipyardHvpRow(h: Hvp, sel: FleetHvp | undefined, selIndex: number, factionId: string, atCap: boolean, generic = false): string {
   const chosen = selIndex >= 0;
   const disabled = !chosen && atCap;
   const label = chosen
@@ -1028,7 +1038,7 @@ function shipyardHvpRow(h: Hvp, sel: FleetHvp | undefined, selIndex: number, atC
   return `
   <article class="sy-hvp ${chosen ? "is-chosen" : ""} ${generic ? "is-generic" : ""}" data-key="syhvp-${h.id}">
     <div class="sy-hvp-body">
-      ${hvpNameLine(h, selIndex, sel?.customName)}
+      ${hvpNameLine(h, selIndex, factionId, sel?.customName)}
       <span class="sy-hvp-rule">${ruleText(h.rule)}</span>
     </div>
     <button class="sy-hvp-check ${chosen ? "is-on" : ""}" data-action="sy-hvp-toggle" data-hvp="${h.id}" aria-pressed="${chosen}" ${disabled ? 'aria-disabled="true"' : ""} aria-label="${escapeHtml(label)}" title="${chosen ? "Chosen" : "Choose"}">${icon(chosen ? "check" : "plus", 16)}</button>
@@ -1302,7 +1312,7 @@ function shipyardView(state: AppState): string {
   const hvpRows = allHvp
     .map((h) => {
       const selIndex = list.fleet.hvp.findIndex((s) => s.hvpId === h.id);
-      return shipyardHvpRow(h, list.fleet.hvp[selIndex], selIndex, atCap, genericIds.has(h.id));
+      return shipyardHvpRow(h, list.fleet.hvp[selIndex], selIndex, list.fleet.factionId, atCap, genericIds.has(h.id));
     })
     .join("");
 
@@ -1458,7 +1468,7 @@ function builderView(state: AppState): string {
     return `
     <article class="sy-hvp ${isChosen ? "is-chosen" : ""} ${isGeneric ? "is-generic" : ""}">
       <div class="sy-hvp-body">
-        ${hvpNameLine(h, selIndex, list.fleet.hvp[selIndex]?.customName)}
+        ${hvpNameLine(h, selIndex, list.fleet.factionId, list.fleet.hvp[selIndex]?.customName)}
         <span class="sy-hvp-rule">${ruleText(h.rule)}</span>
       </div>
       <button class="sy-hvp-check ${isChosen ? "is-on" : ""}" data-action="${isChosen ? "remove-hvp" : "add-hvp"}" ${isChosen ? `data-index="${selIndex}"` : `data-hvp="${h.id}"`} aria-pressed="${isChosen}" ${disabled ? 'aria-disabled="true"' : ""} title="${isChosen ? `Remove ${escapeHtml(h.name)}` : disabled ? "Personnel full" : `Add ${escapeHtml(h.name)}`}">${icon(isChosen ? "check" : "plus", 16)}</button>
@@ -1504,7 +1514,7 @@ function builderView(state: AppState): string {
       return `
       <article class="personnel-row chosen">
         <div class="personnel-body">
-          ${hvpNameLine(def, i, sel.customName, "personnel-name")}
+          ${hvpNameLine(def, i, list.fleet.factionId, sel.customName, "personnel-name")}
           <span class="personnel-rule">${ruleText(def.rule)}</span>
         </div>
       </article>`;

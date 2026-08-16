@@ -12,9 +12,10 @@ import {
 import { w } from "../src/data/_helpers.ts";
 import { randomFleetName } from "../src/fleet-names.ts";
 import { capitalShipName } from "../src/ship-names.ts";
+import { rollHvpName } from "../src/hvp-names.ts";
 import { announce } from "./announce.ts";
 import { findFaction, isCustom } from "./catalog.ts";
-import { ERA_MODES, resolveShip } from "./render.ts";
+import { ERA_MODES, hvpById, resolveShip } from "./render.ts";
 import {
   clearAllData,
   exportAllData,
@@ -1493,6 +1494,45 @@ function dispatchAction(target: HTMLElement): void {
           return { ...f, hvp: [...f.hvp, chosenHvp(f, hvpId)] };
         });
       });
+      break;
+    }
+    /**
+     * Roll somebody into the name field beside the die (see hvpNameLine).
+     *
+     * p.57 asks you to name your personnel and the field has been there since
+     * the row was clickable, but twelve empty fields is a wall and the names
+     * never got typed. This fills one in off the name tables - a culture, then
+     * a name from it. See src/hvp-names.ts.
+     *
+     * It writes the same two places a typed name does, so a rolled name is in
+     * every respect a typed one: editable, remembered by role if you unchoose
+     * them, and carried by share links and the roster.
+     */
+    case "hvp-roll-name": {
+      const id = currentListId();
+      const index = Number(target.dataset["index"]);
+      const hvpId = target.dataset["hvp"];
+      if (!id || !hvpId || !Number.isInteger(index) || index < 0) return;
+      const state = store.getState();
+      const list = state.lists.find((l) => l.id === id);
+      if (!list) return;
+      const def = hvpById(hvpId, findFaction(list.fleet.factionId, state.customFactions));
+      if (!def) return;
+      const name = rollHvpName(def.name);
+      store.setState((s) =>
+        updateFleet(s, id, (f) => {
+          const sel = f.hvp[index];
+          if (!sel) return f;
+          return {
+            ...f,
+            hvpNames: { ...(f.hvpNames ?? {}), [sel.hvpId]: name },
+            hvp: f.hvp.map((h, i) => (i === index ? { ...h, customName: name } : h)),
+          };
+        }),
+      );
+      // The field is repainted by the re-render, which a screen reader has no
+      // reason to look at, so the name is spoken as well as written.
+      announce(name);
       break;
     }
     case "do-print": {

@@ -6394,6 +6394,34 @@ main.play-body .roster-section::before { content: none; }
   margin-inline-start: -8px;
   width: calc(100% + 8px);
 }
+/* The die sits inside the name line, at the end of the field it fills, because
+   that is the thing it acts on - out on the row beside the choose-square it
+   would read as a second way to pick somebody. It only exists on a chosen row,
+   which is the only row that has a field at all, so nothing moves when it
+   appears that was not already moving. */
+.is-nameable { gap: 2px; }
+.is-nameable .hvp-name-input { flex: 1 1 auto; min-width: 0; }
+.hvp-name-roll {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* WCAG 2.5.8 Target Size (Minimum), AA - the same 24px floor the field it
+     sits beside is held to. */
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: none;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: color 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+}
+.hvp-name-roll:hover { color: var(--blue); border-color: var(--field-edge); background: var(--paper); }
+.hvp-name-roll:focus-visible { outline: 2px solid var(--red); outline-offset: -2px; }
+/* Nothing to press on paper. */
+@media print { .hvp-name-roll { display: none; } }
 /* Personnel rule text was set at 1.4, which on a 13px serif is 18.2px a line
    and reads as double-spacing down a twelve-row list. 1.15 is the ceiling. */
 .sy-hvp-rule,

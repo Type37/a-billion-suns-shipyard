@@ -263,8 +263,6 @@ export interface PrintOpts {
   score: boolean;
   /** Paper the preview is laid out at, and what the page count is based on. */
   paper: "letter" | "a4";
-  /** No coloured fills or bars: survives "Background graphics: off" and saves toner. */
-  inkSaver: boolean;
   /** Unit ids left out of this printout. */
   excluded: string[];
 }
@@ -279,7 +277,6 @@ export const DEFAULT_PRINT: PrintOpts = {
   commands: true,
   score: true,
   paper: "letter",
-  inkSaver: false,
   excluded: [],
 };
 

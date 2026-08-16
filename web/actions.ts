@@ -1556,10 +1556,6 @@ function dispatchAction(target: HTMLElement): void {
       patchPrint({ commands: !(store.getState().ui.print ?? DEFAULT_PRINT).commands });
       break;
     }
-    case "print-inksaver": {
-      patchPrint({ inkSaver: !(store.getState().ui.print ?? DEFAULT_PRINT).inkSaver });
-      break;
-    }
     case "print-exclude-unit": {
       const unit = target.dataset["unit"];
       if (!unit) return;

@@ -1647,7 +1647,6 @@ button { font-family: inherit; }
 .sv-figure { display: flex; align-items: center; gap: 9px; min-height: 20px; }
 .sv-value { font-family: var(--display); font-weight: 800; font-size: 20px; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
 .sv-figure .dice-row { gap: 3px; }
-.is-inksaver .sv-item { background: none; }
 .sheet-section { font-family: var(--display); font-size: 12px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--blue); background: none; padding: 0 0 2px; margin: 10px 0 5px; border-bottom: 1px solid var(--blue); }
 .print-rule { margin-top: 7px; border-left: 1px solid var(--ink-3); padding: 1px 0 1px 9px; }
 .print-rule h3 { font-family: var(--display); font-size: 14px; margin-bottom: 3px; }
@@ -2598,10 +2597,6 @@ button { font-family: inherit; }
   padding: 12px 14px 16px;
   background: #f6f7f9;
   print-color-adjust: exact; -webkit-print-color-adjust: exact;
-}
-.is-inksaver .sheet.is-solo .print-card {
-  background: none;
-  border: 1px solid var(--hair-soft);
 }
 .sheet.is-solo .print-cards { gap: 14px; }
 
@@ -4853,14 +4848,11 @@ button { font-family: inherit; }
 }
 .print-excluded-note { font-size: 12.5px; color: var(--ink-2); margin: 0 0 12px; }
 .linklike { background: none; border: none; padding: 0; font: inherit; color: var(--blue); text-decoration: underline; cursor: pointer; }
-/* Ink saver never touches colour - a coloured line costs no more ink than a
-   black one. It strips the fills and thins the structural lines instead:
-   the actual ink cost of a page, not its palette. Colour print is the
-   default; this is the opt-in for someone printing on a mono laser. */
-.is-inksaver .print-unit-head { background: none; }
-.is-inksaver .print-card { border-color: var(--hair-soft); }
-.is-inksaver .pc-weapons-col { border-left-color: var(--hair-soft); }
-.is-inksaver .print-roster thead th { border-bottom-width: 1px; }
+/* Ink saver is GONE (user, 2026-08-15: "it doesn't do anything"). It dropped
+   four fills and thinned three lines, and the @media print block already forces
+   backgrounds off with !important on most of what it touched, so on paper the
+   toggle changed almost nothing - a switch that claims to save toner and does
+   not is worse than no switch. Its four rules lived here. */
 /* On the sheet the credits mark is a unit symbol, not a highlight: it appears
    beside every cost on the page, so at full size and in blue it read as the
    loudest thing in the roster. Smaller, and in ink. */

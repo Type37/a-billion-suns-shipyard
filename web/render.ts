@@ -2498,7 +2498,7 @@ function printView(
 
   return `
   ${topbar()}
-  <main class="print-page ${opts.inkSaver ? "is-inksaver" : ""}">
+  <main class="print-page">
     <div class="print-toolbar">
       <a class="bar-btn" href="${override ? `#/solo/${list.id}` : `#/list/${list.id}`}">${icon("chevronRight", 15, "flip-x")} Back to the ${override ? "outfit" : isShipyard ? "Shipyard" : "Fleet List"}</a>
       <div class="print-opts">
@@ -2526,7 +2526,6 @@ function printView(
         }
         <label class="print-toggle" title="The core Actions reference"><input type="checkbox" data-action="print-actions" ${opts.actions ? "checked" : ""} /> Actions</label>
         <label class="print-toggle" title="The Commands reference, including any your faction changes"><input type="checkbox" data-action="print-commands" ${opts.commands ? "checked" : ""} /> Commands</label>
-        <label class="print-toggle" title="Drops the solid fills and heavy rules. Colour is kept: a coloured line costs no more ink than a black one"><input type="checkbox" data-action="print-inksaver" ${opts.inkSaver ? "checked" : ""} /> Ink saver</label>
       </div>
       <div class="print-go">
         <span class="print-pagecount" data-print-pagecount>&nbsp;</span>

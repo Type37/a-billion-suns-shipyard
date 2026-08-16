@@ -38,6 +38,13 @@ finishing the job - deploying, updating docs a change made wrong, cleaning up a
 branch - do it and report it. Ask only when proceeding either way would be
 genuinely unsafe or would waste real work if the guess is wrong.
 
+## Keep chat replies short
+
+Long explanatory comments belong in the code. Replies in chat do not. Answer in
+a few lines: what you found, what you changed, anything genuinely blocking. No
+tables of measurements, no restating the question, no summarising work the user
+just watched you do.
+
 ## House style
 
 The code carries long explanatory comments about *why* a thing is the way it is

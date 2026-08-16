@@ -5064,7 +5064,7 @@ a .icon,
    as a chosen one and only the width told them apart. Scoped here, not fixed on
    .print-hvp.is-generic, because the chosen-only layout has no such contrast to
    protect and its edges have printed that way all along. */
-.print-hvp-menu .print-hvp.is-generic { border-left-color: var(--hair-soft); }
+.print-hvp-menu .print-hvp.is-generic:not(.is-chosen) { border-left-color: var(--hair-soft); }
 .print-hvp-mark {
   font-family: var(--sans); font-size: 8.5px; font-weight: 700; letter-spacing: 0.06em;
   text-transform: uppercase; color: var(--ink); margin-left: 5px; vertical-align: 1px;

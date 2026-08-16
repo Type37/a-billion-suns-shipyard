@@ -305,7 +305,7 @@ function unitsByMass(units: FleetUnit[], faction: Faction | undefined, customs: 
   });
 }
 
-function hvpById(id: string, faction: Faction | undefined): Hvp | undefined {
+export function hvpById(id: string, faction: Faction | undefined): Hvp | undefined {
   return faction?.hvp.find((h) => h.id === id) ?? GENERIC_HVP.find((h) => h.id === id);
 }
 
@@ -1002,7 +1002,11 @@ function hvpNameLine(def: Hvp, selIndex: number, customName?: string, cls = "sy-
   // The job title IS the field's name, and the same string is its starting
   // value, so the row says the identical words whether or not you have touched
   // it. aria-label states it too: a value is not an accessible name.
-  return `<span class="${cls} is-nameable"><input class="hvp-name-input" type="text" value="${escapeHtml(customName ?? `${def.name} `)}" data-default="${escapeHtml(def.name)}" aria-label="${escapeHtml(def.name)}" data-action="hvp-name" data-index="${selIndex}" /></span>`;
+  // ...and the die beside it fills the field in for you. Naming twelve people
+  // is the sort of job everyone means to do and nobody does, so the roll is one
+  // click and lands in the same field you would have typed into - it is not a
+  // separate mode, and you can edit whatever it gives you.
+  return `<span class="${cls} is-nameable"><input class="hvp-name-input" type="text" value="${escapeHtml(customName ?? `${def.name} `)}" data-default="${escapeHtml(def.name)}" aria-label="${escapeHtml(def.name)}" data-action="hvp-name" data-index="${selIndex}" /><button class="hvp-name-roll" data-action="hvp-roll-name" data-index="${selIndex}" data-hvp="${def.id}" title="Roll a name" aria-label="Roll a name for ${escapeHtml(def.name)}">${icon("die", 14)}</button></span>`;
 }
 
 // One person: their name line and its verbatim rule, then a single square
@@ -2401,7 +2405,23 @@ function printView(
         <p>${ruleText(d.rule)}</p>
       </section>`;
   };
-  const hvpMenu = [...(faction?.hvp ?? []), ...GENERIC_HVP].map(menuBlock).join("");
+  /*
+   * Your faction's own, and no generics (user, 2026-08-15: "when you have all
+   * personnel toggled on, don't bother showing generics"). The five generics are
+   * the same five for every fleet in the game and they are on the shipyard
+   * screen you chose from; printing them here spent a third of the block on a
+   * list that never changes, in among the seven that are the point.
+   *
+   * A generic you actually CHOSE still prints - it is in your fleet, and a sheet
+   * that drops somebody you took is a worse failure than one that lists five you
+   * did not.
+   */
+  const hvpMenu = [
+    ...(faction?.hvp ?? []),
+    ...GENERIC_HVP.filter((g) => list.fleet.hvp.some((h) => h.hvpId === g.id)),
+  ]
+    .map(menuBlock)
+    .join("");
   const hvpBlocks = {
     own: list.fleet.hvp.filter((h) => !isGenericSel(h)).map(selectedBlock).join(""),
     shared: list.fleet.hvp.filter(isGenericSel).map(selectedBlock).join(""),

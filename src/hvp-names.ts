@@ -385,8 +385,13 @@ export const NAME_LISTS: Record<string, string[]> = {
     "Kiana Jazani",
   ],
   sultanate: [
+    // The source roster is alphabetical by surname and its sixth entry lost its
+    // surname somewhere upstream - "Muhammed", nothing after it, between Kaya
+    // and Koca. Kilic is filled in for it: it sorts into that gap, and it is
+    // the same kind of word as the names around it (Aslan lion, Kaplan tiger,
+    // Ceylan gazelle, Reis captain - Kilic, sword).
     "Yusuf Aga", "Mustafa Aslan", "Mirac Bata", "Ayaz Dogan", "Ahmet Kaya",
-    "Emir Koca", "Koray Malas", "Mansur Onder", "Zekeriya Ozan", "Ensar Sari",
+    "Muhammed Kilic", "Emir Koca", "Koray Malas", "Mansur Onder", "Zekeriya Ozan", "Ensar Sari",
     "Ozturk Ceylan", "Medine Asker", "Mira Barak", "Elif-Nur Beg", "Esma Kaplan",
     "Beren Koc", "Zeynep Kocak", "Ecrin Mogul", "Defne Osman", "Elif-Ada Reis",
     "Hulya Tabak", "Fadime Tati", "Cemile Younan",

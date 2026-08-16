@@ -532,7 +532,7 @@ export const CULTURES = [...LIST_KEYS, ...TABLE_KEYS];
  * so any of them can be nudged without touching the others.
  */
 export const CULTURE_WEIGHT: Record<string, number> = {
-  arabic: 10,
+  arabic: 8,
   chinese: 10,
   english: 10,
   greek: 10,
@@ -542,6 +542,13 @@ export const CULTURE_WEIGHT: Record<string, number> = {
   japanese: 8,
   indian: 8,
   russian: 6,
+  // The four Haqqislam rosters, a step under the other ten. Only the Caliphate
+  // is Arabic - the Khanate is Central Asian, the Shahnate Persian, the
+  // Sultanate Turkish - but they were lowered as the set they were given as.
+  caliphate: 3,
+  khanate: 3,
+  shahnate: 3,
+  sultanate: 3,
   // The two-column table: above the faction rosters, below the d100 tables.
   mixed: 6,
   tribute: 2,

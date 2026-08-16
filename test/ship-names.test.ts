@@ -44,15 +44,13 @@ test("it still returns a name when the whole pool is taken", () => {
   assert.ok(pool.includes(n!));
 });
 
-test("the UNSC pool carries the tributes and the Covenant pool does not", () => {
-  // The Covenant name ships after virtues, never after people. The UNSC name
-  // them after people all the time, which is what makes the egg hide there.
-  for (const t of TRIBUTE_NAMES) {
-    assert.ok(SHIP_NAME_POOLS["cf-example-unsc"]!.includes(t), t);
-    assert.ok(!SHIP_NAME_POOLS["cf-example-covenant"]!.includes(t), t);
+test("no ship pool carries a tribute name", () => {
+  // The easter egg lives in the HVP roller, where it can be weighted down to
+  // one roll in seventy-five. A capital-ship pool has no weights - the name is
+  // hashed out of a fixed list - so ten tributes there was one hull in twelve.
+  for (const pool of Object.values(SHIP_NAME_POOLS)) {
+    for (const t of TRIBUTE_NAMES) assert.ok(!pool.includes(t), t);
   }
-  // And the transcription itself stays a transcription.
-  for (const t of TRIBUTE_NAMES) assert.ok(!UNSC_CAPITAL_SHIP_NAMES.includes(t), t);
 });
 
 test("a faction with no pool is not christened at all", () => {

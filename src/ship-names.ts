@@ -33,8 +33,6 @@
 // So pools are keyed by faction id (SHIP_NAME_POOLS) and a faction without one
 // simply does not auto-name, the way every hull under Mass 3 already does not.
 
-import { TRIBUTE_NAMES } from "./tributes.ts";
-
 /** The UNSC pool. 108 names, all multi-word, in the order Halopedia lists them. */
 export const UNSC_CAPITAL_SHIP_NAMES: string[] = [
   "Totem Lake",
@@ -207,13 +205,14 @@ export const COVENANT_CAPITAL_SHIP_NAMES: string[] = [
  * is a bigger liberty than leaving the field blank for the player.
  */
 export const SHIP_NAME_POOLS: Record<string, readonly string[]> = {
-  // The tributes ride along with the UNSC list rather than sitting in it: that
-  // list is a transcription and stays one. A UNSC fleet is about one name in
-  // twelve away from a designer, and naming a hull after a person is already
-  // what that pool does - Carl Sagan and Phyllis Wheatley are in there.
-  "cf-example-unsc": [...UNSC_CAPITAL_SHIP_NAMES, ...TRIBUTE_NAMES],
-  // The Covenant name ships after virtues and verdicts, never after people,
-  // so no tributes here.
+  // No tributes in either pool. They were in the UNSC list briefly, on the
+  // argument that naming a hull after a person is what that pool already does
+  // (Carl Sagan and Phyllis Wheatley are in it). The rate killed it: capital
+  // names are drawn by hash from a fixed pool, so the only lever is pool size,
+  // and ten names in 118 is one capital in twelve. A fleet fields two. An
+  // easter egg you meet every sixth fleet is a naming convention. They live in
+  // the HVP roller instead, where the culture can be weighted down to 1 in 75.
+  "cf-example-unsc": UNSC_CAPITAL_SHIP_NAMES,
   "cf-example-covenant": COVENANT_CAPITAL_SHIP_NAMES,
 };
 

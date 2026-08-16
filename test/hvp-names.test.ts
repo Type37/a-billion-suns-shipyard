@@ -108,10 +108,17 @@ test("the weights land in the order they were asked for", () => {
   assert.equal(o["japanese"], o["indian"]);
   assert.ok(o["japanese"]! > o["russian"]!);
   assert.ok(o["russian"]! > o["caledonia"]!);
-  // Every faction roster is weighted the same as every other. The tributes are
-  // not a faction roster - they are the easter egg, and sit below everything.
-  const rosters = Object.keys(NAME_LISTS).filter((k) => k !== "tribute").map((k) => o[k]!);
-  assert.equal(new Set(rosters).size, 1);
+  // The Arabic table sits with Japanese and Indian, a step under the baseline.
+  assert.ok(o["english"]! > o["arabic"]!);
+  assert.equal(o["arabic"], o["japanese"]);
+  // The rosters come in two tiers: the four Haqqislam ones, then the other ten.
+  const HAQQ = ["caliphate", "khanate", "shahnate", "sultanate"];
+  const rosterKeys = Object.keys(NAME_LISTS).filter((k) => k !== "tribute");
+  const tiers = new Map(rosterKeys.map((k) => [k, o[k]!]));
+  assert.equal(new Set(HAQQ.map((k) => tiers.get(k))).size, 1);
+  assert.equal(new Set(rosterKeys.filter((k) => !HAQQ.includes(k)).map((k) => tiers.get(k))).size, 1);
+  assert.ok(tiers.get("caliphate")! < tiers.get("caledonia")!);
+  const rosters = rosterKeys.map((k) => o[k]!);
   for (const c of CULTURES) {
     if (c !== "tribute") assert.ok(o[c]! > o["tribute"]!, `${c} is rarer than the easter egg`);
   }

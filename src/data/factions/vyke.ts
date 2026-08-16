@@ -20,7 +20,7 @@ export const VYKE: Faction = {
     { id: "orbspinner", name: "Orbspinner", mass: 0, thrust: 6, silhouette: 3, shields: 0,
       primary: [w("Silkorb Spitters", 1, "D8", 0, 12)], auxiliary: [], utilityBays: false, cost: 5 },
     { id: "snarefang", name: "Snarefang", mass: 1, thrust: 12, silhouette: 3, shields: 0,
-      primary: [], auxiliary: [w("Snarefangs", 1, "D10", 0, 2)], utilityBays: true, cost: 6 },
+      primary: [], auxiliary: [w("Snarefangs", 1, "D10", 0, 2)], utilityBays: true, primaryUtility: true, cost: 6 },
     { id: "needlespitter", name: "Needlespitter", mass: 1, thrust: 8, silhouette: 4, shields: 0,
       primary: [w("Lancespear", 1, "D10", 6, 12)], auxiliary: [w("Mandibles", 1, "D8", 0, 2)], utilityBays: false, cost: 9 },
     { id: "latchweaver", name: "Latchweaver", mass: 2, thrust: 10, silhouette: 5, shields: 1,

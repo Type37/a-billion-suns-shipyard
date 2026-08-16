@@ -28,7 +28,7 @@ export const GEN_OMEGA: Faction = {
     { id: "torchbearer-heavy-destroyer", name: "Torchbearer Heavy Destroyer", mass: 2, thrust: 4, silhouette: 8, shields: 5,
       primary: [w("Particle Beams", 2, "D10", 12, 24)], auxiliary: [w("Light Blasters", 2, "D6", 0, 3)], utilityBays: false, cost: 45 },
     { id: "matryoshka-class-factory-ship", name: "Matryoshka-class Factory Ship", mass: 3, thrust: 3, silhouette: 8, shields: 5,
-      primary: [], auxiliary: [w("Laser Cannon", 2, "D8", 0, 9)], utilityBays: true, cost: 30 },
+      primary: [], auxiliary: [w("Laser Cannon", 2, "D8", 0, 9)], utilityBays: true, primaryUtility: true, cost: 30 },
     { id: "termina-class-colony-ship", name: "Termina-class Colony Ship", mass: 3, thrust: 5, silhouette: 9, shields: 6,
       primary: [w("Cruise Missiles", 4, "D10", 18, 36)], auxiliary: [w("Defence Grid", 4, "D8", 0, 9)], utilityBays: false, cost: 70 },
   ],

@@ -2,6 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import { ARMAGEDDON_FACTIONS, FACTIONS, GENERIC_HVP, getFaction } from "../src/data/index.ts";
+import { JUNKSPACE_SHIPS } from "../src/data/junkspace.ts";
+import { TRAINING_FLEET } from "../src/data/training-fleet.ts";
 import { DAMAGE_BY_DIE } from "../src/types.ts";
 
 const DIE_TYPES = new Set(Object.keys(DAMAGE_BY_DIE));
@@ -82,6 +84,32 @@ test("ship stats are internally consistent", () => {
         assert.ok(wpn.rangeMin >= 0 && wpn.rangeMax >= wpn.rangeMin, `${s.id} ${wpn.name} range ok`);
       }
     }
+  }
+});
+
+/**
+ * The book prints "Utility Bays" *in one of the two weapon columns*, so which
+ * column it sits in is data, not decoration - it decides what the spec table
+ * prints. utilityBays alone does not say which, and six ships (AEGIS Repair
+ * Drone and Warden, Vyke Snarefang, Gen O Matryoshka, Alliance Tug and Mining
+ * Ship) were set without it. Four still rendered right by way of the fallback
+ * in primarySlotText; the two with a primary weapon and an empty aux slot -
+ * Repair Drone and Mining Ship - printed "None" where the book says Utility
+ * Bays. Requiring the flag is what makes that a test failure rather than a
+ * quiet wrong cell.
+ */
+test("every utility-bay ship says which column the bays are in", () => {
+  const ships = [...FACTIONS.flatMap((f) => f.ships), ...TRAINING_FLEET.ships, ...JUNKSPACE_SHIPS];
+  for (const s of ships) {
+    if (!s.utilityBays) {
+      assert.ok(!s.primaryUtility && !s.auxiliaryUtility, `${s.id} flags a column without utilityBays`);
+      continue;
+    }
+    assert.ok(s.primaryUtility || s.auxiliaryUtility, `${s.id} has utility bays but no column`);
+    assert.ok(!(s.primaryUtility && s.auxiliaryUtility), `${s.id} claims bays in both columns`);
+    // The bays occupy the slot, so that slot carries no weapons.
+    if (s.primaryUtility) assert.equal(s.primary.length, 0, `${s.id} primary is bays, so no primary weapons`);
+    if (s.auxiliaryUtility) assert.equal(s.auxiliary.length, 0, `${s.id} aux is bays, so no aux weapons`);
   }
 });
 

@@ -5035,6 +5035,26 @@ a .icon,
    else. */
 .print-hvp-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 14px; align-items: start; }
 .print-hvp-menu .print-hvp { break-inside: avoid; margin-bottom: 2px; }
+/* The ones you have already chosen, inside the menu. A heavier ink-coloured
+   edge and a word, not a fill: this prints, and a grey panel behind eleven-point
+   serif is the first thing a laser printer ruins. The word carries it on its
+   own if the edge is lost to Background graphics: off. Generic entries that are
+   chosen come back to full ink here - they are yours now, so they should not
+   still be reading as part of the shared pool. */
+.print-hvp.is-chosen { border-left: 2.5px solid var(--ink); padding-left: 6px; }
+.print-hvp.is-chosen h4,
+.print-hvp.is-chosen p { color: var(--ink); }
+/* Inside the menu the edge has to carry "chosen", so every other edge has to be
+   lighter than it. Generic blocks are the exception that broke that: --hair
+   resolves to full ink inside .sheet, so a generic entry drew as heavy an edge
+   as a chosen one and only the width told them apart. Scoped here, not fixed on
+   .print-hvp.is-generic, because the chosen-only layout has no such contrast to
+   protect and its edges have printed that way all along. */
+.print-hvp-menu .print-hvp.is-generic { border-left-color: var(--hair-soft); }
+.print-hvp-mark {
+  font-family: var(--sans); font-size: 8.5px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--ink); margin-left: 5px; vertical-align: 1px;
+}
 .print-hvp-note { margin: 0 0 4px; }
 /* These two used to drop to two columns at 760 and one at 560, on the reasoning
    that three names and their rules do not fit across a third of a phone. True

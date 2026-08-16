@@ -136,6 +136,15 @@ rules explicitly cover an HVP token sitting in your shipyard granting nothing. T
 builder chooses; the printed roster carries the names; assignment happens at the
 table. If assignment is ever added, it must not be a dropdown — see §7.
 
+**Choosing can wait for the table too.** p.123 makes "Choose and assign HVPs" step
+4, *after* the two D12 missions are rolled, and p.141 says it outright: "In
+Hypergrowth and Age of Unity era games, you select your HVP after you learn the
+missions for the game." So the print bar carries an **All personnel** toggle in
+these two modes: it prints all twelve blocks, marking any you have already
+chosen, and prints them unasked when you have chosen nobody. Twelve blocks are
+250px of a 710px Letter sheet — page one still holds them with the Actions and
+Commands reference switched off, and spills to a second page with it on.
+
 ---
 
 ## 6. Interaction

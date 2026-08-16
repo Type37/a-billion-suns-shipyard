@@ -234,6 +234,17 @@ export interface PrintOpts {
   jumpTrackers: boolean;
   rules: boolean;
   /**
+   * Print every HVP available to you, not just the ones you chose.
+   *
+   * Only offered where the rules defer the choice: Hypergrowth (p.123 step 4)
+   * and Age of Unity (p.92 step 5) both have you select AFTER the missions are
+   * rolled, so the sheet you carry to the table is the menu you pick from. The
+   * ones you have already chosen still print marked, because burying your three
+   * in nine you did not take is the reason the old always-print-everything
+   * behaviour was removed.
+   */
+  allHvp: boolean;
+  /**
    * The two halves of the reference section, each on its own. They used to ride
    * `rules` with the faction block, so wanting your faction's rule on the sheet
    * meant taking four pages of core reference with it, and wanting the reference
@@ -255,6 +266,7 @@ export const DEFAULT_PRINT: PrintOpts = {
   trackers: false,
   jumpTrackers: false,
   rules: true,
+  allHvp: false,
   actions: true,
   commands: true,
   paper: "letter",

@@ -2082,6 +2082,20 @@ function printView(
   // Age of Unity assigns HVP only after the missions are generated, so the sheet
   // prints every available HVP plus a blank write-in slot on each ship.
   const isUnity = list.mode === "age-of-unity";
+  /*
+   * Hypergrowth defers the same step, and the book says so twice: p.123 lists
+   * "Choose and assign HVPs" as step 4, AFTER rolling the two D12 missions, and
+   * p.141 states it outright - "In Hypergrowth and Age of Unity era games, you
+   * select your HVP after you learn the missions for the game."
+   *
+   * So in both modes the sheet you carry to the table is the menu you choose
+   * from, and "All personnel" in the print bar prints all of them. It is offered
+   * nowhere else: Armageddon chooses at build (p.79 step 4), and Basic Training
+   * fixes all three as Seasoned Captains (p.63), so a menu there is nine blocks
+   * of paper answering a question already settled.
+   */
+  const defersHvp = isUnity || list.mode === "hypergrowth";
+  const printAllHvp = opts.allHvp && defersHvp;
 
   // The printed sheet doubles as the legality check, so the header says whether
   // this list is legal. Same mode-aware relaxations the builder applies (null =
@@ -2154,7 +2168,10 @@ function printView(
   // fields personnel gets a write-in box on each unit; where the carrier is
   // already chosen it is printed faintly as the starting position, with room to
   // strike it out and write the new one.
-  const fieldsHvp = isUnity || list.fleet.hvp.length > 0;
+  // defersHvp, not isUnity: Hypergrowth chooses after the missions too, so a
+  // Hypergrowth sheet printed with nobody chosen was printing the whole menu of
+  // personnel over a roster with no column to write the chosen ones into.
+  const fieldsHvp = defersHvp || list.fleet.hvp.length > 0;
   const hvpCarrierCell = (u: FleetUnit): string => {
     if (!fieldsHvp) return "";
     const held = list.fleet.hvp
@@ -2361,6 +2378,27 @@ function printView(
       </section>`;
   };
   const isGenericSel = (sel: (typeof list.fleet.hvp)[number]) => GENERIC_HVP.some((g) => g.id === sel.hvpId);
+  /*
+   * The same block, drawn from the definition rather than from a selection, so
+   * the whole menu can print: your faction's seven and the five generics.
+   *
+   * The chosen ones are MARKED and left in place rather than lifted into a
+   * section of their own. Splitting the list would print several of them twice,
+   * and the objection that killed the old always-print-everything behaviour was
+   * that your three were lost among the nine you did not take - which a mark
+   * answers on its own. A chosen entry prints whatever you named them, since
+   * that is what is written on the roster's HVP carried column.
+   */
+  const menuBlock = (d: Hvp): string => {
+    const sel = list.fleet.hvp.find((h) => h.hvpId === d.id);
+    const generic = GENERIC_HVP.some((g) => g.id === d.id);
+    return `
+      <section class="print-hvp ${generic ? "is-generic" : ""} ${sel ? "is-chosen" : ""}">
+        <h4>${escapeHtml(sel ? hvpDisplayName(sel, faction) : d.name)}${sel ? '<span class="print-hvp-mark">chosen</span>' : ""}</h4>
+        <p>${ruleText(d.rule)}</p>
+      </section>`;
+  };
+  const hvpMenu = [...(faction?.hvp ?? []), ...GENERIC_HVP].map(menuBlock).join("");
   const hvpBlocks = {
     own: list.fleet.hvp.filter((h) => !isGenericSel(h)).map(selectedBlock).join(""),
     shared: list.fleet.hvp.filter(isGenericSel).map(selectedBlock).join(""),
@@ -2473,6 +2511,11 @@ function printView(
         <label class="print-toggle" title="A row of HP boxes per ship, to cross off as damage lands"><input type="checkbox" data-action="print-trackers" ${opts.trackers ? "checked" : ""} /> Damage trackers</label>
         <label class="print-toggle" title="${isShipyard ? "A Jumped in and an In reserve box per ship" : "A Jumped in box per ship"}"><input type="checkbox" data-action="print-jumptrackers" ${opts.jumpTrackers ? "checked" : ""} /> Jump trackers</label>
         <label class="print-toggle" title="Your faction's own rule, Initiative and CMD"><input type="checkbox" data-action="print-rules" ${opts.rules ? "checked" : ""} /> Rules</label>
+        ${
+          defersHvp
+            ? `<label class="print-toggle" title="Every HVP you could take, with the ones you have chosen marked. You choose after the missions are rolled, so the sheet is the menu"><input type="checkbox" data-action="print-allhvp" ${opts.allHvp ? "checked" : ""} /> All personnel</label>`
+            : ""
+        }
         <label class="print-toggle" title="The core Actions reference"><input type="checkbox" data-action="print-actions" ${opts.actions ? "checked" : ""} /> Actions</label>
         <label class="print-toggle" title="The Commands reference, including any your faction changes"><input type="checkbox" data-action="print-commands" ${opts.commands ? "checked" : ""} /> Commands</label>
         <label class="print-toggle" title="Drops the solid fills and heavy rules. Colour is kept: a coloured line costs no more ink than a black one"><input type="checkbox" data-action="print-inksaver" ${opts.inkSaver ? "checked" : ""} /> Ink saver</label>
@@ -2539,29 +2582,28 @@ function printView(
         // it did it differently from every other mode. If the app knows which
         // three are yours, those are the three that print.
         //
-        // The menu survives for the one case it was actually built for. Age of
-        // Unity defers the HVP step - you assign after the missions are rolled
-        // (p.92 step 5), and the builder marks the count optional there
-        // (HVP_COUNT is dropped for this mode) - so a Unity player can quite
-        // legitimately reach the table having chosen nobody. For them the sheet
-        // is the menu they will choose from, and printing nothing would take
-        // away the one page that has the rules on it.
+        // The menu is now asked for, by the two modes that defer the choice.
+        // Hypergrowth (p.123 step 4) and Age of Unity (p.92 step 5) both pick
+        // after the missions are rolled, and the builder marks the count
+        // optional in both (HVP_COUNT is dropped), so a player can quite
+        // legitimately reach the table having chosen nobody. "All personnel"
+        // prints the menu on demand; with nobody chosen it prints anyway, since
+        // otherwise the sheet loses the one page that has the rules on it.
         //
         // You choose three, so print three columns - one personnel each, side by
         // side. A CSS multi-column flow was used here before; it packs by height
         // rather than by item, so two blocks landed in the first row and the
         // third started a second row with a column and a half of blank paper
         // beside it.
-        hasHvpBlocks
-          ? `<div class="print-hvp-chosen">${hvpBlocks.own}${hvpBlocks.shared}</div>`
-          : isUnity
-            ? `<p class="print-note print-hvp-note">None chosen yet &mdash; in Age of Unity you pick and assign once the missions are rolled. Every one available to you:</p>
-               <div class="print-hvp-menu">${[...(faction?.hvp ?? []), ...GENERIC_HVP]
-                 .map(
-                   (d) =>
-                     `<section class="print-hvp ${GENERIC_HVP.some((g) => g.id === d.id) ? "is-generic" : ""}"><h4>${escapeHtml(d.name)}</h4><p>${ruleText(d.rule)}</p></section>`,
-                 )
-                 .join("")}</div>`
+        printAllHvp || (defersHvp && !hasHvpBlocks)
+          ? `${
+              hasHvpBlocks
+                ? ""
+                : `<p class="print-note print-hvp-note">None chosen yet &mdash; in ${escapeHtml(era ?? "this era")} you pick and assign once the missions are rolled. Every one available to you:</p>`
+            }
+               <div class="print-hvp-menu">${hvpMenu}</div>`
+          : hasHvpBlocks
+            ? `<div class="print-hvp-chosen">${hvpBlocks.own}${hvpBlocks.shared}</div>`
             : ""
       }
 

@@ -1536,6 +1536,10 @@ function dispatchAction(target: HTMLElement): void {
       patchPrint({ rules: !(store.getState().ui.print ?? DEFAULT_PRINT).rules });
       break;
     }
+    case "print-allhvp": {
+      patchPrint({ allHvp: !(store.getState().ui.print ?? DEFAULT_PRINT).allHvp });
+      break;
+    }
     case "print-jumptrackers": {
       patchPrint({ jumpTrackers: !(store.getState().ui.print ?? DEFAULT_PRINT).jumpTrackers });
       break;

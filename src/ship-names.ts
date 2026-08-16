@@ -21,12 +21,20 @@
 // adjective-noun pattern like the fleet namer uses - a generator produces
 // consistent output, and consistency is exactly what makes ship names boring.
 //
-// The names are used for EVERY faction, not just the UNSC example. They are
-// naval-register names, not Halo-specific lore, and a corporate battlegroup
-// called the Witch Bucket is funnier than one called the Profit Margin.
+// WHO GETS THEM
+//
+// The UNSC example faction, and nobody else. These went to every faction once,
+// on the argument that they are naval-register names rather than Halo lore and
+// a corporate battlegroup called the Witch Bucket is funnier than one called
+// the Profit Margin. It is still funnier, and it is still wrong: the Vyke are
+// an alien hive and Megamart is a shop, and neither of them christens a hull
+// "Of Uncommon Courage". A pool belongs to the fleet it was written for.
+//
+// So pools are keyed by faction id (SHIP_NAME_POOLS) and a faction without one
+// simply does not auto-name, the way every hull under Mass 3 already does not.
 
-/** The pool. 108 names, all multi-word, in the order Halopedia lists them. */
-export const CAPITAL_SHIP_NAMES: string[] = [
+/** The UNSC pool. 108 names, all multi-word, in the order Halopedia lists them. */
+export const UNSC_CAPITAL_SHIP_NAMES: string[] = [
   "Totem Lake",
   "Fifth Winter",
   "Victory of Samothrace",
@@ -138,6 +146,19 @@ export const CAPITAL_SHIP_NAMES: string[] = [
 ];
 
 /**
+ * Capital-ship name pools, keyed by faction id.
+ *
+ * Only the UNSC example has one. Adding another is a list and a line here; a
+ * faction with no entry auto-names nothing, which is the right default for the
+ * twelve published factions - the book gives them ship CLASSES, not registers
+ * of named hulls, and inventing a naming tradition for somebody else's faction
+ * is a bigger liberty than leaving the field blank for the player.
+ */
+export const SHIP_NAME_POOLS: Record<string, readonly string[]> = {
+  "cf-example-unsc": UNSC_CAPITAL_SHIP_NAMES,
+};
+
+/**
  * A stable 32-bit hash of a string. Not cryptographic - it exists so a name is
  * a pure function of the unit it belongs to.
  */
@@ -153,6 +174,9 @@ function hash(s: string): number {
 /**
  * Name a capital ship, deterministically, from a seed.
  *
+ * Returns undefined for a faction with no pool of its own - that fleet's Mass 3
+ * hulls arrive unnamed and the player names them or does not.
+ *
  * Deterministic on purpose: the seed is the unit's own id, so the name is
  * decided once by WHICH unit it is and never drifts. The app re-renders the
  * whole page on every state change, and a name that came from Math.random()
@@ -162,8 +186,13 @@ function hash(s: string): number {
  * forward from the hashed index rather than re-rolling, so adding a second
  * capital never changes the first one's name.
  */
-export function capitalShipName(seed: string, taken: readonly string[] = []): string {
-  const pool = CAPITAL_SHIP_NAMES;
+export function capitalShipName(
+  factionId: string,
+  seed: string,
+  taken: readonly string[] = [],
+): string | undefined {
+  const pool = SHIP_NAME_POOLS[factionId];
+  if (!pool?.length) return undefined;
   const start = hash(seed) % pool.length;
   const used = new Set(taken);
   for (let i = 0; i < pool.length; i++) {

@@ -994,12 +994,17 @@ function dispatchAction(target: HTMLElement): void {
           // never re-rolls on an unrelated re-render. Everything smaller stays
           // unnamed - naming nine corvettes is noise, and the roster already
           // shows what they are.
+          //
+          // Only a faction with a pool of its own is christened at all, which
+          // today means the UNSC example: capitalShipName returns undefined for
+          // everyone else and their capitals arrive blank.
           const unitId = nextUnitIdFor(f);
           const mass = resolveShip(shipId, faction, s.customFactions)?.ship.mass;
-          const named =
+          const christened =
             mass === 3
-              ? { name: capitalShipName(`${f.factionId}:${unitId}`, f.units.map((u) => u.name ?? "")) }
-              : {};
+              ? capitalShipName(f.factionId, `${f.factionId}:${unitId}`, f.units.map((u) => u.name ?? ""))
+              : undefined;
+          const named = christened ? { name: christened } : {};
           return { ...f, units: [...f.units, { id: unitId, shipClassId: shipId, count: 1, ...named }] };
         }),
       );

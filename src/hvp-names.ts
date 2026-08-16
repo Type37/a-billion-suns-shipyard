@@ -519,12 +519,14 @@ export const NON_HUMAN_FACTIONS = new Set(["aegis", "golem-mega-systems", "vyke"
  *   Not human -    the Discord's wings are human; their Gorgronti Veteran
  *                  (p.157) is not.
  *   Not a person - a crew, a cell or a cabal is a group, and "Documentary Crew
- *                  Callum Paterson" is a category error. So is naming a relic:
- *                  the Ordinate's Blessed Lambda and Quantum Seraph read as
- *                  things its priests keep, not priests.
+ *                  Callum Paterson" is a category error.
  *
  * And one that is its own joke: Gen Omega's Nameless Punk (p.169) has no name
  * on purpose, and handing them one deletes the only characterisation they have.
+ *
+ * The Ordinate's Blessed Lambda and Quantum Seraph were on this list once, read
+ * as relics its priests keep rather than priests. They are not: the user's call,
+ * and the titles are honorifics on people, the way the Hand of the Registrar is.
  */
 export const NON_HUMAN_HVP = new Set([
   "gorgronti-veteran",   // The Discord
@@ -532,8 +534,6 @@ export const NON_HUMAN_HVP = new Set([
   "righteous-saboteurs", // Gen Omega - a cell
   "documentary-crew",    // News Inc. - a crew
   "technocratic-cabal",  // The Ordinate - a cabal
-  "the-blessed-lambda",  // The Ordinate - a relic
-  "quantum-seraph",      // The Ordinate - a relic
 ]);
 
 /**

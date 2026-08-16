@@ -146,6 +146,43 @@ export const UNSC_CAPITAL_SHIP_NAMES: string[] = [
 ];
 
 /**
+ * The Covenant pool.
+ *
+ * Transcribed from the Halo Encyclopedia (2022), which is organised by ship
+ * CLASS rather than as a register, so named hulls are scarce in it: these are
+ * every one the book names, found by pulling each phrase that follows a class
+ * word ("the Covenant corvette Ardent Prayer") and then reading the sentence
+ * around it. That last step is not optional - the same sweep turned up the
+ * Revenant (a ground vehicle), Pervading Stone (a Prophet), and the Unyielding
+ * Hierophant and the Ring of Mighty Abundance (both stations), none of which
+ * are ships and none of which are here.
+ *
+ * Fourteen names is a thin pool next to the UNSC's hundred and eight, but a
+ * fleet fields one or two Mass 3 hulls, so it only shows if you build a dozen
+ * Covenant fleets. Halopedia's ship category would top it up the way it did for
+ * the UNSC list.
+ *
+ * Enduring Conviction is included though the book meets it in Banished hands:
+ * it is a Covenant assault carrier, taken, not a Banished design.
+ */
+export const COVENANT_CAPITAL_SHIP_NAMES: string[] = [
+  "Anodyne Spirit",
+  "Ardent Prayer",
+  "Ascendant Justice",
+  "Breath of Annihilation",
+  "Enduring Conviction",
+  "Hammer of Faith",
+  "Incorruptible",
+  "Long Night of Solace",
+  "Pious Inquisitor",
+  "Rapid Conversion",
+  "Shadow of Intent",
+  "Solemn Penance",
+  "Sublime Transcendence",
+  "Unrelenting",
+];
+
+/**
  * Capital-ship name pools, keyed by faction id.
  *
  * Only the UNSC example has one. Adding another is a list and a line here; a
@@ -156,6 +193,7 @@ export const UNSC_CAPITAL_SHIP_NAMES: string[] = [
  */
 export const SHIP_NAME_POOLS: Record<string, readonly string[]> = {
   "cf-example-unsc": UNSC_CAPITAL_SHIP_NAMES,
+  "cf-example-covenant": COVENANT_CAPITAL_SHIP_NAMES,
 };
 
 /**

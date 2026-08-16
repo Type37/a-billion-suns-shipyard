@@ -464,8 +464,56 @@ const LIST_KEYS = Object.keys(NAME_LISTS);
 /** Every culture a roll can land on, rosters and tables together. */
 export const CULTURES = [...LIST_KEYS, ...TABLE_KEYS];
 
+/**
+ * How often each culture comes up, relative to the others.
+ *
+ * Flat odds put 14 of the 24 cultures - 58% of all rolls - on the faction
+ * rosters, which are the smallest and most distinctive lists in the file, so
+ * they repeated first and hardest. The tables carry hundreds of combinations
+ * each and can take the traffic.
+ *
+ * 10 is the baseline table. Japanese and Indian sit a little under it, Russian
+ * further under, and every roster is equally lower again. Weights are relative,
+ * so any of them can be nudged without touching the others.
+ */
+export const CULTURE_WEIGHT: Record<string, number> = {
+  arabic: 10,
+  chinese: 10,
+  english: 10,
+  greek: 10,
+  latin: 10,
+  nigerian: 10,
+  spanish: 10,
+  japanese: 8,
+  indian: 8,
+  russian: 6,
+};
+const ROSTER_WEIGHT = 4;
+
+/** Cumulative weights, built once: [culture, running total]. */
+const WEIGHTED: Array<[string, number]> = [];
+let WEIGHT_TOTAL = 0;
+for (const culture of CULTURES) {
+  WEIGHT_TOTAL += CULTURE_WEIGHT[culture] ?? ROSTER_WEIGHT;
+  WEIGHTED.push([culture, WEIGHT_TOTAL]);
+}
+
+/** The odds of each culture, as a fraction of 1. For tests and for tuning. */
+export function cultureOdds(): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const c of CULTURES) out[c] = (CULTURE_WEIGHT[c] ?? ROSTER_WEIGHT) / WEIGHT_TOTAL;
+  return out;
+}
+
 function pick<T>(arr: readonly T[], rand: Rand): T {
   return arr[Math.floor(rand() * arr.length)]!;
+}
+
+/** The culture a roll lands on. Exported so a test can walk the whole range. */
+export function pickCulture(rand: Rand): string {
+  const r = rand() * WEIGHT_TOTAL;
+  for (const [culture, upTo] of WEIGHTED) if (r < upTo) return culture;
+  return WEIGHTED[WEIGHTED.length - 1]![0];
 }
 
 /**
@@ -473,10 +521,12 @@ function pick<T>(arr: readonly T[], rand: Rand): T {
  *
  * A roster culture hands back a whole name as written. A table culture builds
  * one - given + surname most of the time, sometimes given + place, sometimes a
- * place on its own.
+ * place on its own. The culture is weighted (see CULTURE_WEIGHT); the name
+ * within it is not, because the tables are d100 tables and every row on one is
+ * as likely as every other.
  */
 export function rollName(rand: Rand = Math.random): string {
-  const culture = pick(CULTURES, rand);
+  const culture = pickCulture(rand);
 
   const list = NAME_LISTS[culture];
   if (list) return pick(list, rand);

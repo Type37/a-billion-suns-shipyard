@@ -3,11 +3,13 @@ import { test } from "node:test";
 import { FACTIONS, GENERIC_HVP } from "../src/data/index.ts";
 import {
   CULTURES,
+  cultureOdds,
   NAME_LISTS,
   NON_HUMAN_FACTIONS,
   NON_HUMAN_HVP,
   TABLES,
   canRollName,
+  pickCulture,
   rollHvpName,
   rollName,
 } from "../src/hvp-names.ts";
@@ -87,6 +89,36 @@ test("every exception names a real HVP", () => {
 
 test("a homebrew faction is human until told otherwise", () => {
   assert.equal(canRollName("my-custom-faction", "some-hvp"), true);
+});
+
+test("every culture has odds, and they add up to one", () => {
+  const odds = cultureOdds();
+  assert.equal(Object.keys(odds).length, CULTURES.length);
+  for (const c of CULTURES) assert.ok(odds[c]! > 0, `${c} can never come up`);
+  const total = Object.values(odds).reduce((a, b) => a + b, 0);
+  assert.ok(Math.abs(total - 1) < 1e-9, `odds sum to ${total}`);
+});
+
+test("the weights land in the order they were asked for", () => {
+  const o = cultureOdds();
+  // A baseline table > Japanese and Indian > Russian > any single roster.
+  assert.ok(o["english"]! > o["japanese"]!);
+  assert.equal(o["japanese"], o["indian"]);
+  assert.ok(o["japanese"]! > o["russian"]!);
+  assert.ok(o["russian"]! > o["caledonia"]!);
+  // Every roster is weighted the same as every other.
+  const rosters = Object.keys(NAME_LISTS).map((k) => o[k]!);
+  assert.equal(new Set(rosters).size, 1);
+  // And the rosters as a block no longer take most of the rolls.
+  assert.ok(rosters.reduce((a, b) => a + b, 0) < 0.5);
+});
+
+test("a weighted roll still visits every culture", () => {
+  // A cumulative-weights bug that skipped the first or last entry would show
+  // here and nowhere else: the name still looks perfectly plausible.
+  const seen = new Set<string>();
+  for (let i = 0; i < 400; i++) seen.add(pickCulture(() => i / 400));
+  assert.equal(seen.size, CULTURES.length, [...CULTURES].filter((c) => !seen.has(c)).join(", "));
 });
 
 test("rolls reach both the rosters and the built names", () => {

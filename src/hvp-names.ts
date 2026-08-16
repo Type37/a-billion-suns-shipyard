@@ -11,6 +11,8 @@
 // table - given + surname, given + place, or a bare place. Nothing is decorated
 // with epithets, callsigns or titles: the table is the whole vocabulary.
 
+import { TRIBUTE_NAMES } from "./tributes.ts";
+
 export type Rand = () => number;
 
 /** A d100 name table: three columns of people, one of places. */
@@ -328,6 +330,10 @@ export const TABLES: Record<string, NameTable> = {
 // ---------------------------------------------------------------------------
 
 export const NAME_LISTS: Record<string, string[]> = {
+  // The easter egg (see src/tributes.ts). Weighted far below every real
+  // culture, so an HVP turns out to be a game designer about once in seventy
+  // rolls - often enough to happen at a table, rare enough to be a surprise.
+  tribute: TRIBUTE_NAMES,
   caledonia: [
     "Jack Robertson", "Charlie Campbell", "Callum Paterson", "Rory Campbell",
     "Gawen Stewart", "Robert Balfour", "James Conroy", "Nairn Kinnison",
@@ -487,6 +493,7 @@ export const CULTURE_WEIGHT: Record<string, number> = {
   japanese: 8,
   indian: 8,
   russian: 6,
+  tribute: 2,
 };
 const ROSTER_WEIGHT = 4;
 

@@ -106,11 +106,17 @@ test("the weights land in the order they were asked for", () => {
   assert.equal(o["japanese"], o["indian"]);
   assert.ok(o["japanese"]! > o["russian"]!);
   assert.ok(o["russian"]! > o["caledonia"]!);
-  // Every roster is weighted the same as every other.
-  const rosters = Object.keys(NAME_LISTS).map((k) => o[k]!);
+  // Every faction roster is weighted the same as every other. The tributes are
+  // not a faction roster - they are the easter egg, and sit below everything.
+  const rosters = Object.keys(NAME_LISTS).filter((k) => k !== "tribute").map((k) => o[k]!);
   assert.equal(new Set(rosters).size, 1);
+  for (const c of CULTURES) {
+    if (c !== "tribute") assert.ok(o[c]! > o["tribute"]!, `${c} is rarer than the easter egg`);
+  }
   // And the rosters as a block no longer take most of the rolls.
   assert.ok(rosters.reduce((a, b) => a + b, 0) < 0.5);
+  // An easter egg that fires one roll in twenty is not an easter egg.
+  assert.ok(o["tribute"]! < 0.02, `tributes come up ${(o["tribute"]! * 100).toFixed(1)}% of the time`);
 });
 
 test("a weighted roll still visits every culture", () => {

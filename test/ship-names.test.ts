@@ -1,6 +1,7 @@
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { SHIP_NAME_POOLS, UNSC_CAPITAL_SHIP_NAMES, capitalShipName } from "../src/ship-names.ts";
+import { TRIBUTE_NAMES } from "../src/tributes.ts";
 
 const UNSC = "cf-example-unsc";
 
@@ -38,9 +39,20 @@ test("adding a second capital does not rename the first", () => {
 });
 
 test("it still returns a name when the whole pool is taken", () => {
-  const all = [...UNSC_CAPITAL_SHIP_NAMES];
-  const n = capitalShipName(UNSC, "x:y", all);
-  assert.ok(UNSC_CAPITAL_SHIP_NAMES.includes(n!));
+  const pool = SHIP_NAME_POOLS[UNSC]!;
+  const n = capitalShipName(UNSC, "x:y", [...pool]);
+  assert.ok(pool.includes(n!));
+});
+
+test("the UNSC pool carries the tributes and the Covenant pool does not", () => {
+  // The Covenant name ships after virtues, never after people. The UNSC name
+  // them after people all the time, which is what makes the egg hide there.
+  for (const t of TRIBUTE_NAMES) {
+    assert.ok(SHIP_NAME_POOLS["cf-example-unsc"]!.includes(t), t);
+    assert.ok(!SHIP_NAME_POOLS["cf-example-covenant"]!.includes(t), t);
+  }
+  // And the transcription itself stays a transcription.
+  for (const t of TRIBUTE_NAMES) assert.ok(!UNSC_CAPITAL_SHIP_NAMES.includes(t), t);
 });
 
 test("a faction with no pool is not christened at all", () => {

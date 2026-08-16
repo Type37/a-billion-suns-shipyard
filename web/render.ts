@@ -1011,7 +1011,7 @@ function hvpNameLine(def: Hvp, selIndex: number, factionId: string, customName?:
   // die - the field is still there, and you can still type whatever you like
   // into it, which is the right answer for a Brood-Mother.
   const roll = canRollName(factionId, def.id)
-    ? `<button class="hvp-name-roll" data-action="hvp-roll-name" data-index="${selIndex}" data-hvp="${def.id}" title="Roll a name" aria-label="Roll a name for ${escapeHtml(def.name)}">${icon("die", 14)}</button>`
+    ? `<button class="hvp-name-roll" data-action="hvp-roll-name" data-index="${selIndex}" data-hvp="${def.id}" title="Roll a random name" aria-label="Roll a random name for ${escapeHtml(def.name)}">${icon("random", 11)}</button>`
     : "";
   // The job title IS the field's name, and the same string is its starting
   // value, so the row says the identical words whether or not you have touched
@@ -1323,7 +1323,7 @@ function shipyardView(state: AppState): string {
       <div class="sy-id">
         <span class="mf-emblem">${emblemPicker}</span>
         <input class="mf-name sy-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled company" aria-label="Company name" data-action="fleet-name" />
-        <button class="mf-name-gen" data-action="reroll-corp-name" title="Roll a company name" aria-label="Roll a company name">${icon("d12", 18)}</button>
+        <button class="mf-name-gen" data-action="reroll-corp-name" title="Roll a random company name" aria-label="Roll a random company name">${icon("random", 14)}</button>
         <button class="mf-name-gen" data-action="blank-fleet-name" title="Clear the name" aria-label="Clear the name">${icon("eraser", 18)}</button>
       </div>
       <div class="sy-fac">
@@ -1675,7 +1675,7 @@ function builderView(state: AppState): string {
       <div class="sy-id">
         <span class="mf-emblem">${emblemPicker}</span>
         <input class="mf-name sy-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled fleet" aria-label="Fleet name" data-action="fleet-name" />
-        <button class="mf-name-gen" data-action="gen-fleet-name" title="Roll a fleet name" aria-label="Roll a fleet name">${icon("die", 18)}</button>
+        <button class="mf-name-gen" data-action="gen-fleet-name" title="Roll a random fleet name" aria-label="Roll a random fleet name">${icon("random", 14)}</button>
         <button class="mf-name-gen" data-action="blank-fleet-name" title="Clear the name" aria-label="Clear the name">${icon("eraser", 18)}</button>
       </div>
       <div class="sy-fac">
@@ -3264,7 +3264,7 @@ function playFleetPanel(list: SavedList, faction: Faction | undefined, customs: 
         <span class="pf-tally-n is-reserve">${tally.reserve}</span> in reserve
         ${actLine}
       </p>
-      ${anyActed ? `<button class="pf-clear-acted" data-action="play-acted-clear">${icon("shuffle", 12)} Clear tokens</button>` : ""}
+      ${anyActed ? `<button class="pf-clear-acted" data-action="play-acted-clear" title="Clear every activated token on the board">${icon("eraser", 12)} Clear tokens</button>` : ""}
     </div>
     <div class="pf-list">${rows}</div>
   </section>`;
@@ -3706,7 +3706,7 @@ function playView(state: AppState): string {
           round counter and a phase track it would wipe.
         -->
         <a class="ghost-btn play-bar-print" href="#/print/${list.id}">${icon("print", 14)} Print</a>
-        <button class="ghost-btn play-bar-reset" data-action="play-reset">${icon("shuffle", 14)} Reset game</button>
+        <button class="ghost-btn play-bar-reset" data-action="play-reset" title="Reset the round, phase, CMD and VP trackers">${icon("eraser", 14)} Reset game</button>
         <a class="cta-btn play-bar-end" href="#/list/${list.id}">${icon("check", 15)} End play</a>
       </header>
       <div class="phase-track">${phaseBtns}</div>
@@ -4862,7 +4862,7 @@ function emblemModal(state: AppState): string {
       <div class="em-tabs" role="tablist">${tabBtns}</div>
       <div class="em-body">${body}</div>
       <div class="em-foot">
-        <button class="bar-btn" data-action="${cfg.rndA}">${icon("shuffle", 15)} Random</button>
+        <button class="bar-btn" data-action="${cfg.rndA}" title="Pick a random emblem from the library">${icon("random", 11)} Random</button>
         ${cfg.hasImage ? `<button class="bar-btn danger" data-action="${cfg.clrA}">${icon("close", 15)} Remove</button>` : ""}
         <button class="cta-btn em-done" data-action="close-modal">${icon("check", 16)} Done</button>
       </div>

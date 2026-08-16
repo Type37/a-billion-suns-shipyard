@@ -463,7 +463,7 @@ function blipsPanel(o: SavedOutfit): string {
     <section class="solo-card solo-blips">
       <h3 class="roster-section">Blips</h3>
       <p class="blip-note">Eight markers, numbered 1 to 8, shuffled facedown into the Hostile half.</p>
-      <button class="primary-btn" data-action="solo-shuffle-blips">${icon("shuffle", 16)} Shuffle the bag</button>
+      <button class="primary-btn" data-action="solo-shuffle-blips" title="Shuffle the eight blips into a random order">${icon("random", 12)} Shuffle the bag</button>
     </section>`;
   }
   // NOTHING MOVES WHEN A MARKER IS FLIPPED. Every tile carries both faces at
@@ -503,7 +503,7 @@ function blipsPanel(o: SavedOutfit): string {
   return `
     <section class="solo-card solo-blips">
       <h3 class="roster-section">Blips
-        <button class="ghost-btn" data-action="solo-shuffle-blips">${icon("shuffle", 13)} Reshuffle</button>
+        <button class="ghost-btn" data-action="solo-shuffle-blips" title="Shuffle the eight blips into a random order">${icon("random", 10)} Reshuffle</button>
       </h3>
       <div class="blip-grid">${markers}</div>
       <p class="blip-rule">${ruleText(PIRATE_RULE)}</p>

@@ -127,6 +127,14 @@ const PATHS: Record<string, string> = {
   sync: '<path d="M20 11.5A8 8 0 0 0 6.3 6.3L4 8.5M4 12.5a8 8 0 0 0 13.7 5.2l2.3-2.2"/><path d="M4 4.5v4h4M20 19.5v-4h-4"/>',
   image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.8" fill="currentColor" stroke="none"/><path d="M4 18 9 12 13 16 16 13 20 18" fill="none"/>',
   die: '<rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="9" cy="9" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="9" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="9" cy="15" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="15" r="1.5" fill="currentColor" stroke="none"/>',
+  // THE randomise mark. Every control in the app that rolls something wears
+  // this one - fleet name, company name, HVP name, emblem, the blip bag - so
+  // "this button will pick for me" is one shape you learn once. A solid mark on
+  // a 32x24 grid, so it carries its own fill and stroke:none and ignores
+  // icon()'s stroke wrapper; the empty 32x24 background path in the source is
+  // dropped, since the viewBox already states the canvas.
+  random:
+    '<path fill="currentColor" stroke="none" d="M24.983 8.539V6.054h-4.902l-3.672 5.945l-2.099 3.414l-3.24 5.256c-.326.51-.889.844-1.53.845H0v-3.568h8.538L12.211 12l2.099-3.414l3.24-5.256a1.81 1.81 0 0 1 1.525-.845h5.904V0l7.417 4.27l-7.417 4.27z"/><path fill="currentColor" stroke="none" d="m12.902 6.316l-.63 1.022l-1.468 2.39l-2.265-3.675H.001V2.485h9.54a1.81 1.81 0 0 1 1.526.838l.004.007l1.836 2.985zM24.983 24v-2.485h-5.904a1.81 1.81 0 0 1-1.521-.838l-.004-.007l-1.836-2.985l.63-1.022l1.468-2.39l2.264 3.675h4.902v-2.485l7.417 4.27l-7.417 4.27z"/>',
   // ship-stat glyphs, drawn on the 24 grid to sit inline with numbers
   "stat-mass": MASS_MARK,
   "stat-thrust":
@@ -209,6 +217,10 @@ const ICON_VIEWBOX: Record<string, string> = {
   "stat-shields": "-6 -6 524 524",
   // Siemens ix icons ship on a 512 grid, not the 24 the rest of this set uses.
   "ix-context-menu": "0 0 512 512",
+  // The randomise mark is the one wide glyph in the set: 32x24, an arrow
+  // crossing over itself. icon() widens the box to match rather than squaring
+  // it, so it keeps its proportions instead of sitting letterboxed in a square.
+  random: "0 0 32 24",
 };
 
 /**
@@ -233,7 +245,13 @@ export function icon(name: string, size = 18, cls = ""): string {
   if (!body) return "";
   const vb = ICON_VIEWBOX[name] ?? "0 0 24 24";
   const sw = strokeFor(size, vb).toFixed(2);
-  return `<svg class="icon ${cls}" width="${size}" height="${size}" viewBox="${vb}" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true">${body}</svg>`;
+  // `size` is the icon's HEIGHT. Every glyph in the set but one is square, so
+  // for those the width is the same number; a wide viewBox gets a wide box, or
+  // the browser would letterbox it and draw it smaller than everything beside
+  // it at the same nominal size.
+  const [, , vbW = "24", vbH = "24"] = vb.split(/\s+/);
+  const w = (size * (Number(vbW) / Number(vbH))).toFixed(2).replace(/\.?0+$/, "");
+  return `<svg class="icon ${cls}" width="${w}" height="${size}" viewBox="${vb}" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true">${body}</svg>`;
 }
 
 export function emblem(name: string, size = 28, cls = ""): string {

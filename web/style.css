@@ -5774,11 +5774,22 @@ body[data-view="solo"] .wlf,
 body[data-view="solo-outfit"] .wlf,
 body[data-view="play"] .wlf { display: none; }
 /* On home the credits line rides the bottom of the screen while you scroll, then
-   settles above the WarLore footer once you reach it (sticky is bounded by #app).
-   Desktop only: on a phone the credits wrap to several lines, which would be a
-   permanent band covering the page. */
-@media (min-width: 761px) {
-  body[data-view="home"] .game-info-footer { position: sticky; bottom: 0; z-index: 40; background: var(--paper); }
+   settles above the WarLore footer once you reach it (sticky is bounded by #app,
+   and .wlf follows #app). Home has no fixed bottom bar, so bottom: 0 is clear. */
+body[data-view="home"] .game-info-footer { position: sticky; bottom: 0; z-index: 40; background: var(--paper); }
+/* On a phone that band sits over the page the whole time, so it packs tight:
+   smaller type, small gaps, and the coarse-pointer 13px link padding (the 44px
+   tap floor, set above) dropped here, where it made every wrapped row 45px tall. */
+@media (max-width: 760px) {
+  body[data-view="home"] .game-info-footer { margin-top: 24px; padding: 6px 8px max(6px, env(safe-area-inset-bottom)); }
+  /* Three rows at 320px is the floor: the seven items are 781px of text at 11px
+     against a 304px row. The 6px column gap is what makes the third row
+     (Shipyard by WarLore, Send Feedback, Source on GitHub, 299px) fit; at 10px
+     it was 307px and spilled a fourth and fifth. */
+  body[data-view="home"] .gif-inner { gap: 2px 6px; font-size: 11px; line-height: 1.35; }
+  body[data-view="home"] .gif-inner > span,
+  body[data-view="home"] .gif-inner > a { padding: 2px 0; }
+  body[data-view="home"] .gif-inner svg { width: 11px; height: 11px; }
 }
 .play-cols .pc-cmds { margin-top: 0; }
 .play-cols .play-counters { margin: 0; }
@@ -7668,6 +7679,9 @@ main.play-body .roster-section::before { content: none; }
   .ltp-tabs--bottom .ltp-tab-n {
     display: block; font-family: var(--display); font-weight: 800; font-size: 10px;
   }
-  .ltp ~ .game-info-footer { padding-bottom: calc(58px + env(safe-area-inset-bottom, 0)); }
+  /* 48px: the shrunk bar measured 47px tall at 880x400 (42px tabs, its border,
+     the tab padding); on the body for the same reason as the portrait rule (it
+     must clear the shared WarLore footer). */
+  body:is([data-view="learn"], [data-view="rules"]) { padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px)); }
   .ltp-sec { scroll-margin-top: 60px; }
 }

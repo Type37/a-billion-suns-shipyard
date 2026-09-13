@@ -5762,6 +5762,24 @@ a .icon,
 /* Nothing decorative survives in Play Mode: the credits/links footer is a whole
    band of screen you cannot use with a fleet on the table in front of you. */
 main.play-body ~ .game-info-footer { display: none; }
+
+/* The shared WarLore footer (type37.github.io/warlore-footer, appended to <body>
+   after #app) belongs on pages you read: home, fleets, ships, learn and rules.
+   Not on screens you work in. body[data-view] is set on every render in main.ts. */
+body[data-view="builder"] .wlf,
+body[data-view="print"] .wlf,
+body[data-view="print-outfit"] .wlf,
+body[data-view="foundry"] .wlf,
+body[data-view="solo"] .wlf,
+body[data-view="solo-outfit"] .wlf,
+body[data-view="play"] .wlf { display: none; }
+/* On home the credits line rides the bottom of the screen while you scroll, then
+   settles above the WarLore footer once you reach it (sticky is bounded by #app).
+   Desktop only: on a phone the credits wrap to several lines, which would be a
+   permanent band covering the page. */
+@media (min-width: 761px) {
+  body[data-view="home"] .game-info-footer { position: sticky; bottom: 0; z-index: 40; background: var(--paper); }
+}
 .play-cols .pc-cmds { margin-top: 0; }
 .play-cols .play-counters { margin: 0; }
 
@@ -7605,11 +7623,12 @@ main.play-body .roster-section::before { content: none; }
   }
   .ltp-tabs--bottom .ltp-tab.on { border-top-color: var(--blue); border-bottom-color: transparent; }
   /* Clear of the fixed bar plus its safe-area inset, so nothing ends up sitting
-     under it. The clearance goes on the site footer, not on .ltp, because the
-     footer is what actually comes last on the page - putting it on .ltp left the
-     bottom third of the footer covered while opening a dead gap above it. */
+     under it. The clearance goes on the body, not on .ltp or the credits footer,
+     because it must come after whatever is last on the page: on .ltp it left the
+     credits covered, and on the credits it left the shared WarLore footer (which
+     follows #app) covered. 56px = the bar's 54px tabs plus its 2px top border. */
   .ltp { padding-bottom: 26px; }
-  .ltp ~ .game-info-footer { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0)); }
+  body:is([data-view="learn"], [data-view="rules"]) { padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px)); }
   /* The header is one row shorter without the strip, so the offset drops. */
   .ltp-sec { scroll-margin-top: 74px; }
 }

@@ -439,6 +439,9 @@ function paint(): void {
   if (mainEl) mainEl.id = "main-content";
   holdAnchor();
   syncDocumentTitle();
+  // The shared WarLore footer (index.html) lives outside #app, so the CSS that
+  // hides it on work screens keys off the body, not off anything render() makes.
+  document.body.dataset["view"] = store.getState().route.view;
   enhanceNav();
   positionTour();
 

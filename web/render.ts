@@ -4421,10 +4421,10 @@ function learnFleetTable(): string {
         .flat()
         .join("<br>");
       return `<tr>
-        <td class="lf-qty">${counts.get(id) ?? 1}</td>
+        <td class="lf-qty" data-label="Qty">${counts.get(id) ?? 1}</td>
         <td class="lf-ship">${escapeHtml(s.name)}</td>
-        <td>${s.mass}</td><td>${s.thrust}"</td><td>${s.silhouette}</td><td>${s.shields}</td>
-        <td class="lf-weap">${cells || (s.utilityBays ? "Utility bays" : "&mdash;")}</td>
+        <td data-label="Mass">${s.mass}</td><td data-label="Thrust">${s.thrust}"</td><td data-label="Sil">${s.silhouette}</td><td data-label="Shields">${s.shields}</td>
+        <td class="lf-weap" data-label="Weapons">${cells || (s.utilityBays ? "Utility bays" : "&mdash;")}</td>
       </tr>`;
     })
     .join("");

@@ -442,6 +442,7 @@ function paint(): void {
   // The shared WarLore footer (index.html) lives outside #app, so the CSS that
   // hides it on work screens keys off the body, not off anything render() makes.
   document.body.dataset["view"] = store.getState().route.view;
+  placeFleetMenus();
   enhanceNav();
   positionTour();
 
@@ -1316,6 +1317,31 @@ document.addEventListener(
       // Closed: let it play again next time it is opened.
       delete el.dataset["animDone"];
     }
+  },
+  true,
+);
+
+// The fleet menu panel hangs from its button's right edge (style.css, .mf-menu-
+// panel), which is right while the button ends the header row. When the header
+// wraps so the button starts a row instead - 768px, four of the eight starter
+// fleets - the 210px panel ran 151px off the left edge of the screen. Which side
+// is right depends on where the wrap fell, so it is measured on open: hang it
+// from the right edge, and if that puts it off the left, hang it from the left.
+// Also called after every paint, because morph drops a class the template does
+// not carry, which would swing an open panel back off-screen.
+function placeFleetMenus(): void {
+  for (const d of document.querySelectorAll<HTMLDetailsElement>("details.mf-menu[open]")) {
+    const panel = d.querySelector<HTMLElement>(".mf-menu-panel");
+    if (!panel) continue;
+    d.classList.remove("is-flip");
+    if (panel.getBoundingClientRect().left < 8) d.classList.add("is-flip");
+  }
+}
+
+document.addEventListener(
+  "toggle",
+  (e) => {
+    if (e.target instanceof HTMLDetailsElement && e.target.classList.contains("mf-menu")) placeFleetMenus();
   },
   true,
 );

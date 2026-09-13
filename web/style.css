@@ -7685,3 +7685,83 @@ main.play-body .roster-section::before { content: none; }
   body:is([data-view="learn"], [data-view="rules"]) { padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px)); }
   .ltp-sec { scroll-margin-top: 60px; }
 }
+
+/* ---------------------------------------------------- No sideways scrolling
+   From the 2026-09-13 audit (every view, dialog and menu at 320, 360, 375,
+   393, 430, 768 and 1280px): these are the things that pushed the page, or
+   their own box, sideways. Each is fixed by reflowing, never by clipping. */
+
+/* 1. The faction picker is up to 720px wide and hung off the left edge of its
+   summary, which sits mid-header: opened at 768px it ran 307px past the screen,
+   and even at 1280px 34-106px. The header is now its containing block (the
+   details go static), so it takes its width from the header row and lines up
+   with the header's right edge. top:auto keeps its static position, so it
+   still drops from directly under the summary. */
+.sy-head { position: relative; }
+.sy-head .mf-fac, .sy-head .faction-switch { position: static; }
+.sy-head .faction-switch-panel { top: auto; left: auto; right: 0; margin-top: 6px; width: min(720px, 100%); }
+
+/* 2. The era panel hangs its 300px off the era badge's left edge. Above the
+   phone sheet (760px) the badge can sit far enough right that it ran 8-17px
+   off a 768px screen, so up to 1100px it hangs off the badge's right edge. */
+@media (min-width: 761px) and (max-width: 1100px) {
+  .era-switch-panel { left: auto; right: 0; }
+}
+
+/* 3. The Ship Compendium table needs 896px and only gets it from about 993px
+   wide; between the phone cards (760px) and there it scrolled 84-205px inside
+   its box. The same packed cards as the phone rules, same labels, taken up to
+   1000px. Duplicated rather than moved because the phone block shares its
+   selectors with the fleets table, which fits at these widths. */
+@media (min-width: 761px) and (max-width: 1000px) {
+  .comp-scroll { overflow-x: visible; }
+  .comp-table, .comp-table tbody, .comp-table tr, .comp-table td { display: block; width: auto; }
+  .comp-table thead { position: absolute; left: -9999px; }
+  .comp-table tbody tr:not(.comp-group) {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 1px 10px;
+    border: 1px solid var(--hair); background: var(--paper); padding: 8px 11px; margin-bottom: 6px;
+  }
+  .comp-table tbody tr:not(.comp-group) td { border: none; padding: 3px 0; text-align: left; white-space: normal; }
+  .comp-table td[data-label] { display: flex; align-items: baseline; gap: 10px; }
+  .comp-table td[data-label]::before {
+    content: attr(data-label); flex: 0 0 auto;
+    font-family: var(--sans); font-size: 11px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3);
+  }
+  .comp-table .comp-name { font-family: var(--display); font-weight: 800; font-size: 15px; white-space: normal; flex: 1 1 auto; order: 0; padding-bottom: 0; }
+  .comp-table td.comp-cost { order: 1; margin-left: auto; font-weight: 800; color: var(--blue); }
+  .comp-table td.comp-cost::before { content: none; }
+  .comp-table td.comp-fac { order: 2; flex: 1 1 100%; }
+  .comp-table td.comp-num:not(.comp-cost) { order: 3; flex: 0 0 auto; gap: 5px; }
+  .comp-table td.comp-weap { order: 4; flex: 1 1 100%; min-width: 0; }
+  .comp-table tbody tr.comp-group td { position: sticky; top: 0; z-index: 2; }
+}
+
+/* 4. New-outfit dialog: a dial row is a 128px label, a 12px gap and a 162px
+   stepper, 302px in a 286px body at 320px, so the dialog scrolled 11px. The
+   stepper wraps under its label when the row cannot hold both. */
+.no-dial { flex-wrap: wrap; row-gap: 6px; }
+
+/* 5. The archived walkthrough's fleet table (#/learn-classic/1) holds a 560px
+   minimum, so on a phone it scrolled 166-274px inside its box. Below 600px each
+   ship becomes a card: quantity and name on the first line, the four stats
+   with their labels (data-label, render.ts) on the next, weapons full width. */
+@media (max-width: 600px) {
+  .lf-table-wrap { overflow-x: visible; border: 0; }
+  .lf-table { min-width: 0; }
+  .lf-table, .lf-table tbody, .lf-table tr, .lf-table td { display: block; }
+  .lf-table thead { position: absolute; left: -9999px; }
+  .lf-table tbody tr { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; border: 1px solid var(--hair); padding: 8px 11px; margin-bottom: 6px; }
+  .lf-table td, .lf-table tbody tr:last-child td { border: 0; padding: 1px 0; }
+  .lf-table td.lf-qty { order: -2; }
+  .lf-table td.lf-ship { order: -1; flex: 1 1 auto; font-weight: 700; }
+  .lf-table td.lf-weap { flex: 1 1 100%; }
+  .lf-table td[data-label]::before { content: attr(data-label); margin-right: 5px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--ink-3); }
+}
+
+/* 6. The fleet menu panel hangs from its button's right edge, which is right
+   while the button ends the header row. When the header wraps so the button
+   starts a row (768px, four of the eight starter fleets) the 210px panel ran
+   151px off the left edge. Which side it is on depends on how the row wrapped,
+   so main.ts measures on open and sets .is-flip to hang it from the left edge. */
+.mf-menu.is-flip .mf-menu-panel { right: auto; left: 0; }

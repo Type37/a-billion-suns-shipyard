@@ -48,13 +48,20 @@ export const FACTION_EMBLEMS: FactionEmblem[] = [
       '<g fill="var(--paper)"><circle cx="27" cy="27" r="3"/><circle cx="27" cy="73" r="3"/><circle cx="72" cy="27" r="3"/><circle cx="72" cy="73" r="3"/></g>',
   },
   {
+    // Id kept from the old stencil M so saved lists still resolve. The mark is
+    // the Phantom Megamart logo (teal roundel, M over a mirrored M), rescaled
+    // from its -1412..1412 grid. The source let the lower M run past the circle
+    // onto a white square; here that M is cut at the circle edge instead so the
+    // mark sits on any background. Fixed teal, so it is multicolor.
     id: "megamart-stencil-m",
     factionId: "megamart",
-    label: "Stencil M",
+    label: "Megamart M",
     defaultColor: "ink",
+    multicolor: true,
     body:
-      '<path fill="currentColor" d="M18 82 L18 20 L32 20 L50 50 L68 20 L82 20 L82 82 L68 82 L68 44 L54 66 L46 66 L32 44 L32 82 Z"/>' +
-      '<g fill="var(--paper)"><rect x="18" y="50" width="14" height="3"/><rect x="68" y="50" width="14" height="3"/></g>',
+      '<circle cx="50" cy="50" r="50" fill="rgb(57,127,139)"/>' +
+      '<g fill="#fff"><polygon points="20.25,22.84 50,44.44 79.75,22.84 79.75,67.81 65.93,67.81 65.93,48.69 50,60.3 34.07,48.69 34.07,67.81 20.25,67.81"/>' +
+      '<path d="M20.25 77.37 H34.07 V96.49 L50 84.88 L65.93 96.49 V77.37 H79.75 V90.19 A50 50 0 0 1 20.25 90.19 Z"/></g>',
   },
   {
     id: "news-masthead-n",

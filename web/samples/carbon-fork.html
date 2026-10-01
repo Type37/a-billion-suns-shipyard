@@ -140,13 +140,15 @@ h1, h2, h3, p { margin: 0; }
 
 /* Segmented control: Astryx's behaviour, Carbon's tokens. One always selected,
    2 to 5 segments, equal widths, lg 48. */
-.seg { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; border: 1px solid var(--border-strong); background: var(--field); }
-.seg.fill { display: grid; }
-.seg button { height: 46px; border: none; border-left: 1px solid var(--border-subtle); background: none; padding: 0 var(--spacing-05); font: 400 14px/18px var(--sans); letter-spacing: 0.16px; color: var(--text-secondary); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: var(--spacing-03); }
-.seg button:first-child { border-left: none; }
+/* Segments never break a label across lines. When the row is too narrow for
+   every label on one line (five credit limits on a phone) the segments wrap
+   onto a second row instead, each row still filling the width. The 1px gap
+   over a border-coloured ground draws the dividers on both axes. */
+.seg { display: inline-flex; flex-wrap: wrap; gap: 1px; background: var(--border-subtle); border: 1px solid var(--border-strong); max-width: 100%; }
+.seg.fill { display: flex; }
+.seg button { flex: 1 1 auto; height: 46px; white-space: nowrap; border: none; background: var(--field); padding: 0 var(--spacing-05); font: 400 14px/18px var(--sans); letter-spacing: 0.16px; color: var(--text-secondary); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: var(--spacing-03); }
 .seg button:hover { background: var(--field-hover); color: var(--text-primary); }
 .seg button[aria-checked="true"] { background: var(--text-primary); color: #fff; font-weight: 600; }
-.seg button[aria-checked="true"] + button { border-left-color: transparent; }
 .seg button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
 
 /* Radio and checkbox */
@@ -212,6 +214,14 @@ h1, h2, h3, p { margin: 0; }
 .steps li.current .dot { border-width: 5px; }
 .steps li.todo .dot { border-color: var(--text-secondary); }
 .steps li.current .label { font-weight: 600; }
+/* Carbon: "When possible, arrange the progress indicator vertically." Four
+   steps at 128px minimum do not fit a phone across, so below md (672) the
+   line runs down the left instead. */
+@media (max-width: 671px) {
+  .steps { grid-template-columns: 1fr; }
+  .steps li { border-top: none; border-left: 2px solid var(--border-subtle); padding: 0 0 var(--spacing-05) var(--spacing-03); }
+  .steps li.done, .steps li.current { border-left-color: var(--interactive); }
+}
 
 /* Tags, md 24, read-only */
 .tags { display: flex; flex-wrap: wrap; gap: var(--spacing-03); }

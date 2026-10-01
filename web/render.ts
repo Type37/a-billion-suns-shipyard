@@ -1616,7 +1616,10 @@ function builderView(state: AppState): string {
           <ul class="yard-status-panel issue-list">${issues.map(issueLine).join("")}</ul>
         </details>`
         : nUnits > 0
-          ? `<p class="yard-status is-ok">${icon("check", 12)} Legal</p>`
+          ? // The mark alone, in the warning mark's place and size, so the row
+            // does not change width between the two (Jet: "instead of legal
+            // let's just have a carbon:checkbox-checked-filled").
+            `<p class="yard-status is-ok" role="img" aria-label="Legal" title="Legal">${icon("legal", 20)}</p>`
           : "";
 
   return `
@@ -1828,7 +1831,7 @@ export function gunArc(ship: ShipClass, kind: "primary" | "aux"): string {
   const glyph = `<span class="gun-arc" role="img" aria-label="${label}" title="${label}">${icon(kind === "primary" ? "arc-primary" : "arc-aux", 16)}</span>`;
   if (weapons.length)
     return weapons
-      .map((w) => `<span class="gun">${glyph}<span class="gun-txt"><span class="gun-name">${escapeHtml(w.name)}</span> <span class="gun-fig">${w.count}${w.die} ${w.rangeMin}&ndash;${w.rangeMax}"</span></span></span>`)
+      .map((w) => `<span class="gun">${glyph}<span class="gun-txt"><span class="gun-name">${escapeHtml(w.name)}</span> <span class="gun-fig"><span class="gun-dice">${w.count}${w.die}</span> <span class="gun-range">${w.rangeMin}&ndash;${w.rangeMax}"</span></span></span></span>`)
       .join("");
   if (utility) return `<span class="gun">${glyph}<span class="gun-txt"><span class="gun-name">${icon("utility", 12, "util-ico")}Utility Bays</span></span></span>`;
   // An empty arc draws nothing. It used to draw the arc glyph and "None", a row

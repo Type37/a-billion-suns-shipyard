@@ -1610,10 +1610,14 @@ button { font-family: inherit; }
    three lines, and because grid rows stretch, a short card was padded out to the
    height of the tallest card in its row - the empty space inside those boxes.
    Two wider cards fit each weapon on one line AND come out shorter overall.
-   align-items:start means a card is only ever as tall as its own contents. */
+   Cards in a row now share the row's height again (stretch). With
+   align-items:start each card ended at its own contents, so two cards side by
+   side had ragged bottoms and the gap under the shorter one read as a missing
+   card (Jet: "card misalignment?"). At this width the spare height is a line
+   or two at most, and a straight row is also a straight cut. */
 .print-cards {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(min(330px, 100%), 1fr));
-  gap: 4px; align-items: start;
+  gap: 4px; align-items: stretch;
 }
 /* Cards are cut out and held at the table, so they are dense by design: the
    layout is name + count with cost, then the stat block and the weapons list
@@ -5166,8 +5170,13 @@ a .icon,
    label across the whole set, which is wider than a print card's left column -
    so the second pair overflowed its box and printed on top of the weapon names
    beside it. Here each chip is a simple flex row that stays inside its cell. */
+/* The two columns have a floor wide enough for a two digit Thrust (12"),
+   measured at 39.3px and 55.0px at the card's 11.5px, so the weapons start at
+   the same x in every card. Sized to content, a 6" ship's block came out 4.6px
+   narrower than a 10" ship's and its guns sat left of the card beside it (Jet:
+   "card misalignment?"). */
 .print-card .stat-chips {
-  display: grid; grid-template-columns: repeat(2, minmax(0, max-content));
+  display: grid; grid-template-columns: minmax(3.5em, max-content) minmax(4.8em, max-content);
   gap: 0 7px; align-content: start;
 }
 .print-card .stat-chips > .stat-chip {
@@ -8268,3 +8277,15 @@ cds-button.btn, cds-button.sy-add-unit { width: max-content; min-width: max-cont
    reads as a break between groups rather than one more card edge (Jet: "color
    the dividers one of our accent colors, make it a lil thicker"). */
 .au-groups > .au-list + .au-list { border-top: 3px solid var(--blue); }
+
+/* Weapon lines: the name on its own line, then the figures in two columns,
+   dice and range, so 1D8 0-9" and 12D6 12-24" start their ranges at the same
+   x in every card. The name used to share the figures' line when it fitted and
+   wrap above them when it did not, so in one card the figures sat at the end
+   of LASER CANNON and in the next under HEAVY RAILGUNS (Jet: "it would be nice
+   if we could figure out a way to get that shit aligned"). The dice column is
+   as wide as the widest roll in the data: four characters (10D6, 12D6),
+   measured at 31.2px in 13px tabular figures, so 2.5em. A custom faction's
+   five character roll (10D10) widens its own line rather than overrunning. */
+.gun-name { display: block; }
+.gun-fig { display: grid; grid-template-columns: minmax(2.5em, max-content) max-content; column-gap: 8px; justify-content: start; }

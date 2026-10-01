@@ -21,6 +21,7 @@ import c_subtract from "@carbon/icons/es/subtract/16.js";
 import c_close from "@carbon/icons/es/close/16.js";
 import c_checkmark from "@carbon/icons/es/checkmark/16.js";
 import c_warning_alt from "@carbon/icons/es/warning--alt/16.js";
+import c_checkbox_checked_filled from "@carbon/icons/es/checkbox--checked--filled/16.js";
 import c_printer from "@carbon/icons/es/printer/16.js";
 import c_link from "@carbon/icons/es/link/16.js";
 import c_home from "@carbon/icons/es/home/16.js";
@@ -74,6 +75,7 @@ export const CARBON_ICONS: Record<string, Node> = {
   "close": c_close,
   "check": c_checkmark,
   "warning": c_warning_alt,
+  "legal": c_checkbox_checked_filled,
   "print": c_printer,
   "link": c_link,
   "home": c_home,

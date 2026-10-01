@@ -265,7 +265,7 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--sans);
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -395,7 +395,7 @@ button { font-family: inherit; }
 .cta-btn {
   background: var(--blue);
   color: #fff;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -416,7 +416,7 @@ button { font-family: inherit; }
 .bar-btn {
   background: var(--paper);
   color: var(--ink);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -431,7 +431,7 @@ button { font-family: inherit; }
 .ghost-btn {
   background: transparent;
   color: var(--ink-2);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   padding: 7px 10px;
   /* NOT --hair-soft (1.43:1 on white). A ghost button has no fill and no
@@ -448,7 +448,7 @@ button { font-family: inherit; }
 .add-btn {
   background: var(--blue);
   color: #fff;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -477,7 +477,7 @@ button { font-family: inherit; }
 @media (hover: hover) { .wordmark:hover { text-decoration: none; } }
 .wordmark-text { font-family: var(--display); font-weight: 900; font-size: 18px; letter-spacing: 0.02em; text-transform: uppercase; }
 .wordmark-sub {
-  font-family: var(--sans); font-weight: 600; font-size: 10px; letter-spacing: 0.16em;
+  font-family: var(--sans); font-weight: 600; font-size: 11px; letter-spacing: 0.16em;
   text-transform: uppercase; color: #bcd0f2; padding-left: 12px; margin-left: 2px; border-left: 1px solid #35569f;
 }
 .topnav { position: relative; display: flex; gap: 4px; }
@@ -492,7 +492,7 @@ button { font-family: inherit; }
 .topnav a, .topnav-btn {
   position: relative; z-index: 1;
   display: inline-flex; align-items: center; gap: 7px; color: #fff;
-  font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+  font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
   padding: 9px 14px; border: 1px solid transparent; transition: color 0.16s ease;
 }
 .topnav-btn { background: none; cursor: pointer; }
@@ -527,7 +527,7 @@ button { font-family: inherit; }
 
 /* Uniform WarLore builder footer: one centered, dot-separated line. */
 .game-info-footer { margin-top: 24px; border-top: 1px solid var(--hair-soft); padding: 16px 16px 22px; }
-.gif-inner { max-width: var(--shell); margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 24px; font-size: 12.5px; color: var(--ink-2); }
+.gif-inner { max-width: var(--shell); margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 24px; font-size: 13px; color: var(--ink-2); }
 .gif-inner > span, .gif-inner > a { padding: 0 2px; }
 /* Footer links were 15px tall text runs; 24px is the WCAG 2.5.8 floor and the
    wrap gap keeps neighbours from sharing a thumb. */
@@ -620,6 +620,20 @@ button { font-family: inherit; }
   .gif-inner > a { padding-top: 13px; padding-bottom: 13px; }
 }
 
+/* ---------------------------------------------------------------- Type scale
+   Every on-screen font-size is one of seven steps (October 2026, Jet: "font
+   sizes should all make sense"; there were 25 different sizes from 9px to
+   32px across seven screens):
+     11  small caps labels (MASS, THRUST, era tags, gun names)
+     13  small text and rules prose in cards
+     16  body text and every field (iOS zooms into a field under 16px)
+     18  card titles, ship and unit names
+     22  section heads
+     28  big headings
+     32+ page titles (clamped)
+   Print sheets keep their own sizes, set for paper. New rules pick a step;
+   an in-between size needs a reason written next to it. */
+
 /* -------------------------------------------------------------------- Carbon */
 /* IBM's Carbon design system supplies the dialogs (web components, see main.ts).
    Its colours are pointed at ours here so a Carbon dialog looks like the rest
@@ -708,7 +722,7 @@ button { font-family: inherit; }
    the middle of it, and clears the home bar. */
 @media (max-width: 760px) {
   .toast { left: 10px; right: 10px; transform: none; }
-  .toast.is-loud { font-size: 15px; padding: 14px 18px; }
+  .toast.is-loud { font-size: 16px; padding: 14px 18px; }
   @keyframes toast-in {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
@@ -736,7 +750,7 @@ button { font-family: inherit; }
   font-size: clamp(52px, 12vw, 132px); line-height: 0.86; letter-spacing: -0.03em;
   text-transform: uppercase;
 }
-.hero-sub { margin-top: 24px; max-width: 52ch; font-size: 17px; line-height: 1.5; color: #d6e2f6; }
+.hero-sub { margin-top: 24px; max-width: 52ch; font-size: 18px; line-height: 1.5; color: #d6e2f6; }
 
 /* ------------------------------------------------------------- hub + fleets */
 
@@ -761,7 +775,7 @@ button { font-family: inherit; }
 /* Vertically centred now that the body is a single line - flex-start left the
    dismiss button floating above a one-line paragraph. */
 .onboard { display: flex; align-items: center; gap: 16px; margin: 0 0 22px; padding: 14px 16px 14px 20px; border: 2px solid var(--color-line); border-left: 6px solid var(--color-accent); background: var(--paper); }
-.onboard-line { flex: 1; min-width: 0; font-size: 15px; line-height: 1.45; color: var(--ink); }
+.onboard-line { flex: 1; min-width: 0; font-size: 16px; line-height: 1.45; color: var(--ink); }
 .onboard-line a { font-family: var(--display); font-weight: 700; color: var(--color-action); }
 .onboard-close { background: transparent; border: 1px solid var(--hair); color: var(--ink-3); cursor: pointer; display: inline-flex; padding: 7px; flex-shrink: 0; }
 @media (hover: hover) { .onboard-close:hover { background: var(--ink); color: #fff; border-color: var(--ink); } }
@@ -832,8 +846,8 @@ button { font-family: inherit; }
   @media (hover: hover) {   .index-row:hover .index-desc { color: #cfe0fb; } }
 }
 .index-main { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-.index-name { font-family: var(--display); font-weight: 800; font-size: clamp(20px, 3vw, 30px); letter-spacing: -0.01em; line-height: 1.02; text-transform: uppercase; }
-.index-desc { font-size: 13.5px; color: var(--ink-2); transition: color 0.16s; }
+.index-name { font-family: var(--display); font-weight: 800; font-size: clamp(22px, 3vw, 28px); letter-spacing: -0.01em; line-height: 1.02; text-transform: uppercase; }
+.index-desc { font-size: 13px; color: var(--ink-2); transition: color 0.16s; }
 @media (hover: hover) { .index-row:hover .index-desc { color: #cfe0fb; } }
 .index-go { color: var(--ink-3); transition: transform 0.18s ease, color 0.16s; }
 @media (hover: hover) { .index-row:hover .index-go { color: #fff; transform: translateX(6px); } }
@@ -882,13 +896,13 @@ button { font-family: inherit; }
 @media (hover: hover) { .fleet-card-name:hover { color: var(--blue); text-decoration: none; } }
 .fleet-card-name:focus-visible { outline: none; }
 .fleet-card:has(.fleet-card-name:focus-visible) { outline: 2px solid var(--red); outline-offset: 1px; }
-.fleet-card-cost { grid-column: 3; grid-row: 1; align-self: start; justify-self: end; padding-right: 6px; font-family: var(--display); font-weight: 800; font-size: 17px; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fleet-card-cost { grid-column: 3; grid-row: 1; align-self: start; justify-self: end; padding-right: 6px; font-family: var(--display); font-weight: 800; font-size: 18px; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .fleet-card-faction { grid-column: 2 / 4; grid-row: 2; min-width: 0; padding-right: 104px; font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-2); }
-.fleet-card-mode { grid-column: 2 / 4; grid-row: 3; padding-right: 104px; font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--blue); }
+.fleet-card-mode { grid-column: 2 / 4; grid-row: 3; padding-right: 104px; font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--blue); }
 .fleet-card-actions { grid-column: 2 / 4; grid-row: 2 / 4; justify-self: end; align-self: end; }
 
 .fleets-empty { margin-top: 26px; font-family: var(--display); font-weight: 800; font-size: clamp(20px, 3vw, 26px); color: var(--ink); line-height: 1.25; }
-.fleets-empty-sub { font-family: var(--sans); font-size: 13.5px; font-weight: 500; color: var(--ink-2); }
+.fleets-empty-sub { font-family: var(--sans); font-size: 13px; font-weight: 500; color: var(--ink-2); }
 
 /* ------------------------------------------------------------- home layout */
 
@@ -905,19 +919,19 @@ button { font-family: inherit; }
 }
 @media (max-width: 940px) { .home-main { grid-template-columns: 1fr; } }
 
-.panel-title { font-size: 12px; font-weight: 600; color: var(--blue); margin-bottom: 6px; }
-.panel-note { color: var(--ink-2); font-size: 14px; margin-bottom: 24px; max-width: 62ch; }
+.panel-title { font-size: 13px; font-weight: 600; color: var(--blue); margin-bottom: 6px; }
+.panel-note { color: var(--ink-2); font-size: 13px; margin-bottom: 24px; max-width: 62ch; }
 /* Flavor lede: the narrative scene-setter at the top of a mode. Serif, larger,
    a touch loose, with a red rule down the left - it reads as story, not UI. */
 .flavor-lede {
-  font-family: var(--serif); font-size: 16.5px; line-height: 1.6; color: var(--ink);
+  font-family: var(--serif); font-size: 16px; line-height: 1.6; color: var(--ink);
   max-width: 64ch; margin: 4px 0 26px; padding-left: 16px; border-left: 3px solid var(--red);
 }
 @media (max-width: 620px) { }
 
 .era-block { margin-bottom: 34px; }
 .era-title {
-  font-family: var(--sans); font-size: 12px; font-weight: 800; color: var(--ink);
+  font-family: var(--sans); font-size: 13px; font-weight: 800; color: var(--ink);
   padding-bottom: 8px; margin-bottom: 14px; border-bottom: 2px solid var(--hair);
   display: flex; align-items: baseline; justify-content: space-between;
 }
@@ -990,14 +1004,14 @@ button { font-family: inherit; }
   .faction-plaque.just-picked .faction-plaque-rule { animation: none; }
   .faction-plaque.just-picked::after { content: none; }
 }
-.faction-plaque-name { font-family: var(--display); font-weight: 700; font-size: 14px; line-height: 1.15; letter-spacing: -0.01em; color: var(--ink); }
-.faction-plaque-rule { font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
+.faction-plaque-name { font-family: var(--display); font-weight: 700; font-size: 13px; line-height: 1.15; letter-spacing: -0.01em; color: var(--ink); }
+.faction-plaque-rule { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
 
 /* Faction picker grouped by era, custom last: a small ruled subheading over
    each block of plaques. */
 .faction-era-group + .faction-era-group { margin-top: 14px; }
 .faction-era-label {
-  font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
   text-transform: uppercase; color: var(--ink-3); margin-bottom: 7px; padding-bottom: 3px;
   border-bottom: 1px solid var(--hair-soft);
 }
@@ -1008,17 +1022,17 @@ button { font-family: inherit; }
 /* fleet dock (saved lists) */
 .fleet-dock { position: sticky; top: 20px; }
 .table-scroll { overflow-x: auto; border: 1px solid var(--hair); }
-.dock-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.dock-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .dock-table thead th {
   background: var(--ink); color: #fff; text-align: left;
-  font-size: 10px; font-weight: 700; padding: 9px 12px; white-space: nowrap;
+  font-size: 11px; font-weight: 700; padding: 9px 12px; white-space: nowrap;
 }
 .dock-table tbody td { padding: 11px 12px; border-top: 1px solid var(--hair-soft); vertical-align: middle; }
 @media (hover: hover) { .dock-table tbody tr:hover { background: var(--blue-wash); } }
 .cell-emblem { width: 40px; }
-.cell-name a { font-family: var(--display); font-weight: 700; font-size: 15px; }
+.cell-name a { font-family: var(--display); font-weight: 700; font-size: 16px; }
 .cell-num { font-variant-numeric: tabular-nums; font-weight: 700; }
-.cell-date { color: var(--ink-3); white-space: nowrap; font-size: 12px; }
+.cell-date { color: var(--ink-3); white-space: nowrap; font-size: 13px; }
 .cell-actions { text-align: right; }
 .cell-actions .ghost-btn { padding: 6px 8px; }
 
@@ -1039,7 +1053,7 @@ button { font-family: inherit; }
   margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--hair-soft);
 }
 .control-group { display: flex; flex-direction: column; gap: 5px; }
-.control-label { font-size: 10px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); }
+.control-label { font-size: 11px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); }
 .control-group-emblem { flex: 0 0 auto; min-width: 0; }
 .fleet-name-input {
   font-family: var(--display); font-weight: 800; font-size: clamp(18px, 2.4vw, 24px);
@@ -1115,7 +1129,7 @@ button { font-family: inherit; }
 @media (hover: hover) { .cf-shipimg-drop:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-wash); } }
 .cf-shipimg-drop.has-img { border-style: solid; border-color: var(--blue); padding: 0; min-height: 0; }
 .cf-shipimg-drop img { width: 100%; max-width: 240px; height: auto; object-fit: cover; display: block; }
-.cf-shipimg-cue { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sans); font-size: 12.5px; font-weight: 700; }
+.cf-shipimg-cue { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sans); font-size: 13px; font-weight: 700; }
 /* In the ship editor the tile is a thumbnail at the head of the stat row, sized
    to that row rather than being the tallest thing on it. It had a "Ship image"
    label and a 220x70 dashed panel reading "Click to upload an image", which was
@@ -1132,7 +1146,7 @@ button { font-family: inherit; }
 .cf-shipimg-cell > .cf-shipimg-drop { min-width: 0; width: 108px; height: 65px; min-height: 65px; padding: 4px; }
 .cf-shipimg-cell > .cf-shipimg-drop.has-img { padding: 0; }
 .cf-shipimg-cell > .cf-shipimg-drop img { width: 100%; max-width: none; height: 100%; object-fit: cover; }
-.cf-shipimg-cell .cf-shipimg-cue { flex-direction: column; gap: 3px; font-size: 10.5px; line-height: 1.1; text-align: center; pointer-events: none; }
+.cf-shipimg-cell .cf-shipimg-cue { flex-direction: column; gap: 3px; font-size: 11px; line-height: 1.1; text-align: center; pointer-events: none; }
 /* Clears the art, and only exists when there is art to clear. Sits on the
    corner of the thumbnail it clears rather than taking a slot in the row. */
 .cf-shipimg-x {
@@ -1153,11 +1167,11 @@ button { font-family: inherit; }
   display: flex; flex-direction: column; max-height: 62vh;
 }
 .ep-lib-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid var(--hair); position: sticky; top: 0; background: var(--paper); }
-.ep-lib-title { font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.03em; color: var(--ink-2); }
+.ep-lib-title { font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: 0.03em; color: var(--ink-2); }
 .ep-lib-close { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border: 1px solid var(--hair); background: var(--paper); color: var(--ink); cursor: pointer; }
 @media (hover: hover) { .ep-lib-close:hover { border-color: var(--ink); } }
 .ep-lib-scroll { overflow-y: auto; padding: 14px; }
-.lib-cat-title { font-family: var(--sans); font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--hair-soft); }
+.lib-cat-title { font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--hair-soft); }
 .lib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; align-items: stretch; }
 /* No checkerboard, and no box. The chequer existed so an all-white sigil was
    visible against a white tile; a round tile with a hairline ring says where the
@@ -1179,14 +1193,14 @@ button { font-family: inherit; }
 .band-readout { display: flex; gap: 0; border: 1px solid var(--hair); }
 .readout { padding: 10px 20px; text-align: right; border-left: 1px solid var(--hair-soft); }
 .readout:first-child { border-left: none; }
-.readout-label { display: block; font-size: 10px; font-weight: 600; color: var(--ink-3); margin-bottom: 3px; }
+.readout-label { display: block; font-size: 11px; font-weight: 600; color: var(--ink-3); margin-bottom: 3px; }
 .readout-value { font-family: var(--display); font-weight: 800; font-size: 22px; font-variant-numeric: tabular-nums; color: var(--ink); }
 .readout-value.negative { color: var(--red-deep); }
 /* Three numbers of very different importance were reading as one flat row:
    your score is what you're actually tracking, CMD is the resource you
    spend (so it gets the "interactive" blue), the opponent's score is pure
    reference. */
-.readout-primary .readout-value { font-size: 26px; }
+.readout-primary .readout-value { font-size: 28px; }
 .readout-accent .readout-value { color: var(--blue); }
 .readout-quiet .readout-value { font-size: 18px; font-weight: 600; color: var(--ink-2); }
 
@@ -1197,8 +1211,8 @@ button { font-family: inherit; }
 .budget { flex: 1 1 300px; max-width: 520px; min-width: 260px; }
 .budget-head { display: flex; align-items: baseline; gap: 10px; font-family: var(--sans); }
 .budget-now { font-size: clamp(22px, 3vw, 30px); font-weight: 700; color: var(--color-ink); letter-spacing: -0.02em; }
-.budget-cap { font-size: 15px; font-weight: 500; color: var(--ink-3); }
-.budget-free { margin-left: auto; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; color: var(--color-action); }
+.budget-cap { font-size: 16px; font-weight: 500; color: var(--ink-3); }
+.budget-free { margin-left: auto; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: var(--color-action); }
 .budget.over .budget-free { color: var(--color-feedback-error); }
 .budget-track {
   position: relative; height: 12px; margin-top: 9px;
@@ -1220,14 +1234,14 @@ button { font-family: inherit; }
 .segment button:first-child { border-left: none; }
 @media (hover: hover) { .segment button:hover { background: var(--blue-wash); color: var(--blue); } }
 .segment button.selected { background: var(--blue); color: #fff; }
-.inline-field { display: inline-flex; flex-direction: column; gap: 4px; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
-.inline-field select, .limit-input { font-family: var(--sans); font-size: 14px; font-weight: 600; padding: 8px 10px; border: 1px solid var(--hair); background: var(--paper); color: var(--ink); }
+.inline-field { display: inline-flex; flex-direction: column; gap: 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.inline-field select, .limit-input { font-family: var(--sans); font-size: 13px; font-weight: 600; padding: 8px 10px; border: 1px solid var(--hair); background: var(--paper); color: var(--ink); }
 .limit-input { width: 120px; font-variant-numeric: tabular-nums; }
 .freeplay-badge { font-size: 11px; font-weight: 700; color: var(--red-deep); background: var(--red-wash); padding: 8px 14px; border-left: 3px solid var(--red); letter-spacing: 0.04em; }
 
 .faction-switch { position: relative; }
 .faction-switch > summary {
-  list-style: none; cursor: pointer; font-size: 12px; font-weight: 700; letter-spacing: 0.05em;
+  list-style: none; cursor: pointer; font-size: 13px; font-weight: 700; letter-spacing: 0.05em;
   text-transform: uppercase; padding: 11px 16px; border: 1px solid var(--hair); background: var(--paper); min-height: var(--tap); display: inline-flex; align-items: center;
 }
 .faction-switch > summary::-webkit-details-marker { display: none; }
@@ -1256,8 +1270,8 @@ button { font-family: inherit; }
    so the card grows to fit the whole rule rather than hiding the tail. */
 .rule-card-text { font-family: var(--serif); font-size: 13px; line-height: 1.4; color: var(--ink); }
 /* Initiative + CMD as a single compact prominent line, not two tall boxes. */
-.rule-card-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; margin-bottom: 7px; font-size: 12px; }
-.rcm-k { font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; font-size: 10px; color: var(--ink-2); }
+.rule-card-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; margin-bottom: 7px; font-size: 13px; }
+.rcm-k { font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; font-size: 11px; color: var(--ink-2); }
 .rcm-v { font-family: var(--display); font-weight: 800; font-size: 16px; color: var(--blue-deep); font-variant-numeric: tabular-nums; }
 .rcm-gap { width: 14px; }
 .rule-card-meta .init-dice { margin-left: 4px; }
@@ -1265,13 +1279,13 @@ button { font-family: inherit; }
    Sized to their content, not stretched across the whole panel. */
 .rule-card-stats { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
 .rc-stat { flex: 0 1 auto; min-width: 92px; background: #fff; border: 1px solid var(--blue); border-top: 3px solid var(--blue); padding: 5px 14px 7px; }
-.rc-stat-label { display: block; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+.rc-stat-label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
 .rc-stat-val { display: block; font-family: var(--display); font-weight: 800; font-size: 22px; line-height: 1.1; color: var(--blue-deep); font-variant-numeric: tabular-nums; }
 /* One die glyph per die in the Initiative pool: 2D6 shows two, 3D6 shows three. */
 .init-dice { display: inline-flex; gap: 2px; vertical-align: middle; margin-left: 8px; }
 .init-die { color: var(--red); }
 
-.catalog-title { position: relative; font-family: var(--sans); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; color: var(--ink); padding: 0 0 7px 18px; margin: 20px 0 12px; border-bottom: 2px solid var(--color-line); display: flex; justify-content: space-between; align-items: baseline; text-transform: uppercase; }
+.catalog-title { position: relative; font-family: var(--sans); font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: var(--ink); padding: 0 0 7px 18px; margin: 20px 0 12px; border-bottom: 2px solid var(--color-line); display: flex; justify-content: space-between; align-items: baseline; text-transform: uppercase; }
 .catalog-title::before { content: ""; position: absolute; left: 0; top: 3px; width: 10px; height: 10px; background: var(--color-accent); }
 .catalog-title:first-child, .catalog-title:first-of-type { margin-top: 0; }
 .catalog-title .muted { text-transform: none; letter-spacing: 0; font-size: 11px; }
@@ -1285,7 +1299,7 @@ button { font-family: inherit; }
 .catalog-list { display: flex; flex-direction: column; gap: 0; }
 
 .catalog-group { border: 1px solid var(--hair-soft); }
-.catalog-group > summary { cursor: pointer; padding: 11px 14px; font-family: var(--display); font-weight: 700; font-size: 15px; background: var(--paper); display: flex; justify-content: space-between; }
+.catalog-group > summary { cursor: pointer; padding: 11px 14px; font-family: var(--display); font-weight: 700; font-size: 16px; background: var(--paper); display: flex; justify-content: space-between; }
 .catalog-group > summary .muted { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
 .catalog-group[open] > summary { background: var(--ink); color: #fff; }
 .catalog-group[open] > summary .muted { color: #9fb2d6; }
@@ -1329,15 +1343,15 @@ button { font-family: inherit; }
 .ship-row.has-art { grid-template-columns: 44px minmax(0, 1fr) auto; }
 .ship-row.has-art .ship-thumb { width: 44px; height: 32px; }
 .ship-row-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-.ship-name { flex: 1 1 auto; min-width: 0; font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: -0.01em; white-space: normal; }
-.ship-cost { margin-left: auto; padding-left: 4px; font-family: var(--display); font-weight: 800; font-size: 14px; font-variant-numeric: tabular-nums; color: var(--blue); white-space: nowrap; }
+.ship-name { flex: 1 1 auto; min-width: 0; font-family: var(--display); font-weight: 700; font-size: 16px; letter-spacing: -0.01em; white-space: normal; }
+.ship-cost { margin-left: auto; padding-left: 4px; font-family: var(--display); font-weight: 800; font-size: 13px; font-variant-numeric: tabular-nums; color: var(--blue); white-space: nowrap; }
 .ship-row-details {
   display: flex; flex-wrap: wrap; align-items: flex-start; gap: 4px 14px; margin-top: 3px;
 }
 .ship-row-details .stat-chips { flex: 0 0 auto; gap: 3px 6px; }
 /* Dense rows: the chips give back what they can without touching the labels,
    which stay at full length everywhere (a bare icon and a number is a puzzle). */
-.ship-row-details .stat-chip, .ru-spec .stat-chip { padding: 1px 5px 1px 4px; font-size: 12px; column-gap: 4px; }
+.ship-row-details .stat-chip, .ru-spec .stat-chip { padding: 1px 5px 1px 4px; font-size: 13px; column-gap: 4px; }
 .ship-row-details .weap-table { flex: 0 1 auto; margin-top: 0; }
 /* Weapons sit to the RIGHT of the four stat chips, not stacked under them. The
    flex-basis is the width below which the row gives up and stacks; 200px, not
@@ -1392,21 +1406,21 @@ button { font-family: inherit; }
    saying it twice. */
 .wt-inline-lbl { display: none; }
 .weap-table .wt-h {
-  font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+  font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
   color: var(--ink-3); padding-bottom: 3px; border-bottom: 1px solid var(--hair-soft); align-self: end;
 }
 /* Arc cell: the wedge icon plus a PRI / AUX abbreviation, so the firing arc
    reads as a word, not only a glyph you have to decode. */
 .wt-arc { color: var(--blue); display: flex; align-items: center; gap: 4px; }
 /* Word first, then the wedge: the label is what you read, the glyph confirms it. */
-.wt-arc-abbr { font-size: 10px; font-weight: 800; letter-spacing: 0.03em; color: var(--ink-2); order: -1; }
-.wt-name { font-size: 13.5px; font-weight: 400; color: var(--ink); }
+.wt-arc-abbr { font-size: 11px; font-weight: 800; letter-spacing: 0.03em; color: var(--ink-2); order: -1; }
+.wt-name { font-size: 13px; font-weight: 400; color: var(--ink); }
 /* Left, like every other column. A table that mixes left and right alignment
    makes the reader re-find the start of each figure on every row. */
 .wt-num { font-size: 13px; font-weight: 700; color: var(--ink); text-align: left; white-space: nowrap; }
 .wt-h.wt-num { font-weight: 700; }
-.wt-note { grid-column: 2 / -1; font-size: 11.5px; font-style: normal; color: var(--ink-2); }
-.weap-none { font-size: 12px; color: var(--ink-3); margin-top: 6px; }
+.wt-note { grid-column: 2 / -1; font-size: 11px; font-style: normal; color: var(--ink-2); }
+.weap-none { font-size: 13px; color: var(--ink-3); margin-top: 6px; }
 /* The 2x2 stat block. Each chip is icon / label / value, and the three parts
    take their column widths from the parent via subgrid - so Mass and Silhouette
    share a column, Thrust and Shields share another, and every number lines up
@@ -1451,8 +1465,8 @@ button { font-family: inherit; }
 .sg-gun { grid-column: 7; min-width: 0; padding-left: 4px; font-size: 13px; }
 .sg-gun .gun-name { overflow-wrap: normal; }
 .stat-chip { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--hair-soft); padding: 3px 8px 3px 6px; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; column-gap: 5px; }
-.stat-chip-mini { gap: 4px; padding: 2px 6px 2px 5px; font-size: 12px; }
-.stat-chip-mini .stat-lbl { font-size: 10.5px; letter-spacing: 0.03em; }
+.stat-chip-mini { gap: 4px; padding: 2px 6px 2px 5px; font-size: 13px; }
+.stat-chip-mini .stat-lbl { font-size: 11px; letter-spacing: 0.03em; }
 /* One colour per stat, so a glance at a row tells you which figure is which
    before you have read the label. Drawn from the Okabe-Ito colourblind-safe
    palette and darkened for contrast on white: they stay distinguishable under
@@ -1462,9 +1476,9 @@ button { font-family: inherit; }
 .stat-ico-thrust { color: var(--stat-thrust); }
 .stat-ico-silhouette { color: var(--stat-sil); }
 .stat-ico-shields { color: var(--stat-shields); }
-.stat-lbl { font-family: var(--narrow); font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+.stat-lbl { font-family: var(--narrow); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
 .stat-val { color: var(--ink); }
-.ship-row .ship-weapons { font-size: 11.5px; line-height: 1.35; color: var(--ink-3); white-space: normal; }
+.ship-row .ship-weapons { font-size: 11px; line-height: 1.35; color: var(--ink-3); white-space: normal; }
 
 /* Personnel: two compact columns, each row name + one-line rule + a small
    add button. Full rule is on the row's tooltip and in the unit modal. */
@@ -1475,7 +1489,7 @@ button { font-family: inherit; }
 .personnel-row.chosen { border-color: var(--blue); border-left: 3px solid var(--blue); background: var(--blue-wash); }
 .personnel-body { min-width: 0; }
 .personnel-actions { display: flex; align-items: center; gap: 6px; }
-.personnel-assign { font-family: var(--sans); font-size: 12px; font-weight: 600; padding: 6px 8px; border: 1px solid var(--hair-soft); background: var(--paper); color: var(--ink); max-width: 150px; }
+.personnel-assign { font-family: var(--sans); font-size: 13px; font-weight: 600; padding: 6px 8px; border: 1px solid var(--hair-soft); background: var(--paper); color: var(--ink); max-width: 150px; }
 /* HVP NAMES ARE SET NARROW, HERE AND EVERYWHERE ELSE THEY APPEAR.
    An HVP's name is the longest short string in the app and the only one the
    player writes themselves: the rules ask for "Lt. Commander Sadie Hyatt, Chief
@@ -1486,7 +1500,7 @@ button { font-family: inherit; }
    sibling, so the row does not change voice - it just stops running out of room.
    Sizes go up a point with it, since a condensed face at the same size reads
    smaller. Nothing else about the row moves. */
-.personnel-name { display: block; font-family: var(--narrow); font-weight: 700; font-size: 14px; white-space: normal; }
+.personnel-name { display: block; font-family: var(--narrow); font-weight: 700; font-size: 13px; white-space: normal; }
 /* Generic personnel (any faction can take them) read quieter than a faction's
    own named HVPs, so the two pools are distinguishable at a glance. */
 .personnel-name.is-generic { font-family: var(--sans); font-weight: 600; font-size: 13px; color: var(--ink-2); }
@@ -1502,7 +1516,7 @@ button { font-family: inherit; }
 .roster-sheet { border: none; background: none; overflow-y: auto; }
 .roster-head { display: flex; align-items: center; gap: 14px; padding: 0 0 10px; background: none; color: var(--ink); border-bottom: 2px solid var(--ink); margin-bottom: 4px; }
 .roster-emblem { color: var(--blue); }
-.roster-title { font-family: var(--display); font-weight: 800; font-size: 21px; letter-spacing: -0.01em; line-height: 1.1; color: var(--ink); }
+.roster-title { font-family: var(--display); font-weight: 800; font-size: 22px; letter-spacing: -0.01em; line-height: 1.1; color: var(--ink); }
 .roster-subtitle { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-top: 3px; }
 .roster-section { position: relative; font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: var(--ink); margin: 0; padding: 12px 20px 8px 34px; display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--hair-soft); text-transform: uppercase; }
 .roster-section::before { content: ""; position: absolute; left: 20px; top: 15px; width: 8px; height: 8px; background: var(--color-accent); }
@@ -1514,9 +1528,9 @@ button { font-family: inherit; }
 .roster-unit-glyph { color: var(--blue); flex-shrink: 0; }
 /* No border-bottom here: the shared rename affordance above owns it. Setting
    one would win on source order and put this field back to invisible. */
-.unit-name-input { flex: 1; min-width: 0; font-family: var(--display); font-weight: 700; font-size: 15px; border: none; padding: 3px 0; background: transparent; color: var(--ink); }
+.unit-name-input { flex: 1; min-width: 0; font-family: var(--display); font-weight: 700; font-size: 16px; border: none; padding: 3px 0; background: transparent; color: var(--ink); }
 .unit-name-input::placeholder { color: var(--placeholder); font-weight: 600; }
-.roster-unit-cost { font-family: var(--display); font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums; color: var(--blue); white-space: nowrap;
+.roster-unit-cost { font-family: var(--display); font-weight: 800; font-size: 16px; font-variant-numeric: tabular-nums; color: var(--blue); white-space: nowrap;
   /* Reserve the width of a four-figure cost so the trash button beside it does
      not slide left every time the total gets shorter. */
   min-width: 74px; text-align: right; }
@@ -1532,8 +1546,8 @@ button { font-family: inherit; }
 .ru-spec > .roster-unit-stats { flex: 0 0 auto; }
 .ru-spec > .weap-lines { flex: 1 1 130px; margin-top: 0; min-width: 0; }
 .roster-unit-sub { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; }
-.roster-unit-class { font-size: 12px; font-weight: 600; color: var(--ink-2); }
-.roster-unit-class .muted { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; }
+.roster-unit-class { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.roster-unit-class .muted { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
 .stepper { display: inline-flex; align-items: center; border: 1px solid var(--hair); }
 .stepper button { background: var(--paper); border: none; padding: 6px 9px; cursor: pointer; color: var(--ink); display: inline-flex; }
 @media (hover: hover) { .stepper button:hover { background: var(--ink); color: #fff; } }
@@ -1546,7 +1560,7 @@ button { font-family: inherit; }
 @media (hover: hover) { .stepper button[aria-disabled="true"]:hover { background: var(--paper); color: var(--ink-3); } }
 /* At count 1 the (-) deletes the unit: warn in red on hover. */
 @media (hover: hover) { .stepper button.will-remove:hover { background: var(--red); color: #fff; } }
-.stepper-count { padding: 0 12px; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; border-left: 1px solid var(--hair); border-right: 1px solid var(--hair); line-height: 28px; }
+.stepper-count { padding: 0 12px; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; border-left: 1px solid var(--hair); border-right: 1px solid var(--hair); line-height: 28px; }
 .roster-unit-tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; align-items: center; }
 .inline-field select { font-family: var(--sans); font-size: 13px; padding: 7px 9px; border: 1px solid var(--hair-soft); background: var(--paper); color: var(--ink); }
 
@@ -1559,7 +1573,7 @@ button { font-family: inherit; }
 /* The inspection heading resets its left padding, so the section's red marker
    dot would float orphaned to its left. Suppress it here. */
 .inspection .roster-section::before { display: none; }
-.inspection-pass { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: var(--go); }
+.inspection-pass { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; color: var(--go); }
 .issue-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
 .issue-list li { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; line-height: 1.4; }
 .issue-sev { font-weight: 800; }
@@ -1577,7 +1591,7 @@ button { font-family: inherit; }
 .notes-input:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 /* Print setup: options bar (screen only), per-unit cards, and trackers. */
 .print-opts { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-.print-toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
+.print-toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
 /* Two across, and align-items:start.
    Three across squeezed the weapons column so hard that every weapon wrapped to
    three lines, and because grid rows stretch, a short card was padded out to the
@@ -1610,7 +1624,7 @@ button { font-family: inherit; }
 .pc-main { flex: 0 0 auto; }
 .pc-stats-chips { margin: 0; }
 .pc-weapons-col { flex: 1 1 0; min-width: 0; }
-.pc-ships { font-family: var(--serif); font-size: 10px; color: var(--ink); margin-top: 2px; }
+.pc-ships { font-family: var(--serif); font-size: 11px; color: var(--ink); margin-top: 2px; }
 /* Small, always-there firing-arc glyph beside the Primary/Auxiliary label -
    a permanent reminder of the fixed 45/180 degree geometry, not a stat that
    varies per ship. */
@@ -1620,22 +1634,22 @@ button { font-family: inherit; }
 .pcw { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 5px; margin: 0; }
 .pcw-arc {
   display: inline-flex; align-items: center; flex: none;
-  font-family: var(--narrow); font-size: 9px; font-weight: 700; letter-spacing: 0.04em; color: var(--ink-3);
+  font-family: var(--narrow); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: var(--ink-3);
 }
 /* PARITY WITH THE ROSTER. A card and a roster row carry the same eight facts
    about the same ship, and they were setting them in different faces: the gun
    name serif here and narrow there, the stat figure Libre Franklin here and
    narrow there. Whichever view you print, the numbers and the guns now look
    like the same numbers and guns. */
-.pcw-name { font-family: var(--narrow); font-size: 10px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.15; color: var(--ink); }
+.pcw-name { font-family: var(--narrow); font-size: 11px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.15; color: var(--ink); }
 /* The condensed face is for NAMES that have to fit a box and for small caps
    labels. Not for numbers: a figure set condensed reads as a different figure
    from the same figure set in the sans two lines up, and the sheet has both.
    Numbers are the sans with tabular-nums, everywhere. */
-.pcw-fig { font-family: var(--sans); font-size: 9.5px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; color: var(--ink-2); white-space: nowrap; }
-.pc-carry { font-size: 9px; font-style: italic; color: var(--ink-2); margin-top: 2px; }
+.pcw-fig { font-family: var(--sans); font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; color: var(--ink-2); white-space: nowrap; }
+.pc-carry { font-size: 11px; font-style: italic; color: var(--ink-2); margin-top: 2px; }
 .pc-track { margin-top: 5px; padding-top: 4px; border-top: 1px solid var(--hair-soft); display: flex; flex-direction: column; gap: 1px; }
-.pc-track-h { font-family: var(--display); font-weight: 800; font-size: 9px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-2); margin: 0 0 3px; }
+.pc-track-h { font-family: var(--display); font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-2); margin: 0 0 3px; }
 .pc-track-sub { font-family: var(--sans); font-weight: 600; font-size: 8.5px; letter-spacing: 0; text-transform: none; color: var(--ink-3); margin-left: 5px; }
 .pc-track-row { display: flex; align-items: center; gap: 4px; }
 .pc-track-label { font-family: var(--narrow, var(--sans)); font-size: 8.5px; font-weight: 700; color: var(--ink-3); min-width: 34px; }
@@ -1650,7 +1664,7 @@ button { font-family: inherit; }
 .pr-hp-box { width: 9px; height: 9px; border: 1px solid var(--ink-3); display: inline-block; margin: 0 -1px -1px 0; }
 .print-track-strip { display: flex; gap: 24px; flex-wrap: wrap; margin: 5px 0; padding: 4px 0; border-top: 1px solid var(--hair-soft); border-bottom: 1px solid var(--hair-soft); }
 .pts-item { display: flex; align-items: center; gap: 10px; }
-.pts-label { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
+.pts-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
 .pts-blank { display: inline-block; min-width: 120px; border-bottom: 1px solid var(--ink-2); height: 14px; }
 @media print { .print-cards { grid-template-columns: repeat(2, 1fr); } }
 
@@ -1706,9 +1720,9 @@ button { font-family: inherit; }
    the sheet worth setting large. */
 .sheet-vitals { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 8px 0 4px; }
 .sv-item { display: flex; flex-direction: column; gap: 4px; padding: 6px 9px; border: 1px solid var(--hair); background: none; }
-.sv-label { font-family: var(--sans); font-size: 9px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); }
+.sv-label { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); }
 .sv-figure { display: flex; align-items: center; gap: 9px; min-height: 20px; }
-.sv-value { font-family: var(--display); font-weight: 800; font-size: 20px; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
+.sv-value { font-family: var(--display); font-weight: 800; font-size: 22px; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
 .sv-figure .dice-row { gap: 3px; }
 .sheet-section { font-family: var(--display); font-size: 12px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--blue); background: none; padding: 0 0 2px; margin: 10px 0 5px; border-bottom: 1px solid var(--blue); }
 .print-rule { margin-top: 7px; border-left: 1px solid var(--ink-3); padding: 1px 0 1px 9px; }
@@ -1802,7 +1816,7 @@ button { font-family: inherit; }
 .prw-t { min-width: 0; }
 .print-roster tbody td { border-bottom: 1px solid var(--hair-soft); padding: 2px 5px; vertical-align: top; font-size: 11px; }
 .print-roster tbody tr { break-inside: avoid; }
-.pr-unit-name { display: block; font-family: var(--display); font-weight: 800; font-size: 12.5px; line-height: 1.2; }
+.pr-unit-name { display: block; font-family: var(--display); font-weight: 800; font-size: 13px; line-height: 1.2; }
 .pr-unit-x { font-weight: 900; color: var(--blue); }
 /* A footnote to the name above it - which class the thing you called "Bright
    Hammer" actually is - so it is quiet in all three ways at once: quite a bit
@@ -1814,8 +1828,8 @@ button { font-family: inherit; }
   display: block; font-family: var(--narrow); font-size: 8.5px; font-weight: 500;
   letter-spacing: 0.02em; line-height: 1.2; color: var(--ink-3);
 }
-.pr-unit-ships { display: block; font-family: var(--serif); font-size: 11.5px; color: var(--ink); margin-top: 2px; }
-.pr-unit-notes { display: block; font-family: var(--serif); font-style: italic; font-size: 11.5px; color: var(--ink-2); margin-top: 2px; }
+.pr-unit-ships { display: block; font-family: var(--serif); font-size: 11px; color: var(--ink); margin-top: 2px; }
+.pr-unit-notes { display: block; font-family: var(--serif); font-style: italic; font-size: 11px; color: var(--ink-2); margin-top: 2px; }
 /* Wide enough for SHIELDS, the longest single-word heading, so it sits on one
    line instead of being split mid-word. */
 /* 50 -> 30. These hold a single digit (a Thrust of 12" is the widest thing that
@@ -1906,7 +1920,7 @@ button { font-family: inherit; }
    edges rather than scattered across the column. */
 .pr-req-box { display: inline-block; width: 11px; height: 11px; border: 1px solid var(--ink-3); margin: 0 -1px -1px 0; }
 .print-roster tfoot td { border-top: 1px solid var(--ink-3); padding: 4px 5px; font-weight: 700; }
-.pr-total-label { text-align: right; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+.pr-total-label { text-align: right; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
 
 .print-score { width: 100%; border-collapse: collapse; }
 
@@ -1927,13 +1941,13 @@ button { font-family: inherit; }
 .pr-hvp-slot { width: 7%; }
 /* Where the carrier started, so it can be struck through and rewritten when
    the token changes hands mid-game. */
-.pr-hvp-start { display: block; font-size: 9.5px; color: var(--ink-3); line-height: 1.2; }
+.pr-hvp-start { display: block; font-size: 11px; color: var(--ink-3); line-height: 1.2; }
 .pr-writein { display: block; height: 13px; border-bottom: 1px solid var(--ink-3); margin-bottom: 3px; }
 .pr-writein:last-child { margin-bottom: 0; }
 
 /* Training-guide print sheets: dense, newspaper-style. */
 .ref-block { break-inside: avoid; margin-bottom: 18px; }
-.ref-list { list-style: none; margin: 0; padding: 0; font-family: var(--serif); font-size: 12.5px; line-height: 1.5; }
+.ref-list { list-style: none; margin: 0; padding: 0; font-family: var(--serif); font-size: 13px; line-height: 1.5; }
 .ref-list li { position: relative; padding-left: 14px; margin-bottom: 6px; }
 .ref-list:not(.ref-list-numbered) li::before { content: "\2022"; position: absolute; left: 0; color: var(--blue); }
 .ref-list-numbered { list-style: decimal; padding-left: 18px; }
@@ -1943,7 +1957,7 @@ button { font-family: inherit; }
 .ref-subpoints { margin: 6px 0 2px; }
 .ref-subpoints li { padding-left: 14px; }
 .ref-subpoints li::before { content: "\2022"; position: absolute; left: 2px; color: var(--blue); }
-.print-guide-intro { font-family: var(--serif); font-size: 14px; line-height: 1.55; margin-bottom: 16px; }
+.print-guide-intro { font-family: var(--serif); font-size: 13px; line-height: 1.55; margin-bottom: 16px; }
 
 .print-score th, .print-score td { border: 1px solid var(--hair-soft); padding: 2px 5px; font-size: 10px; }
 .print-score thead th { background: none; color: var(--ink-2); border-bottom: 1px solid var(--ink-3); font-size: 8px; font-weight: 600; text-transform: uppercase; text-align: center; }
@@ -1990,21 +2004,21 @@ button { font-family: inherit; }
    without leaning in. The page is wider to pay for it. */
 .foundry-main { max-width: 1120px; }
 .cf-section { margin-bottom: 26px; border-top: 2px solid var(--hair); padding-top: 16px; }
-.cf-section .panel-title { margin-bottom: 12px; font-size: 14px; letter-spacing: 0.03em; text-transform: uppercase; }
+.cf-section .panel-title { margin-bottom: 12px; font-size: 13px; letter-spacing: 0.03em; text-transform: uppercase; }
 .foundry-main { padding-top: clamp(14px, 2vw, 22px); }
 .foundry-main .page-title { margin-bottom: 6px; }
-.foundry-main .panel-note { margin-bottom: 12px; font-size: 15px; }
-.foundry-main .breadcrumb { margin-bottom: 6px; font-size: 12px; }
+.foundry-main .panel-note { margin-bottom: 12px; font-size: 16px; }
+.foundry-main .breadcrumb { margin-bottom: 6px; font-size: 13px; }
 .foundry-actions { margin: 14px 0 20px; }
 .cf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px 16px; }
-.field-block { display: flex; flex-direction: column; gap: 6px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.045em; text-transform: uppercase; color: var(--ink-3); }
+.field-block { display: flex; flex-direction: column; gap: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.045em; text-transform: uppercase; color: var(--ink-3); }
 .field-block.wide { grid-column: 1 / -1; }
 /* Only where there is a second column to span into. In a one-column grid,
    `span 2` invents an implicit second column and the whole form overflows. */
 @media (min-width: 640px) { .cf-emblem-field { grid-column: span 2; } }
 .field-block input, .field-block select, .field-block textarea,
 .cf-hvp input, .cf-hvp textarea, .weapon-edit-row input, .weapon-edit-row select {
-  font-family: var(--sans); font-size: 15px; font-weight: 500; padding: 10px 12px; min-height: 42px;
+  font-family: var(--sans); font-size: 16px; font-weight: 500; padding: 10px 12px; min-height: 42px;
   border: 1px solid var(--hair); background: var(--paper); color: var(--ink); letter-spacing: 0;
 }
 /* A field you are typing in should be obvious at a glance on a page holding
@@ -2054,12 +2068,12 @@ button { font-family: inherit; }
 .cf-ship .cf-slot h5 { margin-bottom: 8px; }
 .cf-ship .weapon-edit-row { margin-bottom: 8px; }
 .cf-ship .field-block input, .cf-ship .field-block select,
-.cf-ship .weapon-edit-row input, .cf-ship .weapon-edit-row select { padding: 9px 11px; font-size: 14.5px; min-height: 42px; }
+.cf-ship .weapon-edit-row input, .cf-ship .weapon-edit-row select { padding: 9px 11px; font-size: 16px; min-height: 42px; }
 /* Row 3: the two weapon slots, side by side while they each have ~300px. */
 .cf-slots { display: flex; flex-wrap: wrap; gap: 14px 20px; margin: 16px 0 0; padding-top: 14px; border-top: 1px solid var(--hair-soft); }
 .cf-slot { flex: 1 1 300px; min-width: 0; }
-.cf-slot h5 { font-family: var(--sans); font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; color: var(--ink-2); }
-.check-inline { font-size: 12px; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--ink-2); display: inline-flex; gap: 7px; align-items: center; }
+.cf-slot h5 { font-family: var(--sans); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; color: var(--ink-2); }
+.check-inline { font-size: 13px; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--ink-2); display: inline-flex; gap: 7px; align-items: center; }
 /*
  * Name, attack, range, remove - in that order, on one line while they fit and
  * wrapping when they do not.
@@ -2086,14 +2100,14 @@ button { font-family: inherit; }
    Commander" to "Special Operations Comman". */
 .cf-hvp { display: grid; grid-template-columns: auto minmax(240px, 340px) 1fr auto; gap: 12px; align-items: start; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--hair-soft); }
 .cf-hvp:last-of-type { border-bottom: none; }
-.cf-hvp-num { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin-top: 6px; border: 1.5px solid var(--blue); color: var(--blue); font-family: var(--display); font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+.cf-hvp-num { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin-top: 6px; border: 1.5px solid var(--blue); color: var(--blue); font-family: var(--display); font-weight: 800; font-size: 16px; font-variant-numeric: tabular-nums; flex-shrink: 0; }
 /* Each field says what it is, in every layout. These used to appear only in the
    stacked one, where the column header disappeared - which left a sighted user
    with an unlabelled "[1] x [D6]" and "[0] - [6] in". Now there is no header to
    lose them with. Same swap the weapons table uses (.wt-inline-lbl). */
 .we-inline-lbl {
   display: inline-block;
-  font-family: var(--narrow); font-size: 11.5px; font-weight: 700;
+  font-family: var(--narrow); font-size: 11px; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3);
 }
 @media (max-width: 720px) {
@@ -2125,7 +2139,7 @@ button { font-family: inherit; }
    a player who has read it should not have to scroll it every time, but it
    stays one click away rather than being dismissed for good. */
 .guide-title {
-  font-family: var(--sans); font-size: 12px; font-weight: 600; letter-spacing: 0.09em;
+  font-family: var(--sans); font-size: 13px; font-weight: 600; letter-spacing: 0.09em;
   text-transform: uppercase; color: var(--blue-deep); display: flex; align-items: center; gap: 8px;
   max-width: var(--shell-wide); margin: 0 auto; padding: 14px clamp(14px, 2vw, 24px);
   cursor: pointer; list-style: none; user-select: none;
@@ -2137,22 +2151,22 @@ button { font-family: inherit; }
 }
 .guide-shell[open] > .guide-title::after { content: "Hide"; }
 @media (hover: hover) { .guide-title:hover::after { background: var(--blue); color: #fff; } }
-.guide-intro { font-family: var(--serif); font-size: 14px; line-height: 1.55; color: var(--ink); max-width: 78ch; margin-bottom: 14px; }
+.guide-intro { font-family: var(--serif); font-size: 13px; line-height: 1.55; color: var(--ink); max-width: 78ch; margin-bottom: 14px; }
 .guide-step { border: 1px solid var(--hair-soft); background: var(--paper); margin-bottom: 6px; }
-.guide-step > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 10px 14px; font-family: var(--display); font-weight: 700; font-size: 14px; }
+.guide-step > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 10px 14px; font-family: var(--display); font-weight: 700; font-size: 13px; }
 .guide-step > summary::-webkit-details-marker { display: none; }
 .guide-step[open] > summary { border-bottom: 1px solid var(--hair-soft); }
-.guide-step-n { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: var(--blue); color: #fff; font-size: 12px; font-weight: 800; flex-shrink: 0; }
+.guide-step-n { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: var(--blue); color: #fff; font-size: 13px; font-weight: 800; flex-shrink: 0; }
 .guide-step-body { padding: 12px 14px 14px 46px; }
 /* Notes have no numbered badge (they're not a step in the sequence), so the
    body text shouldn't be indented as if a number were sitting to its left. */
 .guide-step-note .guide-step-body { padding-left: 14px; }
 .guide-notes-title { font-family: var(--display); font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-2); margin: 18px 0 2px; padding-top: 14px; border-top: 1px solid var(--hair-soft); }
-.guide-notes-sub { font-size: 12px; color: var(--ink-3); margin-bottom: 8px; }
-.guide-step-body p { font-family: var(--serif); font-size: 14px; line-height: 1.55; color: var(--ink); margin: 0; }
+.guide-notes-sub { font-size: 13px; color: var(--ink-3); margin-bottom: 8px; }
+.guide-step-body p { font-family: var(--serif); font-size: 13px; line-height: 1.55; color: var(--ink); margin: 0; }
 /* Sub-points (rule lists, D6 tables) shown under a guide step, on-screen. */
 .guide-points { list-style: none; margin: 8px 0 0; padding: 0; }
-.guide-points li { position: relative; padding-left: 15px; margin-bottom: 5px; font-family: var(--serif); font-size: 13.5px; line-height: 1.5; color: var(--ink); }
+.guide-points li { position: relative; padding-left: 15px; margin-bottom: 5px; font-family: var(--serif); font-size: 13px; line-height: 1.5; color: var(--ink); }
 .guide-points li:last-child { margin-bottom: 0; }
 .guide-points li::before { content: "\2022"; position: absolute; left: 2px; color: var(--blue); }
 .guide-step-body p + .guide-points { margin-top: 10px; }
@@ -2162,8 +2176,8 @@ button { font-family: inherit; }
    text above already describes in words. */
 .tut-diagram { display: block; width: 100%; max-width: 340px; height: auto; margin-top: 12px; color: var(--ink); }
 
-.phase-track .switcher-opt { text-transform: uppercase; letter-spacing: 0.05em; font-size: 12px; }
-.phase-n { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border: 1px solid currentColor; font-size: 10px; flex-shrink: 0; }
+.phase-track .switcher-opt { text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; }
+.phase-n { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border: 1px solid currentColor; font-size: 11px; flex-shrink: 0; }
 
 /* Play-mode walkthrough: each phase is a real checklist you tick off at the
    table, not a paragraph you read once and interpret yourself. One rule
@@ -2182,8 +2196,8 @@ button { font-family: inherit; }
   border-left: 3px solid var(--blue); padding: 14px 18px;
   min-height: 227px;
 }
-.phase-checklist-count { font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-.phase-check { display: flex; align-items: flex-start; gap: 10px; padding: 6px 2px; cursor: pointer; font-family: var(--serif); font-size: 14px; line-height: 1.45; color: var(--ink); }
+.phase-checklist-count { font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.phase-check { display: flex; align-items: flex-start; gap: 10px; padding: 6px 2px; cursor: pointer; font-family: var(--serif); font-size: 13px; line-height: 1.45; color: var(--ink); }
 .phase-check input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--blue); cursor: pointer; flex-shrink: 0; }
 .phase-check.done { color: var(--ink-3); }
 .phase-check.done span { text-decoration: line-through; text-decoration-color: var(--hair); }
@@ -2200,27 +2214,27 @@ button { font-family: inherit; }
 }
 .comp-filters select, .comp-search { min-width: 130px; }
 .comp-search { min-width: 200px; }
-.comp-count { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); margin: 0; }
+.comp-count { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); margin: 0; }
 /* Compendium Table/Compare toggle. */
 .comp-viewbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin: 14px 0 10px; }
 .comp-view-toggle { display: inline-flex; border: 1px solid var(--hair); }
-.comp-view-btn { display: inline-flex; align-items: center; gap: 6px; font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 8px 14px; background: var(--paper); color: var(--ink-2); border: none; cursor: pointer; }
+.comp-view-btn { display: inline-flex; align-items: center; gap: 6px; font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 8px 14px; background: var(--paper); color: var(--ink-2); border: none; cursor: pointer; }
 .comp-view-btn + .comp-view-btn { border-left: 1px solid var(--hair); }
 @media (hover: hover) { .comp-view-btn:hover { background: var(--blue-wash); color: var(--ink); } }
 .comp-view-btn.on { background: var(--blue); color: #fff; }
 /* Compare (bar chart) view. */
 .chart-picker { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
-.chart-picker-btn { display: inline-flex; align-items: center; gap: 5px; font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.03em; padding: 7px 12px; background: var(--paper); color: var(--ink-2); border: 1px solid var(--hair-soft); cursor: pointer; }
+.chart-picker-btn { display: inline-flex; align-items: center; gap: 5px; font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: 0.03em; padding: 7px 12px; background: var(--paper); color: var(--ink-2); border: 1px solid var(--hair-soft); cursor: pointer; }
 @media (hover: hover) { .chart-picker-btn:hover { border-color: var(--ink); color: var(--ink); } }
 .chart-picker-btn.selected { background: var(--ink); border-color: var(--ink); color: #fff; }
 .comp-chart-wrap { border: 1px solid var(--hair); padding: 4px 14px; }
 .chart-row { display: grid; grid-template-columns: minmax(120px, 1.4fr) minmax(0, 2fr) auto; align-items: center; gap: 12px; padding: 5px 2px; border-bottom: 1px solid var(--hair-soft); }
 .chart-row:last-child { border-bottom: none; }
-.chart-label { font-family: var(--display); font-weight: 700; font-size: 12.5px; color: var(--ink); }
-.chart-fac { font-family: var(--sans); font-weight: 600; font-size: 10.5px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.03em; }
+.chart-label { font-family: var(--display); font-weight: 700; font-size: 13px; color: var(--ink); }
+.chart-fac { font-family: var(--sans); font-weight: 600; font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.03em; }
 .chart-track { display: block; height: 16px; background: var(--ground); }
 .chart-bar { display: block; height: 100%; background: var(--blue); }
-.chart-val { font-family: var(--display); font-weight: 800; font-size: 12px; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; min-width: 48px; }
+.chart-val { font-family: var(--display); font-weight: 800; font-size: 13px; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; min-width: 48px; }
 /* Grouping / custom toggles live inline in the filter bar (after the dropdowns,
    before Clear), bottom-aligned with the selects. */
 .comp-filters .comp-groupcheck { align-self: flex-end; }
@@ -2250,7 +2264,7 @@ button { font-family: inherit; }
 .comp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .comp-table thead th {
   position: sticky; top: 0; background: var(--ink); color: #fff; text-align: left;
-  font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
   padding: 9px 12px; white-space: nowrap;
 }
 /* vertical-align middle so the glyph and its label sit on one optical centre.
@@ -2266,12 +2280,12 @@ button { font-family: inherit; }
 .comp-table thead th.comp-stat.comp-sortable .comp-hlabel { color: #fff; }
 .comp-table tbody td { padding: 9px 12px; border-top: 1px solid var(--hair-soft); vertical-align: top; }
 @media (hover: hover) { .comp-table tbody tr:hover { background: var(--blue-wash); } }
-.comp-name { font-family: var(--display); font-weight: 700; font-size: 14px; white-space: nowrap; }
+.comp-name { font-family: var(--display); font-weight: 700; font-size: 13px; white-space: nowrap; }
 .comp-era { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
-.comp-fac { font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+.comp-fac { font-size: 13px; color: var(--ink-2); white-space: nowrap; }
 .comp-num { text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .comp-cost { color: var(--blue); }
-.comp-weap { font-family: var(--serif); font-size: 12.5px; min-width: 170px; }
+.comp-weap { font-family: var(--serif); font-size: 13px; min-width: 170px; }
 
 /* Faction group bar: turns the dense list into a scannable, foldered index. */
 /* Flex, not floats. The count and the build button used to float right, and
@@ -2285,12 +2299,12 @@ button { font-family: inherit; }
   position: sticky; top: 34px; z-index: 1;
 }
 .comp-group .cg-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
-.comp-group .cg-name { font-family: var(--display); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 0.01em; }
-.comp-group .cg-era { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #9fb2d6; }
-.comp-group .cg-count { margin-left: auto; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #9fb2d6; }
+.comp-group .cg-name { font-family: var(--display); font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 0.01em; }
+.comp-group .cg-era { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #9fb2d6; }
+.comp-group .cg-count { margin-left: auto; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #9fb2d6; }
 .comp-group .cg-build {
   display: inline-flex; align-items: center; gap: 5px;
-  font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
   color: #fff; background: none; border: 1px solid rgba(255,255,255,0.5); padding: 3px 8px; cursor: pointer;
   /* WCAG 2.5.8 (AA) asks 24x24 of ANY pointer, not just a thumb - the app's own
      44px rule is the touch standard on top of it and is gated on pointer:coarse.
@@ -2331,7 +2345,7 @@ button { font-family: inherit; }
 }
 .pilot-name-input::placeholder { color: var(--placeholder); font-weight: 500; }
 .pilot-name-input:focus { border-color: var(--blue); outline: none; }
-.pilot-field-label { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.pilot-field-label { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
 .pilot-picker { display: flex; gap: 4px; flex-wrap: wrap; }
 /* Compact segmented chips: a small icon + the class name, side by side. Much
    tighter than the old 80px cards; the selected class's ability shows below. */
@@ -2350,7 +2364,7 @@ button { font-family: inherit; }
    the selected chip inverts that back to white for the blue ground. */
 .pilot-ico-img { width: 20px; height: 20px; object-fit: contain; display: block; filter: brightness(0); }
 .pilot-opt.on .pilot-ico-img { filter: brightness(0) invert(1); }
-.pilot-name { font-family: var(--display); font-weight: 800; font-size: 12px; letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink); }
+.pilot-name { font-family: var(--display); font-weight: 800; font-size: 13px; letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink); }
 .pilot-opt.on .pilot-name { color: #fff; }
 /* All three class abilities stacked in ONE grid cell, only the chosen one
    visible. The cell is as tall as the longest of them no matter which is
@@ -2359,9 +2373,9 @@ button { font-family: inherit; }
 .pilot-abilities { display: grid; margin-top: 2px; }
 .pilot-abilities > .pilot-ability { grid-area: 1 / 1; visibility: hidden; }
 .pilot-abilities > .pilot-ability.is-on { visibility: visible; }
-.pilot-ability { margin: 0; font-size: 12.5px; line-height: 1.4; color: var(--ink-2); }
+.pilot-ability { margin: 0; font-size: 13px; line-height: 1.4; color: var(--ink-2); }
 .pilot-ability b { color: var(--ink); }
-.solo-primer { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; font-size: 14px; color: var(--ink-2); }
+.solo-primer { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: var(--ink-2); }
 .solo-primer strong { color: var(--ink); }
 .solo-tagline { font-family: var(--serif); font-size: 16px; line-height: 1.55; color: var(--ink-2); max-width: 70ch; margin: 6px 0 0; }
 .solo-panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
@@ -2386,7 +2400,7 @@ button { font-family: inherit; }
    by default. */
 .no-emblem-swap {
   display: inline-flex; align-items: center; gap: 5px;
-  font-family: var(--sans); font-size: 10.5px; font-weight: 700;
+  font-family: var(--sans); font-size: 11px; font-weight: 700;
   letter-spacing: 0.06em; text-transform: uppercase; color: var(--blue);
 }
 .no-name-field { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
@@ -2406,7 +2420,7 @@ button { font-family: inherit; }
   .no-identity { flex-direction: column; align-items: stretch; }
   .no-emblem-btn { flex-direction: row; justify-content: center; gap: 12px; }
 }
-.solo-empty { margin-top: 10px; display: flex; flex-direction: column; gap: 16px; max-width: 70ch; color: var(--ink-2); font-size: 14px; }
+.solo-empty { margin-top: 10px; display: flex; flex-direction: column; gap: 16px; max-width: 70ch; color: var(--ink-2); font-size: 13px; }
 /* Outfit cards: campaign status at a glance - a debt progress bar, games left. */
 .outfit-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
 .outfit-card {
@@ -2416,10 +2430,10 @@ button { font-family: inherit; }
 @media (hover: hover) { .outfit-card-main:hover .outfit-card-name { color: var(--blue); } }
 .outfit-card-emblem { flex-shrink: 0; color: var(--blue); }
 .outfit-card-id { display: flex; flex-direction: column; min-width: 0; }
-.outfit-card-name { font-family: var(--display); font-weight: 800; font-size: 17px; color: var(--ink); }
-.outfit-card-meta { font-size: 12px; color: var(--ink-3); }
+.outfit-card-name { font-family: var(--display); font-weight: 800; font-size: 18px; color: var(--ink); }
+.outfit-card-meta { font-size: 13px; color: var(--ink-3); }
 .outfit-card-debt { padding: 0 16px 12px; }
-.ocd-line { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 700; color: var(--ink); margin-bottom: 5px; }
+.ocd-line { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 5px; }
 .ocd-bar { height: 8px; background: var(--ground); border: 1px solid var(--hair-soft); overflow: hidden; }
 .ocd-fill { display: block; height: 100%; background: var(--red); }
 .outfit-card-debt.is-clear .ocd-fill { background: var(--go); }
@@ -2467,7 +2481,7 @@ button { font-family: inherit; }
 .solo-workspace { padding: clamp(14px, 2vw, 22px) clamp(16px, 4vw, 40px) 0; gap: clamp(16px, 2.4vw, 30px); }
 
 .solo-tabs { padding: 0 clamp(16px, 4vw, 40px); display: flex; gap: 0; border-bottom: 2px solid var(--hair); }
-.solo-tab { background: transparent; border: none; border-bottom: 3px solid transparent; margin-bottom: -2px; font-family: var(--sans); font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 14px 18px; cursor: pointer; color: var(--ink-3); }
+.solo-tab { background: transparent; border: none; border-bottom: 3px solid transparent; margin-bottom: -2px; font-family: var(--sans); font-size: 13px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 14px 18px; cursor: pointer; color: var(--ink-3); }
 @media (hover: hover) { .solo-tab:hover { color: var(--ink); } }
 .solo-tab.selected { color: var(--blue); border-bottom-color: var(--red); }
 
@@ -2492,7 +2506,7 @@ button { font-family: inherit; }
 }
 .game-bar.high { border-top-color: var(--red); }
 .gb-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.gb-note { font-family: var(--sans); font-size: 11.5px; font-weight: 600; color: var(--ink-3); }
+.gb-note { font-family: var(--sans); font-size: 11px; font-weight: 600; color: var(--ink-3); }
 .gb-read { display: flex; align-items: center; gap: 14px; margin: 6px 0 10px; }
 .gb-figure {
   font-family: var(--display); font-weight: 900; font-size: 44px; line-height: 1;
@@ -2507,9 +2521,9 @@ button { font-family: inherit; }
 .game-bar.high .alert-pip.is-on { background: var(--red); border-color: var(--red); }
 
 .gb-alert .alert-controls { margin: 0; }
-.alert-delta { font-family: var(--display); font-weight: 900; font-size: 12px; color: var(--blue); font-variant-numeric: tabular-nums; }
+.alert-delta { font-family: var(--display); font-weight: 900; font-size: 13px; color: var(--blue); font-variant-numeric: tabular-nums; }
 .ghost-btn .alert-delta { color: var(--ink-3); }
-.alert-start-note { font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--red-deep); margin-top: 9px; }
+.alert-start-note { font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--red-deep); margin-top: 9px; }
 
 /* The round is the band's second figure: quieter than Alert, still one glance,
    and its steppers sit under it rather than beside a number three cards away. */
@@ -2558,7 +2572,7 @@ button { font-family: inherit; }
 .perk-list li { align-items: flex-start; gap: 10px; padding-bottom: 9px; }
 .perk-taken { min-width: 0; }
 .perk-taken-head { font-size: 13px; }
-.perk-taken-head b { font-family: var(--display); font-weight: 800; font-size: 14px; color: var(--ink); }
+.perk-taken-head b { font-family: var(--display); font-weight: 800; font-size: 13px; color: var(--ink); }
 .perk-taken-text { font-family: var(--serif); font-size: 13px; line-height: 1.45; color: var(--ink-2); margin-top: 2px; }
 
 /* One column below the split point: the band's two halves stack, and act/refer
@@ -2625,12 +2639,12 @@ button { font-family: inherit; }
   padding: 11px 13px;
   background: var(--paper); border: 1px solid var(--ink);
   box-shadow: 0 6px 20px rgb(0 0 0 / 0.14);
-  font-size: 13.5px; line-height: 1.5; color: var(--ink-2);
+  font-size: 13px; line-height: 1.5; color: var(--ink-2);
 }
 
 /* The ship cap, only when it bites. */
 .roster-warn {
-  font-family: var(--narrow); font-size: 11.5px; font-weight: 700;
+  font-family: var(--narrow); font-size: 11px; font-weight: 700;
   text-transform: none; letter-spacing: 0; color: var(--red-deep);
 }
 
@@ -2758,7 +2772,7 @@ button { font-family: inherit; }
 }
 .pp-name { font-weight: 700; color: var(--ink); }
 .pp-class {
-  font-family: var(--narrow); font-size: 9px; font-weight: 700;
+  font-family: var(--narrow); font-size: 11px; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-3);
 }
 /* Full rule text, never trimmed, and readable. 9px is the size the stat
@@ -2785,27 +2799,27 @@ button { font-family: inherit; }
 .perk-block { display: flex; flex-direction: column; gap: 5px; margin-top: 5px; }
 .perk-block .perk-list { gap: 4px; }
 .perk-block .perk-list li { padding-bottom: 4px; }
-.perk-block .perk-taken-head b { font-size: 12.5px; }
-.perk-block .perk-taken-text { font-size: 12px; line-height: 1.4; }
+.perk-block .perk-taken-head b { font-size: 13px; }
+.perk-block .perk-taken-text { font-size: 13px; line-height: 1.4; }
 .perk-block .ghost-btn.danger { padding: 1px 5px; flex: none; }
 /* Not full width: a select that runs the whole card reads as the card's
    subject rather than one more thing you may do to the pilot. */
-.perk-select { max-width: 230px; font-size: 12.5px; padding: 4px 6px; }
+.perk-select { max-width: 230px; font-size: 13px; padding: 4px 6px; }
 /* The log is a story, so an entry is a line of it: which game, what it paid,
    when, and what happened. */
 .game-log { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
 .game-log-row { display: grid; gap: 2px; }
 .glr-head { display: flex; align-items: baseline; gap: 10px; }
-.glr-n { font-family: var(--display); font-weight: 800; font-size: 13.5px; color: var(--ink); }
+.glr-n { font-family: var(--display); font-weight: 800; font-size: 13px; color: var(--ink); }
 .glr-earned { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--blue); }
-.glr-date { margin-left: auto; font-size: 11.5px; color: var(--ink-3); }
+.glr-date { margin-left: auto; font-size: 11px; color: var(--ink-3); }
 /* Never clipped: the note is the only part of a campaign the app remembers. */
 .glr-note { font-size: 13px; line-height: 1.45; color: var(--ink-2); }
 
 .outfit-notes {
   width: 100%; min-height: 120px; padding: 10px 12px;
   border: 1px solid var(--hair); background: var(--paper);
-  font-family: var(--sans); font-size: 14px; line-height: 1.5; color: var(--ink);
+  font-family: var(--sans); font-size: 13px; line-height: 1.5; color: var(--ink);
   resize: vertical;
 }
 
@@ -2824,7 +2838,7 @@ button { font-family: inherit; }
 
    No count heading either. "8 still face down" is a number you can get by
    looking at the eight markers, which are right there. */
-.blip-note { margin: 0 0 10px; font-size: 13.5px; line-height: 1.45; color: var(--ink-3); max-width: 62ch; }
+.blip-note { margin: 0 0 10px; font-size: 13px; line-height: 1.45; color: var(--ink-3); max-width: 62ch; }
 /* Wide enough for a stat line, because that is what a flipped marker carries:
    the pirate's four stats in the same chips every ship in this app wears, and
    its weapon systems. p.211 prints them as a row in a table with the Blip
@@ -2854,16 +2868,16 @@ button { font-family: inherit; }
 .blip.is-revealed .blip-front { transform: rotateY(0deg); opacity: 1; }
 .blip-head { display: flex; align-items: baseline; gap: 7px; }
 .blip-n {
-  font-family: var(--display); font-weight: 800; font-size: 17px; line-height: 1;
+  font-family: var(--display); font-weight: 800; font-size: 18px; line-height: 1;
   color: var(--red);
 }
-.blip-what { font-family: var(--display); font-weight: 800; font-size: 13.5px; color: var(--ink); }
+.blip-what { font-family: var(--display); font-weight: 800; font-size: 13px; color: var(--ink); }
 .blip-weapons { display: flex; flex-direction: column; gap: 1px; }
 /* Full weapon text, never trimmed: the range and the dice are the whole reason
    you flipped it. */
-.blip-w { font-size: 11.5px; line-height: 1.35; color: var(--ink-2); }
+.blip-w { font-size: 11px; line-height: 1.35; color: var(--ink-2); }
 .blip-w b { font-family: var(--narrow); font-weight: 700; color: var(--ink-3); }
-.blip-rule { margin: 10px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-3); max-width: 68ch; }
+.blip-rule { margin: 10px 0 0; font-size: 13px; line-height: 1.45; color: var(--ink-3); max-width: 68ch; }
 @media (prefers-reduced-motion: reduce) {
   .blip-face { transition: opacity 100ms linear; }
   .blip-back, .blip-front, .blip.is-revealed .blip-back, .blip.is-revealed .blip-front { transform: none; }
@@ -2871,14 +2885,14 @@ button { font-family: inherit; }
 
 /* A roll table you read, printed whole. Nothing rolls it - see the note in
    solo.ts where the roller used to be. */
-.roll-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.roll-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .roll-table td { padding: 5px 0; border-top: 1px solid var(--hair-soft); color: var(--ink-2); vertical-align: top; }
 .roll-table tr:first-child td { border-top: none; }
 .rt-roll {
   width: 46px; font-family: var(--display); font-weight: 800; color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
-.rt-detail { display: block; margin-top: 2px; font-size: 12.5px; color: var(--ink-3); }
+.rt-detail { display: block; margin-top: 2px; font-size: 13px; color: var(--ink-3); }
 
 /* One column, now that the roller has gone from beside it. */
 .solo-split-solo { grid-template-columns: minmax(0, 1fr); }
@@ -2892,9 +2906,9 @@ button { font-family: inherit; }
 .solo-outfit .control-label,
 .solo-outfit .gb-note {
   letter-spacing: 0; text-transform: none;
-  font-family: var(--sans); font-size: 12.5px; font-weight: 700;
+  font-family: var(--sans); font-size: 13px; font-weight: 700;
 }
-.solo-outfit .roster-section { font-size: 13.5px; }
+.solo-outfit .roster-section { font-size: 13px; }
 /* And no accent square before each one. It is a marker for the builder's
    roster columns, where several sections stack in one narrow panel and the
    squares are what tells you a new one has started. On the solo pages the
@@ -2918,7 +2932,7 @@ button { font-family: inherit; }
 .roller-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 4px; }
 .roll-result { display: flex; gap: 16px; align-items: center; margin-top: 16px; border: 2px solid var(--blue); padding: 14px; background: var(--blue-wash); }
 .roll-die { font-family: var(--display); font-weight: 900; font-size: 44px; line-height: 1; color: var(--blue); min-width: 54px; text-align: center; }
-.roll-table { font-size: 10px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); }
+.roll-table { font-size: 11px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); }
 .roll-headline { font-family: var(--display); font-weight: 800; font-size: 18px; margin-top: 2px; }
 .roll-detail { font-family: var(--serif); font-size: 13px; color: var(--ink-2); margin-top: 4px; }
 
@@ -2926,8 +2940,8 @@ button { font-family: inherit; }
 .perk-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
 .perk-list li { display: flex; align-items: center; gap: 8px; justify-content: space-between; border-bottom: 1px solid var(--hair-soft); padding-bottom: 6px; }
 
-.rule-list { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 1.5; }
-.rule-list.small { font-size: 12.5px; gap: 7px; }
+.rule-list { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 10px; font-size: 13px; line-height: 1.5; }
+.rule-list.small { font-size: 13px; gap: 7px; }
 .rule-list strong { color: var(--ink); }
 .rule-card .rule-list { font-family: var(--serif); }
 
@@ -2939,14 +2953,14 @@ button { font-family: inherit; }
 .ref-table td, .ref-table th { border: 1px solid var(--hair-soft); padding: 7px 10px; text-align: left; vertical-align: top; }
 /* A heading row, not a black bar. Reversing it out of solid ink laid a heavy
    band of toner across every table on the page for no gain in legibility. */
-.ref-table thead th { background: none; color: var(--ink-2); border-bottom: 1px solid var(--ink-3); font-size: 10px; font-weight: 700; }
+.ref-table thead th { background: none; color: var(--ink-2); border-bottom: 1px solid var(--ink-3); font-size: 11px; font-weight: 700; }
 .ref-table.pirates { white-space: nowrap; }
 .ref-jobs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 @media (max-width: 720px) { .ref-jobs { grid-template-columns: 1fr; } }
 .ref-item { border-left: 3px solid var(--blue); padding: 2px 0 2px 14px; }
-.ref-item h4 { font-family: var(--display); font-size: 15px; margin-bottom: 4px; }
+.ref-item h4 { font-family: var(--display); font-size: 16px; margin-bottom: 4px; }
 .ref-item p { font-family: var(--serif); font-size: 13px; line-height: 1.5; color: var(--ink-2); }
-.ref-sub { font-family: var(--sans); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin: 16px 0 8px; color: var(--blue); }
+.ref-sub { font-family: var(--sans); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin: 16px 0 8px; color: var(--blue); }
 
 /* Grid/flex children must be allowed to shrink below their content's
    min-content, or nested auto-fill grids force the page wider than the
@@ -2972,13 +2986,13 @@ button { font-family: inherit; }
   /* One line beside the hamburger: at 360 the full wordmark broke to
      "A BILLION SUNS / 2E". Smaller and unbreakable instead. */
   .wordmark { min-width: 0; }
-  .wordmark-text { font-size: 15px; white-space: nowrap; }
+  .wordmark-text { font-size: 16px; white-space: nowrap; }
   .wordmark svg { flex-shrink: 0; }
 
   .nav-fold { position: relative; margin-left: auto; }
   .nav-fold > .nav-fold-btn {
     display: inline-flex; align-items: center; gap: 8px; list-style: none; cursor: pointer;
-    padding: 9px 13px; color: #fff; font-family: var(--sans); font-weight: 700; font-size: 12px;
+    padding: 9px 13px; color: #fff; font-family: var(--sans); font-weight: 700; font-size: 13px;
     /* 0.55, not 0.32. Over the blue bar, white at 32%% is 2.36:1 - under the
        3:1 that 1.4.11 asks of the only line identifying a control. 0.55 is
        3.3:1 and still reads as a keyline rather than a filled button. */
@@ -2999,7 +3013,7 @@ button { font-family: inherit; }
   .nav-fold > .topnav a, .nav-fold > .topnav .topnav-btn {
     flex: 0 0 auto; width: 100%; flex-direction: row; align-items: center; justify-content: flex-start;
     text-align: left; gap: 11px; white-space: normal; line-height: 1.2;
-    padding: 12px 12px; font-size: 12.5px; letter-spacing: 0.03em; border: none;
+    padding: 12px 12px; font-size: 13px; letter-spacing: 0.03em; border: none;
   }
   @media (hover: hover) {   .nav-fold > .topnav a:hover, .nav-fold > .topnav .topnav-btn:hover { background: rgba(255, 255, 255, 0.12); } }
   .nav-fold > .topnav a svg, .nav-fold > .topnav .topnav-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
@@ -3052,7 +3066,7 @@ button { font-family: inherit; }
   .wt-headrow { display: none; }
   .wt-name { flex: 1 1 100%; font-size: 13px; }
   .wt-arc { flex: 0 0 auto; }
-  .wt-num { font-size: 12px; text-align: left; }
+  .wt-num { font-size: 13px; text-align: left; }
   .wt-inline-lbl {
     display: inline; font-family: var(--sans); font-size: 11px; font-weight: 700;
     letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3);
@@ -3108,7 +3122,7 @@ button { font-family: inherit; }
      here - otherwise the Ships and Personnel counts read as a bare "9" and "7". */
   .dock-table td[data-label]::before {
     content: attr(data-label) ": ";
-    font-family: var(--sans); font-size: 10px; font-weight: 700;
+    font-family: var(--sans); font-size: 11px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-3); margin-right: 5px;
   }
   /* wrap, NOT nowrap: four actions (Duplicate / Copy / Download / Delete) are
@@ -3136,7 +3150,7 @@ button { font-family: inherit; }
      both halves of every button are still there - no icon-only buttons. */
   .cf-table .cell-actions .ghost-btn {
     flex: 0 1 auto; min-width: 0; flex-direction: column; gap: 2px;
-    padding: 5px 6px; font-size: 10.5px; letter-spacing: 0.01em;
+    padding: 5px 6px; font-size: 11px; letter-spacing: 0.01em;
   }
 
   /* The generic table-to-card rule above gives every cell its own labelled
@@ -3150,7 +3164,7 @@ button { font-family: inherit; }
     display: flex; flex-wrap: wrap; align-items: baseline;
     gap: 1px 10px; padding: 8px 11px; margin-bottom: 6px;
   }
-  .comp-table .comp-name { flex: 1 1 auto; order: 0; padding-bottom: 0; font-size: 15px; }
+  .comp-table .comp-name { flex: 1 1 auto; order: 0; padding-bottom: 0; font-size: 16px; }
   .comp-table td.comp-cost { order: 1; margin-left: auto; font-weight: 800; color: var(--blue); }
   .comp-table td.comp-cost::before { content: none; }
   .comp-table td.comp-fac { order: 2; flex: 1 1 100%; }
@@ -3212,7 +3226,7 @@ button { font-family: inherit; }
   /* A fifth of a 320px screen is narrower than the word "Compendium" at any
      readable size, so here the word breaks across two lines. Ugly, but it is
      the only option that keeps every label whole and every target equal. */
-  .topnav a, .topnav-btn { font-size: 9.5px; padding: 8px 1px; overflow-wrap: anywhere; }
+  .topnav a, .topnav-btn { font-size: 11px; padding: 8px 1px; overflow-wrap: anywhere; }
 }
 
 /* ============================================================ ROSTER ROWS + MODAL */
@@ -3249,9 +3263,9 @@ button { font-family: inherit; }
 .roster-sheet .roster-unit.unresolved { background: var(--red-wash); }
 .ru-id { min-width: 0; display: flex; align-items: center; gap: 10px; }
 .ru-main { min-width: 0; flex: 1 1 auto; display: flex; flex-direction: column; gap: 1px; }
-.ru-name { font-family: var(--display); font-weight: 700; font-size: 15px; line-height: 1.1; }
+.ru-name { font-family: var(--display); font-weight: 700; font-size: 16px; line-height: 1.1; }
 .ru-main .unit-name-input { width: 100%; }
-.ru-sub { font-size: 12px; color: var(--ink-2); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.ru-sub { font-size: 13px; color: var(--ink-2); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .ru-carry { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 2px 3px; font-family: var(--sans); font-weight: 600; color: var(--color-action); }
 .ru-carry-sep { color: var(--ink-3); margin-left: -2px; }
 /* Each carried person is a tap target that reveals their rule in a popover.
@@ -3269,12 +3283,12 @@ button { font-family: inherit; }
 }
 /* 700, not the 800 this was: --narrow's variable range stops there and a heavier
    ask would be synthesised into a smeared fake bold. */
-.hvp-pop-name { font-family: var(--narrow); font-weight: 700; font-size: 14px; color: var(--ink); text-transform: none; }
-.hvp-pop-rule { font-size: 12.5px; line-height: 1.4; color: var(--ink-2); }
+.hvp-pop-name { font-family: var(--narrow); font-weight: 700; font-size: 13px; color: var(--ink); text-transform: none; }
+.hvp-pop-rule { font-size: 13px; line-height: 1.4; color: var(--ink-2); }
 /* Full-width detail line: stat chips + weapons, so the whole unit is legible
    without opening it. */
 .ru-details { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 3px; padding-top: 6px; border-top: 1px dashed var(--hair-soft); }
-.ru-weap { font-size: 11.5px; line-height: 1.35; color: var(--ink-2); }
+.ru-weap { font-size: 11px; line-height: 1.35; color: var(--ink-2); }
 .ru-stepper { height: 30px; }
 .ru-stepper .stepper-count { line-height: 28px; padding: 0 9px; min-width: 34px; text-align: center; }
 .ru-remove { background: transparent; border: none; cursor: pointer; color: var(--ink-3); padding: 5px; display: inline-flex; }
@@ -3316,7 +3330,7 @@ button { font-family: inherit; }
 .mf-era-badge {
   flex-shrink: 0; align-self: center;
   background: var(--blue); color: #fff; font-family: var(--display); font-weight: 800;
-  font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; padding: 5px 11px; white-space: nowrap;
+  font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; padding: 5px 11px; white-space: nowrap;
 }
 /* Era was a read-only badge; it is a control now. Same badge, plus a caret and
    a popover - position:absolute, so opening it shifts nothing. */
@@ -3334,7 +3348,7 @@ button { font-family: inherit; }
   display: flex; flex-direction: column; gap: 5px;
   box-shadow: var(--shadow16);
 }
-.era-switch-head { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin: 2px 2px 4px; }
+.era-switch-head { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin: 2px 2px 4px; }
 .era-opt {
   display: flex; flex-direction: column; gap: 1px; text-align: left; cursor: pointer;
   padding: 8px 10px; min-height: var(--tap); justify-content: center;
@@ -3342,9 +3356,9 @@ button { font-family: inherit; }
 }
 @media (hover: hover) { .era-opt:hover { border-left-color: var(--blue); background: var(--blue-wash); } }
 .era-opt.on { border-color: var(--blue); border-left-color: var(--red); background: var(--blue-wash); }
-.era-opt-name { font-family: var(--display); font-weight: 700; font-size: 13.5px; color: var(--ink); }
-.era-opt-hint { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); }
-.era-switch-note { font-size: 11.5px; line-height: 1.4; color: var(--ink-3); margin: 4px 2px 0; }
+.era-opt-name { font-family: var(--display); font-weight: 700; font-size: 13px; color: var(--ink); }
+.era-opt-hint { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); }
+.era-switch-note { font-size: 11px; line-height: 1.4; color: var(--ink-3); margin: 4px 2px 0; }
 /* The badge sits mid-row, so a 300px panel hung off its left edge started at
    x=103 and ended at x=403 on a 390px screen: the era you are switching TO was
    the part that fell off. Nothing an absolute panel can do fixes that - its
@@ -3386,7 +3400,7 @@ button { font-family: inherit; }
 .mf-budget { margin-left: auto; flex-shrink: 0; }
 .mf-tally { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 7px; font-family: var(--display); font-variant-numeric: tabular-nums; }
 .mf-tally-now { font-size: clamp(22px, 2.6vw, 30px); font-weight: 900; color: var(--ink); }
-.mf-tally-free { margin-left: 6px; font-family: var(--display); font-size: 14px; font-weight: 900; color: var(--go); }
+.mf-tally-free { margin-left: 6px; font-family: var(--display); font-size: 13px; font-weight: 900; color: var(--go); }
 /* --red is 3.60:1 on white; at 17px this is normal-size text needing 4.5:1.
    --red-deep is 5.07:1 and reads identically at a glance. */
 .builder.is-over .mf-tally-now, .builder.is-over .mf-tally-free { color: var(--red-deep); }
@@ -3412,7 +3426,7 @@ button { font-family: inherit; }
 .mf-menu-panel a, .mf-menu-panel button {
   display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
   border: none; background: none; cursor: pointer; padding: 10px 10px; min-height: var(--tap);
-  font-family: var(--sans); font-size: 14px; font-weight: 600; color: var(--ink); text-decoration: none;
+  font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink); text-decoration: none;
 }
 @media (hover: hover) { .mf-menu-panel a:hover, .mf-menu-panel button:hover { background: var(--blue-wash); } }
 .mf-menu-panel .danger { color: var(--red-deep); }
@@ -3438,7 +3452,7 @@ button { font-family: inherit; }
    you do with a finished fleet; printing is a thing you may also want. */
 .mf-print-cta {
   background: transparent; color: var(--ink-2); border-color: var(--hair);
-  padding: 12px; font-size: 14px; letter-spacing: 0.03em;
+  padding: 12px; font-size: 13px; letter-spacing: 0.03em;
 }
 @media (hover: hover) { .mf-print-cta:hover { background: transparent; border-color: var(--blue); color: var(--blue); } }
 .mf-print-cta .icon { width: 16px; height: 16px; }
@@ -3452,7 +3466,7 @@ button { font-family: inherit; }
 .mf-fac .faction-switch > summary,
 .mf-fac .freeplay-badge {
   border: none; background: none; padding: 0; list-style: none;
-  font-family: var(--display); font-weight: 700; font-size: 15px; text-transform: none; letter-spacing: 0;
+  font-family: var(--display); font-weight: 700; font-size: 16px; text-transform: none; letter-spacing: 0;
   color: var(--ink); cursor: pointer; border-bottom: 2px solid var(--field-edge);
 }
 .mf-fac .faction-switch > summary::after,
@@ -3489,7 +3503,7 @@ button { font-family: inherit; }
 .nf-unlimited-box { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border: 1.5px solid var(--hair); color: transparent; flex-shrink: 0; }
 .nf-unlimited-toggle input:checked + .nf-unlimited-box { background: var(--blue); border-color: var(--blue); color: #fff; }
 .nf-unlimited-toggle input:focus-visible + .nf-unlimited-box { outline: 2px solid var(--red); outline-offset: 2px; }
-.nf-unlimited-hint { display: block; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
+.nf-unlimited-hint { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
 
 /* ===========================================================================
    HYPERGROWTH SHIPYARD  (spec: HYPERGROWTH-SHIPYARD.md)
@@ -3551,7 +3565,7 @@ button { font-family: inherit; }
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   flex-shrink: 0; height: 40px; padding: 0 12px;
   border: 1px solid var(--blue); background: var(--blue); color: #fff;
-  font-family: var(--sans); font-size: 12px; font-weight: 700;
+  font-family: var(--sans); font-size: 13px; font-weight: 700;
   letter-spacing: 0.05em; text-transform: uppercase; text-decoration: none;
 }
 @media (hover: hover) { .mf-play-btn:hover { background: var(--blue-deep); border-color: var(--blue-deep); color: #fff; } }
@@ -3575,7 +3589,7 @@ button { font-family: inherit; }
 .sy-budget-row { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; font-family: var(--display); font-variant-numeric: tabular-nums; }
 .sy-budget-now { font-size: clamp(24px, 5vw, 32px); font-weight: 900; color: var(--ink); }
 .sy-budget-cap { font-weight: 800; }
-.sy-budget-cap .limit-switch > summary { font-size: 15px; font-weight: 700; color: var(--ink-2); border-bottom-width: 1px; }
+.sy-budget-cap .limit-switch > summary { font-size: 16px; font-weight: 700; color: var(--ink-2); border-bottom-width: 1px; }
 /* Always 44px tall, whichever status it holds: "Legal" is a line of text and
    "1 to resolve" a 44px tap target, and swapping one for the other (choosing
    a personnel card is enough) moved everything below by 5px. */
@@ -3583,7 +3597,7 @@ button { font-family: inherit; }
 .sy-budget-status .yard-status, .sy-budget-status .yard-status-pop { margin: 0; }
 /* The issues panel opens from the right edge now that its summary sits there. */
 .sy-budget-status .yard-status-panel { left: auto; right: 0; }
-.sy-budget-free { font-size: 15px; font-weight: 900; color: var(--go); }
+.sy-budget-free { font-size: 16px; font-weight: 900; color: var(--go); }
 .shipyard.is-over .sy-budget-now, .shipyard.is-over .sy-budget-free { color: var(--red-deep); }
 .sy-meter { margin-top: 6px; height: 8px; background: var(--ground); border: 1px solid var(--hair-soft); }
 .sy-meter-fill { display: block; height: 100%; background: var(--blue); transition: width 0.18s var(--ease); }
@@ -3602,7 +3616,7 @@ button { font-family: inherit; }
 .sy-ship:first-child { border-top: none; }
 .sy-ship-head { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 2px 12px; }
 .sy-ship-name { font-family: var(--display); font-weight: 700; font-size: clamp(15px, 3.4vw, 17px); letter-spacing: -0.01em; line-height: 1.15; margin: 0; min-width: 0; }
-.sy-ship-cost { font-family: var(--display); font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums; color: var(--blue); white-space: nowrap; }
+.sy-ship-cost { font-family: var(--display); font-weight: 800; font-size: 16px; font-variant-numeric: tabular-nums; color: var(--blue); white-space: nowrap; }
 /* The workings, not the answer: lighter and a size down, so the total still
    reads as the figure on the line and "3x (10) =" is the note beside it. */
 .sy-ship-cost .cost-mult { font-family: var(--sans); font-weight: 600; font-size: 11px; color: var(--ink-3); }
@@ -3631,7 +3645,7 @@ button { font-family: inherit; }
 
 /* A note replacing the list when No Limit is on (no shipyard is built in
    advance, so there is nothing to pre-buy). */
-.sy-note { display: flex; gap: 9px; align-items: flex-start; font-family: var(--serif); font-size: 14px; line-height: 1.5; color: var(--ink-2); padding: 8px 0 12px; }
+.sy-note { display: flex; gap: 9px; align-items: flex-start; font-family: var(--serif); font-size: 13px; line-height: 1.5; color: var(--ink-2); padding: 8px 0 12px; }
 .sy-note .icon { flex-shrink: 0; color: var(--blue); margin-top: 2px; }
 
 /* Personnel. One flat list (faction + generic together, no divider). Each row:
@@ -3659,8 +3673,8 @@ button { font-family: inherit; }
   .sy-personnel > .hvp-assign,
   .sy-personnel > .hvp-req { padding-left: 10px; }
 }
-.sy-hvp-count { display: flex; align-items: baseline; gap: 8px; font-family: var(--display); font-weight: 800; font-size: 14px; margin: 0 0 6px; }
-.sy-hvp-count span { font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }
+.sy-hvp-count { display: flex; align-items: baseline; gap: 8px; font-family: var(--display); font-weight: 800; font-size: 13px; margin: 0 0 6px; }
+.sy-hvp-count span { font-family: var(--sans); font-size: 13px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }
 .sy-hvp-list { display: flex; flex-direction: column; }
 .sy-hvp {
   display: grid; grid-template-columns: minmax(0, 1fr) 32px; gap: 12px; align-items: center;
@@ -3693,14 +3707,14 @@ button { font-family: inherit; }
 @media (hover: hover) { .sy-hvp-check[aria-disabled="true"]:hover { background: var(--paper); } }
 .sy-hvp-check:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 .sy-hvp-body { min-width: 0; }
-.sy-hvp-name { display: block; font-family: var(--narrow); font-weight: 700; font-size: 15px; line-height: 1.2; }
+.sy-hvp-name { display: block; font-family: var(--narrow); font-weight: 700; font-size: 16px; line-height: 1.2; }
 .sy-hvp-rule { display: block; font-family: var(--serif); font-size: 13px; line-height: 1.4; color: var(--ink-2); margin-top: 2px; }
 /* Generics read a touch quieter than a faction's own HVP: a shade greyer and a
    hair smaller. Still in the same flat list, just slightly less appealing. A
    chosen generic still turns blue like any chosen pick. */
-.sy-hvp.is-generic .sy-hvp-name { font-size: 14px; }
+.sy-hvp.is-generic .sy-hvp-name { font-size: 13px; }
 .sy-hvp.is-generic:not(.is-chosen) .sy-hvp-name { color: var(--ink-2); }
-.sy-hvp.is-generic .sy-hvp-rule { color: var(--ink-3); font-size: 12.5px; }
+.sy-hvp.is-generic .sy-hvp-rule { color: var(--ink-3); font-size: 13px; }
 
 /* The faction picker drops out of the (non-sticky) masthead but has to cover the
    sticky budget bar below it, which owns z-index 30. Lift the open panel above. */
@@ -3713,7 +3727,7 @@ button { font-family: inherit; }
    Fleet-List builder (Armageddon / Age of Unity): the Shipyard shell reused,
    with per-unit rows, an Add-unit picker and a Ship Reference table.
    --------------------------------------------------------------------------- */
-.sy-ref-btn { display: inline-flex; align-items: center; gap: 6px; font-family: var(--display); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.02em; padding: 5px 10px; border: 1px solid var(--hair-soft); background: var(--paper); color: var(--ink); cursor: pointer; }
+.sy-ref-btn { display: inline-flex; align-items: center; gap: 6px; font-family: var(--display); font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.02em; padding: 5px 10px; border: 1px solid var(--hair-soft); background: var(--paper); color: var(--ink); cursor: pointer; }
 @media (hover: hover) { .sy-ref-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-wash); } }
 
 .sy-list-head { display: flex; align-items: center; gap: 12px; margin: 10px 0; min-height: var(--tap); }
@@ -3721,8 +3735,8 @@ button { font-family: inherit; }
    now that it shares the row. */
 .sy-list-head .sy-add-unit { margin-left: auto; }
 .sy-list-head .yard-status, .sy-list-head .yard-status-pop { margin: 0; }
-.sy-h { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; font-size: 15px; margin: 0; display: flex; align-items: baseline; gap: 8px; }
-.sy-h-count { font-weight: 600; font-size: 12px; color: var(--ink-3); }
+.sy-h { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; font-size: 16px; margin: 0; display: flex; align-items: baseline; gap: 8px; }
+.sy-h-count { font-weight: 600; font-size: 13px; color: var(--ink-3); }
 .sy-add-unit { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; font-size: 13px; padding: 9px 15px; border: none; background: var(--blue); color: #fff; cursor: pointer; }
 @media (hover: hover) { .sy-add-unit:hover { background: var(--blue-deep); } }
 /* A firm press: the button sinks a touch and shrinks, so the click has weight. */
@@ -3744,7 +3758,7 @@ button { font-family: inherit; }
 @media (hover: hover) { .sy-unit-remove:hover { border-color: var(--red); color: var(--red); } }
 .sy-unit-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 6px 0 2px; }
 
-.sy-hvp-note { font-size: 12.5px; color: var(--ink-3); margin: 0 0 10px; }
+.sy-hvp-note { font-size: 13px; color: var(--ink-3); margin: 0 0 10px; }
 
 /* Add-unit picker: one list, lightest first (no Mass headings, see render.ts).
    Two columns of cards once there is room, one on a phone. */
@@ -3753,7 +3767,7 @@ button { font-family: inherit; }
 /* The budget shares the title's row. It sat in Carbon's label slot on a line
    of its own above "Add unit", one more row for one number. */
 .au-heading { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 14px; }
-.au-budget { font-size: 14px; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.au-budget { font-size: 13px; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 .au-budget.is-over { color: var(--red-deep); }
 
 /* Ship Reference: one line per ship, PDF-style, grouped by Mass. Built as a grid
@@ -3761,7 +3775,7 @@ button { font-family: inherit; }
    compact stacked entry on a phone. The whole sheet must be readable without
    scrolling in EITHER direction, so nothing here may overflow sideways. */
 .shipref-modal { width: min(780px, 100%); }
-.shipref-cap { display: flex; flex-wrap: wrap; gap: 2px 16px; margin: 0 0 8px; font-size: 12px; color: var(--ink-3); }
+.shipref-cap { display: flex; flex-wrap: wrap; gap: 2px 16px; margin: 0 0 8px; font-size: 13px; color: var(--ink-3); }
 .shipref { display: flex; flex-direction: column; }
 .sr-row {
   display: grid;
@@ -3772,17 +3786,17 @@ button { font-family: inherit; }
 @media (hover: hover) { .sr-row:hover:not(.sr-head) { background: var(--blue-wash); } }
 .sr-head {
   font-family: var(--display); font-weight: 800; text-transform: uppercase;
-  font-size: 10px; letter-spacing: 0.04em; color: var(--ink-2);
+  font-size: 11px; letter-spacing: 0.04em; color: var(--ink-2);
   border-bottom: 2px solid var(--ink); padding-bottom: 4px;
 }
 .sr-head .sr-num, .sr-head .sr-cost { text-align: inherit; }
 .sr-name { font-weight: 700; font-size: 13px; min-width: 0; }
-.sr-num { font-size: 12px; text-align: center; font-variant-numeric: tabular-nums; }
-.sr-w { font-size: 11.5px; line-height: 1.3; color: var(--ink-2); min-width: 0; overflow-wrap: anywhere; }
-.sr-cost { font-family: var(--display); font-weight: 800; font-size: 12.5px; text-align: right; }
+.sr-num { font-size: 13px; text-align: center; font-variant-numeric: tabular-nums; }
+.sr-w { font-size: 11px; line-height: 1.3; color: var(--ink-2); min-width: 0; overflow-wrap: anywhere; }
+.sr-cost { font-family: var(--display); font-weight: 800; font-size: 13px; text-align: right; }
 .sr-mass {
   background: var(--blue-wash); color: var(--blue); padding: 3px 8px;
-  font-family: var(--display); font-weight: 800; font-size: 10px;
+  font-family: var(--display); font-weight: 800; font-size: 11px;
   text-transform: uppercase; letter-spacing: 0.05em;
 }
 .sr-num::before, .sr-w::before { content: none; }
@@ -3800,21 +3814,21 @@ button { font-family: inherit; }
     grid-template-columns: 1fr auto;
     gap: 0 8px; padding: 2px 2px; line-height: 1.22;
   }
-  .sr-name { grid-column: 1; font-size: 12px; }
+  .sr-name { grid-column: 1; font-size: 13px; }
   .sr-cost { grid-column: 2; grid-row: 1; }
   /* Stats on one line with real labels and gaps between them; one labelled line
      per weapon. This was "M0 · T10" · S2 · Sh0" over "P ... · A ...": single
      letters to decode and middots that meant nothing. */
   .sr-stats { display: flex; flex-wrap: wrap; gap: 0 14px; grid-column: 1 / -1; }
   .sr-weps { display: grid; gap: 1px; grid-column: 1 / -1; }
-  .sr-num { display: inline; text-align: left; font-size: 12px; color: var(--ink); font-weight: 700; }
-  .sr-num::before { content: attr(data-l) " "; color: var(--ink-3); font-weight: 700; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .sr-num { display: inline; text-align: left; font-size: 13px; color: var(--ink); font-weight: 700; }
+  .sr-num::before { content: attr(data-l) " "; color: var(--ink-3); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; }
   /* The arc glyph in gunArc says Primary or Auxiliary; no word label too. */
-  .sr-w { display: block; font-size: 12px; }
+  .sr-w { display: block; font-size: 13px; }
   .sr-w::before { content: none; }
   .sr-w.is-empty { display: none; }
-  .sr-mass { padding: 0 6px; font-size: 9px; }
-  .shipref-cap { font-size: 10.5px; margin-bottom: 4px; }
+  .sr-mass { padding: 0 6px; font-size: 11px; }
+  .shipref-cap { font-size: 11px; margin-bottom: 4px; }
   .shipref-body { padding: 6px 10px 8px; }
 }
 
@@ -3833,9 +3847,9 @@ button { font-family: inherit; }
 .au-card:focus-visible { background: var(--blue-wash); outline: 2px solid var(--red); outline-offset: -2px; }
 .au-card:last-child { border-bottom: none; }
 .au-card-top { display: flex; align-items: baseline; gap: 7px; }
-.au-card-name { font-weight: 700; font-size: 13.5px; }
-.au-card-owned { white-space: nowrap; font-family: var(--display); font-weight: 800; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.03em; color: #fff; background: var(--blue); padding: 0 5px; border-radius: 9px; }
-.au-card-cost { margin-left: auto; font-family: var(--display); font-weight: 800; font-size: 12.5px; }
+.au-card-name { font-weight: 700; font-size: 13px; }
+.au-card-owned { white-space: nowrap; font-family: var(--display); font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; color: #fff; background: var(--blue); padding: 0 5px; border-radius: 9px; }
+.au-card-cost { margin-left: auto; font-family: var(--display); font-weight: 800; font-size: 13px; }
 .au-card-add { display: inline-flex; align-items: center; color: var(--blue); }
 /* Stats on the left, weapons to their right (wraps below only when cramped). */
 /* Guns to the right of the stats, always, at every width: stats are the
@@ -3845,11 +3859,11 @@ button { font-family: inherit; }
 .au-card-body { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: 0 16px; margin-top: 2px; }
 .au-card .stat-chip, .au-card .stat-chip-mini { border: none; background: none; padding: 0; }
 .au-card .stat-chips { gap: 0 10px; }
-.au-card-wep { display: grid; gap: 1px; font-size: 11.5px; line-height: 1.35; color: var(--ink-2); flex: 1 1 200px; min-width: 0; }
+.au-card-wep { display: grid; gap: 1px; font-size: 11px; line-height: 1.35; color: var(--ink-2); flex: 1 1 200px; min-width: 0; }
 /* In a column this narrow the label sits over its weapon, not beside it. */
 .au-wrow { display: grid; gap: 0; }
 .au-wrow + .au-wrow { margin-top: 4px; }
-.au-wl { font-family: var(--display); font-weight: 800; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3); }
+.au-wl { font-family: var(--display); font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3); }
 /* Species on a roster row: three plain buttons, the unit's own one filled. */
 .species-pick { display: inline-grid; grid-template-columns: repeat(3, auto); border: 1px solid var(--hair); }
 .species-opt { min-height: 36px; padding: 0 12px; font: inherit; font-size: 13px; font-weight: 600; background: var(--paper); color: var(--ink-2); border: 0; border-left: 1px solid var(--hair); cursor: pointer; }
@@ -3864,10 +3878,10 @@ button { font-family: inherit; }
    positioned, so opening it never moves the rows below. */
 .hvp-assign { margin-top: 12px; border-top: 1px solid var(--hair-soft); padding-top: 10px; }
 .hvp-assign-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
-.hvp-assign-note { font-family: var(--sans); font-size: 11.5px; font-weight: 600; color: var(--ink-3); margin: 0; }
+.hvp-assign-note { font-family: var(--sans); font-size: 11px; font-weight: 600; color: var(--ink-3); margin: 0; }
 .hvp-assign-row { display: flex; flex-direction: column; gap: 3px; padding: 6px 0; border-bottom: 1px solid var(--hair-soft); }
 .hvp-assign-row:last-child { border-bottom: none; }
-.hvp-assign-name { font-family: var(--narrow); font-weight: 700; font-size: 14.5px; }
+.hvp-assign-name { font-family: var(--narrow); font-weight: 700; font-size: 16px; }
 
 .hvp-pick { position: relative; }
 .hvp-pick > summary {
@@ -3898,8 +3912,8 @@ button { font-family: inherit; }
 }
 @media (hover: hover) { .hvp-pick-opt:hover { border-left-color: var(--blue); background: var(--blue-wash); } }
 .hvp-pick-opt.on { border-color: var(--blue); border-left-color: var(--red); background: var(--blue-wash); }
-.hvp-pick-name { font-family: var(--narrow); font-weight: 700; font-size: 14.5px; color: var(--ink); }
-.hvp-pick-why { font-family: var(--sans); font-size: 10.5px; font-weight: 600; color: var(--ink-3); }
+.hvp-pick-name { font-family: var(--narrow); font-weight: 700; font-size: 16px; color: var(--ink); }
+.hvp-pick-why { font-family: var(--sans); font-size: 11px; font-weight: 600; color: var(--ink-3); }
 /* Too light to carry: shown, never hidden, so you can see the unit is there and
    why it is not an option. Not a button, so it cannot be tapped or tabbed to. */
 .hvp-pick-opt.is-blocked { cursor: default; opacity: 0.55; border-left-color: var(--hair-soft); }
@@ -3978,11 +3992,11 @@ button { font-family: inherit; }
 .chart-picker-btn.selected { background: var(--ink); border-color: var(--ink); color: #fff; }
 .chart { display: flex; flex-direction: column; padding: 4px 0 14px; }
 .chart-row { display: grid; grid-template-columns: minmax(90px, 1fr) minmax(0, 2fr) auto; align-items: center; gap: 10px; padding: 5px 2px; border-bottom: 1px solid var(--hair-soft); }
-.chart-label { font-family: var(--display); font-weight: 700; font-size: 12.5px; color: var(--ink); }
+.chart-label { font-family: var(--display); font-weight: 700; font-size: 13px; color: var(--ink); }
 .chart-track { display: block; height: 16px; background: var(--ground); }
 .chart-bar { display: block; height: 100%; background: var(--blue); }
-.chart-val { font-family: var(--display); font-weight: 800; font-size: 12px; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; min-width: 44px; }
-.mf-empty { padding: 16px 2px; font-size: 14px; font-weight: 600; color: var(--ink); }
+.chart-val { font-family: var(--display); font-weight: 800; font-size: 13px; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; min-width: 44px; }
+.mf-empty { padding: 16px 2px; font-size: 13px; font-weight: 600; color: var(--ink); }
 
 /* every list is the same ledger: flush, hairline-separated, no borders.
    Two rows: the top row is identity (name) on the left and the controls
@@ -4013,7 +4027,7 @@ button { font-family: inherit; }
 .is-option { cursor: pointer; }
 .add-cue {
   display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; align-self: center;
-  font-family: var(--display); font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.02em;
+  font-family: var(--display); font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 0.02em;
   color: var(--blue); border: 2px solid var(--blue); padding: 5px 10px;
 }
 @media (hover: hover) { .is-option:hover .add-cue { background: var(--blue); color: #fff; } }
@@ -4041,12 +4055,12 @@ button { font-family: inherit; }
 .mf-rule-meta { display: flex; align-items: center; gap: 6px; font-family: var(--display); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.01em; color: var(--ink); }
 .mf-rule-meta b { color: var(--blue); }
 .mf-rule-name { font-family: var(--display); font-weight: 800; font-size: 18px; color: var(--blue); margin-top: 5px; }
-.mf-rule-text { font-family: var(--serif); font-size: 14.5px; line-height: 1.45; font-weight: 500; font-style: normal; color: var(--ink); margin-top: 4px; }
+.mf-rule-text { font-family: var(--serif); font-size: 16px; line-height: 1.45; font-weight: 500; font-style: normal; color: var(--ink); margin-top: 4px; }
 
 /* Legality status: one small line by the ship-buying section, not its own
    block. Clean fleets get a quiet checkmark; problems collapse into a tiny
    count that expands as a position:absolute popover (no layout shift). */
-.yard-status { display: flex; align-items: center; gap: 5px; margin: 0 0 8px; font-family: var(--sans); font-size: 12px; font-weight: 700; }
+.yard-status { display: flex; align-items: center; gap: 5px; margin: 0 0 8px; font-family: var(--sans); font-size: 13px; font-weight: 700; }
 .yard-status.is-ok { color: var(--go); }
 .yard-status.is-muted { color: var(--ink-3); font-weight: 600; }
 .yard-status-pop { position: relative; margin-bottom: 8px; }
@@ -4060,7 +4074,7 @@ button { font-family: inherit; }
   box-shadow: var(--shadow16);
 }
 .yard-status-panel.issue-list { gap: 8px; }
-.builder .issue-list li { font-size: 12.5px; font-weight: 600; }
+.builder .issue-list li { font-size: 13px; font-weight: 600; }
 .builder .issue-error { color: var(--red-deep); }
 .builder .issue-warning { color: var(--amber); }
 
@@ -4129,11 +4143,11 @@ button { font-family: inherit; }
   /* Era switcher: let long labels ("Age of Unity", "Armageddon") shrink and
      wrap inside their equal cells instead of overflowing and clipping. The
      sliding thumb stays aligned because it is sized from the option count. */
-  .switcher-opt { padding: 8px 3px; font-size: 12px; white-space: normal; line-height: 1.1; gap: 4px; }
+  .switcher-opt { padding: 8px 3px; font-size: 13px; white-space: normal; line-height: 1.1; gap: 4px; }
   /* Four equal quarters of a 360px screen is ~85px a tab; at 12px letterspaced
      "COMMAND" needs ~100px and would wrap. Tighten just the phase track. */
-  .phase-track .switcher-opt { font-size: 10.5px; letter-spacing: 0.01em; padding: 8px 2px; }
-  .phase-track .phase-n { width: 15px; height: 15px; font-size: 9px; }
+  .phase-track .switcher-opt { font-size: 11px; letter-spacing: 0.01em; padding: 8px 2px; }
+  .phase-track .phase-n { width: 15px; height: 15px; font-size: 11px; }
 
   /* Credits-cap popover: the preset segment is too wide for a phone, so cap
      the panel width and let the presets wrap - it opens rightward from the
@@ -4187,7 +4201,7 @@ button { font-family: inherit; }
 .modal-header.is-danger { background: var(--red-deep); }
 .modal-header.is-danger .modal-close { border-color: rgb(255 255 255 / 0.35); }
 @media (hover: hover) { .modal-header.is-danger .modal-close:hover { background: #fff; color: var(--red-deep); } }
-.cf-body { font-size: 14.5px; line-height: 1.5; color: var(--ink-2); }
+.cf-body { font-size: 16px; line-height: 1.5; color: var(--ink-2); }
 .cta-btn.cf-danger { background: var(--red-deep); border-color: var(--red-deep); box-shadow: none; }
 @media (hover: hover) { .cta-btn.cf-danger:hover { background: var(--red); border-color: var(--red); } }
 
@@ -4220,19 +4234,19 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 @media (hover: hover) { .opt-toggle:hover { border-color: var(--blue); background: var(--blue-wash); } }
 .opt-toggle input { flex: 0 0 auto; width: 16px; height: 16px; margin-top: 2px; accent-color: var(--blue); cursor: pointer; }
 .opt-toggle-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.opt-toggle-name { font-family: var(--sans); font-size: 14px; font-weight: 700; color: var(--ink); }
-.opt-toggle-desc { font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+.opt-toggle-name { font-family: var(--sans); font-size: 13px; font-weight: 700; color: var(--ink); }
+.opt-toggle-desc { font-size: 13px; line-height: 1.45; color: var(--ink-2); }
 .opt-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .opt-version { font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-3); margin: 0; font-variant-numeric: tabular-nums; }
 .opt-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
-.opt-links a { display: inline-flex; align-items: center; gap: 9px; padding: 8px 4px; color: var(--blue); font-weight: 600; font-size: 14px; }
+.opt-links a { display: inline-flex; align-items: center; gap: 9px; padding: 8px 4px; color: var(--blue); font-weight: 600; font-size: 13px; }
 
 /* Fleet Sync dialog. Reuses .opt-section/.opt-h/.opt-actions/.field-block's
    input look rather than inventing a second visual language for what is,
    structurally, one more settings panel. */
-.sync-note { font-size: 12px; line-height: 1.5; color: var(--ink-3); padding: 8px 10px; border: 1px dashed var(--hair-soft); background: var(--paper); }
+.sync-note { font-size: 13px; line-height: 1.5; color: var(--ink-3); padding: 8px 10px; border: 1px dashed var(--hair-soft); background: var(--paper); }
 .sync-hint { font-size: 13px; color: var(--ink-2); }
-.sync-on-state { font-size: 13.5px; color: var(--ink-2); line-height: 1.5; }
+.sync-on-state { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
 .sync-token-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .sync-token {
   font-family: var(--mono);
@@ -4252,18 +4266,18 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
   border: 1px solid var(--hair);
   background: var(--paper);
   font-family: var(--sans);
-  font-size: 13.5px;
+  font-size: 13px;
   color: var(--ink);
 }
 .sync-input:focus { outline: none; border-color: var(--blue); }
-.sync-status { font-size: 12.5px; color: var(--ink-3); }
-.sync-error { font-size: 12.5px; color: var(--red-deep); font-weight: 600; }
+.sync-status { font-size: 13px; color: var(--ink-3); }
+.sync-error { font-size: 13px; color: var(--red-deep); font-weight: 600; }
 /* Discord's own blurple, on Discord's own button only: it is their mark, and a
    player scanning the dialog looks for that colour, not for our blue. */
 .sync-discord-btn { background: #5865f2; border-color: #5865f2; }
 .sync-discord-btn:active { background: #4752c4; border-color: #4752c4; }
 @media (hover: hover) { .sync-discord-btn:hover { background: #4752c4; border-color: #4752c4; } }
-.sync-discord-who { display: flex; align-items: center; gap: 10px; font-size: 15px; }
+.sync-discord-who { display: flex; align-items: center; gap: 10px; font-size: 16px; }
 .sync-avatar { width: 32px; height: 32px; border-radius: 50%; }
 @media (max-width: 480px) {
   .sync-join-row { flex-direction: column; }
@@ -4278,7 +4292,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 @media (hover: hover) { .modal-close:hover { background: #fff; color: var(--color-action); } }
 .modal-body { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
 .modal-footer { display: flex; justify-content: space-between; gap: 12px; padding: 14px 20px; border-top: 2px solid var(--color-line); }
-.modal-field { display: flex; flex-direction: column; gap: 8px; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.modal-field { display: flex; flex-direction: column; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
 
 /* New Fleet modal pickers */
 .modal-panel.modal-lg { width: min(680px, 100%); }
@@ -4293,7 +4307,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 .nf-custom { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); border: 1px solid var(--color-line); padding: 4px 10px; }
 .nf-custom.on { border-color: var(--color-action); color: var(--color-action); }
 /* Closed state: "Custom" is a plain word-button; click it to open the field. */
-.nf-hyper-note { font-size: 11.5px; color: var(--ink-3); margin-top: 8px; line-height: 1.4; }
+.nf-hyper-note { font-size: 11px; color: var(--ink-3); margin-top: 8px; line-height: 1.4; }
 .nf-custom-btn { background: transparent; cursor: pointer; font-family: inherit; }
 @media (hover: hover) { .nf-custom-btn:hover { border-color: var(--color-action); color: var(--color-action); } }
 .nf-custom input { width: 64px; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; padding: 3px 0; background: transparent; color: var(--ink); }
@@ -4308,8 +4322,8 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 @media (hover: hover) { .nf-era-btn:hover { border-color: var(--blue); background: var(--blue-wash); } }
 .nf-era-btn:active { transform: translateY(1px); }
 .nf-era-btn.on { border-color: var(--blue); background: var(--blue); }
-.nf-era-name { font-family: var(--display); font-weight: 800; font-size: 14px; line-height: 1.1; letter-spacing: -0.01em; color: var(--ink); text-wrap: balance; }
-.nf-era-hint { font-family: var(--sans); font-size: 9.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); }
+.nf-era-name { font-family: var(--display); font-weight: 800; font-size: 13px; line-height: 1.1; letter-spacing: -0.01em; color: var(--ink); text-wrap: balance; }
+.nf-era-hint { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); }
 .nf-era-btn.on .nf-era-name { color: #fff; }
 .nf-era-btn.on .nf-era-hint { color: #cfe0fb; }
 @media (max-width: 480px) { .nf-eras { flex-direction: column; } }
@@ -4322,7 +4336,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
    taller than its neighbours. Nothing is clipped - the font gives, not the box. */
 .modal-body .faction-plaque { height: 66px; min-height: 0; justify-content: center; }
 .modal-body .faction-plaque-name { text-wrap: balance; }
-.modal-body .faction-plaque[data-faction="alliance"] .faction-plaque-name { font-size: 11.5px; }
+.modal-body .faction-plaque[data-faction="alliance"] .faction-plaque-name { font-size: 11px; }
 .nf-more {
   align-self: flex-start; margin-top: 4px; background: transparent; border: none; cursor: pointer;
   font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: 0.03em; color: var(--color-action);
@@ -4388,7 +4402,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 @media (prefers-reduced-motion: reduce) {
   .nfd-title.is-wiping::before { animation: none; content: none; }
 }
-.nfd-era-tag { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-bottom: 12px; }
+.nfd-era-tag { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-bottom: 12px; }
 /* The slogan sits in a fixed-height well so the "Signature ability" heading and
    the stat plates below hold the same position no matter which faction you
    click - the one-line slogans pad out with air rather than letting everything
@@ -4399,12 +4413,12 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 /* Slogan: the faction's own epigraph, verbatim. Some are spoken lines, some
    machine logs (starting with >), so no auto-quotes - italic serif sets it
    apart as the one literary line in the pane. */
-.nfd-tagline { font-family: var(--serif); font-style: italic; font-size: 14px; font-weight: 600; line-height: 1.4; color: var(--ink); margin-bottom: 10px; }
+.nfd-tagline { font-family: var(--serif); font-style: italic; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--ink); margin-bottom: 10px; }
 /* Machine-log slogans (those starting with ">") read as a terminal line:
    monospace, upright, tighter, with a blinking block cursor. */
 .nfd-tagline--term {
   font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
-  font-style: normal; font-weight: 500; font-size: 12.5px; line-height: 1.5; letter-spacing: 0; color: var(--ink-2);
+  font-style: normal; font-weight: 500; font-size: 13px; line-height: 1.5; letter-spacing: 0; color: var(--ink-2);
 }
 .nfd-tagline--term::after {
   content: "\2588"; margin-left: 1px; color: var(--blue);
@@ -4415,16 +4429,16 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 /* The command-token row can hold up to nine small deltas; keep them tight. */
 .cmd-row { gap: 2px; }
 .cmd-row .cmd-token { width: 15px; height: 15px; }
-.nfd-summary { font-family: var(--sans); font-size: 13.5px; line-height: 1.5; color: var(--ink); margin-bottom: 4px; font-weight: 500; }
-.nfd-h { font-family: var(--sans); font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin: 18px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--hair-soft); }
-.nfd-rule { font-size: 13.5px; line-height: 1.5; color: var(--ink-2); font-weight: 400; letter-spacing: normal; text-transform: none; }
+.nfd-summary { font-family: var(--sans); font-size: 13px; line-height: 1.5; color: var(--ink); margin-bottom: 4px; font-weight: 500; }
+.nfd-h { font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin: 18px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--hair-soft); }
+.nfd-rule { font-size: 13px; line-height: 1.5; color: var(--ink-2); font-weight: 400; letter-spacing: normal; text-transform: none; }
 .nfd-rule-name { font-weight: 700; color: var(--ink); }
 /* Two stat plates: Initiative (value + a row of dice) and CMD/round (value +
    the command-token delta). Boxed so they read as the two numbers that matter
    at pick-time, not a four-way data dump. */
 .nfd-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
 .nfd-stat { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border: 1px solid var(--hair); background: var(--blue-wash); }
-.nfd-stat-label { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); }
+.nfd-stat-label { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); }
 /* Value and its dice / command glyphs share one line. */
 .nfd-stat-figure { display: flex; align-items: center; gap: 10px; min-height: 24px; }
 .nfd-stat-val { font-family: var(--display); font-weight: 800; font-size: 22px; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
@@ -4460,8 +4474,8 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
   /* Tighter plaques so all four factions of an era are on screen together. */
   .modal-body .faction-plaques { gap: 5px; }
   .modal-body .faction-plaque { height: auto; padding: 8px 10px; gap: 1px; }
-  .modal-body .faction-plaque-name { font-size: 13.5px; }
-  .modal-body .faction-plaque-rule { font-size: 9.5px; }
+  .modal-body .faction-plaque-name { font-size: 13px; }
+  .modal-body .faction-plaque-rule { font-size: 11px; }
   .nf-era-btn { padding: 8px 10px; }
   /* Nothing is selected yet, so this is a 250px box whose entire content is an
      instruction to select something. The faction list right above it is the
@@ -4563,7 +4577,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 }
 @media (hover: hover) { .tour-close:hover { color: var(--red); } }
 .tour-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 6px 0 14px; }
-.tour-title { font-family: var(--display); font-weight: 800; font-size: 15px; letter-spacing: -0.01em; color: var(--color-ink); }
+.tour-title { font-family: var(--display); font-weight: 800; font-size: 16px; letter-spacing: -0.01em; color: var(--color-ink); }
 .tour-body { font-family: var(--sans); font-size: 13px; line-height: 1.45; color: var(--ink-2); padding: 8px 14px 14px; }
 .tour-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 14px 14px; }
 /* Dismiss then go, always in that order. They wrap rather than shrink: "Check
@@ -4576,7 +4590,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   height: 28px; padding: 0 11px;
   background: transparent; border: 1px solid var(--hair); color: var(--color-ink); cursor: pointer;
-  font-family: var(--sans); font-size: 12px; font-weight: 700;
+  font-family: var(--sans); font-size: 13px; font-weight: 700;
 }
 @media (hover: hover) { .tour-next:hover, .tour-got:hover { border-color: var(--color-action); color: var(--color-action); } }
 /* The one thing the tooltip is asking you to do, so it is the filled button and
@@ -4657,8 +4671,8 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
    pushed the last step to the far edge and left a long empty span mid-row. */
 .learn-progress { display: flex; align-items: flex-start; gap: 6px 8px; flex-wrap: wrap; margin-bottom: 22px; }
 .learn-dot { display: inline-flex; align-items: center; gap: 7px; text-decoration: none; color: var(--ink-3); padding: 6px 8px; border: 1px solid transparent; }
-.learn-dot-n { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 1.5px solid var(--hair); font-family: var(--display); font-weight: 800; font-size: 12px; color: var(--ink-3); }
-.learn-dot-l { font-family: var(--sans); font-size: 12px; font-weight: 700; }
+.learn-dot-n { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 1.5px solid var(--hair); font-family: var(--display); font-weight: 800; font-size: 13px; color: var(--ink-3); }
+.learn-dot-l { font-family: var(--sans); font-size: 13px; font-weight: 700; }
 .learn-dot.on .learn-dot-n { background: var(--blue); border-color: var(--blue); color: #fff; }
 .learn-dot.on .learn-dot-l { color: var(--ink); }
 .learn-dot.done .learn-dot-n { border-color: var(--blue); color: var(--blue); }
@@ -4666,29 +4680,29 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 .learn-dot-sep { display: none; }
 
 .learn-title { font-family: var(--display); font-weight: 900; font-size: clamp(28px, 4.4vw, 44px); line-height: 1.04; letter-spacing: -0.01em; margin: 0 0 14px; color: var(--ink); }
-.learn-lede { font-family: var(--serif); font-size: 17px; line-height: 1.6; color: var(--ink-2); max-width: 64ch; margin: 0 0 26px; }
+.learn-lede { font-family: var(--serif); font-size: 18px; line-height: 1.6; color: var(--ink-2); max-width: 64ch; margin: 0 0 26px; }
 
 .learn-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
 .learn-card { border: 1px solid var(--hair); padding: 18px; background: var(--paper); }
-.learn-card h3 { font-family: var(--display); font-weight: 800; font-size: 15px; margin: 0 0 8px; color: var(--ink); }
-.learn-card p { font-size: 13.5px; line-height: 1.5; color: var(--ink-2); margin: 0; }
+.learn-card h3 { font-family: var(--display); font-weight: 800; font-size: 16px; margin: 0 0 8px; color: var(--ink); }
+.learn-card p { font-size: 13px; line-height: 1.5; color: var(--ink-2); margin: 0; }
 
 /* Fleet table */
 .lf-table-wrap { overflow-x: auto; border: 1px solid var(--hair); margin-bottom: 18px; }
-.lf-table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+.lf-table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 13px; font-variant-numeric: tabular-nums; }
 .lf-table thead th { font-family: var(--display); text-transform: uppercase; letter-spacing: 0.04em; font-size: 11px; color: var(--ink-3); text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--ink); background: var(--paper); }
 .lf-h { display: inline-flex; align-items: center; gap: 5px; }
 .lf-table td { padding: 9px 12px; border-bottom: 1px solid var(--hair-soft); vertical-align: top; }
 .lf-table tbody tr:last-child td { border-bottom: 0; }
 .lf-qty { color: var(--red); font-weight: 800; }
 .lf-ship { font-weight: 700; color: var(--ink); }
-.lf-weap { font-family: var(--serif); font-size: 12.5px; color: var(--ink-2); }
-.lf-arc { font-family: var(--sans); font-weight: 800; font-size: 10px; letter-spacing: 0.03em; }
+.lf-weap { font-family: var(--serif); font-size: 13px; color: var(--ink-2); }
+.lf-arc { font-family: var(--sans); font-weight: 800; font-size: 11px; letter-spacing: 0.03em; }
 .lf-arc-pri { color: var(--blue); }
 .lf-arc-aux { color: var(--ink-3); }
 .learn-legend {
   list-style: disc; margin: 16px 0 0; padding-left: 20px;
-  display: grid; gap: 5px; font-size: 14px; line-height: 1.5; color: var(--ink-2); max-width: 56ch;
+  display: grid; gap: 5px; font-size: 13px; line-height: 1.5; color: var(--ink-2); max-width: 56ch;
 }
 .learn-legend li::marker { color: var(--ink-3); }
 .learn-legend b { margin-right: 4px; }
@@ -4698,7 +4712,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 .learn-phases { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 8px; max-width: 68ch; }
 .learn-phase { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 10px; align-items: start; border: 1px solid var(--hair); border-left: 3px solid var(--blue); padding: 10px 14px; }
 .learn-phase .lp-n { font-family: var(--display); font-weight: 900; font-size: 16px; line-height: 1.35; color: var(--blue); }
-.learn-phase b { display: block; font-family: var(--display); font-weight: 800; font-size: 14px; margin: 0 0 3px; color: var(--ink); }
+.learn-phase b { display: block; font-family: var(--display); font-weight: 800; font-size: 13px; margin: 0 0 3px; color: var(--ink); }
 .learn-phase div > span { display: block; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
 
 /* Split: diagram + victory points */
@@ -4707,11 +4721,11 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 .learn-diagram { color: var(--ink); }
 .learn-diagram .tut-diagram { width: 100%; height: auto; }
 .learn-vp { margin: 0; padding-left: 18px; }
-.learn-vp li { margin-bottom: 12px; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+.learn-vp li { margin-bottom: 12px; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
 .learn-vp b { color: var(--ink); }
 
 /* Launch */
-.learn-fineprint { font-size: 12.5px; color: var(--ink-3); margin: 14px 0 0; }
+.learn-fineprint { font-size: 13px; color: var(--ink-3); margin: 14px 0 0; }
 
 /* Nav */
 /* Three buttons (Back / Quick Reference / Next) do not fit a 375px line, and
@@ -4722,7 +4736,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
   .learn-nav { gap: 8px; }
   .learn-nav .learn-btn { flex: 1 1 100%; justify-content: center; margin-left: 0 !important; }
 }
-.learn-btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; text-decoration: none; font-family: var(--display); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 0.03em; border: 1.5px solid var(--ink); color: var(--ink); }
+.learn-btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; text-decoration: none; font-family: var(--display); font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 0.03em; border: 1.5px solid var(--ink); color: var(--ink); }
 .learn-btn-next { background: var(--ink); color: #fff; margin-left: auto; }
 @media (hover: hover) { .learn-btn:hover { border-color: var(--blue); } }
 @media (hover: hover) { .learn-btn-next:hover { background: var(--blue); border-color: var(--blue); } }
@@ -4733,7 +4747,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 .learn-demo .ld-target { fill: none; stroke: var(--ink); stroke-width: 2; }
 .learn-demo .ld-ship { fill: var(--blue); }
 .learn-demo .ld-cone { fill: var(--red); opacity: 0; transform-origin: 0 0; }
-.learn-demo .ld-label { fill: var(--ink-3); font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.03em; }
+.learn-demo .ld-label { fill: var(--ink-3); font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.03em; }
 .learn-demo .ld-unit { transform: translate(46px, 75px); animation: ld-move 4.2s var(--ease) infinite; }
 .learn-demo .ld-cone { animation: ld-fire 4.2s ease-in-out infinite; }
 .learn-demo .ld-target { animation: ld-hit 4.2s ease-in-out infinite; }
@@ -4776,7 +4790,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 @media (hover: hover) { .emblem-choose-btn:hover { border-color: var(--ink); } }
 .emblem-choose-preview { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; border: 1px solid var(--hair-soft); border-radius: 50%; color: var(--blue); flex-shrink: 0; }
 .emblem-choose-preview .emblem, .emblem-choose-preview .emblem-img { width: 34px; height: 34px; }
-.emblem-choose-label { display: inline-flex; align-items: center; gap: 7px; font-family: var(--sans); font-weight: 700; font-size: 14px; color: var(--ink); }
+.emblem-choose-label { display: inline-flex; align-items: center; gap: 7px; font-family: var(--sans); font-weight: 700; font-size: 13px; color: var(--ink); }
 
 /* Modal */
 .em-modal { width: min(680px, 100%); display: flex; flex-direction: column; height: min(720px, 88vh); overflow: hidden; }
@@ -4789,7 +4803,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 .em-preview { display: inline-flex; width: 56px; height: 56px; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,0.14); color: #fff; flex-shrink: 0; }
 .em-preview .emblem, .em-preview .emblem-img { width: 44px; height: 44px; }
 .em-tabs { display: flex; border-bottom: 1px solid var(--hair); }
-.em-tab { flex: 1; padding: 12px 8px; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-family: var(--sans); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3); }
+.em-tab { flex: 1; padding: 12px 8px; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-family: var(--sans); font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3); }
 @media (hover: hover) { .em-tab:hover { color: var(--ink); } }
 .em-tab.on { color: var(--ink); border-bottom-color: var(--blue); }
 .em-body { padding: 16px 18px; min-height: 160px; }
@@ -4845,18 +4859,18 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 }
 @media (hover: hover) { .em-drop:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-wash); } }
 .em-drop-cue { display: inline-flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 20px; text-align: center; pointer-events: none; }
-.em-drop-head { font-family: var(--display); font-weight: 800; font-size: 19px; letter-spacing: -0.01em; color: var(--ink); }
+.em-drop-head { font-family: var(--display); font-weight: 800; font-size: 18px; letter-spacing: -0.01em; color: var(--ink); }
 .em-drop:focus-within .em-drop-head, .em-drop.is-dropping .em-drop-head { color: inherit; }
 @media (hover: hover) { .em-drop:hover .em-drop-head { color: inherit; } }
 .em-drop-sub { font-family: var(--sans); font-weight: 600; font-size: 13px; color: var(--ink-3); max-width: 42ch; line-height: 1.45; }
-.em-drop-note { font-family: var(--sans); font-size: 12.5px; line-height: 1.5; color: var(--ink-3); }
+.em-drop-note { font-family: var(--sans); font-size: 13px; line-height: 1.5; color: var(--ink-3); }
 /* What you already have, at a size you can judge. The header preview is 40px:
    big enough to confirm a mark, too small to see that you cropped somebody's
    head off. */
 .em-current { display: flex; align-items: center; gap: 14px; padding: 12px; border: 1px solid var(--hair); background: var(--paper); }
 .em-current img { width: 88px; height: 88px; object-fit: cover; border-radius: 50%; flex: none; border: 1px solid var(--hair-soft); }
 .em-current figcaption { font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-2); }
-.em-search { width: 100%; margin-bottom: 10px; font-family: var(--sans); font-size: 14px; padding: 9px 11px; border: 1px solid var(--hair); background: var(--paper); color: var(--ink); }
+.em-search { width: 100%; margin-bottom: 10px; font-family: var(--sans); font-size: 13px; padding: 9px 11px; border: 1px solid var(--hair); background: var(--paper); color: var(--ink); }
 .em-search:focus { outline: none; border-color: var(--blue); }
 /* Folder chips for the emblem library. */
 .em-foot { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 12px 18px; border-top: 1px solid var(--hair); }
@@ -4892,9 +4906,9 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 .pc-cmd.is-short { border-left-color: var(--hair); opacity: 0.55; }
 .pc-cmd-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .pc-cmd-name { font-family: var(--display); font-weight: 800; font-size: 13px; color: var(--ink); margin: 0; }
-.pc-cmd-cost { font-family: var(--sans); font-weight: 800; font-size: 10px; color: var(--blue); white-space: nowrap; }
-.pc-cmd-text { font-family: var(--serif); font-size: 11.5px; line-height: 1.34; color: var(--ink-2); margin: 2px 0 0; }
-.pc-cmd-note { font-size: 11.5px; font-style: italic; color: var(--ink-3); margin: 10px 0 0; }
+.pc-cmd-cost { font-family: var(--sans); font-weight: 800; font-size: 11px; color: var(--blue); white-space: nowrap; }
+.pc-cmd-text { font-family: var(--serif); font-size: 11px; line-height: 1.34; color: var(--ink-2); margin: 2px 0 0; }
+.pc-cmd-note { font-size: 11px; font-style: italic; color: var(--ink-3); margin: 10px 0 0; }
 /* Where a command came from, or what one of your rules does to it. */
 .pc-cmd-from { display: block; font-size: 11px; color: var(--red); margin-top: 4px; }
 .pc-cmd-cost s { color: var(--ink-3); font-weight: 400; margin-right: 2px; }
@@ -4962,7 +4976,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 .page-guide::after {
   content: "Page " attr(data-page);
   position: absolute; right: 0; top: 3px;
-  font-family: var(--sans); font-size: 9px; font-weight: 800; letter-spacing: 0.06em;
+  font-family: var(--sans); font-size: 11px; font-weight: 800; letter-spacing: 0.06em;
   text-transform: uppercase; color: var(--red); background: #fff; padding: 1px 5px;
 }
 /* The preview must show what PRINTS, not what the screen collapses. The guide
@@ -4976,7 +4990,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
   font-family: var(--sans); font-size: 12px; font-weight: 800; letter-spacing: 0.04em;
   text-transform: uppercase; color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums;
 }
-.print-excluded-note { font-size: 12.5px; color: var(--ink-2); margin: 0 0 12px; }
+.print-excluded-note { font-size: 13px; color: var(--ink-2); margin: 0 0 12px; }
 .linklike { background: none; border: none; padding: 0; font: inherit; color: var(--blue); text-decoration: underline; cursor: pointer; }
 /* Ink saver is GONE (user, 2026-08-15: "it doesn't do anything"). It dropped
    four fills and thinned three lines, and the @media print block already forces
@@ -5045,7 +5059,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
   .wt-headrow { display: none; }
   .wt-name { flex: 1 1 100%; font-size: 13px; }
   .wt-arc { flex: 0 0 auto; }
-  .wt-num { font-size: 12px; text-align: left; }
+  .wt-num { font-size: 13px; text-align: left; }
   .wt-inline-lbl {
     display: inline; font-family: var(--sans); font-size: 11px; font-weight: 700;
     letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3);
@@ -5104,7 +5118,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
   border: 1px solid var(--hair); background: var(--paper); color: var(--ink-2);
 }
 @media (hover: hover) { .lib-more:hover { border-color: var(--blue); color: var(--blue); } }
-.lib-more-count { font-family: var(--sans); font-size: 12px; font-weight: 700; }
+.lib-more-count { font-family: var(--sans); font-size: 13px; font-weight: 700; }
 
 
 /* Symbol alignment. An inline SVG sits on the text baseline by default, which
@@ -5230,7 +5244,7 @@ a .icon,
 
 .frule-full { padding: 14px 0 0; border-top: 1px solid var(--hair); margin-top: 16px; }
 .frule-full .frule-name { font-size: 16px; margin-bottom: 5px; }
-.frule-full .frule-text { font-size: 14px; line-height: 1.5; }
+.frule-full .frule-text { font-size: 13px; line-height: 1.5; }
 /* A faction's own notes, shown under its rule where the fleet is used. Quiet
    and set off, so it reads as flavour beside the rule, not as more rules. */
 .frule-backstory { margin-top: 8px; padding-top: 8px; border-top: 1px dotted var(--hair-soft); }
@@ -5247,15 +5261,15 @@ a .icon,
 .rt-input { width: 100%; min-height: 96px; padding: 9px 11px; border: 1px solid var(--hair); background: var(--paper); font-family: var(--mono); font-size: 13px; line-height: 1.5; color: var(--ink); resize: vertical; }
 .rt-input:focus { outline: none; border-color: var(--blue); }
 .rt-preview { margin-top: 6px; padding: 9px 11px; border: 1px dashed var(--hair-soft); background: #fbfcfe; min-height: 20px; }
-.rt-preview:empty::before { content: "Preview"; font-family: var(--sans); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--placeholder); }
+.rt-preview:empty::before { content: "Preview"; font-family: var(--sans); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--placeholder); }
 
 .rt-content { font-family: var(--serif); font-size: 13px; line-height: 1.55; color: var(--ink-2); }
 .rt-content > :first-child { margin-top: 0; }
 .rt-content > :last-child { margin-bottom: 0; }
 .rt-content p { margin: 0 0 7px; }
-.rt-content h3.rt-h { font-family: var(--display); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink); margin: 10px 0 5px; }
-.rt-content h4.rt-h { font-family: var(--display); font-weight: 800; font-size: 12.5px; color: var(--ink); margin: 9px 0 4px; }
-.rt-content h5.rt-h { font-family: var(--display); font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--ink-2); margin: 8px 0 4px; }
+.rt-content h3.rt-h { font-family: var(--display); font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink); margin: 10px 0 5px; }
+.rt-content h4.rt-h { font-family: var(--display); font-weight: 800; font-size: 13px; color: var(--ink); margin: 9px 0 4px; }
+.rt-content h5.rt-h { font-family: var(--display); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--ink-2); margin: 8px 0 4px; }
 .rt-content ul, .rt-content ol { margin: 0 0 7px; padding-left: 20px; }
 .rt-content li { margin: 0 0 2px; }
 .rt-content a { color: var(--blue); }
@@ -5263,13 +5277,13 @@ a .icon,
 .rt-content strong { color: var(--ink); }
 /* The builder's backstory keeps its italic-flavour tone even when Markdown-rendered. */
 .frule-backstory.rt-content, .frule-backstory.rt-content p { font-style: italic; color: var(--ink-3); }
-.frule-full .frv-label { font-size: 10px; }
+.frule-full .frv-label { font-size: 11px; }
 .frule-full .frv-value { font-size: 22px; }
 .frule-full .frule-vitals { min-width: 132px; }
 
 .frule-compact .frule-name { font-size: 13px; margin-bottom: 3px; }
-.frule-compact .frule-text { font-size: 12.5px; line-height: 1.4; }
-.frule-compact .frv-label { font-size: 9px; }
+.frule-compact .frule-text { font-size: 13px; line-height: 1.4; }
+.frule-compact .frv-label { font-size: 11px; }
 .frule-compact .frv-value { font-size: 16px; }
 .frule-compact .frule-vitals { min-width: 104px; }
 .frule-compact { gap: 8px 16px; }
@@ -5293,7 +5307,7 @@ a .icon,
 
 /* Learn to Play: a sub-heading, a quiet note, and the link out to the source. */
 .learn-sub { font-family: var(--display); font-weight: 800; font-size: 18px; margin: 26px 0 4px; color: var(--ink); }
-.learn-note { font-size: 13.5px; line-height: 1.5; color: var(--ink-2); max-width: 62ch; margin: 0; }
+.learn-note { font-size: 13px; line-height: 1.5; color: var(--ink-2); max-width: 62ch; margin: 0; }
 .learn-ref { margin-top: 20px; }
 .learn-ref a { display: inline-flex; align-items: center; gap: 7px; font-family: var(--sans); font-weight: 700; font-size: 13px; color: var(--blue); }
 .learn-phases-steps .learn-phase { border-left-color: var(--red); }
@@ -5632,7 +5646,7 @@ a .icon,
 }
 
 /* Learn to Play: rules quoted from the book, and the sub-step dots. */
-.learn-rules { list-style: disc; margin: 10px 0 0; padding-left: 20px; display: grid; gap: 6px; max-width: 66ch; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+.learn-rules { list-style: disc; margin: 10px 0 0; padding-left: 20px; display: grid; gap: 6px; max-width: 66ch; font-size: 13px; line-height: 1.5; color: var(--ink-2); }
 .learn-rules li::marker { color: var(--ink-3); }
 .learn-phase b a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--hair); }
 @media (hover: hover) { .learn-phase b a:hover { color: var(--blue); border-bottom-color: var(--blue); } }
@@ -5655,12 +5669,12 @@ a .icon,
 /* Marks a rule as optional (a CMD-spend you may take, not a step you must). */
 .learn-optional {
   display: inline-block; margin-left: 8px; vertical-align: middle;
-  font-family: var(--display); font-weight: 800; font-size: 9.5px;
+  font-family: var(--display); font-weight: 800; font-size: 11px;
   text-transform: uppercase; letter-spacing: 0.07em;
   color: #fff; background: var(--ink-3); padding: 2px 7px;
 }
 .learn-subs-tag {
-  font-family: var(--display); font-weight: 800; font-size: 10.5px;
+  font-family: var(--display); font-weight: 800; font-size: 11px;
   letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3);
   padding: 3px 6px 3px 10px; border-left: 2px solid var(--hair);
 }
@@ -5669,7 +5683,7 @@ a .icon,
 }
 .learn-dot.is-sub { padding: 3px 4px; }
 .learn-dot.is-sub .learn-dot-n { display: none; }
-.learn-dot.is-sub .learn-dot-l { font-size: 11.5px; font-weight: 600; color: var(--ink-3); }
+.learn-dot.is-sub .learn-dot-l { font-size: 11px; font-weight: 600; color: var(--ink-3); }
 @media (hover: hover) { .learn-dot.is-sub:hover .learn-dot-l { color: var(--ink); } }
 .learn-dot.is-sub.on .learn-dot-l { color: var(--blue); font-weight: 800; }
 
@@ -5682,11 +5696,11 @@ a .icon,
 .learn-acc-head::-webkit-details-marker { display: none; }
 .learn-acc-head::marker { content: ""; }
 @media (hover: hover) { .learn-acc-head:hover .learn-acc-title { color: var(--blue); } }
-.learn-acc-n { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 1.5px solid var(--hair); font-family: var(--display); font-weight: 800; font-size: 12px; color: var(--ink-3); }
+.learn-acc-n { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 1.5px solid var(--hair); font-family: var(--display); font-weight: 800; font-size: 13px; color: var(--ink-3); }
 .learn-acc[open] .learn-acc-n { background: var(--blue); border-color: var(--blue); color: #fff; }
 .learn-acc-text { display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-width: 0; }
 .learn-acc-title { font-family: var(--display); font-weight: 800; font-size: 16px; color: var(--ink); }
-.learn-acc-lede { font-family: var(--serif); font-size: 13.5px; line-height: 1.45; color: var(--ink-2); }
+.learn-acc-lede { font-family: var(--serif); font-size: 13px; line-height: 1.45; color: var(--ink-2); }
 .learn-acc-chev { flex: none; margin-top: 4px; color: var(--ink-3); transform: rotate(90deg); transition: transform 160ms var(--ease); }
 .learn-acc[open] .learn-acc-chev { transform: rotate(-90deg); }
 .learn-acc-body { padding: 2px 16px 18px 50px; }
@@ -5698,7 +5712,7 @@ a .icon,
    its neighbours so the animation under a heading obviously belongs to it. */
 .learn-step { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--hair-soft); }
 .learn-step:first-of-type { margin-top: 12px; padding-top: 0; border-top: none; }
-.learn-step-h { display: flex; align-items: center; gap: 9px; margin: 0 0 3px; font-family: var(--display); font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink); }
+.learn-step-h { display: flex; align-items: center; gap: 9px; margin: 0 0 3px; font-family: var(--display); font-weight: 800; font-size: 16px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink); }
 .learn-step-n { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: var(--blue); color: #fff; font-size: 11px; }
 .learn-step .learn-note { margin-top: 0; }
 
@@ -5768,7 +5782,7 @@ a .icon,
 .learn-substep a { display: flex; align-items: baseline; gap: 8px; padding: 5px 8px; border: 1px solid var(--hair); color: var(--ink); text-decoration: none; }
 @media (hover: hover) { .learn-substep a:hover { border-color: var(--blue); color: var(--blue); } }
 .learn-substep b { font-family: var(--display); font-weight: 800; font-size: 13px; }
-.learn-substep span { font-size: 12px; color: var(--ink-3); }
+.learn-substep span { font-size: 13px; color: var(--ink-3); }
 
 /* Passive attacks. The unit is drawn WHERE IT ENDED UP and stays there: the
    step is a check on final positions, not on a journey, and an animation of a
@@ -5945,8 +5959,8 @@ body[data-view="home"] .game-info-footer { position: sticky; bottom: 0; z-index:
    constant and "what have I got left" is a glance, not a subtraction. */
 .cmd-strip { padding: 6px 0 4px; border-bottom: 1px solid var(--hair-soft); }
 .cmd-strip-head { display: flex; align-items: baseline; gap: 10px; }
-.cmd-strip-count { font-family: var(--sans); font-size: 11.5px; font-weight: 600; color: var(--ink-3); }
-.cmd-strip-count b { font-family: var(--display); font-weight: 900; font-size: 15px; color: var(--ink); }
+.cmd-strip-count { font-family: var(--sans); font-size: 11px; font-weight: 600; color: var(--ink-3); }
+.cmd-strip-count b { font-family: var(--display); font-weight: 900; font-size: 16px; color: var(--ink); }
 .cmd-strip-adjust { display: inline-flex; gap: 4px; margin-left: auto; }
 .cmd-strip-adjust .stepper-btn { width: 30px; height: 30px; min-height: 30px; flex: none; }
 .cmd-pips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
@@ -5961,12 +5975,12 @@ body[data-view="home"] .game-info-footer { position: sticky; bottom: 0; z-index:
    token back has to be as easy as spending it - a mis-tap mid-turn is common. */
 .cmd-pip.is-spent { border-color: var(--hair); background: var(--paper); color: var(--ink-3); opacity: 0.5; }
 @media (hover: hover) { .cmd-pip.is-spent:hover { opacity: 0.85; border-color: var(--ink-3); background: var(--paper); color: var(--ink-2); } }
-.cmd-pips-none { font-family: var(--sans); font-size: 12px; font-style: italic; color: var(--ink-3); }
+.cmd-pips-none { font-family: var(--sans); font-size: 13px; font-style: italic; color: var(--ink-3); }
 /* Section headings lose the indent and the accent square: mid-game that is 34px
    of left margin and a decorative dot on a line that just says "Your fleet". */
-main.play-body .roster-section { padding: 5px 0 4px; font-size: 10.5px; border-bottom: none; }
+main.play-body .roster-section { padding: 5px 0 4px; font-size: 11px; border-bottom: none; }
 main.play-body .roster-section::before { content: none; }
-.play-bar-id { margin: 0; font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); }
+.play-bar-id { margin: 0; font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); }
 .play-bar-id a { color: var(--blue); text-decoration: none; }
 @media (hover: hover) { .play-bar-id a:hover { text-decoration: underline; } }
 /* The crumb reads as a sentence on a wide screen and collapses to this arrow on
@@ -5976,11 +5990,11 @@ main.play-body .roster-section::before { content: none; }
 .play-bar-round .control-label { margin: 0; }
 .play-bar-round { margin-block: 0; }
 .play-bar-round .round-value { min-width: 1.4ch; font-size: 28px; line-height: 1; }
-.play-bar-of { font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-3); }
+.play-bar-of { font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-3); }
 /* A credit total below zero is the normal state of early Hypergrowth, so it is
    marked rather than hidden: the player needs to see the debt they are in. */
 .round-value.is-debt { color: var(--red); }
-.play-bar-of { font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }
+.play-bar-of { font-family: var(--sans); font-size: 13px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }
 .play-bar-reset, .play-bar-print { flex: none; }
 /* The way out, and it looks like one. Solid where Reset and Print are ghosts,
    so the eye lands on the control that ends the session rather than on the one
@@ -6021,7 +6035,7 @@ main.play-body .roster-section::before { content: none; }
 
 /* Phase reference block: a lead line then bullets you READ, not tick (the
    Shipyard Jump Phase). Verbatim, with nested sub-bullets. */
-.phase-ref { font-family: var(--serif); font-size: 13.5px; line-height: 1.5; color: var(--ink); }
+.phase-ref { font-family: var(--serif); font-size: 13px; line-height: 1.5; color: var(--ink); }
 .phase-ref-lead { margin: 0 0 8px; }
 .phase-ref-list { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 8px; }
 .phase-ref-list > li { padding-left: 2px; }
@@ -6043,7 +6057,7 @@ main.play-body .roster-section::before { content: none; }
 .sy-req-acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .sy-req-btn {
   flex: 1 1 auto; min-height: 34px; padding: 6px 10px; border: 1px solid var(--hair); background: var(--paper);
-  font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.02em; color: var(--ink); cursor: pointer;
+  font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: 0.02em; color: var(--ink); cursor: pointer;
   transition: transform 0.08s var(--ease), background 0.1s ease, color 0.1s ease;
 }
 @media (hover: hover) { .sy-req-btn:not(:disabled):hover { background: var(--blue); border-color: var(--blue); color: #fff; } }
@@ -6081,17 +6095,17 @@ main.play-body .roster-section::before { content: none; }
    popover off its own button, so opening it shifts nothing. Persists open across
    moves so the log grows live. Opens flush to the RIGHT edge (it lives there). */
 .sy-ledger { position: relative; }
-.sy-ledger-btn { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px; border: 1px solid var(--hair); background: var(--paper); font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--ink); white-space: nowrap; }
+.sy-ledger-btn { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px; border: 1px solid var(--hair); background: var(--paper); font-family: var(--sans); font-size: 13px; font-weight: 700; color: var(--ink); white-space: nowrap; }
 .sy-ledger-btn::-webkit-details-marker { display: none; }
 .sy-ledger[open] .sy-ledger-btn { border-color: var(--blue); color: var(--blue); }
 .sy-ledger-total { font-family: var(--display); font-weight: 800; color: var(--blue); font-variant-numeric: tabular-nums; }
 .sy-ledger-panel { position: absolute; z-index: 25; top: calc(100% + 6px); right: 0; width: max-content; min-width: 240px; max-width: min(340px, 88vw); max-height: 60vh; overflow-y: auto; background: var(--paper); border: 2px solid var(--hair); padding: 12px 14px; box-shadow: var(--shadow16); }
 .sy-ledger-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
-.sy-log { display: flex; align-items: baseline; gap: 7px; font-family: var(--sans); font-size: 12.5px; color: var(--ink); padding-left: 10px; border-left: 2px solid var(--hair-soft); }
+.sy-log { display: flex; align-items: baseline; gap: 7px; font-family: var(--sans); font-size: 13px; color: var(--ink); padding-left: 10px; border-left: 2px solid var(--hair-soft); }
 .sy-log-deploy { border-left-color: var(--blue); }
 .sy-log-jumpout { border-left-color: var(--amber); }
 .sy-log-jumpin { border-left-color: var(--go); }
-.sy-log-verb { font-weight: 800; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3); flex: none; }
+.sy-log-verb { font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3); flex: none; }
 .sy-log-ship { font-weight: 600; }
 .sy-log-move { font-size: 11px; color: var(--ink-3); }
 .sy-ledger-cost { margin-left: auto; font-family: var(--display); font-weight: 700; color: var(--blue); font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -6147,7 +6161,7 @@ main.play-body .roster-section::before { content: none; }
 
 /* Stat definitions on the Learn "Your fleet" page: prose, not bullets. */
 .learn-stat-defs { margin-top: 16px; max-width: 64ch; display: grid; gap: 10px; }
-.learn-stat-defs p { font-size: 14.5px; line-height: 1.55; color: var(--ink-2); }
+.learn-stat-defs p { font-size: 16px; line-height: 1.55; color: var(--ink-2); }
 .learn-stat-defs b { color: var(--ink); }
 .learn-stat-defs .stat-ico { color: var(--blue); vertical-align: -2px; }
 
@@ -6181,7 +6195,7 @@ main.play-body .roster-section::before { content: none; }
 .pf-unit { border: none; border-bottom: 1px solid var(--hair-soft); padding: 3px 0 4px; }
 .pf-unit:last-child { border-bottom: none; }
 .pf-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 1px; }
-.pf-name { font-family: var(--display); font-weight: 800; font-size: 13.5px; }
+.pf-name { font-family: var(--display); font-weight: 800; font-size: 13px; }
 .pf-x { color: var(--blue); font-weight: 900; }
 .pf-data { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 14px; margin-bottom: 0; }
 .pf-data .stat-chips { flex: 0 0 auto; gap: 0 8px; }
@@ -6196,8 +6210,8 @@ main.play-body .roster-section::before { content: none; }
    a state class (.is-reserve / .is-play) which tints its left edge, so you can
    read the shape of your fleet by scanning the margin. */
 .pf-panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-.pf-tally { margin: 0; font-family: var(--sans); font-size: 11.5px; font-weight: 600; color: var(--ink-3); }
-.pf-tally-n { font-family: var(--display); font-weight: 900; font-size: 14px; }
+.pf-tally { margin: 0; font-family: var(--sans); font-size: 11px; font-weight: 600; color: var(--ink-3); }
+.pf-tally-n { font-family: var(--display); font-weight: 900; font-size: 13px; }
 .pf-tally-n.is-play { color: var(--blue); }
 .pf-tally-n.is-reserve { color: var(--ink-2); }
 .pf-tally-sep { display: inline-block; width: 10px; }
@@ -6210,7 +6224,7 @@ main.play-body .roster-section::before { content: none; }
 .pf-pos-opt {
   min-height: 34px; padding: 0 6px; cursor: pointer;
   border: 1px solid var(--hair); margin-left: -1px; background: var(--paper); color: var(--ink-3);
-  font-family: var(--sans); font-size: 10.5px; font-weight: 700;
+  font-family: var(--sans); font-size: 11px; font-weight: 700;
   letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;
   transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
 }
@@ -6239,7 +6253,7 @@ main.play-body .roster-section::before { content: none; }
   display: inline-flex; align-items: center; justify-content: center; gap: 5px;
   min-height: 34px; padding: 0 10px; cursor: pointer; flex: 0 0 auto;
   border: 1px solid var(--hair); background: var(--paper); color: var(--ink-3);
-  font-family: var(--sans); font-size: 10.5px; font-weight: 700;
+  font-family: var(--sans); font-size: 11px; font-weight: 700;
   letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;
   transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
 }
@@ -6257,7 +6271,7 @@ main.play-body .roster-section::before { content: none; }
 .pf-clear-acted {
   flex: none; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
   min-height: 30px; padding: 0 9px; border: 1px solid var(--hair); background: var(--paper);
-  font-family: var(--sans); font-size: 10.5px; font-weight: 700;
+  font-family: var(--sans); font-size: 11px; font-weight: 700;
   letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2);
 }
 @media (hover: hover) { .pf-clear-acted:hover { border-color: var(--ink-3); color: var(--ink); } }
@@ -6270,16 +6284,16 @@ main.play-body .roster-section::before { content: none; }
 .play-result.is-win { border-color: var(--blue); }
 .play-result.is-loss { border-color: var(--hair); }
 .play-result-round {
-  margin: 0; font-family: var(--sans); font-size: 10.5px; font-weight: 700;
+  margin: 0; font-family: var(--sans); font-size: 11px; font-weight: 700;
   letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3);
 }
-.play-result-head { margin: 4px 0 0; font-family: var(--display); font-weight: 900; font-size: 26px; line-height: 1.1; color: var(--ink); }
+.play-result-head { margin: 4px 0 0; font-family: var(--display); font-weight: 900; font-size: 28px; line-height: 1.1; color: var(--ink); }
 .play-result.is-win .play-result-head { color: var(--blue-deep); }
-.play-result-sub { margin: 3px 0 0; font-family: var(--sans); font-size: 14px; font-weight: 700; color: var(--ink-2); }
+.play-result-sub { margin: 3px 0 0; font-family: var(--sans); font-size: 13px; font-weight: 700; color: var(--ink-2); }
 .play-result-note { margin: 9px 0 0; font-family: var(--serif); font-size: 13px; line-height: 1.45; color: var(--ink-2); }
 .play-result-out {
   margin: 10px 0 0; padding-top: 8px; border-top: 1px solid var(--hair-soft);
-  font-family: var(--sans); font-size: 12px; color: var(--ink-3);
+  font-family: var(--sans); font-size: 13px; color: var(--ink-3);
 }
 /* The last press of the game says so. Same solid CTA, red rather than blue,
    because it is the one press here that cannot be undone by pressing it again
@@ -6317,7 +6331,7 @@ main.play-body .roster-section::before { content: none; }
   .play-dock-cmd { display: flex; align-items: center; flex: none; }
   .play-dock-cmd-n { display: grid; justify-items: center; min-width: 34px; line-height: 1; }
   .play-dock-cmd-n b { font-family: var(--display); font-size: 22px; font-variant-numeric: tabular-nums; }
-  .play-dock-cmd-n span { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; color: var(--ink-3); }
+  .play-dock-cmd-n span { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: var(--ink-3); }
   /* Carbon pads the right of a button by 64px for a trailing icon this one
      does not have; on a 390px phone that space came out of the phase name
      ("COMM..."). Its exposed part takes even padding instead. */
@@ -6381,8 +6395,8 @@ main.play-body .roster-section::before { content: none; }
   .play-sticky .play-bar-id a { justify-content: center; min-width: var(--tap); }
   .play-sticky .play-bar-back { display: block; }
   .play-sticky .play-bar-round { flex: none; gap: 5px; margin-left: auto; }
-  .play-sticky .play-bar-round .round-value { font-size: 19px; }
-  .play-sticky .play-bar-of { font-size: 10.5px; }
+  .play-sticky .play-bar-round .round-value { font-size: 18px; }
+  .play-sticky .play-bar-of { font-size: 11px; }
   /* The word each of these three keeps or loses, and why. Reset is destructive
      and pressed least, so it was already an icon; Print joins it now that the
      row is paying for a 44px crumb (its own icon is a printer, which is not a
@@ -6438,7 +6452,7 @@ main.play-body .roster-section::before { content: none; }
    they drop below it in a quieter voice. */
 .learn-fn {
   margin: 8px 0 0; padding-left: 12px; border-left: 2px solid var(--hair);
-  font-size: 12.5px; line-height: 1.5; color: var(--ink-3); max-width: 64ch;
+  font-size: 13px; line-height: 1.5; color: var(--ink-3); max-width: 64ch;
 }
 
 /* Builder header groups. Each group wraps as a whole rather than its members
@@ -6454,7 +6468,7 @@ main.play-body .roster-section::before { content: none; }
   .mf-grp-budget { margin-left: 0; flex: 1 1 100%; }
   .mf-grp-fac { flex: 1 1 100%; }
 }
-.learn-sub-min { font-family: var(--display); font-weight: 800; font-size: 14px; margin: 16px 0 3px; color: var(--ink); }
+.learn-sub-min { font-family: var(--display); font-weight: 800; font-size: 13px; margin: 16px 0 3px; color: var(--ink); }
 
 
 /* Learn rail, responsive. Each step is a self-contained chip that never grows,
@@ -6463,11 +6477,11 @@ main.play-body .roster-section::before { content: none; }
 .learn-dot.on { border-color: var(--blue); color: var(--ink); }
 .learn-dot.done { color: var(--ink-2); }
 
-.learn-dot.is-sub { padding: 4px 8px; font-size: 12px; }
+.learn-dot.is-sub { padding: 4px 8px; font-size: 13px; }
 @media (max-width: 700px) {
   .learn-progress { gap: 5px; margin-bottom: 18px; }
   .learn-dot { padding: 5px 7px; gap: 6px; }
-  .learn-dot-l { font-size: 12px; }
+  .learn-dot-l { font-size: 13px; }
 }
 
 
@@ -6709,8 +6723,8 @@ main.play-body .roster-section::before { content: none; }
      on the row and the one with the most air in it, so it gives up the most:
      tighter tracking and padding at the same weight. Play and the menu shed a
      few px of padding each. */
-  .sy-head .mf-era-badge { padding: 3px 5px; font-size: 10px; letter-spacing: 0.01em; gap: 3px; }
-  .sy-head .mf-play-btn { padding: 0 7px; font-size: 10.5px; gap: 4px; }
+  .sy-head .mf-era-badge { padding: 3px 5px; font-size: 11px; letter-spacing: 0.01em; gap: 3px; }
+  .sy-head .mf-play-btn { padding: 0 7px; font-size: 11px; gap: 4px; }
   .sy-head .mf-menu > summary { height: 26px; padding: 0 5px; }
   /* max-width, and not only overflow:hidden. The summary is an inline-flex box
      sized to its own content, and a <details> does not clip its child: with
@@ -6743,7 +6757,7 @@ main.play-body .roster-section::before { content: none; }
   .sy-head .sy-id { gap: 2px; }
   .sy-head .sy-ref-btn { padding: 0 8px; }
   .sy-budget { padding: 6px 0 8px; }
-  .sy-budget-now { font-size: 26px; }
+  .sy-budget-now { font-size: 28px; }
 }
 
 /* ------------------------------------------------ 24px target floor
@@ -6872,10 +6886,10 @@ main.play-body .roster-section::before { content: none; }
 .hvp-req { margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--hair-soft); }
 .hvp-req-list { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-direction: column; gap: 3px; }
 .hvp-req-row {
-  font-family: var(--narrow); font-weight: 700; font-size: 14.5px; color: var(--ink);
+  font-family: var(--narrow); font-weight: 700; font-size: 16px; color: var(--ink);
   border-left: 3px solid var(--blue); padding: 5px 0 5px 9px; background: var(--blue-wash);
 }
-.hvp-req-why { font-size: 12.5px; line-height: 1.45; color: var(--ink-2); margin: 0 0 10px; }
+.hvp-req-why { font-size: 13px; line-height: 1.45; color: var(--ink-2); margin: 0 0 10px; }
 .hvp-req-why strong { color: var(--ink); }
 
 
@@ -6920,7 +6934,7 @@ main.play-body .roster-section::before { content: none; }
 }
 .ltp-head-id { min-width: 0; }
 .ltp-head-title {
-  font-family: var(--display); font-weight: 800; font-size: 19px;
+  font-family: var(--display); font-weight: 800; font-size: 18px;
   letter-spacing: -0.01em; margin: 0; color: var(--ink);
 }
 
@@ -6946,7 +6960,7 @@ main.play-body .roster-section::before { content: none; }
   background: var(--red); transform-origin: 0 50%; transform: scaleX(0);
 }
 .ltp-prog-num {
-  font-family: var(--display); font-weight: 800; font-size: 12px;
+  font-family: var(--display); font-weight: 800; font-size: 13px;
   letter-spacing: 0.04em; color: var(--ink-3); white-space: nowrap;
 }
 .ltp-prog-of { font-weight: 500; color: var(--ink-off); }
@@ -6963,7 +6977,7 @@ main.play-body .roster-section::before { content: none; }
   display: flex; align-items: center; justify-content: center; gap: 6px;
   min-height: var(--tap);
   padding: 8px 10px;
-  font-family: var(--sans); font-size: 14px; font-weight: 700;
+  font-family: var(--sans); font-size: 13px; font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--ink-2); text-decoration: none;
   border-bottom: 3px solid transparent;
@@ -6997,7 +7011,7 @@ main.play-body .roster-section::before { content: none; }
      unlayered, and a min-height declared up there loses to this rule. */
   padding: 9px 10px; min-height: var(--tap);
   background: var(--paper); text-decoration: none;
-  font-family: var(--sans); font-weight: 700; font-size: 14px; color: var(--ink-2);
+  font-family: var(--sans); font-weight: 700; font-size: 13px; color: var(--ink-2);
   white-space: nowrap;
   transition: background 120ms var(--ease), color 120ms var(--ease);
 }
@@ -7044,7 +7058,7 @@ main.play-body .roster-section::before { content: none; }
    step below the section title: it is the first thing read, but it is not the
    heading, and it should not compete with "Pick an era" sitting under it. */
 .ltp-pitch {
-  font-family: var(--sans); font-size: 17px; line-height: 1.55; font-weight: 500;
+  font-family: var(--sans); font-size: 18px; line-height: 1.55; font-weight: 500;
   color: var(--ink-2); margin: 0 0 16px; max-width: 62ch;
 }
 /* The one-line summary sits tight to the scope note under it: they are one
@@ -7084,8 +7098,8 @@ main.play-body .roster-section::before { content: none; }
   font-family: var(--sans); font-size: 18px; line-height: 1.5; font-weight: 500;
   color: var(--ink); margin: 0 0 12px;
 }
-.ltp-p { font-size: 17px; line-height: 1.55; color: var(--ink); margin: 0 0 9px; }
-.ltp-p-note { font-size: 15px; color: var(--ink-2); }
+.ltp-p { font-size: 18px; line-height: 1.55; color: var(--ink); margin: 0 0 9px; }
+.ltp-p-note { font-size: 16px; color: var(--ink-2); }
 /* A caption under a diagram, in the page's own face.
    The Passive Attacks figure used to carry its title and a legend INSIDE the
    SVG, which set both in the 10px condensed face the diagram uses for pixel
@@ -7093,10 +7107,10 @@ main.play-body .roster-section::before { content: none; }
    sentence in it is small, tracked out, and reads as furniture. Anything that
    is prose comes out of the box and sits under it. */
 .ltp-figcap {
-  font-family: var(--sans); font-size: 15.5px; line-height: 1.45;
+  font-family: var(--sans); font-size: 16px; line-height: 1.45;
   color: var(--ink-2); margin: 4px auto 12px; max-width: 62ch; text-align: center;
 }
-.ltp-list { margin: 0 0 9px; padding-left: 24px; font-size: 17px; line-height: 1.5; color: var(--ink); }
+.ltp-list { margin: 0 0 9px; padding-left: 24px; font-size: 18px; line-height: 1.5; color: var(--ink); }
 .ltp-list li { margin-bottom: 3px; }
 .ltp-list-num { list-style: decimal; }
 
@@ -7220,7 +7234,7 @@ main.play-body .roster-section::before { content: none; }
   padding: 13px 14px; min-height: var(--tap);
   background: var(--paper); cursor: pointer;
   border: 1px solid var(--hair); border-top: 3px solid var(--hair);
-  font-family: var(--sans); font-weight: 700; font-size: 15.5px; color: var(--ink);
+  font-family: var(--sans); font-weight: 700; font-size: 16px; color: var(--ink);
   transition: background 120ms var(--ease), color 120ms var(--ease), border-color 120ms var(--ease);
 }
 @media (hover: hover) { .ltp-pick-tab:hover { background: var(--blue-wash); } }
@@ -7228,7 +7242,7 @@ main.play-body .roster-section::before { content: none; }
   flex: none;
   display: inline-flex; align-items: center; justify-content: center;
   width: 28px; height: 28px;
-  font-family: var(--display); font-weight: 800; font-size: 15px;
+  font-family: var(--display); font-weight: 800; font-size: 16px;
   color: var(--paper); background: var(--ink-3);
   transition: background 120ms var(--ease);
 }
@@ -7301,11 +7315,11 @@ main.play-body .roster-section::before { content: none; }
 @media (hover: hover) { .ltp-era-head:hover { background: var(--ground); } }
 .ltp-era-head-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .ltp-era-name {
-  font-family: var(--display); font-weight: 800; font-size: 20px;
+  font-family: var(--display); font-weight: 800; font-size: 22px;
   letter-spacing: -0.01em; color: var(--ink);
 }
 .ltp-era-meta {
-  font-family: var(--sans); font-size: 12.5px; font-weight: 700;
+  font-family: var(--sans); font-size: 13px; font-weight: 700;
   letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-2);
 }
 .ltp-dot { color: var(--ink-3); }
@@ -7330,7 +7344,7 @@ main.play-body .roster-section::before { content: none; }
 
 .ltp-era-tagline {
   font-family: var(--serif); font-style: italic; font-weight: 400;
-  font-size: 19px; line-height: 1.45; color: var(--ink);
+  font-size: 18px; line-height: 1.45; color: var(--ink);
   margin: 0 0 13px;
 }
 /* ------------------------------------------------------------ the commands */
@@ -7346,18 +7360,18 @@ main.play-body .roster-section::before { content: none; }
 }
 .ltp-cmd-ico { flex: none; color: var(--blue); }
 .ltp-cmd-cost {
-  font-size: 10px; font-weight: 800; letter-spacing: 0.08em;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.08em;
   color: var(--paper); background: var(--blue); padding: 2px 5px;
 }
-.ltp-cmd-text { font-size: 15px; line-height: 1.52; color: var(--ink); margin: 0; }
+.ltp-cmd-text { font-size: 16px; line-height: 1.52; color: var(--ink); margin: 0; }
 
 /* One Command dropped inline where that Command is the subject - Power to
    Engines under Doubling your move. Same card, one column, tighter, so it reads
    as a citation of the Command Phase page rather than a second list of them. */
 .ltp-cmds-inline { grid-template-columns: 1fr; margin-bottom: 12px; }
 .ltp-cmds-inline .ltp-cmd { padding: 9px 12px; }
-.ltp-cmds-inline .ltp-cmd-name { font-size: 15px; }
-.ltp-cmds-inline .ltp-cmd-text { font-size: 14.5px; }
+.ltp-cmds-inline .ltp-cmd-name { font-size: 16px; }
+.ltp-cmds-inline .ltp-cmd-text { font-size: 16px; }
 /* An action, in the same card an action gets in the book: same shell as a
    Command, but the corner reads "action" rather than a CMD cost and there is no
    delta mark, because an action is the free thing you do every activation and a
@@ -7375,7 +7389,7 @@ main.play-body .roster-section::before { content: none; }
   padding: 2px 0 2px 13px;
   border-left: 2px solid var(--hair);
 }
-.ltp-aside .ltp-p { font-size: 14px; line-height: 1.5; color: var(--ink-3); }
+.ltp-aside .ltp-p { font-size: 13px; line-height: 1.5; color: var(--ink-3); }
 .ltp-aside .ltp-p:first-child { margin-top: 0; }
 .ltp-aside .ltp-p:last-child { margin-bottom: 0; }
 
@@ -7443,12 +7457,12 @@ main.play-body .roster-section::before { content: none; }
 @media (hover: hover) { .ltp-gloss:hover .ltp-gloss-pop { display: block; } }
 .ltp-gloss-k {
   display: block; margin-bottom: 3px;
-  font-family: var(--display); font-weight: 800; font-size: 12px;
+  font-family: var(--display); font-weight: 800; font-size: 13px;
   letter-spacing: 0.06em; text-transform: uppercase; color: var(--blue-deep);
 }
 .ltp-gloss-d {
   display: block;
-  font-family: var(--sans); font-size: 14.5px; line-height: 1.45; color: var(--ink-2);
+  font-family: var(--sans); font-size: 16px; line-height: 1.45; color: var(--ink-2);
   /* Definitions run to forty words. They wrap and the box grows; nothing here
      is ever clipped or trimmed to fit. */
   white-space: normal;
@@ -7486,7 +7500,7 @@ main.play-body .roster-section::before { content: none; }
 .ltp-stat-ico-cr {
   display: inline-flex; align-items: center; justify-content: center;
   width: 30px; height: 30px;
-  font-family: var(--display); font-weight: 800; font-size: 17px;
+  font-family: var(--display); font-weight: 800; font-size: 18px;
   letter-spacing: 0.02em; color: var(--blue);
 }
 .ltp-stat-n {
@@ -7500,7 +7514,7 @@ main.play-body .roster-section::before { content: none; }
 /* The definition is the book talking, so it is set as the book's text is set
    everywhere else on these pages - only the first paragraph loses its top
    margin, so the first line sits level with the stat's name. */
-.ltp-stat-d .ltp-p { font-size: 15.5px; }
+.ltp-stat-d .ltp-p { font-size: 16px; }
 .ltp-stat-d .ltp-p:first-child { margin-top: 0; }
 .ltp-stat-d .ltp-p:last-child { margin-bottom: 0; }
 @media (max-width: 560px) {
@@ -7542,7 +7556,7 @@ main.play-body .roster-section::before { content: none; }
    sitting on its own further down the page. */
 .ltp-step-subs {
   margin: 8px 0 0;
-  font-size: 13.5px; line-height: 1.5; color: var(--ink-3);
+  font-size: 13px; line-height: 1.5; color: var(--ink-3);
   border-left: 2px solid var(--red); padding: 3px 0 3px 11px; list-style: none;
 }
 .ltp-step-subs li + li { margin-top: 5px; }
@@ -7556,7 +7570,7 @@ main.play-body .roster-section::before { content: none; }
 .ltp-src-summary {
   display: flex; align-items: center; gap: 9px;
   min-height: var(--tap); padding: 11px 14px; cursor: pointer;
-  font-family: var(--sans); font-weight: 800; font-size: 14px; color: var(--ink);
+  font-family: var(--sans); font-weight: 800; font-size: 13px; color: var(--ink);
   list-style: none; user-select: none;
 }
 .ltp-src-summary::-webkit-details-marker { display: none; }
@@ -7581,7 +7595,7 @@ main.play-body .roster-section::before { content: none; }
 .ltp-fold-head {
   display: flex; align-items: center; gap: 10px;
   min-height: var(--tap); padding: 11px 14px; cursor: pointer;
-  font-family: var(--sans); font-weight: 800; font-size: 15.5px; color: var(--ink);
+  font-family: var(--sans); font-weight: 800; font-size: 16px; color: var(--ink);
   list-style: none; user-select: none;
 }
 .ltp-fold-head::-webkit-details-marker { display: none; }
@@ -7598,14 +7612,14 @@ main.play-body .roster-section::before { content: none; }
 .ltp-fold-body > :last-child { margin-bottom: 12px; }
 /* "No really... multiple tables?" is the reader's own second thought, so it is
    set in the same italic serif as the book's voice that answers it. */
-.ltp-fold-ask { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 17px; }
+.ltp-fold-ask { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 18px; }
 
 /* A step number on a Core Command, so the six on screen match the six in the
    book in the same order. */
 .ltp-cmd-n {
   display: inline-flex; align-items: center; justify-content: center;
   flex: none; width: 20px; height: 20px;
-  font-family: var(--display); font-weight: 800; font-size: 12px;
+  font-family: var(--display); font-weight: 800; font-size: 13px;
   color: var(--paper); background: var(--blue);
 }
 
@@ -7630,10 +7644,10 @@ main.play-body .roster-section::before { content: none; }
 .ltp-pager-next { grid-column: 2; justify-content: flex-end; text-align: right; }
 .ltp-pager-txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 .ltp-pager-dir {
-  font-family: var(--sans); font-size: 10.5px; font-weight: 700;
+  font-family: var(--sans); font-size: 11px; font-weight: 700;
   letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3);
 }
-.ltp-pager-name { font-family: var(--display); font-weight: 800; font-size: 16.5px; line-height: 1.2; }
+.ltp-pager-name { font-family: var(--display); font-weight: 800; font-size: 16px; line-height: 1.2; }
 
 .ltp-src-group { margin-bottom: 18px; }
 /* Each row is a name and a link, nothing else. It used to carry a second line
@@ -7652,7 +7666,7 @@ main.play-body .roster-section::before { content: none; }
 @media (hover: hover) { .ltp-src:hover { background: var(--blue-wash); } }
 .ltp-src-name {
   display: flex; align-items: center; gap: 6px;
-  font-family: var(--sans); font-weight: 700; font-size: 15.5px; color: var(--blue);
+  font-family: var(--sans); font-weight: 700; font-size: 16px; color: var(--blue);
 }
 .ltp-src-name svg { flex: none; }
 
@@ -7660,7 +7674,7 @@ main.play-body .roster-section::before { content: none; }
 .ltp-fig { margin: 0 0 16px; }
 .ltp-table { border-collapse: collapse; border: 1px solid var(--hair); font-size: 16px; }
 .ltp-table caption {
-  text-align: left; font-family: var(--sans); font-size: 10.5px; font-weight: 800;
+  text-align: left; font-family: var(--sans); font-size: 11px; font-weight: 800;
   letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3);
   padding-bottom: 5px;
 }
@@ -7672,12 +7686,12 @@ main.play-body .roster-section::before { content: none; }
   text-transform: uppercase; color: var(--ink-2); background: var(--ground);
 }
 .ltp-table tr:last-child td { border-bottom: 0; }
-.ltp-fig figcaption { font-size: 14.5px; line-height: 1.5; color: var(--ink-2); margin-top: 7px; }
+.ltp-fig figcaption { font-size: 16px; line-height: 1.5; color: var(--ink-2); margin-top: 7px; }
 .ltp-fig-cite { color: var(--ink-off); }
 
 /* -------------------------------------------------------------------- CTAs */
 .ltp-launch { margin: 16px 0 8px; }
-.ltp-launch-note { font-size: 14.5px; line-height: 1.45; color: var(--ink-2); margin: 8px 0 0; }
+.ltp-launch-note { font-size: 16px; line-height: 1.45; color: var(--ink-2); margin: 8px 0 0; }
 .ltp-cta { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 6px; }
 .ltp-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -7690,7 +7704,7 @@ main.play-body .roster-section::before { content: none; }
 @media (hover: hover) { .ltp-btn:hover { background: var(--ground); } }
 .ltp-btn-go, .ltp-btn-buy { background: var(--blue); border-color: var(--blue); color: #fff; }
 @media (hover: hover) { .ltp-btn-go:hover, .ltp-btn-buy:hover { background: var(--blue-deep); border-color: var(--blue-deep); } }
-.ltp-btn-buy { font-size: 17.5px; padding: 14px 24px; }
+.ltp-btn-buy { font-size: 18px; padding: 14px 24px; }
 
 /* The diagrams are shared with the archived walkthrough and are sized for its
    narrower column, so they get room to breathe here. */
@@ -7722,7 +7736,7 @@ main.play-body .roster-section::before { content: none; }
   }
   .ltp-tabs--bottom .ltp-tab {
     flex-direction: column; gap: 2px;
-    padding: 7px 4px; font-size: 10.5px; letter-spacing: 0;
+    padding: 7px 4px; font-size: 11px; letter-spacing: 0;
     border-bottom: 0; border-top: 3px solid transparent;
     min-height: 54px;
   }
@@ -7745,19 +7759,19 @@ main.play-body .roster-section::before { content: none; }
      the count - the half you can actually read at a glance - always fits. */
   .ltp-prog-track { width: 74px; }
   .ltp-sec-title { font-size: 28px; }
-  .ltp-h3 { font-size: 20px; }
-  .ltp-p, .ltp-list { font-size: 16.5px; }
-  .ltp-cool p { font-size: 17.5px; }
-  .ltp-era-title { font-size: 26px; }
-  .ltp-era-tagline { font-size: 17.5px; }
+  .ltp-h3 { font-size: 22px; }
+  .ltp-p, .ltp-list { font-size: 16px; }
+  .ltp-cool p { font-size: 18px; }
+  .ltp-era-title { font-size: 28px; }
+  .ltp-era-tagline { font-size: 18px; }
   .ltp-era-name { font-size: 18px; }
   .ltp-head-in { gap: 12px; }
-  .ltp-head-title { font-size: 17px; }
-  .ltp-lede { font-size: 17px; }
+  .ltp-head-title { font-size: 18px; }
+  .ltp-lede { font-size: 18px; }
   /* Six tabs across 375px. The label is shrunk, never truncated - if it ever
      stops fitting it is dropped whole (see the landscape rule below), because a
      tab reading "Tacti..." is worse than a tab reading nothing. */
-  .ltp-tabs--bottom .ltp-tab-l { font-size: 10.5px; }
+  .ltp-tabs--bottom .ltp-tab-l { font-size: 11px; }
   .ltp-cta { flex-direction: column; align-items: stretch; }
   .ltp-btn { width: 100%; }
 }
@@ -7771,7 +7785,7 @@ main.play-body .roster-section::before { content: none; }
   .ltp-tabs--bottom .ltp-tab { min-height: 42px; padding: 4px; }
   .ltp-tabs--bottom .ltp-tab-l { display: none; }
   .ltp-tabs--bottom .ltp-tab-n {
-    display: block; font-family: var(--display); font-weight: 800; font-size: 10px;
+    display: block; font-family: var(--display); font-weight: 800; font-size: 11px;
   }
   /* 48px: the shrunk bar measured 47px tall at 880x400 (42px tabs, its border,
      the tab padding); on the body for the same reason as the portrait rule (it
@@ -7822,7 +7836,7 @@ main.play-body .roster-section::before { content: none; }
     font-family: var(--sans); font-size: 11px; font-weight: 700;
     letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3);
   }
-  .comp-table .comp-name { font-family: var(--display); font-weight: 800; font-size: 15px; white-space: normal; flex: 1 1 auto; order: 0; padding-bottom: 0; }
+  .comp-table .comp-name { font-family: var(--display); font-weight: 800; font-size: 16px; white-space: normal; flex: 1 1 auto; order: 0; padding-bottom: 0; }
   .comp-table td.comp-cost { order: 1; margin-left: auto; font-weight: 800; color: var(--blue); }
   .comp-table td.comp-cost::before { content: none; }
   .comp-table td.comp-fac { order: 2; flex: 1 1 100%; }
@@ -7868,9 +7882,9 @@ main.play-body .roster-section::before { content: none; }
 }
 
 /* Shared-fleet preview (shareModal in render.ts). */
-.share-meta { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0 0 12px; font-size: 14px; color: var(--ink-2); }
+.share-meta { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0 0 12px; font-size: 13px; color: var(--ink-2); }
 .share-units { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--hair-soft); }
-.share-units li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--hair-soft); font-size: 15px; }
+.share-units li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--hair-soft); font-size: 16px; }
 .share-n { color: var(--ink-3); white-space: nowrap; }
 
 /* Hints (COACHMARKS in render.ts): Carbon inline notifications, full width
@@ -7884,7 +7898,7 @@ cds-inline-notification.app-hint { max-width: none; width: 100%; margin: 6px 0; 
 
 /* The lockup at bar size (WM_DELTA in render.ts). The banner version is
    gone; this is the only title now. */
-.wm-lockup.wm-bar { font-size: 26px; line-height: 1; letter-spacing: -0.01em; }
+.wm-lockup.wm-bar { font-size: 28px; line-height: 1; letter-spacing: -0.01em; }
 .wm-bar .wm-suns { -webkit-text-stroke: 1.2px #fff; }
 @media (max-width: 760px) { .wm-lockup.wm-bar { font-size: 22px; } .wm-bar .wm-suns { -webkit-text-stroke: 1px #fff; } }
 
@@ -7900,7 +7914,7 @@ cds-inline-notification.app-hint { max-width: none; width: 100%; margin: 6px 0; 
 /* The dice and range are what a player reads; the gun's name is a label.
    So the name is styled exactly like the grey THRUST/SHIELDS labels on the
    stat chips beside it, and the figure like their values. */
-.gun-name { font-family: var(--narrow); font-size: 0.85em; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
+.gun-name { font-family: var(--narrow); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
 .gun-fig { font-weight: 700; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .gun-arc-row { display: grid; gap: 2px; }
 
@@ -7932,7 +7946,7 @@ cds-inline-notification.app-hint { max-width: none; width: 100%; margin: 6px 0; 
    one size, every context. Doubled class to outrank the per-screen chip
    rules above (.builder .stat-chips .stat-chip and friends). */
 .sg > .stat-chip.stat-chip { border: none; background: none; padding: 0; font-size: 13px; line-height: 1.3; }
-.sg > .stat-chip.stat-chip .stat-lbl { font-size: 10.5px; letter-spacing: 0.03em; }
+.sg > .stat-chip.stat-chip .stat-lbl { font-size: 11px; letter-spacing: 0.03em; }
 
 /* Every ship or unit is a card of its own (Jet, October 2026: "each ship/unit
    is a card, not these dividers"). The roster, Hypergrowth's yard, Add unit,
@@ -8022,7 +8036,7 @@ cds-menu-button.hdr-menu { border: 1px solid var(--blue); }
 
 /* Credit limit: "/" and the credits mark, a Carbon select, and for Custom a
    Carbon number field beside it. */
-.limit-ctl { display: inline-flex; align-items: center; gap: 4px; font-size: 15px; font-weight: 700; color: var(--ink-2); }
+.limit-ctl { display: inline-flex; align-items: center; gap: 4px; font-size: 16px; font-weight: 700; color: var(--ink-2); }
 cds-select.limit-select { width: 7.5rem; }
 cds-text-input.limit-custom { width: 6.5rem; }
 
@@ -8053,7 +8067,7 @@ cds-text-input.limit-custom { width: 6.5rem; }
      title is hover text, which a phone never shows. */
 @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   .play-sticky .play-bar-round, .play-sticky .play-bar-id { display: none; }
-  .play-sticky .play-bar-reset, .play-sticky .play-bar-print { font-size: 12px; gap: 6px; padding: 0 10px; }
+  .play-sticky .play-bar-reset, .play-sticky .play-bar-print { font-size: 13px; gap: 6px; padding: 0 10px; }
   .play-sticky .play-bar-print { margin-left: auto; }
   .play-sticky .play-bar-end { flex: 0 0 auto; }
 }

@@ -68,6 +68,8 @@ These came out of a mobile review session. They override any default taste.
   arcs, faction emblems) come from the rulebook or the publisher, never drawn
   here. `web/icons.ts` still holds older hand-drawn glyphs; replace them, do
   not add to them.
+- Font sizes come from the type scale at the top of the Carbon section in
+  `web/style.css` (11, 13, 16, 18, 22, 28, 32+). Do not add in-between sizes.
 - Colour is fine. Do not retint, add dark mode or chase contrast unless asked.
 - Work from real phone screenshots (Playwright touch contexts: iPhone 13, Pixel
   7, a 360px Android, portrait AND landscape) and real taps. A finding without

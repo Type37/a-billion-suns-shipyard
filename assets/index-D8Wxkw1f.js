@@ -593,8 +593,13 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         </div>
         <div class="outfit-card-actions">
           <a class="ghost-btn" href="#/solo/${e.id}">${P(`chevronRight`,15)} Continue</a>
-          <button class="ghost-btn" data-action="duplicate-outfit" data-id="${e.id}" title="Duplicate">${P(`duplicate`,15)}</button>
-          <button class="ghost-btn danger" data-action="delete-outfit" data-id="${e.id}" title="Delete">${P(`trash`,15)}</button>
+          
+          <cds-menu-button class="card-menu" label="Actions" kind="ghost" size="sm" menu-alignment="bottom-end">
+            <cds-menu>
+              <cds-menu-item label="Duplicate" data-action="duplicate-outfit" data-id="${e.id}"></cds-menu-item>
+              <cds-menu-item label="Delete" kind="danger" data-action="delete-outfit" data-id="${e.id}"></cds-menu-item>
+            </cds-menu>
+          </cds-menu-button>
         </div>
       </article>`}).join(``);return`
   <main class="home-main solo-main">
@@ -1342,11 +1347,13 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         <span class="fleet-card-cost">${Ni(r)}</span>
         <span class="fleet-card-faction">${F(n?.name??`Mixed forces`)}</span>
         <span class="fleet-card-mode">${t.freePlay?`Free Play`:Kd[t.mode]}</span>
-        <span class="fleet-card-actions">
-          <button class="card-act" data-action="duplicate-list" data-id="${t.id}" title="Duplicate this fleet" aria-label="Duplicate this fleet">${P(`ix-duplicate`,18)}</button>
-          <button class="card-act" data-action="share-list" data-id="${t.id}" title="Copy a share link" aria-label="Copy a share link">${P(`ix-share`,18)}</button>
-          <button class="card-act is-danger" data-action="delete-list" data-id="${t.id}" title="Delete this fleet" aria-label="Delete this fleet">${P(`ix-trash`,18)}</button>
-        </span>
+        <cds-menu-button class="fleet-card-actions card-menu" label="Actions" kind="ghost" size="sm" menu-alignment="bottom-end">
+          <cds-menu>
+            <cds-menu-item label="Duplicate" data-action="duplicate-list" data-id="${t.id}"></cds-menu-item>
+            <cds-menu-item label="Share link" data-action="share-list" data-id="${t.id}"></cds-menu-item>
+            <cds-menu-item label="Delete" kind="danger" data-action="delete-list" data-id="${t.id}"></cds-menu-item>
+          </cds-menu>
+        </cds-menu-button>
       </article>`}).join(``);return`
   ${df()}
   <main class="fleets-main">

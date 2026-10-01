@@ -7347,7 +7347,6 @@ main.play-body .roster-section::before { content: none; }
   font-family: var(--sans); font-size: 13px; font-weight: 700;
   letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-2);
 }
-.ltp-dot { color: var(--ink-3); }
 .ltp-era-chev { flex: none; color: var(--blue); transition: transform 200ms var(--ease); }
 .ltp-era[open] .ltp-era-chev { transform: rotate(180deg); }
 .ltp-era-body { padding: 4px 12px 16px; border-top: 1px solid var(--hair-soft); }
@@ -8236,8 +8235,6 @@ cds-overflow-menu.hdr-menu, cds-overflow-menu.card-menu {
 cds-button.btn::part(button), cds-button.sy-add-unit::part(button), cds-button.mf-foot-btn::part(button) {
   max-inline-size: none; padding-inline: 16px; gap: 8px;
 }
-.play-sticky .play-bar > cds-button { width: 100%; }
-.play-sticky .play-bar > cds-button::part(button) { width: 100%; justify-content: center; padding-inline: 8px; }
 .mf-finish cds-button, .mf-finish cds-button::part(button) { width: 100%; max-inline-size: none; }
 /* With even padding the icon goes back into the flow after the label (Carbon
    pins it absolutely inside a 64px right gutter), and a label never wraps. */
@@ -8270,10 +8267,17 @@ cds-button.btn, cds-button.sy-add-unit { width: max-content; min-width: max-cont
 /* Play's three cells: the older .play-bar-* rule (higher specificity than the
    host reset above) still padded the host 8px a side, which left "Reset game"
    96px inside a 112px cell and pushed its label past the edge at 360px. */
-.play-sticky .play-bar > cds-button.btn.btn { width: 100%; min-width: 0; padding: 0; border: none; }
-/* Carbon draws the tertiary border on the inner button, so the old "drop the
-   left line" rule no longer reaches it; neighbours overlap by 1px instead. */
-.play-sticky .play-bar > cds-button.btn + cds-button.btn { margin-left: -1px; width: calc(100% + 1px); }
+/* Only in the phone grid (same query as the grid above): on a desktop the
+   bar is a row of buttons at their own widths, and an unscoped width: 100%
+   stacked Print, Reset game and End play into three full-width bars. */
+.play-sticky .play-bar > cds-button.btn.btn { padding: 0; border: none; }
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  .play-sticky .play-bar > cds-button.btn.btn { width: 100%; min-width: 0; }
+  .play-sticky .play-bar > cds-button::part(button) { width: 100%; justify-content: center; padding-inline: 8px; }
+  /* Carbon draws the tertiary border on the inner button, so the old "drop
+     the left line" rule no longer reaches it; neighbours overlap by 1px. */
+  .play-sticky .play-bar > cds-button.btn + cds-button.btn { margin-left: -1px; width: calc(100% + 1px); }
+}
 
 /* Add unit's mass groups: the rule between groups is a 3px blue line, so it
    reads as a break between groups rather than one more card edge (Jet: "color
@@ -8325,3 +8329,44 @@ cds-button.btn, cds-button.sy-add-unit { width: max-content; min-width: max-cont
    every card of a list. Sized to content, a card with Thrust 6" put its guns
    a few pixels left of the card with 10" above it. */
 .sg { grid-template-columns: max-content max-content minmax(2ch, max-content) max-content max-content minmax(3ch, max-content) minmax(0, 1fr); }
+
+/* Checkboxes are Carbon's (cds-checkbox). The homemade ones carried their own
+   looks on these classes: Compendium's "Sort by faction" was a blue outlined
+   chip that filled when on, Options' switch a bordered row, print options
+   bare native boxes. The host is bare now and Carbon draws the box and label.
+   The label is the tap target, so it fills a 48px row: 12px above and below
+   the words. Carbon draws the box (::before, 2px down) and the tick (::after,
+   6.5px down) absolutely from the label's top, so both move down the same 12px
+   or the tick lands on the box's top edge. Not centred: Play's steps run to
+   several lines and the box belongs on the first one. */
+cds-checkbox.print-toggle, cds-checkbox.check-inline, cds-checkbox.phase-check,
+cds-checkbox.comp-check, cds-checkbox.opt-check {
+  display: block; padding: 0; border: none; background: none; min-height: 0; gap: 0;
+  font-family: var(--sans); font-size: 13px; font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--ink);
+}
+cds-checkbox.print-toggle, cds-checkbox.check-inline, cds-checkbox.phase-check,
+cds-checkbox.comp-check, cds-checkbox.opt-check { margin: 0; }
+cds-checkbox::part(label) { min-height: var(--tap); padding-top: 12px; padding-bottom: 12px; box-sizing: border-box; }
+cds-checkbox::part(label)::before { inset-block-start: 14px; }
+cds-checkbox::part(label)::after { inset-block-start: 18.5px; }
+/* Each option is already a 48px row; the 12px row gap on top of that spread
+   the print options a screen apart. */
+.print-opts { row-gap: 0; }
+/* Play's steps are rule text, in the rules face; a done step reads as done. */
+cds-checkbox.phase-check { font-family: var(--serif); line-height: 1.45; }
+cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--hair); }
+
+/* One page width on a desktop: the Fleets page's, 1100px with 40px sides
+   (Jet, October 2026, of the Fleets grid: "this is a good width for desktop
+   mode"). Before this every screen had its own ceiling, chosen per screen by
+   content: the builder 902px, Play 1160px, the Junkspace dock 760px, the
+   Compendium 1320px, Learn and the rules 840px. So the page jumped sideways
+   and the masthead's edges matched nothing as you moved between screens. The
+   print preview is the exception: it is a sheet of paper and keeps the
+   paper's width. */
+@media (min-width: 761px) {
+  #app > main:not(.print-page), #app > .shipyard.builder-fleet {
+    max-width: 1100px; margin-left: auto; margin-right: auto;
+    padding-left: 40px; padding-right: 40px; box-sizing: border-box;
+  }
+}

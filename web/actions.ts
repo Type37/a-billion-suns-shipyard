@@ -496,6 +496,11 @@ function firstImage(dt: DataTransfer | null): File | null {
 function handleClick(e: MouseEvent): void {
   const target = (e.target as HTMLElement).closest<HTMLElement>("[data-action]");
   if (!target) return;
+  // A Carbon checkbox acts on its own change event (bridged in main.ts), never
+  // on a click. One tap on its label is two clicks seen from out here, the
+  // label's and the one the label forwards to the input inside, and both are
+  // retargeted to the host, so acting on clicks toggled every box twice.
+  if (target.tagName === "CDS-CHECKBOX") return;
   dispatchAction(target);
 }
 

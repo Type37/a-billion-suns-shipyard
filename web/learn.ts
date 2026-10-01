@@ -458,7 +458,8 @@ function eraAccordion(e: EraCard, first: boolean): string {
     <summary class="ltp-era-head">
       <span class="ltp-era-head-text">
         <span class="ltp-era-name">${escapeHtml(e.name)}</span>
-        <span class="ltp-era-meta">${e.players} <span class="ltp-dot">&middot;</span> ${escapeHtml(e.complexity)}</span>
+        <span class="ltp-era-meta">${e.players}</span>
+        <span class="ltp-era-meta">${escapeHtml(e.complexity)}</span>
       </span>
       ${icon("chevronDown", 20, "ltp-era-chev")}
     </summary>

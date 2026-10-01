@@ -1112,13 +1112,15 @@ function hvpAssignPanel(list: SavedList, faction: Faction | undefined, customs: 
           if (mass < minMass) {
             return `<span class="hvp-pick-opt is-blocked" aria-disabled="true">
               <span class="hvp-pick-name">${escapeHtml(label)}</span>
-              <span class="hvp-pick-why">Mass 0 &middot; cannot carry personnel</span>
+              <span class="hvp-pick-why">Mass 0</span>
+              <span class="hvp-pick-why">Cannot carry personnel</span>
             </span>`;
           }
           const on = sel.assignedUnitId === u.id;
           return `<button class="hvp-pick-opt ${on ? "on" : ""}" data-action="hvp-assign-to" data-index="${i}" data-unit="${u.id}" aria-pressed="${on}">
             <span class="hvp-pick-name">${escapeHtml(label)}</span>
-            <span class="hvp-pick-why">Mass ${mass}${already ? ` &middot; already carrying ${already}` : ""}</span>
+            <span class="hvp-pick-why">Mass ${mass}</span>${already ? `
+            <span class="hvp-pick-why">Already carrying ${already}</span>` : ""}
           </button>`;
         })
         .join("");
@@ -2554,21 +2556,21 @@ function printView(
           <button class="${opts.paper === "letter" ? "selected" : ""}" data-action="print-paper" data-paper="letter">Letter</button>
           <button class="${opts.paper === "a4" ? "selected" : ""}" data-action="print-paper" data-paper="a4">A4</button>
         </span>
-        <label class="print-toggle" title="A row of HP boxes per ship, to cross off as damage lands"><input type="checkbox" data-action="print-trackers" ${opts.trackers ? "checked" : ""} /> Damage trackers</label>
-        <label class="print-toggle" title="${isShipyard ? "A Jumped in and an In reserve box per ship" : "A Jumped in box per ship"}"><input type="checkbox" data-action="print-jumptrackers" ${opts.jumpTrackers ? "checked" : ""} /> Jump trackers</label>
-        <label class="print-toggle" title="Your faction's own rule, Initiative and CMD"><input type="checkbox" data-action="print-rules" ${opts.rules ? "checked" : ""} /> Faction rules</label>
+        <cds-checkbox id="cb-print-trackers" class="print-toggle" title="A row of HP boxes per ship, to cross off as damage lands" data-action="print-trackers" ${opts.trackers ? "checked" : ""}>Damage trackers</cds-checkbox>
+        <cds-checkbox id="cb-print-jumptrackers" class="print-toggle" title="${isShipyard ? "A Jumped in and an In reserve box per ship" : "A Jumped in box per ship"}" data-action="print-jumptrackers" ${opts.jumpTrackers ? "checked" : ""}>Jump trackers</cds-checkbox>
+        <cds-checkbox id="cb-print-rules" class="print-toggle" title="Your faction's own rule, Initiative and CMD" data-action="print-rules" ${opts.rules ? "checked" : ""}>Faction rules</cds-checkbox>
         ${
           list.mode === "junkspace"
             ? ""
-            : `<label class="print-toggle" title="${isCreditsMode ? "Credits spent, earned and profit per round, the opponent and a notes line" : "Victory points per round, the opponent and a notes line"}"><input type="checkbox" data-action="print-score" ${opts.score ? "checked" : ""} /> ${isCreditsMode ? "Credits tracker" : "Score table"}</label>`
+            : `<cds-checkbox id="cb-print-score" class="print-toggle" title="${isCreditsMode ? "Credits spent, earned and profit per round, the opponent and a notes line" : "Victory points per round, the opponent and a notes line"}" data-action="print-score" ${opts.score ? "checked" : ""}>${isCreditsMode ? "Credits tracker" : "Score table"}</cds-checkbox>`
         }
         ${
           defersHvp
-            ? `<label class="print-toggle" title="Every HVP you could take, with the ones you have chosen marked. You choose after the missions are rolled, so the sheet is the menu"><input type="checkbox" data-action="print-allhvp" ${opts.allHvp ? "checked" : ""} /> All personnel</label>`
+            ? `<cds-checkbox id="cb-print-allhvp" class="print-toggle" title="Every HVP you could take, with the ones you have chosen marked. You choose after the missions are rolled, so the sheet is the menu" data-action="print-allhvp" ${opts.allHvp ? "checked" : ""}>All personnel</cds-checkbox>`
             : ""
         }
-        <label class="print-toggle" title="The core Actions reference"><input type="checkbox" data-action="print-actions" ${opts.actions ? "checked" : ""} /> Actions</label>
-        <label class="print-toggle" title="The Commands reference, including any your faction changes"><input type="checkbox" data-action="print-commands" ${opts.commands ? "checked" : ""} /> Commands</label>
+        <cds-checkbox id="cb-print-actions" class="print-toggle" title="The core Actions reference" data-action="print-actions" ${opts.actions ? "checked" : ""}>Actions</cds-checkbox>
+        <cds-checkbox id="cb-print-commands" class="print-toggle" title="The Commands reference, including any your faction changes" data-action="print-commands" ${opts.commands ? "checked" : ""}>Commands</cds-checkbox>
       </div>
       <div class="print-go">
         <span class="print-pagecount" data-print-pagecount>&nbsp;</span>
@@ -2884,11 +2886,11 @@ function foundryEditView(state: AppState, factionId: string): string {
       </div>
       <div class="cf-slots">
         <div class="cf-slot">
-          <h5>Primary weapons <label class="check-inline"><input type="checkbox" ${s.primaryUtility ? "checked" : ""} data-action="cf-ship" data-ship="${si}" data-field="primaryUtility" /> Utility Bays instead</label></h5>
+          <h5>Primary weapons <cds-checkbox id="cb-primary-util-${si}" class="check-inline" ${s.primaryUtility ? "checked" : ""} data-action="cf-ship" data-ship="${si}" data-field="primaryUtility">Utility Bays instead</cds-checkbox></h5>
           ${s.primaryUtility ? "" : weaponEditor(si, "primary", s.primary)}
         </div>
         <div class="cf-slot">
-          <h5>Auxiliary weapons <label class="check-inline"><input type="checkbox" ${s.auxiliaryUtility ? "checked" : ""} data-action="cf-ship" data-ship="${si}" data-field="auxiliaryUtility" /> Utility Bays instead</label></h5>
+          <h5>Auxiliary weapons <cds-checkbox id="cb-auxiliary-util-${si}" class="check-inline" ${s.auxiliaryUtility ? "checked" : ""} data-action="cf-ship" data-ship="${si}" data-field="auxiliaryUtility">Utility Bays instead</cds-checkbox></h5>
           ${s.auxiliaryUtility ? "" : weaponEditor(si, "auxiliary", s.auxiliary)}
         </div>
       </div>
@@ -3555,10 +3557,7 @@ function playView(state: AppState): string {
     : (currentPhase?.steps ?? [])
         .map(
           (step, i) => `
-    <label class="phase-check ${checks[i] ? "done" : ""}">
-      <input type="checkbox" data-action="play-check-step" data-index="${i}"${step.clears ? ` data-clears="${step.clears}"` : ""} ${checks[i] ? "checked" : ""} />
-      <span>${ruleText(step.text)}${step.note ? `<em class="phase-check-note">${ruleText(step.note)}</em>` : ""}</span>
-    </label>`,
+    <cds-checkbox id="cb-step-${i}" class="phase-check ${checks[i] ? "done" : ""}" data-action="play-check-step" data-index="${i}"${step.clears ? ` data-clears="${step.clears}"` : ""} ${checks[i] ? "checked" : ""}>${ruleText(step.text)}${step.note ? `<em class="phase-check-note">${ruleText(step.note)}</em>` : ""}</cds-checkbox>`,
         )
         .join("");
 
@@ -4051,18 +4050,10 @@ function shipsView(state: AppState): string {
         <select data-action="ship-filter" data-field="faction"><option value="">All factions</option>${facOptions}</select></label>
       <label class="control-group"><span class="control-label">Mass</span>
         <select data-action="ship-filter" data-field="mass"><option value="">All masses</option>${massOptions}</select></label>
-      <label class="comp-groupcheck ${grouped ? "on" : ""}">
-        <input type="checkbox" data-action="ship-group-faction" ${grouped ? "checked" : ""} />
-        <span class="comp-groupcheck-box">${icon("check", 14)}</span>
-        <span class="comp-groupcheck-label">Sort by faction</span>
-      </label>
+      <cds-checkbox id="cb-group-faction" class="comp-check" data-action="ship-group-faction" ${grouped ? "checked" : ""}>Sort by faction</cds-checkbox>
       ${
         customCount > 0
-          ? `<label class="comp-groupcheck ${f.showCustom ? "on" : ""}">
-              <input type="checkbox" data-action="ship-show-custom" ${f.showCustom ? "checked" : ""} />
-              <span class="comp-groupcheck-box">${icon("check", 14)}</span>
-              <span class="comp-groupcheck-label">Show custom ships</span>
-            </label>`
+          ? `<cds-checkbox id="cb-show-custom" class="comp-check" data-action="ship-show-custom" ${f.showCustom ? "checked" : ""}>Show custom ships</cds-checkbox>`
           : ""
       }
       ${f.era || f.faction || f.mass || f.q ? '<cds-button has-main-content kind="tertiary" size="lg" class="btn comp-clear" data-action="ship-filter-clear">Clear filters</cds-button>' : ""}
@@ -4214,12 +4205,7 @@ function optionsModal(state: AppState): string {
                reasoning that the disc is right for circular badge art and wrong
                for the marks drawn as squares. In practice it was never turned
                off, so the crop is simply always on now and the choice is gone. -->
-          <label class="opt-toggle">
-            <input type="checkbox" data-action="toggle-example-factions" ${state.settings.exampleFactions ? "checked" : ""} />
-            <span class="opt-toggle-main">
-              <span class="opt-toggle-name">Show sample custom factions</span>
-            </span>
-          </label>
+          <cds-checkbox id="cb-example-factions" class="opt-check" data-action="toggle-example-factions" ${state.settings.exampleFactions ? "checked" : ""}>Show sample custom factions</cds-checkbox>
         </section>
         <section class="opt-section">
           <h3 class="opt-h">Sync</h3>
@@ -4496,8 +4482,8 @@ function learnActivationDemo(): string {
       <path class="ld-cone" d="M0 0 L104 -38 A110 110 0 0 1 104 38 Z"/>
       <path class="ld-ship" d="M12 0 L-9 9 L-3 0 L-9 -9 Z"/>
     </g>
-    <text x="46" y="128" class="ld-label">1 &middot; MOVE up to Thrust</text>
-    <text x="196" y="128" class="ld-label">2 &middot; SHOOT within arc</text>
+    <text x="46" y="128" class="ld-label">1. MOVE up to Thrust</text>
+    <text x="196" y="128" class="ld-label">2. SHOOT within arc</text>
   </svg>`;
 }
 

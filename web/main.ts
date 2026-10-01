@@ -20,6 +20,7 @@ import "@carbon/web-components/es/components/select/index.js";
 import "@carbon/web-components/es/components/text-input/index.js";
 import "@carbon/web-components/es/components/overflow-menu/index.js";
 import "@carbon/web-components/es/components/menu/index.js";
+import "@carbon/web-components/es/components/checkbox/index.js";
 
 // Keep every Markdown notes editor's preview in step with its textarea as the
 // user types. Uncontrolled on purpose (see richtext.ts): typing must not go
@@ -1315,6 +1316,21 @@ document.addEventListener("cds-select-selected", (e) => {
     const shown = host.getAttribute("value");
     if (shown !== null && host.value !== shown) host.value = shown;
   });
+});
+
+// Carbon checkboxes. The input lives in the checkbox's shadow root and its
+// native change event does not cross out of it, so the app's change listener
+// never hears it; Carbon announces the new state as cds-checkbox-changed. The
+// host carries the data-action and, like an input, a .checked property, so it
+// is handed on as a change event from the host itself (the settings switches,
+// Compendium sorting and the Foundry's Utility Bays read target.checked
+// there) and to dispatchAction for the ones that act as a toggle (print
+// options, Play's steps). No action name is handled in both places.
+document.addEventListener("cds-checkbox-changed", (e) => {
+  const host = e.target as HTMLElement;
+  if (!host.dataset["action"]) return;
+  host.dispatchEvent(new Event("change", { bubbles: true }));
+  dispatchAction(host);
 });
 
 document.addEventListener("cds-modal-closed", (e) => {

@@ -144,16 +144,18 @@ export function newOutfitModal(state: AppState): string {
           <div class="no-dial">
             <span class="control-label">Debt</span>
             <div class="dial">
-              <button class="stepper-btn" data-action="new-outfit-debt" data-delta="-5" aria-label="Less debt">${icon("minus", 15)}</button>
               <span class="dial-val ${debt >= HARD_DEBT_K ? "is-hard" : ""}">${ck(debt)}</span>
+              <button class="stepper-btn" data-action="new-outfit-debt" data-delta="-5" aria-label="Less debt">${icon("minus", 15)}</button>
+              <span class="dial-rule" aria-hidden="true"></span>
               <button class="stepper-btn" data-action="new-outfit-debt" data-delta="5" aria-label="More debt">${icon("plus", 15)}</button>
             </div>
           </div>
           <div class="no-dial">
             <span class="control-label">Games to clear it</span>
             <div class="dial">
-              <button class="stepper-btn" data-action="new-outfit-games" data-delta="-1" aria-label="Fewer games">${icon("minus", 15)}</button>
               <span class="dial-val ${games <= HARD_CLEAR_GAMES ? "is-hard" : ""}">${games}</span>
+              <button class="stepper-btn" data-action="new-outfit-games" data-delta="-1" aria-label="Fewer games">${icon("minus", 15)}</button>
+              <span class="dial-rule" aria-hidden="true"></span>
               <button class="stepper-btn" data-action="new-outfit-games" data-delta="1" aria-label="More games">${icon("plus", 15)}</button>
             </div>
           </div>

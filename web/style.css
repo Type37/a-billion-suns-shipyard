@@ -8494,3 +8494,57 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
   @media (hover: hover) {   .nav-fold > .topnav a:hover, .nav-fold > .topnav .topnav-btn:hover { background: rgba(255, 255, 255, 0.12); } }
   .nav-fold > .topnav a svg, .nav-fold > .topnav .topnav-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
 }
+
+/* The Shipyard read as messy (Jet, 1 October 2026, screenshot of the Megamart
+   list). Three causes, measured:
+   1. A gun is two lines (name, then dice and range) or one ("Utility Bays", or
+      an empty slot), and its stat row grows to fit, so Mass-to-Sil spacing
+      differed card to card and cards came out at four different heights.
+      Every gun slot is now two lines tall whether it uses them or not, so
+      every card's stat lines sit at the same offsets.
+   2. Side-by-side cards were align-items: start, so a row's two cards ended
+      at different heights. They stretch to the row now.
+   3. The cards hang 16px into the gutter (narrow gutter mode, see the grid
+      block) but the credits bar above them did not, so their edges missed it
+      by 16px either side. The bar hangs with them. */
+.sg-gun { min-height: calc(2 * 1.3em); }
+@media (min-width: 1000px) {
+  .shipyard:not(.builder-fleet) .sy-list { align-items: stretch; }
+}
+@media (min-width: 672px) {
+  .shipyard:not(.builder-fleet) .sy-budget > .sy-meter { margin-left: calc(-1 * var(--gutter-narrow)); margin-right: calc(-1 * var(--gutter-narrow)); }
+}
+/* An empty gun slot has no baseline, so on a baseline-aligned row it sat on
+   its own bottom edge and pushed that row's stats down a line (Fighter Wing,
+   Prime Corvette). Empty slots align to the top instead. */
+.sg-gun:empty { align-self: start; }
+
+/* Start a new outfit (Jet, 1 October 2026: "i don't love how wide this is").
+   It was Carbon's sm modal at ~690px with each stepper stretched across the
+   whole row and its number floating in the middle of ~500px of field. Now:
+   - the dialog is capped at 480px (four inputs; Carbon puts fewer than five
+     in a dialog, and brief dialogs at xs/sm);
+   - labels sit above their field, Carbon's default, in sentence case;
+   - Debt and Games share one row as two Carbon number inputs (forked: value on
+     the left, subtract and add together at the right with a rule between,
+     grey field, bottom line), so neither is a 500px bar holding a two-digit
+     number. Placed last so it beats the older .no-dials rules above. */
+@media (min-width: 672px) {
+  .no-modal::part(dialog) { max-inline-size: 480px; }
+}
+.no-modal .control-label { font-size: 13px; letter-spacing: 0; text-transform: none; color: var(--ink-2); font-weight: 400; }
+.no-modal .no-identity { flex-direction: row; align-items: end; }
+.no-modal .no-name-field { display: grid; gap: 8px; flex: 1 1 auto; min-width: 0; }
+.no-dials { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 24px; }
+.no-dial { display: grid; gap: 8px; min-width: 0; }
+.no-dial .control-label { min-width: 0; }
+.no-dial .dial {
+  width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) var(--tap) 1px var(--tap);
+  align-items: center; justify-items: stretch; height: var(--tap);
+  background: var(--ground); border: none; border-bottom: 1px solid var(--field-edge);
+}
+.no-dial .dial:focus-within { outline: 2px solid var(--focus); outline-offset: -2px; }
+.no-dial .dial-val { justify-self: start; padding-left: 16px; font-size: 16px; }
+.no-dial .dial .stepper-btn { width: var(--tap); height: var(--tap); border: none; background: none; color: var(--ink); }
+@media (hover: hover) { .no-dial .dial .stepper-btn:hover { background: var(--cds-field-hover, #e8e8e8); color: var(--ink); } }
+.no-dial .dial-rule { height: 24px; background: var(--hair-soft); }

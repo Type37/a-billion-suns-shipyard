@@ -1519,8 +1519,10 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     <header class="sy-head">
       <div class="sy-id">
         <span class="mf-emblem">${u}</span>
-        <input class="mf-name sy-name" type="text" value="${R(t.fleet.name??``)}" placeholder="Untitled company" aria-label="Company name" data-action="fleet-name" />
-        <button class="mf-name-gen" data-action="reroll-corp-name" title="Roll a random company name" aria-label="Roll a random company name">${I(`random`,14)}</button>
+        <span class="name-box">
+          <input class="mf-name sy-name" type="text" value="${R(t.fleet.name??``)}" placeholder="Untitled company" aria-label="Company name" data-action="fleet-name" />
+          <button class="mf-name-gen" data-action="reroll-corp-name" title="Roll a random company name" aria-label="Roll a random company name">${I(`random`,18)}</button>
+        </span>
       </div>
       <div class="sy-fac">
         <span class="mf-fac">${v}</span>
@@ -1610,7 +1612,10 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         <button data-action="duplicate-list" data-id="${t.id}">${I(`ix-duplicate`,16)} Duplicate</button>
         <button class="danger" data-action="delete-list" data-id="${t.id}">${I(`ix-trash`,16)} Delete fleet</button>
       </div>
-    </details>`,ne=t.fleet.units.length;return`
+    </details>`,ne=t.fleet.units.length,k=t.freePlay?`<p class="yard-status is-muted">Free Play, no rules check</p>`:s.length>0&&ne>0?`<details class="yard-status-pop">
+          <summary class="yard-status is-fail">${I(`warning`,12)} ${s.length} to resolve</summary>
+          <ul class="yard-status-panel issue-list">${s.map(Nd).join(``)}</ul>
+        </details>`:ne>0?`<p class="yard-status is-ok">${I(`check`,12)} Legal</p>`:``;return`
   ${Sd()}
   ${sd(t.mode,e.onboarding.visits<=1)}
 
@@ -1618,8 +1623,10 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     <header class="sy-head">
       <div class="sy-id">
         <span class="mf-emblem">${C}</span>
-        <input class="mf-name sy-name" type="text" value="${R(t.fleet.name??``)}" placeholder="Untitled fleet" aria-label="Fleet name" data-action="fleet-name" />
-        <button class="mf-name-gen" data-action="gen-fleet-name" title="Roll a random fleet name" aria-label="Roll a random fleet name">${I(`random`,14)}</button>
+        <span class="name-box">
+          <input class="mf-name sy-name" type="text" value="${R(t.fleet.name??``)}" placeholder="Untitled fleet" aria-label="Fleet name" data-action="fleet-name" />
+          <button class="mf-name-gen" data-action="gen-fleet-name" title="Roll a random fleet name" aria-label="Roll a random fleet name">${I(`random`,18)}</button>
+        </span>
         <!-- No eraser button. It sat flush against the field, a thumb a few px
              off the name blanked it with no undo, and clearing a text field is
              something every phone keyboard already does. -->
@@ -1640,21 +1647,19 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       <div class="sy-budget-row">
         <span class="sy-budget-now">${L(i)}</span>
         <span class="sy-budget-cap">${E}</span>
-        <span class="sy-budget-free">${a<0?`${L(-a)} over`:`${L(a)} remaining`}</span>
+        <div class="sy-budget-status">${k}</div>
+        <span class="sy-budget-free">${a<0?`${L(-a)} over`:`${L(a)} left`}</span>
       </div>
       <div class="sy-meter"><span class="sy-meter-fill" style="width:${t.fleet.creditsLimit>0?Math.min(100,i/t.fleet.creditsLimit*100):0}%"></span></div>
     </div>
 
     <div class="sy-cols">
     <div class="sy-col-fleet">
+    
     <div class="sy-list-head">
-      <h3 class="sy-h">${o?`Your shipyard`:`Your fleet`}</h3>
+      <h3 class="visually-hidden">${o?`Your shipyard`:`Your fleet`}</h3>
       ${t.freePlay||r?`<button class="sy-add-unit ${ne===0?`is-pulsing`:``}" data-action="open-add-unit">${I(`plus`,16)} Add ${o?`ship`:`unit`}</button>`:``}
     </div>
-    ${t.freePlay?`<p class="yard-status is-muted">Free Play, no rules check</p>`:s.length>0&&ne>0?`<details class="yard-status-pop">
-              <summary class="yard-status is-fail">${I(`warning`,12)} ${s.length} to resolve</summary>
-              <ul class="yard-status-panel issue-list">${s.map(Nd).join(``)}</ul>
-            </details>`:ne>0?`<p class="yard-status is-ok">${I(`check`,12)} Legal</p>`:``}
 
     <div class="sy-list">${ne?S:``}</div>
     </div>

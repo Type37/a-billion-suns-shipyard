@@ -1611,6 +1611,10 @@ const GAME_PITCH = `
  * changes on every scroll frame is a screen reader talking over the page, and
  * the caption already says the same thing in words that hold still.
  */
+// No "1 of 9" beside the bar any more. It counted reading stops, and the
+// Tactical Phase is five of them, so it said "of 9" over a strip of six tabs
+// and never matched what the eye could count. The bar and the lit tab say
+// where you are.
 function progressBar(at: number, of: number): string {
   const start = of > 0 ? at / of : 0;
   return `
@@ -1618,7 +1622,6 @@ function progressBar(at: number, of: number): string {
     <span class="ltp-prog-track" aria-hidden="true">
       <i class="ltp-prog-fill" style="transform: scaleX(${start.toFixed(4)})"></i>
     </span>
-    <span class="ltp-prog-num">${at + 1} <span class="ltp-prog-of">of</span> ${of}</span>
   </div>`;
 }
 

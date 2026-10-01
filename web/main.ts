@@ -190,20 +190,10 @@ function animateEraTitle(el: HTMLElement): void {
     return;
   }
   if (era === "arma") {
+    // The slam on its own. Two radial-gradient "flame" layers used to burn
+    // behind the name as it landed; on a phone they read as an orange smudge,
+    // not fire, and were cut in the October 2026 review.
     slamTitle(el, title, ERA_SLOW);
-    // The galaxy is in flames. Two CSS layers behind the name, lit as it lands
-    // and burnt out two and a half seconds later (see .is-burning in the
-    // stylesheet, which also explains why they hang off the accordion body
-    // rather than off the heading). The class goes on the <details>, is dropped
-    // and re-added around a reflow, or reopening the card would find it already
-    // there and never restart the keyframes.
-    const card = el.closest(".ltp-era");
-    if (card) {
-      card.classList.remove("is-burning");
-      void (card as HTMLElement).offsetWidth;
-      card.classList.add("is-burning");
-      window.setTimeout(() => card.classList.remove("is-burning"), 2600);
-    }
     return;
   }
   // Age of Unity, and the one place the Star Wars reference is allowed to be

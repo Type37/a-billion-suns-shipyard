@@ -1794,8 +1794,7 @@ function addUnitModal(state: AppState): string {
             ${owned ? `<span class="au-card-owned">${owned} in fleet</span>` : ""}
           </span>
           <span class="au-card-stats">${statChips(ship, true)}</span>
-          <span class="au-card-pri gun-arc-row">${gunArc(ship, "primary")}</span>
-          <span class="au-card-aux gun-arc-row">${gunArc(ship, "aux")}</span>
+          <span class="au-card-guns">${gunArc(ship, "primary") || (gunArc(ship, "aux") ? '<span class="gun gun-gap" aria-hidden="true"></span>' : "")}${gunArc(ship, "aux")}</span>
         </span>
       </button>
       ${
@@ -1806,19 +1805,17 @@ function addUnitModal(state: AppState): string {
           : ""
       }
       </div>`;
-  const quad = (mass: number) => {
-    const rows = pool.filter((p) => p.ship.mass === mass);
-    const cards = rows
-      .map((p) => {
-        const addId = p.composite ? `${p.owner.id}/${p.ship.id}` : p.ship.id;
-        return auCard(p.ship, addId, ownedCount(addId));
-      })
-      .join("");
-    return `<div class="au-quad">
-        <h4 class="au-quad-head">Mass ${mass}</h4>
-        <div class="au-quad-list">${cards || '<p class="mf-empty">None</p>'}</div>
-      </div>`;
-  };
+  // One list, lightest to heaviest. It used to be four blocks under MASS 0 to
+  // MASS 3 headings with a 2px rule under each, which put a heading and a
+  // divider between every few cards and said the mass twice: every card
+  // already carries its own Mass chip. Jet kept the chip and cut the headings.
+  const cards = [...pool]
+    .sort((x, y) => x.ship.mass - y.ship.mass)
+    .map((p) => {
+      const addId = p.composite ? `${p.owner.id}/${p.ship.id}` : p.ship.id;
+      return auCard(p.ship, addId, ownedCount(addId));
+    })
+    .join("");
   const label = isStocking ? "ship" : "unit";
   // The dialog covers the roster, so the budget it would otherwise hide rides
   // in Carbon's label slot above the title: what is left, or how far over.
@@ -1835,15 +1832,11 @@ function addUnitModal(state: AppState): string {
   <cds-modal open size="lg" class="au-modal" data-key="au-modal">
       <cds-modal-header>
         <cds-modal-close-button></cds-modal-close-button>
-        <cds-modal-label class="au-budget ${remaining < 0 ? "is-over" : ""}">${escapeHtml(budget)}</cds-modal-label>
-        <cds-modal-heading>Add ${label}</cds-modal-heading>
+        <cds-modal-heading class="au-heading">Add ${label} <span class="au-budget ${remaining < 0 ? "is-over" : ""}">${escapeHtml(budget)}</span></cds-modal-heading>
       </cds-modal-header>
       <cds-modal-body class="au-body" data-modal-primary-focus tabindex="-1">
-        <div class="au-grid">${[0, 1, 2, 3].map(quad).join("")}</div>
+        <div class="au-list">${cards}</div>
       </cds-modal-body>
-      <cds-modal-footer>
-        <cds-modal-footer-button kind="primary" data-action="close-modal">Done</cds-modal-footer-button>
-      </cds-modal-footer>
   </cds-modal>`;
 }
 
@@ -1881,7 +1874,11 @@ export function gunArc(ship: ShipClass, kind: "primary" | "aux"): string {
       .map((w) => `<span class="gun">${glyph}<span class="gun-txt"><span class="gun-name">${escapeHtml(w.name)}</span> <span class="gun-fig">${w.count}${w.die} ${w.rangeMin}&ndash;${w.rangeMax}"</span></span></span>`)
       .join("");
   if (utility) return `<span class="gun">${glyph}<span class="gun-txt"><span class="gun-name">${icon("utility", 12, "util-ico")}Utility Bays</span></span></span>`;
-  return `<span class="gun is-none">${glyph}<span class="gun-txt"><span class="gun-name">None</span></span></span>`;
+  // An empty arc draws nothing. It used to draw the arc glyph and "None", a row
+  // that said there was nothing to say (Jet, October 2026). Where the arcs sit
+  // in fixed rows (Add unit) the empty one leaves its row blank, so a lone
+  // Auxiliary still lines up with the stats beside it.
+  return "";
 }
 
 

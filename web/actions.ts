@@ -1000,10 +1000,11 @@ function dispatchAction(target: HTMLElement): void {
           return { ...f, units: [...f.units, { id: unitId, shipClassId: shipId, count: 1, ...named, ...tagged }] };
         }),
       );
-      // The species buttons close once the ship is in; "1 in fleet" on the card says it landed.
-      if (target.dataset["species"]) {
-        store.setState((s) => (s.ui.modal?.kind === "add-unit" ? { ...s, ui: { ...s.ui, modal: { kind: "add-unit" } } } : s));
-      }
+      // The dialog closes once the ship is in, so the roster with the new unit
+      // in it is what you see next. It used to stay open for more adds, which
+      // meant it needed a Done button beside Carbon's X: two ways out of one
+      // dialog (Jet, October 2026). Adding another is one tap on Add unit.
+      store.setState((s) => (s.ui.modal?.kind === "add-unit" ? { ...s, ui: { ...s.ui, modal: undefined } } : s));
       break;
     }
     /**

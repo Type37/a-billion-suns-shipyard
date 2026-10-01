@@ -3519,7 +3519,8 @@ button { font-family: inherit; }
 /* Tightened masthead: the shipyard header is a dense control strip, so its
    shared marks (d12, era badge, ... menu, emblem) shed the roomier padding the
    Armageddon builder uses. Scoped to .sy-head so only this header shrinks. */
-.sy-head .mf-name { padding: 1px 0; font-size: clamp(16px, 1.9vw, 22px); }
+/* 7px each side like every other name field: "padding: 1px 0" here beat the shared rule and put the text against the box edge. */
+.sy-head .mf-name { padding: 1px 7px; font-size: clamp(16px, 1.9vw, 22px); }
 .sy-head .mf-name-gen { width: 24px; height: 24px; border-radius: 5px; }
 .sy-head .mf-era-badge { padding: 3px 7px; font-size: 11px; letter-spacing: 0.04em; }
 .sy-head .mf-menu > summary { height: 28px; padding: 0 8px; gap: 4px; }
@@ -3727,14 +3728,15 @@ button { font-family: inherit; }
 
 .sy-hvp-note { font-size: 12.5px; color: var(--ink-3); margin: 0 0 10px; }
 
-/* Add-unit picker: the faction's classes in a 2x2 grid by Mass. */
-.au-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 18px; }
-.au-quad-head { margin: 0 0 2px; font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; font-size: 12px; color: var(--ink-2); border-bottom: 2px solid var(--ink); padding-bottom: 3px; }
-.au-quad-list { display: flex; flex-direction: column; gap: 0; }
+/* Add-unit picker: one list, lightest first (no Mass headings, see render.ts).
+   Two columns of cards once there is room, one on a phone. */
+.au-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); column-gap: 32px; }
 .au-body { padding-top: 8px; }
-.au-budget { font-variant-numeric: tabular-nums; }
+/* The budget shares the title's row. It sat in Carbon's label slot on a line
+   of its own above "Add unit", one more row for one number. */
+.au-heading { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 14px; }
+.au-budget { font-size: 14px; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 .au-budget.is-over { color: var(--red-deep); }
-@media (max-width: 720px) { .au-grid { grid-template-columns: 1fr; gap: 6px; } }
 
 /* Ship Reference: one line per ship, PDF-style, grouped by Mass. Built as a grid
    rather than a table so it can reflow: aligned columns on a wide screen, a
@@ -3814,7 +3816,7 @@ button { font-family: inherit; }
 .au-card:last-child { border-bottom: none; }
 .au-card-top { display: flex; align-items: baseline; gap: 7px; }
 .au-card-name { font-weight: 700; font-size: 13.5px; }
-.au-card-owned { font-family: var(--display); font-weight: 800; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.03em; color: #fff; background: var(--blue); padding: 0 5px; border-radius: 9px; }
+.au-card-owned { white-space: nowrap; font-family: var(--display); font-weight: 800; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.03em; color: #fff; background: var(--blue); padding: 0 5px; border-radius: 9px; }
 .au-card-cost { margin-left: auto; font-family: var(--display); font-weight: 800; font-size: 12.5px; }
 .au-card-add { display: inline-flex; align-items: center; color: var(--blue); }
 /* Stats on the left, weapons to their right (wraps below only when cramped). */
@@ -4179,6 +4181,14 @@ button { font-family: inherit; }
    its "Close" tooltip and a focus ring on the X before anything was touched.
    Every Carbon dialog here marks its body as where focus starts instead. */
 cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
+/* On a phone Carbon's lg and md dialogs go full width but only as tall as
+   their content, so a short Add unit list stopped 158px above the bottom of a
+   Pixel 7 with the dimmed page showing underneath, and a long one ran 2px past
+   the bottom because the 1px borders sat outside its 100%. Full screen means
+   the whole screen. The xs confirm stays a centred box. */
+@media (max-width: 671px) {
+  cds-modal:not([size="xs"])::part(dialog) { height: 100%; box-sizing: border-box; }
+}
 .opt-section { display: flex; flex-direction: column; gap: 10px; }
 .opt-h { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); border-bottom: 1px solid var(--hair-soft); padding-bottom: 6px; }
 .opt-note { font-size: 13px; color: var(--ink-2); line-height: 1.45; }
@@ -7294,89 +7304,6 @@ main.play-body .roster-section::before { content: none; }
    deliberately - the summary is a control, this is the title card. */
 .ltp-era-title { font-size: 31px; margin: 15px 0 5px; }
 
-/* Armageddon: the galaxy is in flames, so the title arrives on fire.
-   Two layers on the heading's own pseudo-elements, both behind the letters
-   (z-index -1 sits them under the parent's content but above the page, and the
-   heading has no background of its own to hide them). One slow bed of heat, one
-   faster set of licks offset against it - the two cycles going out of step is
-   the entire trick, because a single rising gradient reads as a wipe and two
-   read as flicker. Pure background/transform/filter, nothing that reflows, and
-   the whole thing is removed 2.6s after it is lit. */
-/* The flames hang off the accordion BODY, not off the heading, and the class
-   that lights them rides the <details>.
-
-   The obvious version - two z-index:-1 pseudo-elements on the heading itself -
-   cannot work, and it is worth writing down why. A negative-z-index child
-   paints in step 2 of its stacking context and in-flow block backgrounds paint
-   in step 3, so the accordion's white background goes straight over the top of
-   the fire. Isolating the heading does not rescue it either: that just moves
-   the whole heading, flames and all, into one atomic unit that still paints
-   after the background it needed to sit above.
-
-   Two positioned siblings in one stacking context settle it with no subtlety
-   at all: the flames at z-index 0, the heading at z-index 1, both above the
-   background because both are positioned. */
-.ltp-era-body { position: relative; }
-.ltp-era-title { z-index: 1; }
-.ltp-era.is-burning .ltp-era-body::before,
-.ltp-era.is-burning .ltp-era-body::after {
-  content: "";
-  position: absolute; z-index: 0;
-  pointer-events: none; transform-origin: 50% 100%;
-}
-/* The bed of heat. Its BOTTOM edge is parked on the era name's baseline, which
-   is what makes the fire look like it is coming off the word rather than
-   floating in the paragraph underneath it: the heading sits about 14px down the
-   body and runs ~40px tall, so a 78px box ending at 56px burns up through the
-   letters and fades out above them. */
-/* Sized to the WORD, not to the accordion. The body is 740px wide and the era
-   name is about 180 of them, so a full-width flame box put four fifths of the
-   fire in the empty margin to the right of it and none of it under the letters.
-   A fixed width a little wider than the longest era name keeps the fire on the
-   thing that is meant to be burning. */
-.ltp-era.is-burning .ltp-era-body::before {
-  left: 2px; width: 250px; top: -20px;
-  height: 76px;
-  /* Explicit ellipse radii, NOT closest-side. Every one of these blobs is
-     anchored on the bottom edge of the box, and closest-side measures to the
-     nearest edge - which is the one it is sitting on, so the radius came out at
-     zero and the whole thing rendered as nothing at all. */
-  background:
-    radial-gradient(58px 70px at 12% 100%, rgba(255, 176, 40, 0.98), rgba(226, 52, 16, 0.8) 52%, transparent 84%),
-    radial-gradient(74px 84px at 38% 102%, rgba(255, 206, 74, 0.98), rgba(211, 44, 18, 0.78) 50%, transparent 82%),
-    radial-gradient(66px 76px at 64% 100%, rgba(255, 188, 52, 0.98), rgba(226, 52, 16, 0.78) 52%, transparent 84%),
-    radial-gradient(54px 64px at 88% 100%, rgba(255, 164, 36, 0.95), rgba(211, 44, 18, 0.72) 54%, transparent 86%);
-  animation: ltp-burn-bed 2600ms cubic-bezier(.2, .6, .3, 1) both;
-}
-/* The licks: narrower, brighter, shorter-lived, and reaching a little higher
-   than the bed. Two layers out of step is the entire trick - one rising
-   gradient reads as a wipe, two read as flicker. */
-.ltp-era.is-burning .ltp-era-body::after {
-  left: 14px; width: 210px; top: -32px;
-  height: 82px;
-  background:
-    radial-gradient(26px 72px at 22% 102%, rgba(255, 246, 206, 1), rgba(255, 156, 26, 0.7) 44%, transparent 76%),
-    radial-gradient(32px 86px at 50% 104%, rgba(255, 240, 182, 1), rgba(255, 128, 20, 0.68) 42%, transparent 74%),
-    radial-gradient(24px 64px at 78% 102%, rgba(255, 236, 168, 0.98), rgba(255, 112, 18, 0.66) 44%, transparent 76%);
-  animation: ltp-burn-lick 2600ms cubic-bezier(.2, .7, .3, 1) both;
-}
-@keyframes ltp-burn-bed {
-  0%   { opacity: 0; transform: translateY(16px) scaleY(0.45) scaleX(0.94); filter: blur(12px); }
-  14%  { opacity: 1; transform: translateY(0) scaleY(1.05) scaleX(1); filter: blur(6px); }
-  46%  { opacity: 0.9; transform: translateY(-6px) scaleY(0.95) scaleX(1.03); filter: blur(9px); }
-  100% { opacity: 0; transform: translateY(-30px) scaleY(1.5) scaleX(0.9); filter: blur(18px); }
-}
-@keyframes ltp-burn-lick {
-  0%   { opacity: 0; transform: translateY(10px) scaleY(0.6) scaleX(1.02); filter: blur(9px); }
-  10%  { opacity: 0.95; transform: translateY(-2px) scaleY(1.15) scaleX(0.97); filter: blur(4px); }
-  30%  { opacity: 0.7; transform: translateY(-8px) scaleY(0.9) scaleX(1.04); filter: blur(8px); }
-  54%  { opacity: 0.85; transform: translateY(-16px) scaleY(1.2) scaleX(0.95); filter: blur(7px); }
-  100% { opacity: 0; transform: translateY(-40px) scaleY(1.6) scaleX(1.06); filter: blur(20px); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .ltp-era.is-burning .ltp-era-body::before,
-  .ltp-era.is-burning .ltp-era-body::after { content: none; }
-}
 .ltp-era-tagline {
   font-family: var(--serif); font-style: italic; font-weight: 400;
   font-size: 19px; line-height: 1.45; color: var(--ink);
@@ -7946,7 +7873,6 @@ cds-inline-notification.app-hint { max-width: none; width: 100%; margin: 6px 0; 
 .gun-arc { display: inline-flex; width: 16px; height: 1.3em; align-items: center; justify-content: center; color: var(--blue); }
 .gun-arc svg { width: 16px; height: 16px; }
 .gun-txt { min-width: 0; }
-.gun.is-none .gun-arc, .gun.is-none .gun-name { color: var(--ink-off); }
 /* The dice and range are what a player reads; the gun's name is a label.
    So the name is styled exactly like the grey THRUST/SHIELDS labels on the
    stat chips beside it, and the figure like their values. */
@@ -7956,17 +7882,22 @@ cds-inline-notification.app-hint { max-width: none; width: 100%; margin: 6px 0; 
 
 /* Add unit card, laid out from Jet's sketch: name over stats on the left,
    primary over auxiliary on the right. Same grid at every width. */
-/* Each gun shares a grid ROW with the thing beside it: Primary with the name,
-   Auxiliary with the stats. The first draft stacked both guns in one column
-   spanning both rows, so a Primary that wrapped pushed Auxiliary below the
-   stats it was meant to sit beside. */
-.au-card-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 6px 14px; align-items: start; width: 100%; }
+/* Both guns stack in one cell beside the name and stats, Primary first.
+   Giving each gun its own grid row (Primary with the name, Auxiliary with the
+   stats) was tried: a Primary that wrapped on a phone ("HEAVY RAILGUNS 2D12
+   9-18") made the name's row two lines tall and opened a gap between a ship's
+   name and its own stats. Stacked, a wrap only nudges Auxiliary down a line.
+   With no Primary an empty line holds its place, so Auxiliary still starts
+   level with the stats. */
+/* The left column is as wide as the ship's own name and stats (up to 55%),
+   and the guns start right after it. Two equal halves left a dead gap between
+   the stats and the guns on a wide dialog, so the eye had to jump across. */
+.au-card-grid { display: grid; grid-template-columns: fit-content(55%) minmax(0, 1fr); gap: 6px 22px; align-items: start; width: 100%; }
 .au-card-id { grid-column: 1; grid-row: 1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; min-width: 0; }
 .au-card-stats { grid-column: 1; grid-row: 2; }
-.au-card-pri { grid-column: 2; grid-row: 1; }
-.au-card-aux { grid-column: 2; grid-row: 2; }
-.au-card-pri, .au-card-aux { font-size: 13px; min-width: 0; }
-.au-card-pri .gun-name, .au-card-aux .gun-name, .au-card-pri .gun-fig, .au-card-aux .gun-fig { overflow-wrap: anywhere; }
+.au-card-guns { grid-column: 2; grid-row: 1 / span 2; display: grid; gap: 6px; font-size: 13px; min-width: 0; }
+.gun-gap { height: 1.3em; }
+.au-card-guns .gun-name, .au-card-guns .gun-fig { overflow-wrap: anywhere; }
 
 /* Compendium phone rows: gunArc's glyph names the arc, so the cell's
    "PRIMARY"/"AUXILIARY" word label would say it twice. */

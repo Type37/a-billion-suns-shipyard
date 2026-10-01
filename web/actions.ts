@@ -1970,17 +1970,8 @@ export function dispatchAction(target: HTMLElement): void {
           // this was hardcoded to 1, so it never did.
           alertLevel: startingAlertLevel(debtK),
           round: 1,
-          // Who can take a Perk after this game (p.212): one per ¢1k earned,
-          // surviving pilots only. Then the ships are repaired for the next.
-          perkBudget: {
-            game: o.gamesPlayed + 1,
-            left: earnedK,
-            given: [],
-            surviving: o.ships
-              .filter((sh) => (o.damage?.[sh.id] ?? 0) < (JUNKSPACE_SHIPS.find((c) => c.id === sh.shipClassId)?.silhouette ?? 1))
-              .map((sh) => sh.id),
-          },
-          damage: undefined,
+          // Perks to grant after this game: one per ¢1k earned (p.212).
+          perkBudget: { game: o.gamesPlayed + 1, left: earnedK, given: [] },
           cmd: undefined,
           // The markers belong to the game just finished; the next one gets a
           // fresh shuffle of the bag.
@@ -2771,15 +2762,6 @@ function handleChange(e: Event): void {
       const v = readNumber(inputValue);
       if (v === null) return;
       editOutfit((o) => ({ ...o, cmd: Math.max(0, v) }));
-      break;
-    }
-    case "ship-hp": {
-      const key = target.dataset["key"];
-      const max = Number(target.dataset["max"]);
-      const v = readNumber(inputValue);
-      if (!key || !Number.isFinite(max) || v === null) return;
-      const lost = Math.max(0, Math.min(max, max - v));
-      editOutfit((o) => ({ ...o, damage: { ...(o.damage ?? {}), [key]: lost } }));
       break;
     }
     case "round-set": {

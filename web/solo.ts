@@ -314,9 +314,7 @@ function perkBlock(o: SavedOutfit, sh: SavedOutfit["ships"][number]): string {
     ? ""
     : pb.given.includes(sh.id)
       ? `<cds-tag type="gray" size="md">Perk taken after game ${pb.game}</cds-tag>`
-      : !pb.surviving.includes(sh.id)
-        ? `<cds-tag type="gray" size="md">Destroyed in game ${pb.game}</cds-tag>`
-        : "";
+      : "";
   const has = new Set(o.perks.filter((p) => p.shipId === sh.id).map((p) => p.perk));
   const opts = list
     .map(
@@ -407,6 +405,7 @@ function outfitTab(o: SavedOutfit): string {
           flying this" and "what are they called" and read as a different
           subject entirely. Same person, same row.
         -->
+        <p class="ru-init">Initiative ${initiativeDice(o, s.id)}D6</p>
         <div class="roster-unit-tools">
           <div class="pilot-field">
             <div class="pilot-row">
@@ -566,20 +565,6 @@ function blipsPanel(o: SavedOutfit): string {
         <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="solo-shuffle-blips" title="Shuffle the eight blips into a random order">Reshuffle${icon("random", 10).replace("<svg ", '<svg slot="icon" ')}</cds-button>
       </h3>
       <div class="blip-grid">${markers}</div>
-      ${(() => {
-        const up = blips
-          .map((b, i) => ({ b, i, p: byName.get(BLIP_TO_PIRATE[b.n] ?? "") }))
-          .filter((x) => x.b.revealed && x.p);
-        if (!up.length) return "";
-        return `<ul class="sip-list blip-hp">${up
-          .map(
-            ({ i, b, p }) => `<li class="sip-row">
-              <span class="sip-name"><b>${escapeHtml(p!.name)}</b><span class="sip-who">Blip ${i + 1}, marker ${b.n}</span></span>
-              ${hpField(o, `blip:${i}`, p!.silhouette, `${p!.name}, Blip ${i + 1}`)}
-            </li>`,
-          )
-          .join("")}</ul>`;
-      })()}
     </section>`;
 }
 
@@ -594,7 +579,6 @@ function initiativeDice(o: SavedOutfit, shipId: string): number {
   return 2 + (mine.includes("Slick") ? 1 : 0) + (mine.includes("Rogue") ? 2 : 0);
 }
 
-/** One HP field: Carbon number input, 0 to the ship's Silhouette (HP = Silhouette, p.47). */
 /*
  * Every <cds-number-input> here spells out the attributes Carbon reflects onto
  * itself (type, pattern, locale, input-mode, placeholder, max, step). morph
@@ -603,42 +587,6 @@ function initiativeDice(o: SavedOutfit, shipId: string): number {
  * an error icon ("Please match the requested format"). Same trap as the
  * modal footer's has-three-buttons.
  */
-function hpField(o: SavedOutfit, key: string, max: number, label: string): string {
-  const hp = Math.max(0, max - (o.damage?.[key] ?? 0));
-  return `<span class="hp-cell">
-      <cds-number-input type="number" pattern="[0-9]*" locale="en-US" input-mode="decimal" placeholder="" class="hp-input" label="${escapeHtml(label)} HP" hide-label min="0" max="${max}" step="1" value="${hp}" size="md" data-action="ship-hp" data-key="${escapeHtml(key)}" data-max="${max}"></cds-number-input>
-      <span class="hp-of">of ${max} HP</span>
-      ${hp === 0 ? `<cds-tag type="red" size="md">Destroyed</cds-tag>` : ""}
-    </span>`;
-}
-
-/*
- * The outfit's ships during a game: who is flying, their Initiative, and HP.
- * Found playing a campaign through the app (1 October 2026): nothing on Play
- * tracked damage, so the tracker could not tell you which ship was down. A
- * Carbon structured-list look: one row per ship, quiet row lines.
- */
-function shipsInPlay(o: SavedOutfit): string {
-  if (!o.ships.length) return "";
-  const rows = o.ships
-    .map((sh) => {
-      const def = shipById.get(sh.shipClassId);
-      if (!def) return "";
-      const who = sh.pilotName ? `${escapeHtml(sh.pilotName)}, ${sh.pilotClass}` : sh.pilotClass;
-      return `<li class="sip-row">
-        <span class="sip-name"><b>${escapeHtml(sh.shipName || def.name)}</b><span class="sip-who">${who}</span></span>
-        <span class="sip-init">Initiative ${initiativeDice(o, sh.id)}D6</span>
-        ${hpField(o, sh.id, def.silhouette, sh.shipName || def.name)}
-      </li>`;
-    })
-    .join("");
-  return `<section class="solo-card sip">
-      <h3 class="roster-section">Your ships</h3>
-      <ul class="sip-list">${rows}</ul>
-    </section>`;
-}
-
-
 function playTab(state: AppState, o: SavedOutfit): string {
   const alert = o.alertLevel;
   // Why this game is harder than the last one. The starting Alert Level climbs
@@ -683,7 +631,6 @@ function playTab(state: AppState, o: SavedOutfit): string {
       <cds-number-input type="number" pattern="[0-9]*" locale="en-US" input-mode="decimal" placeholder="" max="" class="round-input" label="CMD tokens" hide-label min="0" step="1" value="${o.cmd ?? cmdGain(o)}" size="lg" data-action="cmd-set"></cds-number-input>
     </div>
   </section>
-  ${shipsInPlay(o)}
   ${blipsPanel(o)}
   ${soloRefTabs(state)}`;
 }

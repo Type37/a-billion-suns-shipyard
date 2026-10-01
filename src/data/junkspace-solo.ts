@@ -221,11 +221,13 @@ export const JUNKSPACE_JOBS: SoloJob[] = [
 // with auxiliary weapons" - so under the old data the two biggest pirates in
 // the game could never make a passive attack and never used their own faction
 // rule. The Starfighter really does have no primary weapon.
+// The Cruiser's Thrust is 3" in Jet's copy of p.211 (1 October 2026); the
+// Layouts 7 PDF has 6". Jet's copy wins.
 export const JUNKSPACE_PIRATES: Aggressor[] = [
   { blip: "1-4", name: "Pirate Starfighter", mass: 0, thrust: 6, silhouette: 3, shields: 0, primary: "", auxiliary: "Stub Blasters [2D6, 0-3\"]" },
   { blip: "5-6", name: "Pirate Gunship", mass: 1, thrust: 6, silhouette: 4, shields: 1, primary: "Blasters [2D6, 0-6\"]", auxiliary: "Stub Blasters [2D6, 0-3\"]" },
   { blip: "7", name: "Pirate Frigate", mass: 2, thrust: 6, silhouette: 6, shields: 2, primary: "Light Railguns [2D8, 9-18\"]", auxiliary: "Shred Cannons [3D6, 0-5\"]" },
-  { blip: "8", name: "Pirate Cruiser", mass: 3, thrust: 6, silhouette: 8, shields: 4, primary: "Plasma Torpedoes [2D10, 6-12\"]", auxiliary: "Shred Cannons [3D6, 0-5\"]" },
+  { blip: "8", name: "Pirate Cruiser", mass: 3, thrust: 3, silhouette: 8, shields: 4, primary: "Plasma Torpedoes [2D10, 6-12\"]", auxiliary: "Shred Cannons [3D6, 0-5\"]" },
 ];
 
 /**

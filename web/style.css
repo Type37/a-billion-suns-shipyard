@@ -8838,3 +8838,38 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
 .round-input { display: block; width: 10rem; margin-top: 8px; }
 .game-log-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
 .game-log-row .glr-remove { margin-left: auto; }
+
+/* Solo Play's rules tabs and their tables (solo.ts soloRefTabs). Carbon line
+   tabs like the outfit's own; tables in Carbon's data-table look: a grey
+   header row, quiet row lines, 16px cell padding. On a phone the eight-column
+   pirate table becomes one block per ship with each cell labelled, so nothing
+   scrolls sideways. */
+.solo-ref-block { margin-top: 24px; }
+.solo-ref-tabs { margin-bottom: 16px; }
+.solo-ref-panel { max-width: 80ch; }
+.solo-ref-panel .ref-h { font: 600 16px/1.4 var(--sans); margin: 24px 0 8px; }
+.solo-ref-panel .ref-h:first-child { margin-top: 0; }
+.solo-ref-panel .rule-entry { font-size: 14px; line-height: 1.5; color: var(--ink); margin: 0 0 8px; }
+.solo-ref-panel .rule-steps { margin: 0 0 12px; padding-left: 24px; font-size: 14px; line-height: 1.5; }
+.solo-ref-panel .rule-list { font-size: 14px; line-height: 1.5; }
+.solo-ref-panel .ref-note { color: var(--ink-2); font-style: italic; }
+.ref-table { border-collapse: collapse; width: 100%; margin: 8px 0 12px; font-size: 14px; }
+.ref-table th { background: var(--ground); text-align: left; font-weight: 600; padding: 12px 16px; }
+.ref-table td { padding: 12px 16px; border-bottom: 1px solid var(--hair-soft); vertical-align: top; }
+.ref-d6 { max-width: 32rem; }
+.ref-d6 td:first-child, .ref-d6 th:first-child { width: 4rem; white-space: nowrap; }
+@media (max-width: 671px) {
+  .ref-pirates thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .ref-pirates, .ref-pirates tbody, .ref-pirates tr, .ref-pirates td { display: block; }
+  .ref-pirates tr { padding: 12px 0; border-bottom: 1px solid var(--hair-soft); }
+  .ref-pirates td { display: grid; grid-template-columns: 9rem minmax(0, 1fr); gap: 8px; padding: 2px 0; border: none; }
+  .ref-pirates td::before { content: attr(data-label); color: var(--ink-2); }
+}
+.solo-ref-tabs { padding-left: 0; padding-right: 0; }
+.ref-table, .ref-table th, .ref-table td { border: none; }
+.ref-table td { border-bottom: 1px solid var(--hair-soft); }
+.ref-table td:first-child { white-space: nowrap; }
+@media (max-width: 671px) {
+  .ref-pirates td { border-bottom: none; padding: 2px 0; }
+  .ref-pirates tr { padding: 12px 0; border-bottom: 1px solid var(--hair-soft); }
+}

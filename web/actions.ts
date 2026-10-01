@@ -1805,6 +1805,12 @@ export function dispatchAction(target: HTMLElement): void {
       if (currentOutfitId() === id) location.hash = "#/solo";
       break;
     }
+    case "solo-ref-tab": {
+      const t = target.dataset["tab"];
+      const tab = t === "hostiles" || t === "blips" || t === "pirates" ? t : "round";
+      store.setState((s) => ({ ...s, ui: { ...s.ui, soloRefTab: tab } }));
+      break;
+    }
     case "solo-tab": {
       const tab = target.dataset["tab"] as "outfit" | "play" | "campaign" | "reference";
       store.setState((s) => ({ ...s, ui: { ...s.ui, soloTab: tab } }));

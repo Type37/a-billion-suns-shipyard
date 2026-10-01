@@ -19,6 +19,25 @@ import {
   LONG_RANGE_SCANNERS_TEXT,
   LONG_RANGE_SCAN_TEXT,
 } from "../src/data/junkspace.ts";
+import {
+  type RuleEntry,
+  PIRATES_INTRO,
+  PIRATES_NOTE,
+  REVEALING_BLIPS,
+  AMBUSH,
+  BLIP_REACTIONS,
+  GLITCH_INTRO,
+  GLITCH_TABLE,
+  GLITCH_RULES,
+  HOSTILE_BEHAVIOUR,
+  RANDOM_BEHAVIOUR_INTRO,
+  RANDOM_BEHAVIOUR_TABLE,
+  RANDOM_BEHAVIOUR_AFTER,
+  ROUTINES,
+  HOSTILES_NOTE,
+  ACTIVATING_HOSTILES,
+  HOSTILE_PASSIVE_ATTACKS,
+} from "../src/data/junkspace-hostiles.ts";
 
 // Each pilot class's starting ability (Gunner "Hot Shot", etc.).
 const BASE_PERK: Record<string, { perkName: string; text: string }> = Object.fromEntries(
@@ -532,7 +551,6 @@ function blipsPanel(o: SavedOutfit): string {
         <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="solo-shuffle-blips" title="Shuffle the eight blips into a random order">Reshuffle${icon("random", 10).replace("<svg ", '<svg slot="icon" ')}</cds-button>
       </h3>
       <div class="blip-grid">${markers}</div>
-      <p class="blip-rule">${ruleText(PIRATE_RULE)}</p>
     </section>`;
 }
 
@@ -579,17 +597,103 @@ function playTab(state: AppState, o: SavedOutfit): string {
     </div>
   </section>
   ${blipsPanel(o)}
-  <div class="solo-split solo-split-solo">
-    <div class="solo-ref">
-      <section class="solo-card solo-card-quiet">
-        <h3 class="roster-section">The round</h3>
-        <ul class="rule-list small">${phases}</ul>
-      </section>
-      <section class="solo-card solo-card-quiet">
-        <h3 class="roster-section">Alert Level rules</h3>
-        <ul class="rule-list small">${SOLO_ALERT_RULES.map((r) => `<li>${ruleText(r)}</li>`).join("")}</ul>
-      </section>
-  </div>`;
+  ${soloRefTabs(state)}`;
+}
+
+/*
+ * The rules a solo game is run from, under the tracker, as Carbon line tabs
+ * (Jet, 1 October 2026: put the pirates and the hostile rules on, "use carbon
+ * design and figure out how stuff gets set up"). One tab open at a time, so
+ * the tracker above never sits on top of four screens of rules:
+ *   Round     - the four phases and the Alert Level rules, as before
+ *   Hostiles  - Hostile Behaviour, the Random Behaviour table, routines,
+ *               activating Hostiles, their passive attacks
+ *   Blips     - revealing, Ambush, Blip reactions, Glitch a Blip
+ *   Pirates   - the Aggressor list the Blips are revealed against
+ * All text verbatim (src/data/junkspace-hostiles.ts). Jobs are not here: they
+ * are played from cards.
+ */
+function ruleEntry(e: RuleEntry): string {
+  return `<p class="rule-entry">${e.name ? `<b>${ruleText(e.name)}</b> ` : ""}${ruleText(e.text)}</p>${
+    e.steps ? `<ol class="rule-steps">${e.steps.map((t) => `<li>${ruleText(t)}</li>`).join("")}</ol>` : ""
+  }`;
+}
+
+function d6Table(head: string, rows: [string, string][]): string {
+  return `<table class="ref-table ref-d6"><thead><tr><th scope="col">D6</th><th scope="col">${escapeHtml(head)}</th></tr></thead><tbody>${rows
+    .map(([d, t]) => `<tr><td>${escapeHtml(d)}</td><td>${ruleText(t)}</td></tr>`)
+    .join("")}</tbody></table>`;
+}
+
+function piratesTable(): string {
+  const cols = ["Blip", "Ship Class", "Mass", "Thrust", "Sil.", "Shields", "Primary Weapons", "Auxiliary Weapons"];
+  const rows = JUNKSPACE_PIRATES.map((p) => {
+    const cells = [p.blip, p.name, String(p.mass), `${p.thrust}"`, String(p.silhouette), String(p.shields), p.primary, p.auxiliary];
+    return `<tr>${cells.map((c, i) => `<td data-label="${escapeHtml(cols[i]!)}">${ruleText(c)}</td>`).join("")}</tr>`;
+  }).join("");
+  return `<table class="ref-table ref-pirates"><thead><tr>${cols.map((c) => `<th scope="col">${escapeHtml(c)}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function soloRefTabs(state: AppState): string {
+  const tab = state.ui.soloRefTab ?? "round";
+  const tabs: [NonNullable<AppState["ui"]["soloRefTab"]>, string][] = [
+    ["round", "Round"],
+    ["hostiles", "Hostiles"],
+    ["blips", "Blips"],
+    ["pirates", "Pirates"],
+  ];
+  const phases = SOLO_PHASES.map((p) => `<li><b>${escapeHtml(p.name)}.</b> ${ruleText(p.text)}</li>`).join("");
+  let body = "";
+  if (tab === "round") {
+    body = `
+      <h4 class="ref-h">The round</h4>
+      <ul class="rule-list">${phases}</ul>
+      <h4 class="ref-h">Alert Level</h4>
+      <ul class="rule-list">${SOLO_ALERT_RULES.map((r) => `<li>${ruleText(r)}</li>`).join("")}</ul>`;
+  } else if (tab === "hostiles") {
+    body = `
+      <h4 class="ref-h">Activating Hostiles</h4>
+      <p class="rule-entry">${ruleText(ACTIVATING_HOSTILES)}</p>
+      <h4 class="ref-h">Hostile behaviour</h4>
+      <p class="rule-entry">${ruleText(HOSTILE_BEHAVIOUR)}</p>
+      <h4 class="ref-h">Random behaviour</h4>
+      <p class="rule-entry">${ruleText(RANDOM_BEHAVIOUR_INTRO)}</p>
+      ${d6Table("Behaviour", RANDOM_BEHAVIOUR_TABLE)}
+      <p class="rule-entry">${ruleText(RANDOM_BEHAVIOUR_AFTER)}</p>
+      <h4 class="ref-h">Routines</h4>
+      ${ROUTINES.map(ruleEntry).join("")}
+      <p class="rule-entry ref-note">${ruleText(HOSTILES_NOTE)}</p>
+      <h4 class="ref-h">Passive attacks</h4>
+      <p class="rule-entry">${ruleText(HOSTILE_PASSIVE_ATTACKS)}</p>`;
+  } else if (tab === "blips") {
+    body = `
+      <h4 class="ref-h">Revealing Blips</h4>
+      ${REVEALING_BLIPS.map(ruleEntry).join("")}
+      <h4 class="ref-h">Ambush</h4>
+      <p class="rule-entry">${ruleText(AMBUSH)}</p>
+      <h4 class="ref-h">Blip reactions</h4>
+      <p class="rule-entry">${ruleText(BLIP_REACTIONS)}</p>
+      <h4 class="ref-h">Glitch a Blip</h4>
+      <p class="rule-entry">${ruleText(GLITCH_INTRO)}</p>
+      ${d6Table("Glitch the Blip", GLITCH_TABLE)}
+      ${GLITCH_RULES.map(ruleEntry).join("")}`;
+  } else {
+    body = `
+      <p class="rule-entry">${ruleText(PIRATES_INTRO)}</p>
+      ${piratesTable()}
+      <p class="rule-entry">${ruleText(PIRATE_RULE)}</p>
+      <p class="rule-entry ref-note">${ruleText(PIRATES_NOTE)}</p>`;
+  }
+  return `
+  <section class="solo-ref-block">
+    <nav class="solo-tabs solo-ref-tabs" role="tablist" aria-label="Rules">${tabs
+      .map(
+        ([id, label]) =>
+          `<button class="solo-tab ${tab === id ? "selected" : ""}" role="tab" aria-selected="${tab === id}" data-action="solo-ref-tab" data-tab="${id}">${label}</button>`,
+      )
+      .join("")}</nav>
+    <div class="solo-ref-panel" role="tabpanel">${body}</div>
+  </section>`;
 }
 
 // --- Campaign tab -----------------------------------------------------------

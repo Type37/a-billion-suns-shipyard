@@ -313,6 +313,8 @@ export interface AppState {
     showAllFactions: boolean;
     /** Active tab within a solo outfit workspace. */
     soloTab?: SoloTab;
+    /** Which rules tab is open under the Solo Play tracker. */
+    soloRefTab?: "round" | "hostiles" | "blips" | "pirates";
     /** Which Hostile-behaviour routine is open, if any. One at a time. */
     soloDef?: string;
     /** Result of the most recent solo dice roll, shown in the roller. */

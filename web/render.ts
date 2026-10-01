@@ -4214,6 +4214,11 @@ function optionsModal(state: AppState): string {
           }</p>
           <div class="opt-actions">
             <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="open-sync">Sync fleets online${icon("sync", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+            ${/* Discord beside the token flow, not only inside the Sync dialog:
+                  one press from Options instead of two (Jet circled the space). */ ""}
+            ${FleetSync.discordConfigured() && !FleetSync.discordUser()
+              ? `<cds-button has-main-content kind="primary" size="lg" class="btn sync-discord-btn" data-action="sync-discord">Sign in with Discord${icon("discord", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>`
+              : ""}
           </div>
         </section>
         <section class="opt-section">

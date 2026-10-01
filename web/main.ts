@@ -1133,10 +1133,24 @@ function animateFactionTitle(): void {
   // opacity and clip-path on one element, so they stay cheap on a phone.
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-  if (era === "hyper") decodeTitle(el, title);
-  else if (era === "arma") slamTitle(el, title);
-  else wipeTitle(el, title);
-  animateStatGlyphs();
+  // Played when the title is actually on screen. A phone held sideways shows
+  // the New Fleet faction list and none of the detail pane, so the animation
+  // ran in full below the fold and was over before you scrolled to it. An
+  // IntersectionObserver reports at once if it is already visible (clipping by
+  // the dialog's scroll box included), otherwise when it comes into view.
+  const io = new IntersectionObserver(
+    (entries) => {
+      if (!entries.some((e) => e.isIntersecting)) return;
+      io.disconnect();
+      if (!el.isConnected) return;
+      if (era === "hyper") decodeTitle(el, title);
+      else if (era === "arma") slamTitle(el, title);
+      else wipeTitle(el, title);
+      animateStatGlyphs();
+    },
+    { threshold: 0.6 },
+  );
+  io.observe(el);
 }
 
 // A popover you opened by accident had exactly one way out: find the small

@@ -621,6 +621,7 @@ button { font-family: inherit; }
   --cds-button-secondary-hover: var(--ink-2);
   --cds-button-disabled: var(--hair-soft);
   --cds-text-on-color-disabled: var(--ink-off);
+  --cds-button-danger-primary: var(--red-deep);
 }
 
 /* --------------------------------------------------------------------- toast */
@@ -3716,7 +3717,7 @@ button { font-family: inherit; }
    compact stacked entry on a phone. The whole sheet must be readable without
    scrolling in EITHER direction, so nothing here may overflow sideways. */
 .shipref-modal { width: min(780px, 100%); }
-.shipref-cap { margin: 0 0 8px; font-size: 12px; color: var(--ink-3); }
+.shipref-cap { display: flex; flex-wrap: wrap; gap: 2px 16px; margin: 0 0 8px; font-size: 12px; color: var(--ink-3); }
 .shipref { display: flex; flex-direction: column; }
 .sr-row {
   display: grid;
@@ -3757,16 +3758,15 @@ button { font-family: inherit; }
   }
   .sr-name { grid-column: 1; font-size: 12px; }
   .sr-cost { grid-column: 2; grid-row: 1; }
-  /* Stats on one line, both weapon slots on one more: three short lines a ship. */
-  .sr-stats, .sr-weps { display: block; grid-column: 1 / -1; }
-  .sr-num { display: inline; text-align: left; font-size: 10.5px; color: var(--ink-2); }
-  .sr-num::before { content: attr(data-l) " "; color: var(--ink-3); font-weight: 700; }
-  .sr-num::after { content: " · "; color: var(--ink-3); }
-  .sr-num:last-child::after { content: none; }
-  .sr-weps { font-size: 10.5px; }
-  .sr-w { display: inline; font-size: 10.5px; }
-  .sr-w::before { content: attr(data-l) " "; font-family: var(--display); font-weight: 800; font-size: 9px; color: var(--ink-3); }
-  .sr-w + .sr-w::before { content: " · " attr(data-l) " "; }
+  /* Stats on one line with real labels and gaps between them; one labelled line
+     per weapon. This was "M0 · T10" · S2 · Sh0" over "P ... · A ...": single
+     letters to decode and middots that meant nothing. */
+  .sr-stats { display: flex; flex-wrap: wrap; gap: 0 14px; grid-column: 1 / -1; }
+  .sr-weps { display: grid; gap: 1px; grid-column: 1 / -1; }
+  .sr-num { display: inline; text-align: left; font-size: 12px; color: var(--ink); font-weight: 700; }
+  .sr-num::before { content: attr(data-l) " "; color: var(--ink-3); font-weight: 700; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .sr-w { display: grid; grid-template-columns: 6.2em 1fr; font-size: 12px; }
+  .sr-w::before { content: attr(data-l); font-family: var(--display); font-weight: 800; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); align-self: baseline; }
   .sr-w.is-empty { display: none; }
   .sr-mass { padding: 0 6px; font-size: 9px; }
   .shipref-cap { font-size: 10.5px; margin-bottom: 4px; }
@@ -4143,7 +4143,11 @@ button { font-family: inherit; }
 
 .opt-modal { width: min(460px, 100%); }
 .no-modal { width: min(420px, 100%); }
-.opt-body { gap: 24px; }
+.opt-body { display: flex; flex-direction: column; gap: 24px; }
+/* Carbon focuses the first control when a dialog opens, which on a phone put
+   its "Close" tooltip and a focus ring on the X before anything was touched.
+   Every Carbon dialog here marks its body as where focus starts instead. */
+cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 .opt-section { display: flex; flex-direction: column; gap: 10px; }
 .opt-h { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); border-bottom: 1px solid var(--hair-soft); padding-bottom: 6px; }
 .opt-note { font-size: 13px; color: var(--ink-2); line-height: 1.45; }

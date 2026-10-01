@@ -721,7 +721,7 @@ function newFleetModal(state: AppState, customs: Faction[]): string {
         <cds-modal-close-button></cds-modal-close-button>
         <cds-modal-heading>New fleet</cds-modal-heading>
       </cds-modal-header>
-      <cds-modal-body class="nf-body">
+      <cds-modal-body class="nf-body" data-modal-primary-focus tabindex="-1">
         <div class="nf-controls">
           <div class="modal-field">
             <span class="control-label">Era</span>
@@ -1848,7 +1848,7 @@ function addUnitModal(state: AppState): string {
         <cds-modal-label class="au-budget ${remaining < 0 ? "is-over" : ""}">${escapeHtml(budget)}</cds-modal-label>
         <cds-modal-heading>Add ${label}</cds-modal-heading>
       </cds-modal-header>
-      <cds-modal-body class="au-body">
+      <cds-modal-body class="au-body" data-modal-primary-focus tabindex="-1">
         ${species ? `<div class="au-species"><span class="au-species-label">Species</span>${switcher("Species", "add-unit-species", "species", ALLIANCE_SPECIES.map((s) => [s, s] as [string, string]), species)}</div>` : ""}
         <div class="au-grid">${[0, 1, 2, 3].map(quad).join("")}</div>
       </cds-modal-body>
@@ -1896,29 +1896,28 @@ function shipReferenceModal(state: AppState): string {
       rows += `<div class="sr-row">
         <span class="sr-name">${escapeHtml(s.name)}</span>
         <span class="sr-stats">
-          <span class="sr-num" data-l="&#9410;">${s.mass}</span>
-          <span class="sr-num" data-l="T">${s.thrust}"</span>
-          <span class="sr-num" data-l="S">${s.silhouette}</span>
-          <span class="sr-num" data-l="Sh">${s.shields}</span>
+          <span class="sr-num" data-l="Mass">${s.mass}</span>
+          <span class="sr-num" data-l="Thrust">${s.thrust}"</span>
+          <span class="sr-num" data-l="SIL">${s.silhouette}</span>
+          <span class="sr-num" data-l="Shields">${s.shields}</span>
         </span>
         <span class="sr-weps">
-          <span class="sr-w ${pri ? "" : "is-empty"}" data-l="P">${pri || "&mdash;"}</span>
-          <span class="sr-w ${aux ? "" : "is-empty"}" data-l="A">${aux || "&mdash;"}</span>
+          <span class="sr-w ${pri ? "" : "is-empty"}" data-l="Primary">${pri || "&mdash;"}</span>
+          <span class="sr-w ${aux ? "" : "is-empty"}" data-l="Auxiliary">${aux || "&mdash;"}</span>
         </span>
         <span class="sr-cost">${credits(s.cost)}</span>
       </div>`;
     }
   }
   return `
-  <div class="modal-root">
-    <div class="modal-backdrop" data-action="close-modal"></div>
-    <div class="modal-panel shipref-modal" role="dialog" aria-modal="true" aria-label="${escapeHtml(faction.name)} ship reference">
-      <header class="modal-header">
-        <h2 class="modal-title">${escapeHtml(faction.name)} &mdash; Ship Reference</h2>
-        <button class="modal-close" data-action="close-modal" aria-label="Close">${icon("close", 18)}</button>
-      </header>
-      <div class="modal-body shipref-body">
-        <p class="shipref-cap">${escapeHtml(faction.rule.name)} · Initiative ${escapeHtml(faction.initiative)} · ${escapeHtml(faction.cmdTokens)} CMD/round</p>
+  <cds-modal open size="lg" class="shipref-modal" data-key="shipref-modal">
+      <cds-modal-header>
+        <cds-modal-close-button></cds-modal-close-button>
+        <cds-modal-label>${escapeHtml(faction.name)}</cds-modal-label>
+        <cds-modal-heading>Ship reference</cds-modal-heading>
+      </cds-modal-header>
+      <cds-modal-body class="shipref-body" data-modal-primary-focus tabindex="-1">
+        <p class="shipref-cap"><span>${escapeHtml(faction.rule.name)}</span><span>Initiative ${escapeHtml(faction.initiative)}</span><span>${escapeHtml(faction.cmdTokens)} CMD a round</span></p>
         <div class="shipref">
           <div class="sr-row sr-head" aria-hidden="true">
             <span class="sr-name">Ship</span><span class="sr-num">Mass</span><span class="sr-num">Thr</span>
@@ -1927,9 +1926,8 @@ function shipReferenceModal(state: AppState): string {
           </div>
           ${rows}
         </div>
-      </div>
-    </div>
-  </div>`;
+      </cds-modal-body>
+  </cds-modal>`;
 }
 
 // ---------------------------------------------------------------------------
@@ -4169,23 +4167,21 @@ function tourPopover(state: AppState): string {
 function confirmModal(state: AppState): string {
   const m = state.ui.modal;
   if (!m || m.kind !== "confirm") return "";
+  // Carbon's modal at its smallest size, with Carbon's danger button when the
+  // action destroys something. Cancel sits where the trigger was more likely
+  // to be (left), the decision on the right.
   return `
-  <div class="modal-root">
-    <div class="modal-backdrop" data-action="confirm-cancel"></div>
-    <div class="modal-panel no-modal cf-modal" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title">
-      <header class="modal-header ${m.danger ? "is-danger" : ""}">
-        <h2 class="modal-title" id="confirm-title">${escapeHtml(m.title)}</h2>
-        <button class="modal-close" data-action="confirm-cancel" aria-label="Cancel">${icon("close", 18)}</button>
-      </header>
-      <div class="modal-body">
-        <p class="cf-body">${escapeHtml(m.body)}</p>
-      </div>
-      <footer class="modal-footer">
-        <button class="bar-btn" data-action="confirm-cancel">Cancel</button>
-        <button class="cta-btn ${m.danger ? "cf-danger" : ""}" data-action="confirm-go" autofocus>${icon(m.danger ? "ix-trash" : "check", 16)} ${escapeHtml(m.confirmLabel)}</button>
-      </footer>
-    </div>
-  </div>`;
+  <cds-modal open size="xs" alert class="cf-modal" data-key="cf-modal">
+      <cds-modal-header>
+        <cds-modal-close-button></cds-modal-close-button>
+        <cds-modal-heading>${escapeHtml(m.title)}</cds-modal-heading>
+      </cds-modal-header>
+      <cds-modal-body data-modal-primary-focus tabindex="-1"><p class="cf-body">${escapeHtml(m.body)}</p></cds-modal-body>
+      <cds-modal-footer>
+        <cds-modal-footer-button kind="secondary" data-action="confirm-cancel">Cancel</cds-modal-footer-button>
+        <cds-modal-footer-button kind="${m.danger ? "danger" : "primary"}" data-action="confirm-go">${escapeHtml(m.confirmLabel)}</cds-modal-footer-button>
+      </cds-modal-footer>
+  </cds-modal>`;
 }
 
 function optionsModal(state: AppState): string {
@@ -4193,14 +4189,12 @@ function optionsModal(state: AppState): string {
   if (!m || m.kind !== "options") return "";
   const v = pkg.version;
   return `
-  <div class="modal-root">
-    <div class="modal-backdrop" data-action="close-modal"></div>
-    <div class="modal-panel opt-modal" role="dialog" aria-modal="true" aria-label="Options">
-      <header class="modal-header">
-        <h2 class="modal-title">Options</h2>
-        <button class="modal-close" data-action="close-modal" aria-label="Close">${icon("close", 18)}</button>
-      </header>
-      <div class="modal-body opt-body">
+  <cds-modal open size="sm" class="opt-modal" data-key="opt-modal">
+      <cds-modal-header>
+        <cds-modal-close-button></cds-modal-close-button>
+        <cds-modal-heading>Options</cds-modal-heading>
+      </cds-modal-header>
+      <cds-modal-body class="opt-body" data-modal-primary-focus tabindex="-1">
         <section class="opt-section">
           <h3 class="opt-h">Your data</h3>
           <p class="opt-note">Everything you build is saved in this browser only.</p>
@@ -4258,9 +4252,8 @@ function optionsModal(state: AppState): string {
                the version, which is a fact rather than a link. -->
           <p class="opt-version">Version ${escapeHtml(v)}</p>
         </section>
-      </div>
-    </div>
-  </div>`;
+      </cds-modal-body>
+  </cds-modal>`;
 }
 
 // ---------------------------------------------------------------------------
@@ -4387,11 +4380,10 @@ function syncPendingJoinHTML(p: { token: string; remoteCount: number; localCount
  *  double the inset and put the border-top in the wrong place. */
 function syncPendingJoinFooter(p: { token: string; exists: boolean }): string {
   return `
-  <footer class="modal-footer">
-    <button class="bar-btn" data-action="sync-join-cancel">Cancel</button>
-    <button class="cta-btn" data-action="sync-join-confirmed" data-token="${escapeHtml(p.token)}" autofocus>
-      ${icon("check", 16)} ${p.exists ? "Combine fleets" : "Start syncing"}</button>
-  </footer>`;
+  <cds-modal-footer>
+    <cds-modal-footer-button kind="secondary" data-action="sync-join-cancel">Cancel</cds-modal-footer-button>
+    <cds-modal-footer-button kind="primary" data-action="sync-join-confirmed" data-token="${escapeHtml(p.token)}">${p.exists ? "Combine fleets" : "Start syncing"}</cds-modal-footer-button>
+  </cds-modal-footer>`;
 }
 
 function syncModal(state: AppState): string {
@@ -4406,17 +4398,14 @@ function syncModal(state: AppState): string {
         : syncOffHTML();
   const footer = m.pendingJoin && FleetSync.supported() ? syncPendingJoinFooter(m.pendingJoin) : "";
   return `
-  <div class="modal-root">
-    <div class="modal-backdrop" data-action="close-modal"></div>
-    <div class="modal-panel opt-modal" role="dialog" aria-modal="true" aria-label="Sync Your Fleets Online">
-      <header class="modal-header">
-        <h2 class="modal-title">Sync Your Fleets Online</h2>
-        <button class="modal-close" data-action="close-modal" aria-label="Close">${icon("close", 18)}</button>
-      </header>
-      <div class="modal-body opt-body">${body}</div>
+  <cds-modal open size="sm" class="opt-modal" data-key="sync-modal">
+      <cds-modal-header>
+        <cds-modal-close-button></cds-modal-close-button>
+        <cds-modal-heading>Sync your fleets</cds-modal-heading>
+      </cds-modal-header>
+      <cds-modal-body class="opt-body" data-modal-primary-focus tabindex="-1">${body}</cds-modal-body>
       ${footer}
-    </div>
-  </div>`;
+  </cds-modal>`;
 }
 
 // ---------------------------------------------------------------------------

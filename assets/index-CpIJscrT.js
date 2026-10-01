@@ -2185,7 +2185,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         -->
         <a class="ghost-btn play-bar-print" href="#/print/${t.id}">${P(`print`,14)} Print</a>
         <button class="ghost-btn play-bar-reset" data-action="play-reset" title="Reset the round, phase, CMD and VP trackers">${P(`eraser`,14)} Reset game</button>
-        <a class="cta-btn play-bar-end" href="#/list/${t.id}">${P(`check`,15)} End play</a>
+        <a class="ghost-btn play-bar-end" href="#/list/${t.id}">${P(`check`,15)} End play</a>
       </header>
       <div class="phase-track">${g}</div>
       ${S}

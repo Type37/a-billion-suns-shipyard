@@ -1199,6 +1199,40 @@ export const ERA_MODES: { era: Era; mode: GameMode; builds: string }[] = [
   { era: "Armageddon", mode: "armageddon", builds: "Build a Fleet List" },
 ];
 
+
+/**
+ * The builder header's controls, on Carbon (Jet, October 2026: "do not invent
+ * a design system", and the header was the last homemade block on the screen).
+ *
+ * Faction and era are Carbon selects: on a phone they open the system's own
+ * picker, which is the biggest, most familiar list a thumb can get, and the
+ * era groups in the faction list come through as real option groups. They
+ * replace two homemade <details> popovers, one of which was a wall of faction
+ * plaques. A choice is replayed as a click on the chosen <cds-select-item>,
+ * which carries the same data-action the old buttons did (see the
+ * cds-select-selected bridge in main.ts), so the confirm dialogs for a
+ * destructive faction or era change still run exactly as before.
+ *
+ * Everything you do TO the fleet lives in one labelled Carbon menu button,
+ * "Fleet", Play mode first. Play used to be a filled button of its own in the
+ * header beside a bare ⋮; Jet moved Play into the menu and asked for the
+ * menu to be easier to see, so it carries a word instead of three dots. That
+ * also leaves Add unit as the screen's one filled button.
+ */
+function factionSelect(list: SavedList, customs: Faction[]): string {
+  if (list.freePlay) return '<span class="freeplay-badge">All ships unlocked</span>';
+  const byEra = factionsByEra(customs);
+  const customIds = new Set(customs.map((c) => c.id));
+  const item = (f: Faction) =>
+    `<cds-select-item value="${escapeHtml(f.id)}" data-action="set-faction" data-faction="${escapeHtml(f.id)}">${escapeHtml(f.name)}</cds-select-item>`;
+  const group = (label: string, fs: Faction[]) =>
+    fs.length ? `<cds-select-item-group label="${escapeHtml(label)}">${fs.map(item).join("")}</cds-select-item-group>` : "";
+  const body =
+    ERA_ORDER.map((e) => group(e, (byEra.get(e) ?? []).filter((f) => !customIds.has(f.id)))).join("") +
+    group("Custom", allFactions(customs).filter((f) => customIds.has(f.id)));
+  return `<cds-select class="hdr-select hdr-faction" hide-label label-text="Faction" size="md" value="${escapeHtml(list.fleet.factionId)}" data-key="hdr-faction">${body}</cds-select>`;
+}
+
 /**
  * The era, as a control rather than a badge.
  *
@@ -1213,24 +1247,33 @@ export const ERA_MODES: { era: Era; mode: GameMode; builds: string }[] = [
  * Only offered on the two training modes' non-training siblings: Combat
  * Simulator and Management Training are fixed scenarios, not eras, and moving
  * one of those to Armageddon would quietly break the scenario it came from.
+ *
+ * A Carbon select since October 2026; it was a homemade popover of three
+ * buttons with a note under them.
  */
-function eraSwitch(list: SavedList): string {
+function eraSelect(list: SavedList): string {
   const here = ERA_MODES.find((e) => e.mode === list.mode);
-  if (!here) return `<span class="mf-era-badge" title="Era you are building for">${escapeHtml(MODE_LABEL[list.mode] ?? list.mode)}</span>`;
-  return `
-    <details class="era-switch">
-      <summary class="mf-era-badge is-control" title="Era you are building for - click to change">${escapeHtml(here.era)}${icon("chevronDown", 12, "era-caret")}</summary>
-      <div class="era-switch-panel">
-        <p class="era-switch-head">Build this fleet for</p>
-        ${ERA_MODES.map(
-          (e) => `<button class="era-opt ${e.mode === list.mode ? "on" : ""}" data-action="set-era" data-mode="${e.mode}" aria-pressed="${e.mode === list.mode}">
-            <span class="era-opt-name">${escapeHtml(e.era)}</span>
-            <span class="era-opt-hint">${escapeHtml(e.builds)}</span>
-          </button>`,
-        ).join("")}
-        <p class="era-switch-note">Your ships and faction come with you. Personnel choices are cleared, because each era picks them at a different moment.</p>
-      </div>
-    </details>`;
+  // Training scenarios are not eras and cannot move (see above).
+  if (!here) return `<span class="mf-era-badge">${escapeHtml(MODE_LABEL[list.mode] ?? list.mode)}</span>`;
+  return `<cds-select class="hdr-select hdr-era" hide-label label-text="Era" size="md" value="${list.mode}" data-key="hdr-era">${ERA_MODES.map(
+    (e) => `<cds-select-item value="${e.mode}" data-action="set-era" data-mode="${e.mode}">${escapeHtml(e.era)}</cds-select-item>`,
+  ).join("")}</cds-select>`;
+}
+
+function fleetMenu(list: SavedList, withReference: boolean): string {
+  return `<cds-menu-button class="hdr-menu" label="Fleet" kind="ghost" size="md" menu-alignment="bottom-end" data-key="hdr-menu">
+      <cds-menu>
+        <cds-menu-item label="Play mode" data-action="go" data-href="#/play/${list.id}"></cds-menu-item>
+        ${withReference ? `<cds-menu-item label="Ship reference" data-action="open-ship-reference"></cds-menu-item>` : ""}
+        <cds-menu-item label="Print setup" data-action="go" data-href="#/print/${list.id}"></cds-menu-item>
+        <cds-menu-item-divider></cds-menu-item-divider>
+        <cds-menu-item label="Share link" data-action="share-list" data-id="${list.id}"></cds-menu-item>
+        <cds-menu-item label="Copy as text" data-action="copy-list-text" data-id="${list.id}"></cds-menu-item>
+        <cds-menu-item label="Duplicate" data-action="duplicate-list" data-id="${list.id}"></cds-menu-item>
+        <cds-menu-item-divider></cds-menu-item-divider>
+        <cds-menu-item label="Delete fleet" kind="danger" data-action="delete-list" data-id="${list.id}"></cds-menu-item>
+      </cds-menu>
+    </cds-menu-button>`;
 }
 
 function shipyardView(state: AppState): string {
@@ -1248,42 +1291,6 @@ function shipyardView(state: AppState): string {
 
   // Masthead chrome, the same pieces the Fleet-List builder uses.
   const emblemPicker = `<button class="emblem-current-btn" data-action="open-emblem-modal" data-target="list" title="Choose an emblem">${listEmblem(list, 46)}${icon("pencil", 12, "emblem-edit-cue")}</button>`;
-  // The one action you take at the table rather than at the desk, so it sits in
-  // the header at full size instead of behind the "..." with the admin actions.
-  const playBtn = `<a class="mf-play-btn" href="#/play/${list.id}" title="Enter Play Mode">${icon("ix-play", 17)}<span class="mf-play-btn-t">Play</span></a>`;
-  const moreMenu = `
-    <details class="mf-menu">
-      <summary class="mf-menu-btn" title="Fleet options: share, print, duplicate, delete" aria-label="Fleet options">${icon("ix-context-menu", 18)}</summary>
-      <div class="mf-menu-panel">
-        <button data-action="share-list" data-id="${list.id}">${icon("ix-share", 16)} Share link</button>
-        <button data-action="copy-list-text" data-id="${list.id}">${icon("scroll", 16)} Copy as text</button>
-        <a href="#/print/${list.id}">${icon("print", 16)} Print setup</a>
-        <button data-action="duplicate-list" data-id="${list.id}">${icon("ix-duplicate", 16)} Duplicate</button>
-        <button class="danger" data-action="delete-list" data-id="${list.id}">${icon("ix-trash", 16)} Delete fleet</button>
-      </div>
-    </details>`;
-
-  // Faction picker (identical to the builder's), so you can switch faction here.
-  const byEra = factionsByEra(customs);
-  const customIds = new Set(customs.map((c) => c.id));
-  const factionOption = (f: Faction) => `
-      <button class="faction-plaque ${f.id === list.fleet.factionId && !list.freePlay ? "selected" : ""}" data-action="set-faction" data-faction="${f.id}">
-        <span class="faction-plaque-name">${escapeHtml(f.name)}</span>
-        <span class="faction-plaque-rule">${escapeHtml(f.rule.name)}</span>
-      </button>`;
-  const factionSection = (label: string, fs: Faction[]) =>
-    fs.length
-      ? `<div class="faction-era-group"><p class="faction-era-label">${escapeHtml(label)}</p><div class="faction-plaques">${fs.map(factionOption).join("")}</div></div>`
-      : "";
-  const factionPickerBody =
-    ERA_ORDER.map((e) => factionSection(e, (byEra.get(e) ?? []).filter((f) => !customIds.has(f.id)))).join("") +
-    factionSection("Custom", allFactions(customs).filter((f) => customIds.has(f.id)));
-  const factionControl = list.freePlay
-    ? '<span class="freeplay-badge">All ships unlocked</span>'
-    : `<details class="faction-switch">
-        <summary>${faction ? escapeHtml(faction.name) : "Choose faction"}</summary>
-        <div class="faction-switch-panel">${factionPickerBody}</div>
-      </details>`;
 
   // The cap is the control: click it for a popover with the only two choices,
   // ¢300bn or No Limit. No explainer text - No Limit means no credit ceiling.
@@ -1336,11 +1343,10 @@ function shipyardView(state: AppState): string {
         </span>
       </div>
       <div class="sy-fac">
-        <span class="mf-fac">${factionControl}</span>
-        ${eraSwitch(list)}
+        ${factionSelect(list, customs)}
+        ${eraSelect(list)}
       </div>
-      ${playBtn}
-      ${moreMenu}
+      ${fleetMenu(list, false)}
     </header>
 
     ${faction && !list.freePlay ? `<section class="sy-faction">${factionRuleBlock(faction, "full")}</section>` : ""}
@@ -1427,29 +1433,6 @@ function builderView(state: AppState): string {
     valid = !issues.some((i) => i.severity === "error");
   }
 
-  // Faction picker: every faction, grouped by era in reading order, with custom
-  // factions gathered in their own section at the bottom.
-  const byEra = factionsByEra(customs);
-  const customIds = new Set(customs.map((c) => c.id));
-  const factionOption = (f: Faction) => `
-      <button class="faction-plaque ${f.id === list.fleet.factionId && !list.freePlay ? "selected" : ""}" data-action="set-faction" data-faction="${f.id}">
-        <span class="faction-plaque-name">${escapeHtml(f.name)}</span>
-        <span class="faction-plaque-rule">${escapeHtml(f.rule.name)}</span>
-      </button>`;
-  const factionSection = (label: string, fs: Faction[]) =>
-    fs.length
-      ? `<div class="faction-era-group">
-          <p class="faction-era-label">${escapeHtml(label)}</p>
-          <div class="faction-plaques">${fs.map(factionOption).join("")}</div>
-        </div>`
-      : "";
-  const factionPickerBody =
-    ERA_ORDER.map((e) =>
-      factionSection(
-        e,
-        (byEra.get(e) ?? []).filter((f) => !customIds.has(f.id)),
-      ),
-    ).join("") + factionSection("Custom", allFactions(customs).filter((f) => customIds.has(f.id)));
 
   const unitNames = unitDisplayNames(list.fleet.units, faction, customs);
   const autoUnitName = (unitId: string) => unitNames.get(unitId) ?? "";
@@ -1641,36 +1624,7 @@ function builderView(state: AppState): string {
       </div>
     </details>`;
 
-  const factionControl = list.freePlay
-    ? '<span class="freeplay-badge">All ships unlocked</span>'
-    : `<details class="faction-switch">
-        <summary>${faction ? escapeHtml(faction.name) : "Choose faction"}</summary>
-        <div class="faction-switch-panel">${factionPickerBody}</div>
-      </details>`;
 
-  // Overflow menu for the secondary fleet actions (share, duplicate, delete). A
-  // position:absolute popover so opening it shifts nothing.
-  //
-  // Print setup lives in here now. Both output actions used to exist ONLY as
-  // buttons at the foot of the manifest, which is fine on a desktop where the
-  // foot is a scroll away, and useless on a phone where it is 3300px away - so
-  // reaching Print or Play meant scrolling the length of the fleet. Print is a
-  // menu item; Play gets its own button in the header (playBtn) because it is
-  // the one you press at the table, mid-game, repeatedly.
-  // The one action you take at the table rather than at the desk, so it sits in
-  // the header at full size instead of behind the "..." with the admin actions.
-  const playBtn = `<a class="mf-play-btn" href="#/play/${list.id}" title="Enter Play Mode">${icon("ix-play", 17)}<span class="mf-play-btn-t">Play</span></a>`;
-  const moreMenu = `
-    <details class="mf-menu">
-      <summary class="mf-menu-btn" title="Fleet options: share, print, duplicate, delete" aria-label="Fleet options">${icon("ix-context-menu", 18)}</summary>
-      <div class="mf-menu-panel">
-        <button data-action="share-list" data-id="${list.id}">${icon("ix-share", 16)} Share link</button>
-        <button data-action="copy-list-text" data-id="${list.id}">${icon("scroll", 16)} Copy as text</button>
-        <a href="#/print/${list.id}">${icon("print", 16)} Print setup</a>
-        <button data-action="duplicate-list" data-id="${list.id}">${icon("ix-duplicate", 16)} Duplicate</button>
-        <button class="danger" data-action="delete-list" data-id="${list.id}">${icon("ix-trash", 16)} Delete fleet</button>
-      </div>
-    </details>`;
 
   const nUnits = list.fleet.units.length;
   // The fleet's legality sits in the credits row beside what is left to
@@ -1709,12 +1663,10 @@ function builderView(state: AppState): string {
              something every phone keyboard already does. -->
       </div>
       <div class="sy-fac">
-        <span class="mf-fac">${factionControl}</span>
-        ${eraSwitch(list)}
-        ${faction && !list.freePlay ? `<button class="sy-ref-btn" data-action="open-ship-reference" title="Faction ship reference" aria-label="Faction ship reference">${icon("scroll", 15)}<span class="sy-ref-t">Reference</span></button>` : ""}
+        ${factionSelect(list, customs)}
+        ${eraSelect(list)}
       </div>
-      ${playBtn}
-      ${moreMenu}
+      ${fleetMenu(list, !!faction && !list.freePlay)}
     </header>
     ${hint(state, "rename-fleet")}
 

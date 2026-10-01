@@ -2,7 +2,7 @@ import { activeList, parseRoute, store } from "./state.ts";
 import { MODE_BUILDER_SHAPE } from "../src/types.ts";
 import { render } from "./render.ts";
 import { morphInto } from "./morph.ts";
-import { armTapGuard, wireActions } from "./actions.ts";
+import { armTapGuard, dispatchAction, wireActions } from "./actions.ts";
 import { decodeShare, decodeSharePayload, sharePayloadFromHash, type DecodedShare } from "./share.ts";
 import { loadLists, persistCustomFactions, persistLists, persistOnboarding } from "./storage.ts";
 import { renderMarkdown } from "./richtext.ts";
@@ -16,6 +16,9 @@ import "./style.css";
 import "@carbon/web-components/es/components/modal/index.js";
 import "@carbon/web-components/es/components/button/index.js";
 import "@carbon/web-components/es/components/notification/index.js";
+import "@carbon/web-components/es/components/select/index.js";
+import "@carbon/web-components/es/components/menu-button/index.js";
+import "@carbon/web-components/es/components/menu/index.js";
 
 // Keep every Markdown notes editor's preview in step with its textarea as the
 // user types. Uncontrolled on purpose (see richtext.ts): typing must not go
@@ -1273,6 +1276,24 @@ document.addEventListener("cds-notification-closed", (e) => {
     return { ...s, onboarding, ui: { ...s.ui, coachmarkDone: true } };
   });
 });
+// A Carbon select's choice, replayed as a click on the chosen item. Each
+// <cds-select-item> carries the data-action and data-* the old picker buttons
+// did, so set-faction and set-era (and their confirm dialogs) run unchanged.
+// If the action asked for confirmation, or changed nothing, the select is put
+// back to what the page says it is; the next paint moves it if the change
+// lands.
+document.addEventListener("cds-select-selected", (e) => {
+  const host = e.target as HTMLElement & { value?: string };
+  const value = (e as CustomEvent<{ value: string }>).detail?.value;
+  if (value === undefined) return;
+  const item = Array.from(host.querySelectorAll<HTMLElement>("cds-select-item")).find((i) => i.getAttribute("value") === value);
+  if (item?.dataset["action"]) dispatchAction(item);
+  requestAnimationFrame(() => {
+    const shown = host.getAttribute("value");
+    if (shown !== null && host.value !== shown) host.value = shown;
+  });
+});
+
 document.addEventListener("cds-modal-closed", () => {
   if (store.getState().ui.modal) store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined } }));
 });

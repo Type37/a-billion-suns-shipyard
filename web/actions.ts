@@ -528,7 +528,7 @@ function needsConfirm(
   return true;
 }
 
-function dispatchAction(target: HTMLElement): void {
+export function dispatchAction(target: HTMLElement): void {
   const action = target.dataset["action"];
   const state = store.getState();
 
@@ -546,6 +546,12 @@ function dispatchAction(target: HTMLElement): void {
       el.dataset["confirmed"] = "1";
       store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined } }));
       dispatchAction(el);
+      break;
+    }
+    // Navigation from a control that cannot be a link: a Carbon menu item.
+    case "go": {
+      const href = target.dataset["href"];
+      if (href) location.hash = href.replace(/^#/, "");
       break;
     }
     case "close-popover": {

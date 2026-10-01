@@ -629,6 +629,13 @@ button { font-family: inherit; }
   --cds-background: var(--paper);
   --cds-layer: var(--paper);
   --cds-layer-01: var(--paper);
+  /* Fields (selects, text inputs) share the name box's grey ground and keyline,
+     so a Carbon picker and the fleet-name field read as the same kind of thing. */
+  --cds-field: var(--ground);
+  --cds-field-01: var(--ground);
+  --cds-field-hover: var(--hair-soft);
+  --cds-border-strong: var(--field-edge);
+  --cds-border-strong-01: var(--field-edge);
   --cds-text-primary: var(--ink);
   --cds-text-secondary: var(--ink-2);
   --cds-icon-primary: var(--ink);
@@ -7972,3 +7979,21 @@ cds-inline-notification.app-hint { max-width: none; width: 100%; margin: 6px 0; 
   background: transparent; color: var(--ink-3); display: inline-flex; align-items: center; justify-content: center;
 }
 .name-box > .mf-name-gen.mf-name-gen:focus-visible { outline: 2px solid var(--red); outline-offset: -4px; }
+
+/* The builder header on Carbon (factionSelect, eraSelect, fleetMenu in
+   render.ts). One row on a wide screen: emblem and name, faction, era, then
+   the Fleet menu at the far right. On a phone the Fleet menu joins the name
+   on the first row and the two pickers split the second row evenly: a Carbon
+   select spends 64px on padding and its chevron, so three controls on one
+   360px row cut "Age of Unity" to "A." and the faction to nothing. */
+.sy-head > .sy-id { flex: 1 1 320px; }
+.sy-head > .sy-fac { flex: 0 1 28rem; flex-wrap: nowrap; gap: 8px; min-width: 0; }
+.sy-head > .hdr-menu { margin-left: auto; flex: none; }
+cds-select.hdr-select { flex: 1 1 0; min-width: 10rem; }
+@media (max-width: 760px) {
+  .sy-head > .sy-id { order: 1; flex: 1 1 0; }
+  .sy-head > .hdr-menu { order: 2; margin-left: 0; }
+  .sy-head > .sy-fac { order: 3; flex: 1 1 100%; }
+  cds-select.hdr-select { min-width: 0; }
+}
+cds-menu-button.hdr-menu { border: 1px solid var(--blue); }

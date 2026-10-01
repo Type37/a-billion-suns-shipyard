@@ -1134,7 +1134,7 @@ export function dispatchAction(target: HTMLElement): void {
     }
     case "sync-generate": {
       syncError();
-      syncBusy(true, "Creating your Sync Token…");
+      syncBusy(true, "Creating your sync token…");
       void FleetSync.start()
         .then((r) => {
           store.setState((s) => ({ ...s, lists: loadLists() }));
@@ -1142,7 +1142,7 @@ export function dispatchAction(target: HTMLElement): void {
         })
         .catch((e: unknown) => {
           syncBusy(false);
-          syncError(e instanceof Error ? e.message : "Could not create a Sync Token.");
+          syncError(e instanceof Error ? e.message : "Could not create a sync token.");
         });
       break;
     }
@@ -1152,7 +1152,7 @@ export function dispatchAction(target: HTMLElement): void {
       const raw = input.value;
       syncError();
       if (!FleetSync.looksLikeToken(raw)) {
-        syncError("That does not look like a Sync Token. It should be six words.");
+        syncError("That does not look like a sync token. It should be six words.");
         return;
       }
       syncBusy(true, "Looking up that token…");
@@ -1212,7 +1212,7 @@ export function dispatchAction(target: HTMLElement): void {
     case "sync-copy": {
       const tok = FleetSync.token() ?? "";
       void navigator.clipboard.writeText(tok).then(
-        () => showToast("Sync Token copied"),
+        () => showToast("Sync token copied"),
         () => {
           // Clipboard can be blocked; select the text so it can be copied by hand.
           const el = document.getElementById("sync-token-text");

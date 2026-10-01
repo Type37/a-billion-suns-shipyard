@@ -347,7 +347,7 @@ function outfitTab(o: SavedOutfit): string {
           ${def ? "" : `<span class="roster-unit-glyph">${icon("warning", 20)}</span>`}
           <input class="unit-name-input" type="text" value="${escapeHtml(s.shipName ?? "")}" placeholder="${escapeHtml(def?.name ?? "Ship")}" aria-label="${escapeHtml(def?.name ?? "Ship")}" data-action="outfit-ship-name" data-ship="${s.id}" />
           <span class="roster-unit-cost">${ck(def?.cost ?? 0)}</span>
-          <cds-button has-main-content kind="danger--tertiary" size="lg" class="btn" data-action="outfit-remove-ship" data-ship="${s.id}">Remove${icon("trash", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+          <cds-button has-main-content kind="danger-tertiary" size="lg" class="btn" data-action="outfit-remove-ship" data-ship="${s.id}">Remove${icon("trash", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>
         </div>
         ${
           // Same stat chips and weapons table the catalogue uses, so a ship
@@ -404,7 +404,7 @@ function outfitTab(o: SavedOutfit): string {
         ${shipRows || ""}
         ${over ? '<div class="inspection fail"><p class="issue-error">Over budget by ' + ck(-remaining) + ".</p></div>" : ""}
         <div class="roster-actions">
-          <cds-button has-main-content kind="danger--tertiary" size="lg" class="btn" data-action="delete-outfit" data-id="${o.id}">Delete outfit${icon("trash", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+          <cds-button has-main-content kind="danger-tertiary" size="lg" class="btn" data-action="delete-outfit" data-id="${o.id}">Delete outfit${icon("trash", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
         </div>
       </div>
     </aside>

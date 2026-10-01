@@ -750,7 +750,7 @@ function newFleetModal(state: AppState, customs: Faction[]): string {
   const selected = m.factionId ? findFaction(m.factionId, customs) : undefined;
 
   // Carbon's modal (IBM's design system), not the homemade one: on a phone it
-  // goes full screen with the footer pinned, so Get building is always on
+  // goes full screen with the footer pinned, so Create fleet is always on
   // screen instead of 250px below the fold; it traps focus and closes on
   // Escape and outside taps itself. Closing fires cds-modal-closed, which
   // main.ts turns into close-modal.
@@ -800,7 +800,7 @@ function newFleetModal(state: AppState, customs: Faction[]): string {
                  scrolls inside this box instead of shoving everything below it. -->
             <div class="nf-faction-scroll">
               <div class="faction-plaques">${eraFactions.map(plaque).join("")}</div>
-              <button class="nf-more" data-action="nf-toggle-all">${m.showAll ? "Show fewer" : `${icon("plus", 13)} More Fleets &amp; Custom`}</button>
+              <button class="nf-more" data-action="nf-toggle-all">${m.showAll ? "Show fewer" : `${icon("plus", 16)} More factions`}</button>
               ${
                 m.showAll
                   ? `<div class="faction-plaques nf-all">${others.map(plaque).join("")}</div>`
@@ -815,7 +815,7 @@ function newFleetModal(state: AppState, customs: Faction[]): string {
       </cds-modal-body>
       <cds-modal-footer>
         <cds-modal-footer-button kind="secondary" data-action="close-modal">Cancel</cds-modal-footer-button>
-        <cds-modal-footer-button kind="primary" data-action="nf-create" ${m.factionId ? "" : "disabled"}>Get building</cds-modal-footer-button>
+        <cds-modal-footer-button kind="primary" data-action="nf-create" ${m.factionId ? "" : "disabled"}>Create fleet</cds-modal-footer-button>
       </cds-modal-footer>
   </cds-modal>`;
 }
@@ -2739,7 +2739,7 @@ function foundryListView(state: AppState): string {
           <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="clone-faction" data-source="${f.id}" title="Duplicate this faction">Duplicate${icon("ix-duplicate", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
           <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="copy-faction" data-id="${f.id}" title="Copy as JSON to share">Copy${icon("scroll", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
           <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="export-faction" data-id="${f.id}" title="Download as a file">Download${icon("download", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
-          <cds-button has-main-content kind="danger--tertiary" size="lg" class="btn" data-action="delete-faction" data-id="${f.id}" title="Delete">Delete${icon("ix-trash", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+          <cds-button has-main-content kind="danger-tertiary" size="lg" class="btn" data-action="delete-faction" data-id="${f.id}" title="Delete">Delete${icon("ix-trash", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
         </td>
       </tr>`,
     )
@@ -2782,9 +2782,9 @@ function foundryListView(state: AppState): string {
           <div class="faction-plaques">${startPlaques}</div>
         </div>
       </details>
-      <label class="bar-btn file-btn">${icon("upload", 16)} Import from a file
+      <span class="file-btn"><cds-button has-main-content kind="tertiary" size="lg" class="btn" tab-index="-1" aria-hidden="true">Import from a file${icon("upload", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
         <input class="file-cover" type="file" accept="application/json" data-action="import-faction" aria-label="Import a faction from a file" />
-      </label>
+      </span>
       <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="paste-faction">Paste from clipboard${icon("duplicate", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
     </div>
     ${
@@ -4202,9 +4202,9 @@ function optionsModal(state: AppState): string {
           }
           <div class="opt-actions">
             <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="export-data">Export a backup${icon("download", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
-            <label class="bar-btn file-btn">${icon("upload", 15)} Import a backup
-              <input class="file-cover" type="file" accept="application/json,.json" data-action="import-data" aria-label="Import a backup file" /></label>
-            <cds-button has-main-content kind="danger--tertiary" size="lg" class="btn" data-action="clear-data">Clear all data${icon("trash", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+            <span class="file-btn"><cds-button has-main-content kind="tertiary" size="lg" class="btn" tab-index="-1" aria-hidden="true">Import a backup${icon("upload", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+              <input class="file-cover" type="file" accept="application/json,.json" data-action="import-data" aria-label="Import a backup file" /></span>
+            <cds-button has-main-content kind="danger-tertiary" size="lg" class="btn" data-action="clear-data">Clear all data${icon("trash", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
           </div>
         </section>
         <section class="opt-section">
@@ -4227,7 +4227,7 @@ function optionsModal(state: AppState): string {
             FleetSync.enabled() ? "Syncing is on for this device." : "Keep the same fleets on your phone and your computer."
           }</p>
           <div class="opt-actions">
-            <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="open-sync">Sync Fleets Online${icon("sync", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+            <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="open-sync">Sync fleets online${icon("sync", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
           </div>
         </section>
         <section class="opt-section">
@@ -4254,8 +4254,7 @@ function optionsModal(state: AppState): string {
 // ---------------------------------------------------------------------------
 
 function syncNoteHTML(): string {
-  return `<p class="sync-note"><strong>Note:</strong> this is not an account, there is no password.
-    The token is the only key. Anyone you give it to can read and change your fleets.</p>`;
+  return `<p class="sync-note">It is not an account and has no password. Anyone holding the token can read and change your fleets.</p>`;
 }
 
 /* Discord sign-in sits above the token flow because it is the easier of the
@@ -4275,19 +4274,17 @@ function syncDiscordHTML(): string {
 function syncOffHTML(): string {
   return `${syncDiscordHTML()}
     <section class="opt-section">
-      <p>You can sync your fleets across devices. (Your fleets stay on this device as well.)
-        Opting in gives you a <strong>Sync Token</strong>.</p>
-      <p>Put this phrase into any device and it will load and sync your current fleets.</p>
+      <p>A sync token is a phrase. Enter it on another device and the same fleets load there and stay in step.</p>
       ${syncNoteHTML()}
       <div class="opt-actions">
-        <cds-button has-main-content kind="primary" size="lg" class="btn" id="sync-generate" data-action="sync-generate">Generate a Sync Token${icon("sync", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+        <cds-button has-main-content kind="primary" size="lg" class="btn" id="sync-generate" data-action="sync-generate">Generate a sync token${icon("sync", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
       </div>
     </section>
     <section class="opt-section sync-existing">
       <h3 class="opt-h">Already have one?</h3>
       <div class="sync-join-row">
-        <input type="text" id="sync-input" class="sync-input" placeholder="Enter your Sync Token…"
-               autocapitalize="none" autocorrect="off" spellcheck="false" aria-label="Sync Token" />
+        <input type="text" id="sync-input" class="sync-input" placeholder="Sync token"
+               autocapitalize="none" autocorrect="off" spellcheck="false" aria-label="Sync token" />
         <cds-button has-main-content kind="tertiary" size="lg" class="btn" id="sync-join" data-action="sync-join">Confirm${icon("check", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>
       </div>
       <p class="sync-status" id="sync-busy" hidden></p>
@@ -4311,7 +4308,7 @@ function syncOnHTML(state: AppState): string {
       <div class="opt-actions">
         <cds-button has-main-content kind="primary" size="lg" class="btn" id="sync-now" data-action="sync-now">Sync now${icon("sync", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
         <cds-button has-main-content kind="tertiary" size="lg" class="btn" id="sync-stop" data-action="sync-stop">Sign out</cds-button>
-        <cds-button has-main-content kind="danger--tertiary" size="lg" class="btn" id="sync-delete" data-action="sync-delete">Delete online copy${icon("trash", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+        <cds-button has-main-content kind="danger-tertiary" size="lg" class="btn" id="sync-delete" data-action="sync-delete">Delete online copy${icon("trash", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>
       </div>
       <p class="sync-status" id="sync-busy" hidden></p>
       <p class="sync-error" id="sync-error" hidden></p>
@@ -4321,7 +4318,7 @@ function syncOnHTML(state: AppState): string {
     <section class="opt-section">
       <p class="sync-on-state"><strong>Syncing is on for this device.</strong>
         ${n} fleet${n === 1 ? "" : "s"}, last synced ${escapeHtml(when)}.</p>
-      <h3 class="opt-h">Your Sync Token</h3>
+      <h3 class="opt-h">Your sync token</h3>
       <div class="sync-token-row">
         <code class="sync-token" id="sync-token-text">${escapeHtml(FleetSync.token() ?? "")}</code>
         <cds-button has-main-content kind="tertiary" size="lg" class="btn" id="sync-copy" data-action="sync-copy">Copy${icon("duplicate", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>
@@ -4335,7 +4332,7 @@ function syncOnHTML(state: AppState): string {
         <cds-button has-main-content kind="primary" size="lg" class="btn" id="sync-now" data-action="sync-now">Sync now${icon("sync", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
         <cds-button has-main-content kind="tertiary" size="lg" class="btn" id="sync-stop" data-action="sync-stop"
           title="Keeps your fleets on this device and leaves the online copy alone">Stop syncing here</cds-button>
-        <cds-button has-main-content kind="danger--tertiary" size="lg" class="btn" id="sync-delete" data-action="sync-delete"
+        <cds-button has-main-content kind="danger-tertiary" size="lg" class="btn" id="sync-delete" data-action="sync-delete"
           title="Removes the online copy. Your fleets on this device are kept">Delete online copy${icon("trash", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>
       </div>
       <p class="sync-status" id="sync-busy" hidden></p>
@@ -4905,7 +4902,7 @@ function emblemModal(state: AppState): string {
     </cds-modal-body>
     <cds-modal-footer>
       <cds-modal-footer-button kind="ghost" data-action="${cfg.rndA}">Random</cds-modal-footer-button>
-      ${cfg.hasImage ? `<cds-modal-footer-button kind="danger--ghost" data-action="${cfg.clrA}">Remove</cds-modal-footer-button>` : ""}
+      ${cfg.hasImage ? `<cds-modal-footer-button kind="danger-ghost" data-action="${cfg.clrA}">Remove</cds-modal-footer-button>` : ""}
       <cds-modal-footer-button kind="primary" data-action="close-modal">Done</cds-modal-footer-button>
     </cds-modal-footer>
   </cds-modal>`;

@@ -1298,7 +1298,9 @@ button { font-family: inherit; }
 .init-dice { display: inline-flex; gap: 2px; vertical-align: middle; margin-left: 8px; }
 .init-die { color: var(--red); }
 
-.catalog-title { position: relative; font-family: var(--sans); font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: var(--ink); padding: 0 0 8px 16px; margin: 16px 0 12px; border-bottom: 1px solid var(--hair); display: flex; justify-content: space-between; align-items: baseline; text-transform: uppercase; }
+.catalog-title { position: relative; font-family: var(--sans); font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: var(--ink); padding: 0 0 0 16px; margin: 16px 0 12px; display: flex; justify-content: space-between; align-items: baseline; text-transform: uppercase; }
+/* No rule under a catalog heading (Jet: "remove this divider also"): the
+   orange square already marks it, and the list under it brings its own edges. */
 .catalog-title::before { content: ""; position: absolute; left: 0; top: 3px; width: 10px; height: 10px; background: var(--color-accent); }
 .catalog-title:first-child, .catalog-title:first-of-type { margin-top: 0; }
 .catalog-title .muted { text-transform: none; letter-spacing: 0; font-size: 11px; }
@@ -3791,7 +3793,6 @@ button { font-family: inherit; }
    rather than a table so it can reflow: aligned columns on a wide screen, a
    compact stacked entry on a phone. The whole sheet must be readable without
    scrolling in EITHER direction, so nothing here may overflow sideways. */
-.shipref-modal { width: min(780px, 100%); }
 .shipref-cap { display: flex; flex-wrap: wrap; gap: 2px 16px; margin: 0 0 8px; font-size: 13px; color: var(--ink-3); }
 .shipref { display: flex; flex-direction: column; }
 .sr-row {
@@ -3825,7 +3826,6 @@ button { font-family: inherit; }
    four stats inline, then each weapon slot that exists. No sideways scroll, and
    short enough that a full roster still fits the screen. */
 @media (max-width: 700px) {
-  .shipref-modal { width: 100%; }
   .sr-head { display: none; }
   .sr-row {
     grid-template-columns: 1fr auto;
@@ -4214,7 +4214,6 @@ button { font-family: inherit; }
    the thing is visible before the words are read - but Cancel stays a normal
    button rather than being made loud, because the quiet option should not have
    to compete. */
-.cf-modal { width: min(440px, 100%); }
 .modal-header.is-danger { background: var(--red-deep); }
 .modal-header.is-danger .modal-close { border-color: rgb(255 255 255 / 0.35); }
 @media (hover: hover) { .modal-header.is-danger .modal-close:hover { background: #fff; color: var(--red-deep); } }
@@ -4222,8 +4221,13 @@ button { font-family: inherit; }
 .cta-btn.cf-danger { background: var(--red-deep); border-color: var(--red-deep); box-shadow: none; }
 @media (hover: hover) { .cta-btn.cf-danger:hover { background: var(--red); border-color: var(--red); } }
 
-.opt-modal { width: min(460px, 100%); }
-.no-modal { width: min(420px, 100%); }
+/* No widths on the dialog classes. .opt-modal, .no-modal, .cf-modal,
+   .em-modal and .shipref-modal once named the homemade panels and carried
+   their widths (460px, 420px, 440px...). When the dialogs moved onto Carbon the
+   classes moved to the cds-modal host, which is the full-screen layer, so on a
+   desktop the backdrop covered only the left 460px and Carbon's dialog was
+   centred inside that strip, 142px to 195px wide. Carbon's size attribute
+   decides the width. */
 .opt-body { display: flex; flex-direction: column; gap: 24px; }
 /* Carbon focuses the first control when a dialog opens, which on a phone put
    its "Close" tooltip and a focus ring on the X before anything was touched.
@@ -4261,7 +4265,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 /* Fleet Sync dialog. Reuses .opt-section/.opt-h/.opt-actions/.field-block's
    input look rather than inventing a second visual language for what is,
    structurally, one more settings panel. */
-.sync-note { font-size: 13px; line-height: 1.5; color: var(--ink-3); padding: 8px 8px; border: 1px dashed var(--hair-soft); background: var(--paper); }
+.sync-note { font-size: 13px; line-height: 1.5; color: var(--ink-3); }
 .sync-hint { font-size: 13px; color: var(--ink-2); }
 .sync-on-state { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
 .sync-token-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -4810,7 +4814,6 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 .emblem-choose-label { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sans); font-weight: 700; font-size: 13px; color: var(--ink); }
 
 /* Modal */
-.em-modal { width: min(680px, 100%); display: flex; flex-direction: column; height: min(720px, 88vh); overflow: hidden; }
 .em-modal .modal-header, .em-modal .em-tabs, .em-modal .em-foot { flex: none; }
 .em-modal .em-body { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
 .em-head { display: flex; align-items: center; gap: 12px; }
@@ -4905,7 +4908,6 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
    count - nothing is truncated, it is the same list on one line instead of
    five. Scroll-snap and a fading right edge say there is more to the right. */
 @media (max-width: 720px) {
-  .em-modal { height: calc(100dvh - 10px); }
   .em-head { gap: 8px; }
   .em-preview { width: 34px; height: 40px; }
   .em-preview .emblem, .em-preview .emblem-img { width: 26px; height: 24px; }
@@ -8289,3 +8291,37 @@ cds-button.btn, cds-button.sy-add-unit { width: max-content; min-width: max-cont
    five character roll (10D10) widens its own line rather than overrunning. */
 .gun-name { display: block; }
 .gun-fig { display: grid; grid-template-columns: minmax(2.5em, max-content) max-content; column-gap: 8px; justify-content: start; }
+
+/* Sync's token field takes the field look (grey ground, one bottom line) like
+   every other text field; it was the last white box with a keyline, sitting
+   beside a Carbon button of a different height. Both are 48px now. */
+.sync-input.sync-input {
+  background: var(--ground); border: none; border-bottom: 1px solid var(--field-edge); border-radius: 0;
+  min-height: var(--tap); padding: 0 12px; font-size: 16px;
+}
+.sync-input.sync-input:focus { outline: 2px solid var(--blue); outline-offset: -2px; }
+
+/* File pickers look like the Carbon button beside them. The real control is
+   still the native file input stretched over the button (see .file-cover), so
+   a tap opens the picker once and the input keeps focus and the tab order; the
+   Carbon button underneath is drawing only (tab-index -1, aria-hidden). */
+.file-btn { display: inline-flex; flex: none; }
+.file-btn:focus-within cds-button::part(button) { outline: 2px solid var(--blue); outline-offset: -2px; }
+
+/* New fleet's "More factions" at the body size, not 11px underlined text. */
+.nf-more.nf-more { font-size: 13px; text-decoration: none; gap: 8px; }
+
+/* Ship reference header: MASS ran into THR. The four stat columns were 30px
+   to 38px, narrower than their own 11px uppercase headings, and the headings
+   sat at the left of a centred column. Four 48px columns, headings centred
+   over their numbers. */
+@media (min-width: 701px) {
+  .sr-row { grid-template-columns: minmax(0, 1.25fr) repeat(4, 48px) minmax(0, 1.9fr) minmax(0, 1.9fr) 64px; }
+  .sr-head .sr-num { text-align: center; }
+}
+
+/* Stats beside guns: the two number columns have a floor, two digits for
+   Mass and Silhouette and 12" for Thrust, so the guns start at the same x in
+   every card of a list. Sized to content, a card with Thrust 6" put its guns
+   a few pixels left of the card with 10" above it. */
+.sg { grid-template-columns: max-content max-content minmax(2ch, max-content) max-content max-content minmax(3ch, max-content) minmax(0, 1fr); }

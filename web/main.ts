@@ -528,7 +528,7 @@ function paint(): void {
   const modalKind = store.getState().ui.modal?.kind ?? "";
   if (modalKind && !lastModalKind) history.pushState({ absModal: true }, "");
   else if (!modalKind && lastModalKind) {
-    // Checked after the current tap finishes, not now: Get building closes the
+    // Checked after the current tap finishes, not now: Create fleet closes the
     // dialog and THEN moves to the new fleet, and a Back fired here would land
     // after that move and undo it. By the next task the move has happened, the
     // entry under us is the fleet's, and there is nothing to take back.

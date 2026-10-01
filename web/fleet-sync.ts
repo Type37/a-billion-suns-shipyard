@@ -447,7 +447,7 @@ function mergeIn(remote: SyncPayload): SyncPayload {
  *  on the phrase and devices on Discord share one list instead of drifting. */
 async function join(raw: string, linked?: string | null): Promise<JoinResult> {
   const tok = normaliseToken(raw);
-  if (!looksLikeToken(tok)) throw new Error("That does not look like a Sync Token.");
+  if (!looksLikeToken(tok)) throw new Error("That does not look like a sync token.");
   const remote = (await remoteGet(tok)) ?? EMPTY;
   const before = loadLists().length;
   let merged = mergeIn(remote);

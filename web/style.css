@@ -832,58 +832,53 @@ button { font-family: inherit; }
 @media (hover: hover) { .index-row:hover .index-go { color: #fff; transform: translateX(6px); } }
 
 .fleets-main { max-width: var(--shell); margin: 0 auto; padding: clamp(24px, 4vw, 44px) clamp(16px, 4vw, 40px) 0; }
-.fleets-head { display: flex; align-items: center; justify-content: flex-start; gap: clamp(24px, 5vw, 48px); flex-wrap: wrap; padding-bottom: 18px; border-bottom: 2px solid var(--hair); }
+/* Title and New fleet on one row with no rule under them: they were two rows
+   and a 2px rule, 172px before the first fleet on an iPhone 13. */
+.fleets-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.fleets-head .page-title { margin-bottom: 0; }
 .create-cta { align-self: center; }
 .create-panel { border: 2px solid var(--hair); padding: clamp(18px, 3vw, 28px); margin-top: 22px; background: var(--paper); }
 .create-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 6px; }
 .create-extras { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 @media (max-width: 720px) { .create-extras { grid-template-columns: 1fr; } }
 
-/* Saved fleets as a card grid. Each lands with a short staggered rise so the
-   set arrives as a deliberate sweep rather than snapping in all at once - the
-   friction between "Fleets" and your list of fleets. */
+/* Saved fleets as a card grid. See fleetsView for what the card holds and why
+   it lost a row, a rule and the date. The staggered rise-in each card used to
+   play on arrival, and the hover lift, went with the redesign: on a phone the
+   list just being there is the point. */
 .fleet-cards {
-  margin-top: 22px; display: grid; gap: 14px;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  margin-top: 18px; display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
 }
 .fleet-card {
-  display: flex; flex-direction: column; background: var(--paper);
-  border: 1px solid var(--hair); border-top: 3px solid var(--blue);
-  transition: border-color 0.14s ease, box-shadow 0.14s ease, transform 0.14s ease;
-  animation: fleet-card-in 0.34s var(--ease) both;
-  animation-delay: calc(var(--i, 0) * 45ms);
+  position: relative; display: grid; align-items: center;
+  /* The actions cover columns 2-3 of the lower two rows and sit at the right,
+     so column 3 is only as wide as the cost. With the actions in a column of
+     their own, that column was 132px wide on every row and squeezed fleet
+     names onto three lines on a 360px phone. Faction and era keep clear of
+     the buttons by padding instead. */
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  grid-template-rows: auto auto auto;
+  column-gap: 12px; row-gap: 1px; padding: 10px 6px 6px 12px;
+  background: var(--paper); border: 1px solid var(--hair);
+  transition: border-color 0.12s ease;
 }
-/* Cards sit ON the page, so at rest they are defined by their keyline and cast
-   nothing - Fluent's own `outline` card appearance does exactly this. Hovering
-   lifts them one step onto the ramp, which is the canonical rest-to-hover jump
-   (4 to 8; here none to 8, since rest is a stroke). The flat blue offset block
-   this replaced was a different lighting model to everything else on screen. */
-@media (hover: hover) {
-.fleet-card:hover {
-  border-color: var(--hair); border-top-color: var(--red);
-  transform: translateY(-3px); box-shadow: var(--shadow8);
-} }
-@keyframes fleet-card-in {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+@media (hover: hover) { .fleet-card:hover { border-color: var(--blue); } }
+.fleet-card-emblem { grid-column: 1; grid-row: 1 / 4; align-self: start; display: inline-flex; }
+.fleet-card-name {
+  grid-column: 2; grid-row: 1; min-width: 0; color: var(--ink); text-decoration: none;
+  font-family: var(--display); font-weight: 800; font-size: 18px; line-height: 1.15; letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
 }
-@media (prefers-reduced-motion: reduce) {
-  .fleet-card { animation: none; }
-  @media (hover: hover) {   .fleet-card:hover { transform: none; } }
-}
-.fleet-card-open { display: flex; align-items: center; gap: 14px; padding: 16px; color: var(--ink); text-decoration: none; }
-@media (hover: hover) { .fleet-card-open:hover { text-decoration: none; } }
-.fleet-card-emblem { flex-shrink: 0; display: inline-flex; }
-.fleet-card-body { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-.fleet-card-name { font-family: var(--display); font-weight: 800; font-size: 19px; line-height: 1.1; letter-spacing: -0.01em; color: var(--ink); }
-@media (hover: hover) { .fleet-card-open:hover .fleet-card-name { color: var(--blue); } }
-.fleet-card-faction { font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-2); }
-.fleet-card-meta { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 0 16px 12px; }
-.fleet-card-mode { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--blue); }
-.fleet-card-cost { font-family: var(--display); font-weight: 800; font-size: 17px; color: var(--ink); font-variant-numeric: tabular-nums; }
-.fleet-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px 8px 16px; border-top: 1px solid var(--hair-soft); margin-top: auto; }
-.fleet-card-date { font-family: var(--sans); font-size: 11px; font-weight: 600; color: var(--ink-3); }
-.fleet-card-actions { display: inline-flex; gap: 4px; flex-wrap: nowrap; }
+/* The whole card is the tap target for opening the fleet. */
+.fleet-card-name::after { content: ""; position: absolute; inset: 0; }
+@media (hover: hover) { .fleet-card-name:hover { color: var(--blue); text-decoration: none; } }
+.fleet-card-name:focus-visible { outline: none; }
+.fleet-card:has(.fleet-card-name:focus-visible) { outline: 2px solid var(--red); outline-offset: 1px; }
+.fleet-card-cost { grid-column: 3; grid-row: 1; align-self: start; justify-self: end; padding-right: 6px; font-family: var(--display); font-weight: 800; font-size: 17px; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fleet-card-faction { grid-column: 2 / 4; grid-row: 2; min-width: 0; padding-right: 136px; font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.fleet-card-mode { grid-column: 2 / 4; grid-row: 3; padding-right: 136px; font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--blue); }
+.fleet-card-actions { grid-column: 2 / 4; grid-row: 2 / 4; justify-self: end; align-self: end; position: relative; z-index: 1; display: inline-flex; gap: 0; flex-wrap: nowrap; }
 /* All three card actions are icon-only, Delete included. Delete used to carry a
    visible "DELETE" label and a red keyline so it could not be mistaken on a
    touchscreen, which made it the loudest thing on every fleet card (Jet, October
@@ -1446,6 +1441,24 @@ button { font-family: inherit; }
   .stat-lbl { min-width: 46px; }
 }
 .stat-chips-mini { gap: 3px 6px; }
+/* statGuns (render.ts): two chips and a gun per line, as one grid so a gun
+   shares its row with the stats beside it. Each chip spans three tracks
+   (glyph, label, value) and takes them by subgrid, so Mass sits over Sil and
+   Thrust over Shields with their numbers aligned, exactly as in .stat-chips.
+   The gun column takes what is left; a long gun name wraps inside it and its
+   row grows. The row aligns on the text baseline, so the gun's first line
+   reads level with the chip numbers beside it. */
+.sg {
+  display: grid; width: 100%;
+  grid-template-columns: repeat(6, max-content) minmax(0, 1fr);
+  column-gap: 0; row-gap: 4px; align-items: baseline;
+}
+.sg > .stat-chip { grid-column: span 3; margin-right: 8px; }
+@supports (grid-template-columns: subgrid) {
+  .sg > .stat-chip { display: grid; grid-template-columns: subgrid; column-gap: 4px; align-items: center; }
+}
+.sg-gun { grid-column: 7; min-width: 0; padding-left: 8px; font-size: 13px; }
+.sg-gun .gun-name { overflow-wrap: normal; }
 .stat-chip { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--hair-soft); padding: 3px 8px 3px 6px; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; column-gap: 5px; }
 .stat-chip-mini { gap: 4px; padding: 2px 6px 2px 5px; font-size: 12px; }
 .stat-chip-mini .stat-lbl { font-size: 10.5px; letter-spacing: 0.03em; }
@@ -2407,10 +2420,7 @@ button { font-family: inherit; }
 .outfit-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
 .outfit-card {
   border: 1px solid var(--hair); border-top: 3px solid var(--blue); background: var(--paper); display: flex; flex-direction: column;
-  animation: fleet-card-in 0.34s var(--ease) both;
-  animation-delay: calc(var(--i, 0) * 45ms);
 }
-@media (prefers-reduced-motion: reduce) { .outfit-card { animation: none; } }
 .outfit-card-main { display: flex; align-items: center; gap: 12px; padding: 14px 16px 10px; text-decoration: none; color: inherit; }
 @media (hover: hover) { .outfit-card-main:hover .outfit-card-name { color: var(--blue); } }
 .outfit-card-emblem { flex-shrink: 0; color: var(--blue); }
@@ -3825,7 +3835,6 @@ button { font-family: inherit; }
    a phone the weapons dropped underneath the stats and every card was a tall
    stack read top to bottom. */
 .au-card-body { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: 0 16px; margin-top: 2px; }
-.au-card-stats { display: flex; flex-wrap: wrap; gap: 0 10px; margin: 0; flex: 0 0 auto; }
 .au-card .stat-chip, .au-card .stat-chip-mini { border: none; background: none; padding: 0; }
 .au-card .stat-chips { gap: 0 10px; }
 .au-card-wep { display: grid; gap: 1px; font-size: 11.5px; line-height: 1.35; color: var(--ink-2); flex: 1 1 200px; min-width: 0; }
@@ -7882,22 +7891,10 @@ cds-inline-notification.app-hint { max-width: none; width: 100%; margin: 6px 0; 
 
 /* Add unit card, laid out from Jet's sketch: name over stats on the left,
    primary over auxiliary on the right. Same grid at every width. */
-/* Both guns stack in one cell beside the name and stats, Primary first.
-   Giving each gun its own grid row (Primary with the name, Auxiliary with the
-   stats) was tried: a Primary that wrapped on a phone ("HEAVY RAILGUNS 2D12
-   9-18") made the name's row two lines tall and opened a gap between a ship's
-   name and its own stats. Stacked, a wrap only nudges Auxiliary down a line.
-   With no Primary an empty line holds its place, so Auxiliary still starts
-   level with the stats. */
-/* The left column is as wide as the ship's own name and stats (up to 55%),
-   and the guns start right after it. Two equal halves left a dead gap between
-   the stats and the guns on a wide dialog, so the eye had to jump across. */
-.au-card-grid { display: grid; grid-template-columns: fit-content(55%) minmax(0, 1fr); gap: 6px 22px; align-items: start; width: 100%; }
-.au-card-id { grid-column: 1; grid-row: 1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; min-width: 0; }
-.au-card-stats { grid-column: 1; grid-row: 2; }
-.au-card-guns { grid-column: 2; grid-row: 1 / span 2; display: grid; gap: 6px; font-size: 13px; min-width: 0; }
-.gun-gap { height: 1.3em; }
-.au-card-guns .gun-name, .au-card-guns .gun-fig { overflow-wrap: anywhere; }
+/* Name and cost on the first line, then the shared stats-and-guns block
+   (.sg): each gun on the line of stats beside it. */
+.au-card-grid { display: grid; gap: 4px; width: 100%; }
+.au-card-id { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; min-width: 0; }
 
 /* Compendium phone rows: gunArc's glyph names the arc, so the cell's
    "PRIMARY"/"AUXILIARY" word label would say it twice. */

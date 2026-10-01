@@ -28,7 +28,7 @@ import { ACTIVATION_STEPS, CORE_ACTIONS, CORE_COMMANDS, ROUND_PHASES } from "../
 import { deriveCommandEffects, effectiveCost } from "../src/command-effects.ts";
 import type { CommandCostChange, CommandEffects, RuleSource } from "../src/command-effects.ts";
 import { allFactions, factionsByEra, findFaction, makeCatalog, ERA_ORDER } from "./catalog.ts";
-import { costBreakdown, credits, creditsText, escapeHtml, formatDate, pluralise, ruleText } from "./format.ts";
+import { costBreakdown, credits, creditsText, escapeHtml, pluralise, ruleText } from "./format.ts";
 import { markdownEditor, renderMarkdown } from "./richtext.ts";
 import {
   commandRow,
@@ -36,6 +36,7 @@ import {
   emblemMark,
   icon,
   statChips,
+  statChipList,
   tacticalDiagram,
 } from "./icons.ts";
 import {
@@ -635,31 +636,30 @@ function fleetsView(state: AppState): string {
     .filter((l) => l.mode !== "combat-simulator" && l.mode !== "management-training")
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 
+  // A fleet card is three short lines beside the emblem: name and cost, then
+  // faction, then era, with the three actions at the bottom right. It used to
+  // be four rows split by a rule: name and faction, then a row of its own for
+  // era and cost, then a footer for "Updated <date>" and the actions. The date
+  // was cut: the list is already sorted newest first, and the example fleets
+  // all claimed "Updated January 1, 2026", which was never true. The whole
+  // card is the link to the fleet (the name's ::after covers it); the actions
+  // sit above that layer.
   const cards = lists
-    .map((l, i) => {
+    .map((l) => {
       const faction = findFaction(l.fleet.factionId, state.customFactions);
       const { total } = listTotals(l, state.customFactions);
       return `
-      <article class="fleet-card" style="--i:${i}">
-        <a class="fleet-card-open" href="#/list/${l.id}" aria-label="Open ${escapeHtml(l.fleet.name || "Unnamed fleet")}">
-          <span class="fleet-card-emblem">${listEmblem(l, 52)}</span>
-          <span class="fleet-card-body">
-            <span class="fleet-card-name">${escapeHtml(l.fleet.name || "Unnamed fleet")}</span>
-            <span class="fleet-card-faction">${escapeHtml(faction?.name ?? "Mixed forces")}</span>
-          </span>
-        </a>
-        <div class="fleet-card-meta">
-          <span class="fleet-card-mode">${l.freePlay ? "Free Play" : MODE_LABEL[l.mode]}</span>
-          <span class="fleet-card-cost">${credits(total)}</span>
-        </div>
-        <div class="fleet-card-foot">
-          <span class="fleet-card-date">Updated ${formatDate(l.updatedAt)}</span>
-          <span class="fleet-card-actions">
-            <button class="card-act" data-action="duplicate-list" data-id="${l.id}" title="Duplicate this fleet" aria-label="Duplicate this fleet">${icon("ix-duplicate", 18)}</button>
-            <button class="card-act" data-action="share-list" data-id="${l.id}" title="Copy a share link" aria-label="Copy a share link">${icon("ix-share", 18)}</button>
-            <button class="card-act is-danger" data-action="delete-list" data-id="${l.id}" title="Delete this fleet" aria-label="Delete this fleet">${icon("ix-trash", 18)}</button>
-          </span>
-        </div>
+      <article class="fleet-card">
+        <span class="fleet-card-emblem">${listEmblem(l, 40)}</span>
+        <a class="fleet-card-name" href="#/list/${l.id}">${escapeHtml(l.fleet.name || "Unnamed fleet")}</a>
+        <span class="fleet-card-cost">${credits(total)}</span>
+        <span class="fleet-card-faction">${escapeHtml(faction?.name ?? "Mixed forces")}</span>
+        <span class="fleet-card-mode">${l.freePlay ? "Free Play" : MODE_LABEL[l.mode]}</span>
+        <span class="fleet-card-actions">
+          <button class="card-act" data-action="duplicate-list" data-id="${l.id}" title="Duplicate this fleet" aria-label="Duplicate this fleet">${icon("ix-duplicate", 18)}</button>
+          <button class="card-act" data-action="share-list" data-id="${l.id}" title="Copy a share link" aria-label="Copy a share link">${icon("ix-share", 18)}</button>
+          <button class="card-act is-danger" data-action="delete-list" data-id="${l.id}" title="Delete this fleet" aria-label="Delete this fleet">${icon("ix-trash", 18)}</button>
+        </span>
       </article>`;
     })
     .join("");
@@ -669,7 +669,7 @@ function fleetsView(state: AppState): string {
   <main class="fleets-main">
     <div class="fleets-head">
       <h1 class="page-title">Fleets</h1>
-      <button class="cta-btn create-cta" data-action="open-new-fleet">${icon("plus", 18)} Assemble new fleet</button>
+      <button class="cta-btn create-cta" data-action="open-new-fleet">${icon("plus", 18)} New fleet</button>
     </div>
 
     ${
@@ -888,11 +888,28 @@ function cardWeapons(ship: ShipClass): string {
   return `<div class="guns">${gunLines(ship)}</div>`;
 }
 
-export function weaponsTable(ship: ShipClass): string {
-  // The builder's fleet rows, Play, Solo and the faction pages all draw guns
-  // through here, and here is gunLines: the same layout as Add unit.
-  return `<div class="guns">${gunLines(ship)}</div>`;
+/**
+ * A ship's stats and guns as one block of two lines, each gun on the line of
+ * stats it belongs beside (Jet, October 2026: "the guns should be on the same
+ * lines as the unit stats"):
+ *
+ *   [Mass] [Thrust]   Primary gun
+ *   [Sil]  [Shields]  Auxiliary gun
+ *
+ * One grid, so the rows are shared and cannot drift apart: earlier versions put
+ * the chips and the guns in two separate boxes side by side, and a gun that
+ * wrapped pushed its partner off the stat line beside it. Here a long gun name
+ * on a narrow phone wraps inside its own row; the row grows, the chips stay
+ * level with the gun's first line, and the other gun stays on its own stat
+ * line. The dice and range never split. Truncating the name with an ellipsis
+ * was proposed and turned down (Jet): the name is the label, it stays whole.
+ * An empty arc keeps its row blank so the other gun stays on its own line.
+ */
+export function statGuns(ship: ShipClass, compact = true): string {
+  const [mass, thrust, sil, shields] = statChipList(ship, compact);
+  return `<div class="sg">${mass}${thrust}<span class="sg-gun">${gunArc(ship, "primary")}</span>${sil}${shields}<span class="sg-gun">${gunArc(ship, "aux")}</span></div>`;
 }
+
 
 // ---------------------------------------------------------------------------
 // Hypergrowth Shipyard  (spec: HYPERGROWTH-SHIPYARD.md)
@@ -925,8 +942,7 @@ function shipyardShipRow(s: ShipClass, count: number): string {
       </span>
     </div>
     <div class="sy-ship-data">
-      ${statChips(s, true)}
-      ${weaponsTable(s)}
+      ${statGuns(s)}
     </div>
   </article>`;
 }
@@ -1573,7 +1589,7 @@ function builderView(state: AppState): string {
           ${control}
         </div>
         ${carried.length || showSpecies ? `<div class="sy-unit-sub">${carryMarkup}${showSpecies ? speciesSwitch(u) : ""}</div>` : ""}
-        ${r ? `<div class="sy-ship-data">${statChips(r.ship, true)}${weaponsTable(r.ship)}</div>` : ""}
+        ${r ? `<div class="sy-ship-data">${statGuns(r.ship)}</div>` : ""}
       </article>`;
     })
     .join("");
@@ -1793,8 +1809,7 @@ function addUnitModal(state: AppState): string {
             <span class="au-card-cost">${credits(ship.cost)}</span>
             ${owned ? `<span class="au-card-owned">${owned} in fleet</span>` : ""}
           </span>
-          <span class="au-card-stats">${statChips(ship, true)}</span>
-          <span class="au-card-guns">${gunArc(ship, "primary") || (gunArc(ship, "aux") ? '<span class="gun gun-gap" aria-hidden="true"></span>' : "")}${gunArc(ship, "aux")}</span>
+          ${statGuns(ship)}
         </span>
       </button>
       ${
@@ -3265,7 +3280,7 @@ function playFleetPanel(list: SavedList, faction: Faction | undefined, customs: 
           <div class="pf-pos" role="group" aria-label="Where ${escapeHtml(title)} is">${places}</div>
           ${actBtn}
         </div>
-        <div class="pf-data">${statChips(ship, true)}${weaponsTable(ship)}</div>
+        <div class="pf-data">${statGuns(ship)}</div>
         ${carried.length ? `<p class="pf-carry">Carrying: ${escapeHtml(carried.join("; "))}</p>` : ""}
       </article>`;
     })
@@ -3390,7 +3405,7 @@ function playShipyardTracker(list: SavedList, faction: Faction | undefined, cust
             lost ? ` <span class="sy-req-sep" aria-hidden="true"></span> <span class="sy-req-lost">${lost} lost</span>` : ""
           }</span>
         </header>
-        <div class="pf-data">${statChips(ship, true)}${weaponsTable(ship)}</div>
+        <div class="pf-data">${statGuns(ship)}</div>
         <!--
           Three buttons, three verbs the rulebook uses, all in the same
           imperative. They read "Deploy / Jumped out / Jump in" before: one

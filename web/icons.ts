@@ -341,7 +341,6 @@ export function statChips(
   // inside where the others are solid marks, and a ring needs more box to read:
   // at the same 13px the hairline circle greyed out to a smudge. Same optical
   // weight, different measured size.
-  const chip = (name: string, label: string, val: string) => {
     // All four at one size. Mass and Silhouette used to be drawn larger on the
     // reasoning that a ring reads smaller than a solid mark, but in a row of
     // four the mismatch just looks like a mistake.
@@ -350,10 +349,24 @@ export function statChips(
     // are SOLID marks, so the stroke-width fix above does nothing for them -
     // size is the only lever. The Silhouette target in particular carries
     // interior detail that closed up into a blob at 14px.
-    const size = compact ? 16 : 18;
-    return `<span class="stat-chip ${compact ? "stat-chip-mini" : ""}">${icon(name, size, `stat-ico stat-ico-${name.replace("stat-", "")}`)}<span class="stat-lbl">${label}</span><span class="stat-val">${val}</span></span>`;
-  };
-  return `<span class="stat-chips ${compact ? "stat-chips-mini" : ""}">${chip("stat-mass", "Mass", String(s.mass))}${chip("stat-thrust", "Thrust", `${s.thrust}"`)}${chip("stat-silhouette", "Sil", String(s.silhouette))}${chip("stat-shields", "Shields", String(s.shields))}</span>`;
+
+  return `<span class="stat-chips ${compact ? "stat-chips-mini" : ""}">${statChipList(s, compact).join("")}</span>`;
+}
+
+/** The four chips on their own, in reading order: Mass, Thrust, Sil, Shields. */
+export function statChipList(
+  s: { mass: number; thrust: number; silhouette: number; shields: number },
+  compact = false,
+): string[] {
+  const size = compact ? 16 : 18;
+  const chip = (name: string, label: string, val: string) =>
+    `<span class="stat-chip ${compact ? "stat-chip-mini" : ""}">${icon(name, size, `stat-ico stat-ico-${name.replace("stat-", "")}`)}<span class="stat-lbl">${label}</span><span class="stat-val">${val}</span></span>`;
+  return [
+    chip("stat-mass", "Mass", String(s.mass)),
+    chip("stat-thrust", "Thrust", `${s.thrust}"`),
+    chip("stat-silhouette", "Sil", String(s.silhouette)),
+    chip("stat-shields", "Shields", String(s.shields)),
+  ];
 }
 
 /** Render an uploaded image if present, otherwise fall back to a built-in emblem glyph. */

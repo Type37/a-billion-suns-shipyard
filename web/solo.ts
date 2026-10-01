@@ -32,7 +32,7 @@ import {
 } from "../src/data/junkspace-solo.ts";
 import { escapeHtml, formatDate, ruleText } from "./format.ts";
 import { icon, statChips } from "./icons.ts";
-import { emblemView, weaponsTable } from "./render.ts";
+import { emblemView, statGuns } from "./render.ts";
 import { libraryUrl } from "./emblems.ts";
 import gunnerIcon from "./pilots/gunner.png";
 import haulerIcon from "./pilots/hauler.png";
@@ -252,7 +252,7 @@ function soloShipCatalog(): string {
           <h4 class="ship-name">${escapeHtml(s.name)}</h4>
           <span class="ship-cost">${ck(s.cost)}</span>
         </div>
-        <div class="ship-row-details">${statChips(s, true)}${weaponsTable(s)}</div>
+        <div class="ship-row-details">${statGuns(s)}</div>
       </div>
       <span class="add-cue">${icon("plus", 15)}<span>Add</span></span>
     </article>`,
@@ -350,7 +350,7 @@ function outfitTab(o: SavedOutfit): string {
           // reads identically whether you're picking it or already own it.
           // Boxed as one "spec" column so the pilot controls can sit beside it
           // instead of stacking under a half-empty row.
-          def ? `<div class="ru-spec"><div class="roster-unit-stats">${statChips(def, true)}</div>${weaponsTable(def)}</div>` : ""
+          def ? `<div class="ru-spec">${statGuns(def)}</div>` : ""
         }
         <!--
           The pilot's name sits with the pilot's class, on the same line, above

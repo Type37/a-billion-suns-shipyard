@@ -98,6 +98,30 @@ function gameTicks(played: number, total: number): string {
 //
 // The ready-made crews used to sit here too, then became pre-built outfits on
 // the Solo page; both are gone (Jet: "they suck"). See dropUntouchedSeedOutfits.
+/** Log a finished game: what it earned, and an optional note (p.211: "Reduce your Debt by the amount you earned in this game"). */
+export function logGameModal(state: AppState): string {
+  const m = state.ui.modal;
+  if (!m || m.kind !== "log-game") return "";
+  return `
+  <cds-modal open size="sm" class="no-modal lg-modal" data-key="lg-modal">
+    <cds-modal-header>
+      <cds-modal-close-button></cds-modal-close-button>
+      <cds-modal-heading>Log a game</cds-modal-heading>
+    </cds-modal-header>
+    <cds-modal-body data-modal-primary-focus tabindex="-1">
+      ${/* Carbon's own number input (Jet: "carbon my friend, carbon"), read
+            when Log game is pressed, so typing and stepping both count. */ ""}
+      <cds-number-input id="log-game-earned" class="lg-earned" label="Credits earned (¢k)" min="0" step="1" value="${m.earnedK}" size="lg"></cds-number-input>
+      <label class="cf-f lg-note"><span class="cf-l">Note</span>
+        <textarea id="log-game-note" rows="3"></textarea></label>
+    </cds-modal-body>
+    <cds-modal-footer>
+      <cds-modal-footer-button kind="secondary" data-action="close-modal">Cancel</cds-modal-footer-button>
+      <cds-modal-footer-button kind="primary" data-action="log-game-confirm">Log game</cds-modal-footer-button>
+    </cds-modal-footer>
+  </cds-modal>`;
+}
+
 export function newOutfitModal(state: AppState): string {
   const m = state.ui.modal;
   if (!m || m.kind !== "new-outfit") return "";
@@ -133,25 +157,11 @@ export function newOutfitModal(state: AppState): string {
               independent was three lines of prose doing a job the two steppers
               do by existing. The book's harder values are where the readout
               turns red, so the dial still says which way is up. */ ""}
+        ${/* Carbon number inputs, uncontrolled like the name above and read
+              when the outfit is created. Typed or stepped, both count. */ ""}
         <div class="no-dials">
-          <div class="no-dial">
-            <span class="control-label">Debt</span>
-            <div class="dial">
-              <span class="dial-val ${debt >= HARD_DEBT_K ? "is-hard" : ""}">${ck(debt)}</span>
-              <button class="stepper-btn" data-action="new-outfit-debt" data-delta="-5" aria-label="Less debt">${icon("minus", 15)}</button>
-              <span class="dial-rule" aria-hidden="true"></span>
-              <button class="stepper-btn" data-action="new-outfit-debt" data-delta="5" aria-label="More debt">${icon("plus", 15)}</button>
-            </div>
-          </div>
-          <div class="no-dial">
-            <span class="control-label">Games to clear it</span>
-            <div class="dial">
-              <span class="dial-val ${games <= HARD_CLEAR_GAMES ? "is-hard" : ""}">${games}</span>
-              <button class="stepper-btn" data-action="new-outfit-games" data-delta="-1" aria-label="Fewer games">${icon("minus", 15)}</button>
-              <span class="dial-rule" aria-hidden="true"></span>
-              <button class="stepper-btn" data-action="new-outfit-games" data-delta="1" aria-label="More games">${icon("plus", 15)}</button>
-            </div>
-          </div>
+          <cds-number-input id="no-debt" label="Debt (¢k)" min="5" max="200" step="5" value="${debt}" size="lg"></cds-number-input>
+          <cds-number-input id="no-games" label="Games to clear it" min="1" max="30" step="1" value="${games}" size="lg"></cds-number-input>
         </div>
     </cds-modal-body>
     <cds-modal-footer>
@@ -556,7 +566,7 @@ function playTab(state: AppState, o: SavedOutfit): string {
         <!-- What just happened on the table, then what it does to the Level.
              The old labels led with the arithmetic ("+1 End Phase"), which is
              the wrong way round: you press these because a thing happened. -->
-        <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="alert-adjust" data-delta="1">End Phase <b class="alert-delta">+1</b>${icon("plus", 13).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="alert-adjust" data-delta="1" data-end-phase="1">End Phase <b class="alert-delta">+1</b>${icon("plus", 13).replace("<svg ", '<svg slot="icon" ')}</cds-button>
         <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="alert-adjust" data-delta="1">Reveal Mass 2-3 <b class="alert-delta">+1</b>${icon("plus", 13).replace("<svg ", '<svg slot="icon" ')}</cds-button>
         <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="alert-adjust" data-delta="-2">Destroy Mass 2-3 <b class="alert-delta">&minus;2</b>${icon("minus", 13).replace("<svg ", '<svg slot="icon" ')}</cds-button>
         <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="alert-adjust" data-delta="-1">Take one back <b class="alert-delta">&minus;1</b>${icon("minus", 13).replace("<svg ", '<svg slot="icon" ')}</cds-button>
@@ -565,14 +575,7 @@ function playTab(state: AppState, o: SavedOutfit): string {
     </div>
     <div class="gb-round">
       <span class="control-label">Round</span>
-      ${/* Carbon number input (forked): value left, subtract and add at the
-            right, the same control as the New outfit dialog's dials. */ ""}
-      <div class="num-field">
-        <span class="num-val round-value">${o.round}</span>
-        <button class="stepper-btn" data-action="round-adjust" data-delta="-1" aria-label="Previous round">${icon("minus", 16)}</button>
-        <span class="num-rule" aria-hidden="true"></span>
-        <button class="stepper-btn" data-action="round-adjust" data-delta="1" aria-label="Next round">${icon("plus", 16)}</button>
-      </div>
+      <cds-number-input class="round-input" label="Round" hide-label min="1" step="1" value="${o.round}" size="lg" data-action="round-set"></cds-number-input>
     </div>
   </section>
   ${blipsPanel(o)}
@@ -633,6 +636,11 @@ function campaignTab(o: SavedOutfit): string {
             standard 8 (it said "Eight" whatever the dial was set to). */ ""}
       ${outOfGames ? `<p class="issue-error">If, after ${gamesLimit(o)} games, you still have outstanding debt, some very unpleasant people pay a visit to your space dock and you lose the campaign (and your ships).</p>` : ""}
     </div>
+    ${/* Logging stays available after the campaign is won or lost. A
+          playtest logged a ninth game of an eight-game campaign and hiding
+          the button was tried; it was the strict reading (Jet: "postel's
+          law"). The outcome line above says where the campaign stands; a
+          player who keeps going, house rules or not, is not stopped. */ ""}
     <div class="gb-act">
       <cds-button has-main-content kind="primary" size="lg" class="btn" data-action="log-game">Log a completed game${icon("plus", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
     </div>
@@ -655,6 +663,10 @@ function campaignTab(o: SavedOutfit): string {
                       ${g.date ? `<span class="glr-date">${escapeHtml(formatDate(g.date))}</span>` : ""}
                     </span>
                     ${g.note ? `<span class="glr-note">${escapeHtml(g.note)}</span>` : ""}
+                    ${/* A mis-logged game can be taken out again (Jet: "can you
+                          even remove anything"). Removing it gives the Debt back
+                          and recounts games and the next starting Alert. */ ""}
+                    <cds-button has-main-content kind="danger-ghost" size="sm" class="btn glr-remove" data-action="remove-game" data-game="${g.game}">Remove${icon("trash", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>
                   </li>`,
                 )
                 .join("")}</ol>`

@@ -55,7 +55,7 @@ import { activeList, activeOutfit, DEFAULT_PRINT, PAPER } from "./state.ts";
 import type { PlayState, SavedList, UnitPosition } from "./storage.ts";
 import { storageBytes } from "./storage.ts";
 import { FleetSync } from "./fleet-sync.ts";
-import { soloListView, soloOutfitView, newOutfitModal } from "./solo.ts";
+import { soloListView, soloOutfitView, newOutfitModal, logGameModal } from "./solo.ts";
 import { learnView } from "./learn.ts";
 
 // The whole app renders from state into #app. Interactive elements carry
@@ -5054,5 +5054,5 @@ export function render(state: AppState): string {
   })();
   // The cropper renders last: it opens OVER the emblem picker that launched it,
   // and hands back to it on cancel.
-  return `${body}${optionsModal(state)}${syncModal(state)}${shipEditModal(state)}${emblemModal(state)}${newOutfitModal(state)}${confirmModal(state)}${shareModal(state)}${cropModal(state)}`;
+  return `${body}${optionsModal(state)}${syncModal(state)}${shipEditModal(state)}${emblemModal(state)}${newOutfitModal(state)}${logGameModal(state)}${confirmModal(state)}${shareModal(state)}${cropModal(state)}`;
 }

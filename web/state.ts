@@ -378,7 +378,9 @@ export interface AppState {
         }
       /** The new-outfit dialog is showing. Its answers live in ui.newOutfit,
        *  not here - see the note there. */
-      | { kind: "new-outfit" };
+      | { kind: "new-outfit" }
+      /** Solo: logging a finished game. earnedK is the stepper's value. */
+      | { kind: "log-game"; earnedK: number };
     /**
      * The outfit being started, held until you press Start so the outfit is
      * only written once.

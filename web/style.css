@@ -8827,3 +8827,14 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
 .solo-outfit .gb-round { border-left: none; padding-left: 0; }
 .solo-outfit .roster-actions { border-top: none; padding-top: 8px; }
 .solo-outfit .blip .stat-chip { border: none; background: none; padding: 0; }
+.lg-modal .no-dials { grid-template-columns: minmax(0, 1fr); margin-top: 0; }
+.lg-note { margin-top: 24px; }
+.lg-note textarea { width: 100%; padding: 12px 16px; font: 400 16px/1.4 var(--sans); border: none; border-bottom: 1px solid var(--field-edge); background: var(--ground); color: var(--ink); resize: vertical; }
+.lg-note textarea:focus { outline: 2px solid var(--focus); outline-offset: -2px; }
+
+/* Carbon number inputs in Solo: label above, at the grid's field widths. */
+.no-modal .no-dials { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.lg-earned { display: block; max-width: 16rem; }
+.round-input { display: block; width: 10rem; margin-top: 8px; }
+.game-log-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.game-log-row .glr-remove { margin-left: auto; }

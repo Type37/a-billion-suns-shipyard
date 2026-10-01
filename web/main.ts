@@ -23,6 +23,7 @@ import "@carbon/web-components/es/components/menu/index.js";
 import "@carbon/web-components/es/components/checkbox/index.js";
 import "@carbon/web-components/es/components/toggle/index.js";
 import "@carbon/web-components/es/components/progress-bar/index.js";
+import "@carbon/web-components/es/components/number-input/index.js";
 
 // Keep every Markdown notes editor's preview in step with its textarea as the
 // user types. Uncontrolled on purpose (see richtext.ts): typing must not go
@@ -1342,6 +1343,15 @@ document.addEventListener("cds-toggle-changed", (e) => {
   const host = e.target as HTMLElement & { toggled?: boolean; checked?: boolean };
   if (!host.dataset["action"]) return;
   host.checked = !!host.toggled;
+  host.dispatchEvent(new Event("change", { bubbles: true }));
+});
+
+// Carbon number inputs: the ones that save as they change carry a data-action
+// on the host and are handed on as a change event, like the checkboxes. The
+// rest (Log a game, New outfit) are read when their dialog's button is pressed.
+document.addEventListener("cds-number-input", (e) => {
+  const host = e.target as HTMLElement;
+  if (!host.dataset["action"]) return;
   host.dispatchEvent(new Event("change", { bubbles: true }));
 });
 

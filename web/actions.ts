@@ -92,6 +92,16 @@ function shuffle<T>(items: T[]): T[] {
   return out;
 }
 
+/**
+ * A number typed into one of the stepper fields, read leniently (Postel's
+ * law): "5", "5k", "¢5k", " 5 " and "5.0" are all 5. Anything without a digit
+ * is null and the field goes back to what it was.
+ */
+function readNumber(raw: string): number | null {
+  const m = raw.replace(/,/g, "").match(/-?\d+(\.\d+)?/);
+  return m ? Math.round(Number(m[0])) : null;
+}
+
 function libFields(lib: string): { emblemLib: string; emblemImage: undefined; emblemColor: undefined } {
   return { emblemLib: lib, emblemImage: undefined, emblemColor: undefined };
 }
@@ -1722,16 +1732,23 @@ export function dispatchAction(target: HTMLElement): void {
     }
     case "solo-new-outfit-create": {
       const draft = state.ui.newOutfit;
+      // Read off the dialog's Carbon number inputs, typed or stepped.
+      const dialRead = (id: string, fallback: number, lo: number, hi: number): number => {
+        const v = readNumber(String((document.getElementById(id) as HTMLInputElement | null)?.value ?? ""));
+        return v === null ? fallback : Math.max(lo, Math.min(hi, v));
+      };
+      const dialDebt = dialRead("no-debt", draft?.debtStartK ?? STARTING_DEBT_K, 5, 200);
+      const dialGames = dialRead("no-games", draft?.gamesLimit ?? DEBT_CLEAR_GAMES, 1, 30);
       const outfit: SavedOutfit = {
         ...createOutfit(),
         name: liveOutfitName(),
         // The two campaign dials, chosen in the dialog before the outfit exists.
-        debtK: draft?.debtStartK ?? STARTING_DEBT_K,
-        debtStartK: draft?.debtStartK ?? STARTING_DEBT_K,
+        debtK: dialDebt,
+        debtStartK: dialDebt,
         // p.195: under ¢25k of Debt the Alert Level starts at 2. A new outfit
         // set to a small Debt on the dial started at 1 regardless.
-        alertLevel: startingAlertLevel(draft?.debtStartK ?? STARTING_DEBT_K),
-        gamesLimit: draft?.gamesLimit ?? DEBT_CLEAR_GAMES,
+        alertLevel: startingAlertLevel(dialDebt),
+        gamesLimit: dialGames,
         ...(draft
           ? {
               emblem: draft.emblem,
@@ -1840,7 +1857,11 @@ export function dispatchAction(target: HTMLElement): void {
     }
     case "alert-adjust": {
       const delta = Number(target.dataset["delta"]);
-      editOutfit((o) => ({ ...o, alertLevel: Math.max(1, Math.min(10, o.alertLevel + delta)) }));
+      // End Phase is the end of the round (p.206): the Alert goes up AND the
+      // round moves on. A playtest needed two taps per round for that, one
+      // here and one on the Round field.
+      const nextRound = target.dataset["endPhase"] ? 1 : 0;
+      editOutfit((o) => ({ ...o, alertLevel: Math.max(1, Math.min(10, o.alertLevel + delta)), round: o.round + nextRound }));
       break;
     }
     case "round-adjust": {
@@ -1891,11 +1912,30 @@ export function dispatchAction(target: HTMLElement): void {
     // and the log printed "Game 2  ¢2k", which is the least interesting third
     // of what happened - a campaign is eight games of a story and the app was
     // keeping the receipts and throwing away the story.
+    // Logging a game is a Carbon dialog. It was two window.prompt() calls,
+    // which some browsers and embedded views suppress outright: the button
+    // did nothing at all there (found playing a campaign through the app,
+    // 1 October 2026).
     case "log-game": {
-      const raw = prompt("Credits earned this game (in thousands, ¢k):", "0");
-      if (raw === null) return;
-      const earnedK = Math.max(0, Math.round(Number(raw) || 0));
-      const note = prompt("What happened? (optional)", "") ?? "";
+      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "log-game", earnedK: 0 } } }));
+      break;
+    }
+    case "log-game-earned": {
+      const delta = Number(target.dataset["delta"]);
+      store.setState((s) =>
+        s.ui.modal?.kind === "log-game"
+          ? { ...s, ui: { ...s.ui, modal: { ...s.ui.modal, earnedK: Math.max(0, s.ui.modal.earnedK + delta) } } }
+          : s,
+      );
+      break;
+    }
+    case "log-game-confirm": {
+      const m = state.ui.modal;
+      if (m?.kind !== "log-game") return;
+      const typed = readNumber(String((document.querySelector("#log-game-earned") as HTMLInputElement | null)?.value ?? ""));
+      const earnedK = typed !== null ? Math.max(0, typed) : m.earnedK;
+      const note = document.querySelector<HTMLTextAreaElement>("#log-game-note")?.value ?? "";
+      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined } }));
       editOutfit((o) => {
         const debtK = Math.max(0, o.debtK - earnedK);
         return {
@@ -1920,6 +1960,17 @@ export function dispatchAction(target: HTMLElement): void {
           // fresh shuffle of the bag.
           blips: undefined,
         };
+      });
+      break;
+    }
+    case "remove-game": {
+      const n = Number(target.dataset["game"]);
+      if (!Number.isInteger(n)) return;
+      editOutfit((o) => {
+        const gameLog = o.gameLog.filter((g) => g.game !== n).map((g, i) => ({ ...g, game: i + 1 }));
+        const earned = gameLog.reduce((sum, g) => sum + g.earnedK, 0);
+        const debtK = Math.max(0, (o.debtStartK ?? STARTING_DEBT_K) - earned);
+        return { ...o, gameLog, gamesPlayed: gameLog.length, debtK, alertLevel: startingAlertLevel(debtK) };
       });
       break;
     }
@@ -2680,6 +2731,12 @@ function handleChange(e: Event): void {
         ...o,
         ships: o.ships.map((s) => (s.id === shipId ? { ...s, pilotName: inputValue } : s)),
       }));
+      break;
+    }
+    case "round-set": {
+      const v = readNumber(inputValue);
+      if (v === null) return;
+      editOutfit((o) => ({ ...o, round: Math.max(1, v) }));
       break;
     }
     case "assign-perk": {

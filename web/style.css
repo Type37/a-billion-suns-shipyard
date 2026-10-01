@@ -6316,7 +6316,11 @@ main.play-body .roster-section::before { content: none; }
    the commands, the checklist - scrolls under it. */
 /* Play mode's phone bar (playDock in render.ts). Hidden on desktop. */
 .play-dock { display: none; }
-@media (max-width: 760px) {
+/* A phone on its side is 750-915px wide and only 340-430px tall, which missed
+   the 760px phone breakpoint: a Pixel 7 in landscape got the desktop Play
+   screen, with no bottom bar and Next phase scrolled away at the top. A short,
+   touch-driven screen gets the phone layout whatever its width. */
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   .play-dock {
     display: flex; align-items: center; gap: 6px;
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
@@ -6341,7 +6345,7 @@ main.play-body .roster-section::before { content: none; }
   /* Next phase lives in the bar now; the header's copy would be a second one. */
   .play-sticky-next { display: none; }
 }
-@media (max-width: 760px) {
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   .play-sticky {
     /* Not pinned any more: it scrolls away and the bar at the bottom carries
        what you need mid game. See playDock in render.ts. */
@@ -8046,3 +8050,36 @@ cds-text-input.limit-custom { width: 6.5rem; }
 .sy-hvp .sy-hvp-name.is-nameable { height: 36px; }
 .sy-hvp .sy-hvp-name.is-nameable input,
 .sy-hvp .sy-hvp-name.is-nameable button { height: 36px; min-height: 0; }
+
+/* Play on a phone (and a phone on its side). End play is outlined: Next phase
+   in the bottom bar is the screen's one filled button. The CMD strip keeps its
+   tokens but drops its own count and -/+, which the bottom bar shows and
+   works the same way; on a phone that head row was 43px repeating the bar. */
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  .play-bar-end.play-bar-end { flex: 0 0 auto; }
+  .cmd-strip-head { display: none; }
+}
+
+/* Play's top row on a phone: three labelled buttons and nothing else.
+   - The round readout goes: the bottom bar says "Round 1 of 4" in the same
+     view, so the screen said it twice.
+   - The back chevron goes: it led to the same place as End play beside it,
+     with no word on it.
+   - Print and Reset keep their words. They were icon-only with a title, and a
+     title is hover text, which a phone never shows. */
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  .play-sticky .play-bar-round, .play-sticky .play-bar-id { display: none; }
+  .play-sticky .play-bar-reset, .play-sticky .play-bar-print { font-size: 12px; gap: 6px; padding: 0 10px; }
+  .play-sticky .play-bar-print { margin-left: auto; }
+  .play-sticky .play-bar-end { flex: 0 0 auto; }
+}
+
+/* CMD tokens in one row on a phone. Nine 40px tokens and their gaps need
+   392px and a 360px phone has 328, so the ninth wrapped onto a 43px row of its
+   own. Each token now takes an equal share of the row, from 44px down to 28px
+   (still past the 24px target floor), so up to eleven fit on one line. */
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  .cmd-pips { flex-wrap: nowrap; }
+  .cmd-pip.cmd-pip { flex: 1 1 0; width: auto; min-width: 28px; max-width: 44px; }
+  .cmd-pip .icon { width: 18px; height: 18px; }
+}

@@ -1263,12 +1263,13 @@ function eraSelect(list: SavedList): string {
   ).join("")}</cds-select>`;
 }
 
-function fleetMenu(list: SavedList, withReference: boolean): string {
+function fleetMenu(list: SavedList, withReference: boolean, withLimit = false): string {
   return `<cds-menu-button class="hdr-menu" label="Actions" kind="ghost" size="md" menu-alignment="bottom-end" data-key="hdr-menu">
       <cds-menu>
         <cds-menu-item label="Play mode" data-action="go" data-href="#/play/${list.id}"></cds-menu-item>
         ${withReference ? `<cds-menu-item label="Ship reference" data-action="open-ship-reference"></cds-menu-item>` : ""}
         <cds-menu-item label="Print setup" data-action="go" data-href="#/print/${list.id}"></cds-menu-item>
+        ${withLimit ? `<cds-menu-item label="Credit limit" data-action="open-credit-limit"></cds-menu-item>` : ""}
         <cds-menu-item-divider></cds-menu-item-divider>
         <cds-menu-item label="Share link" data-action="share-list" data-id="${list.id}"></cds-menu-item>
         <cds-menu-item label="Copy as text" data-action="copy-list-text" data-id="${list.id}"></cds-menu-item>
@@ -1578,25 +1579,13 @@ function builderView(state: AppState): string {
   // it stops eating a row in the setup band.
   const emblemPicker = `<button class="emblem-current-btn" data-action="open-emblem-modal" data-target="list" title="Choose an emblem">${listEmblem(list, 46)}${icon("pencil", 12, "emblem-edit-cue")}</button>`;
 
-  const limitIsPreset = [300, 400, 500].includes(list.fleet.creditsLimit);
-  const limitCustomOpen = state.ui.limitCustomOpen === true;
-  // The credit limit is a Carbon select (300, 400, 500, any custom amount
-  // already set, and "Custom...") with the credits mark in front of it. Custom
-  // opens a Carbon number field in the select's place; entering an amount
-  // closes it again and the amount becomes an option in the list, so the row
-  // only ever holds one control. It was a homemade popover of preset buttons.
-  // The mark sits outside the select because a native option list can only
-  // show text.
-  const limitOptions = limitIsPreset ? [300, 400, 500] : [300, 400, 500, list.fleet.creditsLimit].sort((x, y) => x - y);
-  const limitControl = unlimited
-    ? "∞"
-    : `<span class="limit-ctl">/${creditsGlyph(13.5)}${
-        limitCustomOpen
-          ? `<cds-text-input class="limit-custom" type="number" min="1" step="10" hide-label label="Custom credit limit" size="sm" value="${list.fleet.creditsLimit}" data-action="set-limit-free" data-key="limit-custom" autofocus></cds-text-input>`
-          : `<cds-select class="limit-select" hide-label label-text="Credit limit" size="sm" value="${list.fleet.creditsLimit}" data-key="limit-select">${limitOptions
-              .map((n) => `<cds-select-item value="${n}" data-action="set-limit" data-limit="${n}">${n}</cds-select-item>`)
-              .join("")}<cds-select-item value="custom" data-action="open-limit-custom">Custom...</cds-select-item></cds-select>`
-      }</span>`;
+  // In the credits row the limit is plain text, "/¢300". Changing it is in the
+  // Actions menu ("Credit limit"), which opens creditLimitModal. It was a
+  // Carbon select right here, but a select spends 64px on its padding and
+  // chevron, and with it the row overflowed a 390px phone whenever "1 to
+  // resolve" showed: the row wrapped to two lines, and choosing or dropping
+  // one personnel card made the whole page below jump 31px.
+  const limitControl = unlimited ? "∞" : `<span class="limit-ctl">/${credits(list.fleet.creditsLimit)}</span>`;
 
 
 
@@ -1640,7 +1629,7 @@ function builderView(state: AppState): string {
         ${factionSelect(list, customs)}
         ${eraSelect(list)}
       </div>
-      ${fleetMenu(list, !!faction && !list.freePlay)}
+      ${fleetMenu(list, !!faction && !list.freePlay, true)}
     </header>
     ${hint(state, "rename-fleet")}
 
@@ -1706,7 +1695,8 @@ function builderView(state: AppState): string {
   ${toast(state)}
   ${footer()}
   ${addUnitModal(state)}
-  ${shipReferenceModal(state)}`;
+  ${shipReferenceModal(state)}
+  ${creditLimitModal(state)}`;
 }
 
 
@@ -1841,6 +1831,34 @@ export function gunArc(ship: ShipClass, kind: "primary" | "aux"): string {
 // The faction ship reference: one line per ship, grouped by Mass, laid out like
 // the rulebook - stats plus both weapon slots at a glance. Opened from the
 // masthead in every fleet-list mode.
+/**
+ * The credit limit, changed from the Actions menu: a Carbon select of 300, 400,
+ * 500, any custom amount already set, and "Custom...", which swaps in a
+ * Carbon number field. A change applies at once; the X closes the dialog.
+ */
+function creditLimitModal(state: AppState): string {
+  if (state.ui.modal?.kind !== "credit-limit") return "";
+  const list = activeList(state);
+  if (!list) return "";
+  const limit = list.fleet.creditsLimit;
+  const preset = [300, 400, 500].includes(limit);
+  const options = preset ? [300, 400, 500] : [300, 400, 500, limit].sort((x, y) => x - y);
+  const field =
+    state.ui.limitCustomOpen === true
+      ? `<cds-text-input class="limit-custom" type="number" min="1" step="10" hide-label label="Custom limit" placeholder="Custom amount" size="md" value="${limit}" data-action="set-limit-free" data-key="limit-custom"></cds-text-input>`
+      : `<cds-select class="limit-select" hide-label label-text="Credit limit" size="md" value="${limit}" data-key="limit-select">${options
+          .map((n) => `<cds-select-item value="${n}" data-action="set-limit" data-limit="${n}">${n}</cds-select-item>`)
+          .join("")}<cds-select-item value="custom" data-action="open-limit-custom">Custom...</cds-select-item></cds-select>`;
+  return `
+  <cds-modal open size="xs" class="limit-modal" data-key="limit-modal">
+    <cds-modal-header>
+      <cds-modal-close-button></cds-modal-close-button>
+      <cds-modal-heading>Credit limit</cds-modal-heading>
+    </cds-modal-header>
+    <cds-modal-body data-modal-primary-focus tabindex="-1">${field}</cds-modal-body>
+  </cds-modal>`;
+}
+
 function shipReferenceModal(state: AppState): string {
   const m = state.ui.modal;
   if (!m || m.kind !== "ship-reference") return "";
@@ -3185,7 +3203,6 @@ function playFleetPanel(list: SavedList, faction: Faction | undefined, customs: 
     tally[posOf(u.id)] += 1;
     if (posOf(u.id) === "play" && acted[u.id]) actedInPlay += 1;
   }
-  const anyActed = units.some((u) => acted[u.id]);
 
   const PLACES: { key: UnitPosition; label: string }[] = [
     { key: "reserve", label: "Reserve" },
@@ -3245,7 +3262,11 @@ function playFleetPanel(list: SavedList, faction: Faction | undefined, customs: 
         <span class="pf-tally-n is-reserve">${tally.reserve}</span> in reserve
         ${actLine}
       </p>
-      ${anyActed ? `<button class="pf-clear-acted" data-action="play-acted-clear" title="Clear every activated token on the board">${icon("eraser", 12)} Clear tokens</button>` : ""}
+      ${/* No "Clear tokens" button. It appeared above the fleet the moment the
+            first Activated token went down and pushed every unit 40px down
+            under the thumb that had just tapped. It was also redundant: Next
+            phase into a new round clears every token, so does the End phase
+            checklist line, and each token toggles off on its own unit. */ ""}
     </div>
     <div class="pf-list">${rows}</div>
   </section>`;

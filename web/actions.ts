@@ -1115,6 +1115,10 @@ export function dispatchAction(target: HTMLElement): void {
       store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "add-unit" } } }));
       break;
     }
+    case "open-credit-limit": {
+      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "credit-limit" }, limitCustomOpen: false } }));
+      break;
+    }
     case "open-ship-reference": {
       store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "ship-reference" } } }));
       break;

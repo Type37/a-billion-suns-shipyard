@@ -3591,7 +3591,10 @@ button { font-family: inherit; }
 .sy-budget-now { font-size: clamp(24px, 5vw, 32px); font-weight: 900; color: var(--ink); }
 .sy-budget-cap { font-weight: 800; }
 .sy-budget-cap .limit-switch > summary { font-size: 15px; font-weight: 700; color: var(--ink-2); border-bottom-width: 1px; }
-.sy-budget-status { margin-left: auto; align-self: center; font-family: var(--sans); }
+/* Always 44px tall, whichever status it holds: "Legal" is a line of text and
+   "1 to resolve" a 44px tap target, and swapping one for the other (choosing
+   a personnel card is enough) moved everything below by 5px. */
+.sy-budget-status { margin-left: auto; align-self: center; font-family: var(--sans); min-height: var(--tap); display: flex; align-items: center; }
 .sy-budget-status .yard-status, .sy-budget-status .yard-status-pop { margin: 0; }
 /* The issues panel opens from the right edge now that its summary sits there. */
 .sy-budget-status .yard-status-panel { left: auto; right: 0; }
@@ -8034,3 +8037,12 @@ cds-menu-button.hdr-menu { border: 1px solid var(--blue); }
 .limit-ctl { display: inline-flex; align-items: center; gap: 4px; font-size: 15px; font-weight: 700; color: var(--ink-2); }
 cds-select.limit-select { width: 7.5rem; }
 cds-text-input.limit-custom { width: 6.5rem; }
+
+/* A personnel row's first line is the same height chosen or not. Choosing one
+   swapped its plain name (24px) for the editable name field and its roll
+   button (44px), and every row below jumped 20px under the thumb. Both states
+   are now 36px: the plain name sits centred in the same box the field fills. */
+.sy-hvp .sy-hvp-name { min-height: 36px; display: flex; align-items: center; box-sizing: border-box; }
+.sy-hvp .sy-hvp-name.is-nameable { height: 36px; }
+.sy-hvp .sy-hvp-name.is-nameable input,
+.sy-hvp .sy-hvp-name.is-nameable button { height: 36px; min-height: 0; }

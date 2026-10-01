@@ -327,6 +327,7 @@ export interface AppState {
       | { kind: "new-fleet"; era: Era; limit: number; factionId?: string; showAll: boolean; customOpen?: boolean; noLimit?: boolean }
       | { kind: "add-unit"; pickFor?: string }
       | { kind: "ship-reference" }
+      | { kind: "credit-limit" }
       | {
           kind: "emblem";
           /** "new-outfit" is the outfit being started in the dialog, which does

@@ -1854,7 +1854,8 @@ function addUnitModal(state: AppState): string {
             ${owned ? `<span class="au-card-owned">${owned} in fleet</span>` : ""}
           </span>
           <span class="au-card-stats">${statChips(ship, true)}</span>
-          <span class="au-card-guns">${gunLines(ship)}</span>
+          <span class="au-card-pri gun-arc-row">${gunArc(ship, "primary")}</span>
+          <span class="au-card-aux gun-arc-row">${gunArc(ship, "aux")}</span>
         </span>
       </button>
       ${
@@ -1926,17 +1927,21 @@ function addUnitModal(state: AppState): string {
  * An arc with no weapon says "None" so the two rows always line up.
  */
 export function gunLines(ship: ShipClass): string {
-  const arc = (kind: "primary" | "aux", weapons: Weapon[], utility: boolean): string => {
-    const label = kind === "primary" ? "Primary" : "Auxiliary";
-    const glyph = `<span class="gun-arc" role="img" aria-label="${label}" title="${label}">${icon(kind === "primary" ? "arc-primary" : "arc-aux", 16)}</span>`;
-    if (weapons.length)
-      return weapons
-        .map((w) => `<span class="gun">${glyph}<span class="gun-txt"><span class="gun-name">${escapeHtml(w.name)}</span> <span class="gun-fig">${w.count}${w.die} ${w.rangeMin}&ndash;${w.rangeMax}"</span></span></span>`)
-        .join("");
-    if (utility) return `<span class="gun">${glyph}<span class="gun-txt"><span class="gun-name">${icon("utility", 12, "util-ico")}Utility Bays</span></span></span>`;
-    return `<span class="gun is-none">${glyph}<span class="gun-txt"><span class="gun-name">None</span></span></span>`;
-  };
-  return `<span class="gun-arc-row">${arc("primary", ship.primary, !!ship.utilityBays && ship.primary.length === 0)}</span><span class="gun-arc-row">${arc("aux", ship.auxiliary, !!ship.utilityBays && ship.auxiliary.length === 0)}</span>`;
+  return `<span class="gun-arc-row">${gunArc(ship, "primary")}</span><span class="gun-arc-row">${gunArc(ship, "aux")}</span>`;
+}
+
+/** One arc's guns: the Primary row or the Auxiliary row of gunLines. */
+export function gunArc(ship: ShipClass, kind: "primary" | "aux"): string {
+  const weapons = kind === "primary" ? ship.primary : ship.auxiliary;
+  const utility = !!ship.utilityBays && weapons.length === 0;
+  const label = kind === "primary" ? "Primary" : "Auxiliary";
+  const glyph = `<span class="gun-arc" role="img" aria-label="${label}" title="${label}">${icon(kind === "primary" ? "arc-primary" : "arc-aux", 16)}</span>`;
+  if (weapons.length)
+    return weapons
+      .map((w) => `<span class="gun">${glyph}<span class="gun-txt"><span class="gun-name">${escapeHtml(w.name)}</span> <span class="gun-fig">${w.count}${w.die} ${w.rangeMin}&ndash;${w.rangeMax}"</span></span></span>`)
+      .join("");
+  if (utility) return `<span class="gun">${glyph}<span class="gun-txt"><span class="gun-name">${icon("utility", 12, "util-ico")}Utility Bays</span></span></span>`;
+  return `<span class="gun is-none">${glyph}<span class="gun-txt"><span class="gun-name">None</span></span></span>`;
 }
 
 function shortWeaponText(w: Weapon[], isUtility: boolean): string {

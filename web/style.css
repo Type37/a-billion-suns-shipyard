@@ -7908,7 +7908,9 @@ cds-inline-notification.app-hint { max-width: none; width: 100%; margin: 6px 0; 
    like a sentence. As flex items the dice were pushed to the far edge
    whenever a long name wrapped. */
 .gun { display: grid; grid-template-columns: 16px minmax(0, 1fr); column-gap: 6px; align-items: start; line-height: 1.3; }
-.gun-arc { display: inline-flex; color: var(--blue); padding-top: 1px; }
+/* Both arc glyphs in the same 16px box, centred on the first line of text. */
+.gun-arc { display: inline-flex; width: 16px; height: 1.3em; align-items: center; justify-content: center; color: var(--blue); }
+.gun-arc svg { width: 16px; height: 16px; }
 .gun-txt { min-width: 0; }
 .gun.is-none .gun-arc, .gun.is-none .gun-name { color: var(--ink-off); }
 .gun-name { font-weight: 600; color: var(--ink); }
@@ -7917,8 +7919,14 @@ cds-inline-notification.app-hint { max-width: none; width: 100%; margin: 6px 0; 
 
 /* Add unit card, laid out from Jet's sketch: name over stats on the left,
    primary over auxiliary on the right. Same grid at every width. */
-.au-card-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); grid-template-rows: auto auto; gap: 4px 14px; align-items: start; width: 100%; }
+/* Each gun shares a grid ROW with the thing beside it: Primary with the name,
+   Auxiliary with the stats. The first draft stacked both guns in one column
+   spanning both rows, so a Primary that wrapped pushed Auxiliary below the
+   stats it was meant to sit beside. */
+.au-card-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 6px 14px; align-items: start; width: 100%; }
 .au-card-id { grid-column: 1; grid-row: 1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; min-width: 0; }
 .au-card-stats { grid-column: 1; grid-row: 2; }
-.au-card-guns { grid-column: 2; grid-row: 1 / span 2; display: grid; grid-template-rows: auto auto; gap: 6px; font-size: 13px; min-width: 0; }
-.au-card-guns .gun-name, .au-card-guns .gun-fig { overflow-wrap: anywhere; }
+.au-card-pri { grid-column: 2; grid-row: 1; }
+.au-card-aux { grid-column: 2; grid-row: 2; }
+.au-card-pri, .au-card-aux { font-size: 13px; min-width: 0; }
+.au-card-pri .gun-name, .au-card-aux .gun-name, .au-card-pri .gun-fig, .au-card-aux .gun-fig { overflow-wrap: anywhere; }

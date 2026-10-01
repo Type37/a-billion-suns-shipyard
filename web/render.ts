@@ -4128,6 +4128,42 @@ function shipsView(state: AppState): string {
  * Cancel comes first in the DOM and the destructive button is the one that has
  * to be reached for, rather than being the default under a returning Enter.
  */
+/**
+ * A shared fleet, before it is saved: what it is, so the player can decide.
+ * Saving is "share-save" in actions.ts; closing saves nothing.
+ */
+function shareModal(state: AppState): string {
+  const m = state.ui.modal;
+  if (!m || m.kind !== "share") return "";
+  const { list, customFaction } = m.decoded;
+  const customs = customFaction ? [...state.customFactions.filter((f) => f.id !== customFaction.id), customFaction] : state.customFactions;
+  const faction = findFaction(list.fleet.factionId, customs);
+  const { total } = listTotals(list, customs);
+  const already = state.lists.some((l) => l.mode === list.mode && JSON.stringify(l.fleet) === JSON.stringify(list.fleet));
+  const rows = list.fleet.units
+    .map((u) => {
+      const ship = resolveShip(u.shipClassId, faction, customs)?.ship;
+      return `<li><span>${escapeHtml(u.name || ship?.name || u.shipClassId)}</span><span class="share-n">${u.count > 1 ? `${u.count} ships` : "1 ship"}</span></li>`;
+    })
+    .join("");
+  return `
+  <cds-modal open size="sm" class="share-modal" data-key="share-modal">
+      <cds-modal-header>
+        <cds-modal-close-button></cds-modal-close-button>
+        <cds-modal-label>Shared with you</cds-modal-label>
+        <cds-modal-heading>${escapeHtml(list.fleet.name || "Unnamed fleet")}</cds-modal-heading>
+      </cds-modal-header>
+      <cds-modal-body class="share-body" data-modal-primary-focus tabindex="-1">
+        <p class="share-meta"><span>${escapeHtml(faction?.name ?? "Unknown faction")}</span><span>${escapeHtml(list.freePlay ? "Free Play" : MODE_LABEL[list.mode])}</span><span>${credits(total)} of ${credits(list.fleet.creditsLimit)}</span></p>
+        ${rows ? `<ul class="share-units">${rows}</ul>` : ""}
+      </cds-modal-body>
+      <cds-modal-footer>
+        <cds-modal-footer-button kind="secondary" data-action="close-modal">Not now</cds-modal-footer-button>
+        <cds-modal-footer-button kind="primary" data-action="share-save">${already ? "Open my copy" : "Save to my fleets"}</cds-modal-footer-button>
+      </cds-modal-footer>
+  </cds-modal>`;
+}
+
 function confirmModal(state: AppState): string {
   const m = state.ui.modal;
   if (!m || m.kind !== "confirm") return "";
@@ -4961,5 +4997,5 @@ export function render(state: AppState): string {
   })();
   // The cropper renders last: it opens OVER the emblem picker that launched it,
   // and hands back to it on cancel.
-  return `${body}${optionsModal(state)}${syncModal(state)}${emblemModal(state)}${newOutfitModal(state)}${confirmModal(state)}${cropModal(state)}`;
+  return `${body}${optionsModal(state)}${syncModal(state)}${emblemModal(state)}${newOutfitModal(state)}${confirmModal(state)}${shareModal(state)}${cropModal(state)}`;
 }

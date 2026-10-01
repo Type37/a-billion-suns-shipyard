@@ -17,6 +17,7 @@ import {
   persistTrainingGame,
 } from "./storage.ts";
 import type { Onboarding, SavedList, SavedOutfit, Settings } from "./storage.ts";
+import type { DecodedShare } from "./share.ts";
 
 // A minimal store: state + subscribers, no framework. The whole app re-renders
 // on every change (main.ts).
@@ -345,6 +346,8 @@ export interface AppState {
           libShown?: number;
         }
       | { kind: "options" }
+      /** A share link was opened: its fleet, waiting for Save or Not now. */
+      | { kind: "share"; decoded: DecodedShare }
       /**
        * Fleet Sync (fleet-sync.ts). `pendingJoin` holds a token the user is
        * about to adopt, once its remote/local counts have come back from

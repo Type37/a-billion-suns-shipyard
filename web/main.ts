@@ -540,22 +540,17 @@ function paint(): void {
   syncLearnProgress();
 }
 
-// A share link carries the whole list (and any custom faction) in the hash. Import
-// it once, drop it into the register, then rewrite the URL to the new list's
-// builder route so a refresh cannot import a second copy.
+// A share link carries the whole list (and any custom faction) in the hash. It
+// used to be saved into the fleets the moment the link opened, with no say in
+// it, and opening the same link twice made two copies. Now it opens a preview
+// (shareModal in render.ts) and nothing is saved until the player presses Save
+// ("share-save" in actions.ts). The address drops the payload at once, so a
+// refresh shows Fleets rather than the same preview again.
 function importDecodedShare(decoded: DecodedShare): void {
-  store.setState((s) => {
-    const lists = [...s.lists, decoded.list];
-    const customFactions = decoded.customFaction
-      ? [...s.customFactions.filter((f) => f.id !== decoded.customFaction!.id), decoded.customFaction]
-      : s.customFactions;
-    persistLists(lists);
-    if (decoded.customFaction) persistCustomFactions(customFactions);
-    return { ...s, lists, customFactions, route: { view: "builder", listId: decoded.list.id } };
-  });
-  // Keep the address bar in step. This fires hashchange, which re-derives the
-  // same route - harmless and idempotent.
-  location.replace(`#/list/${decoded.list.id}`);
+  // replaceState, not location.replace: the latter fires hashchange, and the
+  // hashchange handler closes any open dialog, which would be this one.
+  history.replaceState(null, "", "#/fleets");
+  store.setState((s) => ({ ...s, route: { view: "fleets" }, ui: { ...s.ui, modal: { kind: "share", decoded } } }));
 }
 
 // Returns true if the hash held a share link. Compressed ("z=") links inflate

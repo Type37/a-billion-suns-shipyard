@@ -7879,3 +7879,9 @@ main.play-body .roster-section::before { content: none; }
 @media (max-width: 760px), (pointer: coarse) {
   .hvp-name-input, .comp-search, .comp-filters select, #emblem-lib-search { font-size: 16px; }
 }
+
+/* Shared-fleet preview (shareModal in render.ts). */
+.share-meta { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0 0 12px; font-size: 14px; color: var(--ink-2); }
+.share-units { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--hair-soft); }
+.share-units li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--hair-soft); font-size: 15px; }
+.share-n { color: var(--ink-3); white-space: nowrap; }

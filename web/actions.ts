@@ -1051,6 +1051,32 @@ function dispatchAction(target: HTMLElement): void {
       // anything is lost the confirm above has already said what.
       break;
     }
+    // Save a shared fleet the player has looked at and chosen to keep. If the
+    // same fleet is already saved (opened from the same link before), open
+    // that one instead of making a second copy.
+    case "share-save": {
+      const m = state.ui.modal;
+      if (m?.kind !== "share") return;
+      const { list, customFaction } = m.decoded;
+      const same = state.lists.find(
+        (l) => l.mode === list.mode && JSON.stringify(l.fleet) === JSON.stringify(list.fleet),
+      );
+      const id = same?.id ?? list.id;
+      if (!same) {
+        store.setState((s) => {
+          const lists = [...s.lists, list];
+          const customFactions = customFaction
+            ? [...s.customFactions.filter((f) => f.id !== customFaction.id), customFaction]
+            : s.customFactions;
+          persistLists(lists);
+          if (customFaction) persistCustomFactions(customFactions);
+          return { ...s, lists, customFactions };
+        });
+      }
+      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined } }));
+      location.hash = routeHash({ view: "builder", listId: id });
+      break;
+    }
     case "close-modal": {
       store.setState((s) => {
         // The picker opened OVER the new-outfit dialog, so closing it hands

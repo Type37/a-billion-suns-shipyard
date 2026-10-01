@@ -42,6 +42,30 @@ export const CORP_NAME_WHOLE: readonly string[] = [
   "Fideistic Transformation",
   "Kaytell Makers",
   "Spectral FT Banks & Holdings",
+  // Added 1 October 2026 (Jet). Eleven of these have logos in the emblem
+  // library's corporate folder (web/emblems/corpo/).
+  "Aava Industrial Spacecraft",
+  "ARMA",
+  "Armadyne Weapons, Inc.",
+  "BAS-Lehman Ges.m.b.H",
+  "CANYONHEAVY.market",
+  "Carter Tactical Concerns Ltd.",
+  "COMOCO",
+  "Confederated Systems Inc.",
+  "Czernobog Private Military Corporation",
+  "Gauss",
+  "Mérida",
+  "NorthStar Engineering Group",
+  "Parker-Vance Holding Company",
+  "Salo-Mercury Biomotors Inc.",
+  "Sato Systems GS",
+  "SEBACO Mining Ltd.",
+  "Tannhäuser",
+  "The Anders-Klimt Mining Corporation",
+  "The Sindec Alloyed Metals Corporation",
+  "Valecore Mining Consortium",
+  "The Exo-Credit Federated Union",
+  "The Maru Banking Colonies",
 ];
 
 /**

@@ -16,6 +16,8 @@ import {
   ALERT_START,
   LOW_DEBT_THRESHOLD_K,
   startingAlertLevel,
+  LONG_RANGE_SCANNERS_TEXT,
+  LONG_RANGE_SCAN_TEXT,
 } from "../src/data/junkspace.ts";
 
 // Each pilot class's starting ability (Gunner "Hot Shot", etc.).
@@ -250,6 +252,10 @@ function soloShipCatalog(): string {
           <span class="ship-cost">${ck(s.cost)}</span>
         </div>
         <div class="ship-row-details">${statGuns(s)}</div>
+        ${/* The Recon Ship's scanner rule, p.202 verbatim. It was transcribed
+              but never shown anywhere, so the one thing that makes a ¢2k Recon
+              Ship worth taking was invisible. */ ""}
+        ${s.auxiliaryFitting === "Long-Range Scanners" ? `<p class="ship-rule">${ruleText(LONG_RANGE_SCANNERS_TEXT)}</p><p class="ship-rule">${ruleText(LONG_RANGE_SCAN_TEXT)}</p>` : ""}
       </div>
       <span class="add-cue">${icon("plus", 15)}<span>Add</span></span>
     </article>`,

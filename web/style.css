@@ -8683,3 +8683,6 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
    page, name and tabs included, jumped 47px sideways between tabs. Full grid
    width on every tab. */
 #app > .solo-outfit { width: 100%; }
+/* A ship's own rule printed under its stats (the Recon Ship's scanners). */
+.ship-rule { font-size: 13px; line-height: 1.45; color: var(--ink-2); margin-top: 8px; }
+.ship-rule + .ship-rule { margin-top: 4px; }

@@ -37,6 +37,10 @@ export const JUNKSPACE_SHIPS: ShipClass[] = [
     utilityBays: false, cost: 25 },
 ];
 
+/** The Recon Ship's upgrade, p.202, verbatim. */
+export const LONG_RANGE_SCANNERS_TEXT =
+  "Long-Range Scanners: Recon Ships start with the Long-Range Scanners upgrade. This allows this ship to take the Long-Range Scan action in its Action Step.";
+
 /** Long-Range Scan action granted by the Recon Ship's Long-Range Scanners (p.202). */
 export const LONG_RANGE_SCAN_TEXT =
   "Long-Range Scan (action): Make an Initiative Test. If you succeed, peek at the number on one Blip marker within 12\" without revealing it.";
@@ -56,10 +60,10 @@ export const PILOT_PERKS: PilotPerk[] = [
     text: "A ship with a Gunner as a pilot can re-roll one attack die in each salvo." },
   { class: "Hauler", perkName: "Tough",
     text: "A ship with a Hauler as a pilot ignores the first damage received from each salvo." },
-  // Transcribed verbatim: "Hauler" here is an obvious typo in the source book,
-  // this is the Junker starting perk and should read "Junker".
+  // "Junker". The Layouts 7 PDF in Documents/ prints "Hauler" here, a typo the
+  // app used to keep; Jet's copy of p.202 (1 October 2026) reads "Junker".
   { class: "Junker", perkName: "Smartass",
-    text: "A ship with a Hauler as a pilot rolls two extra dice when making an Initiative Check as part of a Scan action." },
+    text: "A ship with a Junker as a pilot rolls two extra dice when making an Initiative Check as part of a Scan action." },
 ];
 
 // ---------------------------------------------------------------------------

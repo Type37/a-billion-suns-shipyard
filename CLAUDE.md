@@ -70,6 +70,9 @@ These came out of a mobile review session. They override any default taste.
   not add to them.
 - Font sizes come from the type scale at the top of the Carbon section in
   `web/style.css` (11, 13, 16, 18, 22, 28, 32+). Do not add in-between sizes.
+  Spacing (2-96 on Carbon's steps), line widths (1px, 3px status edges only),
+  control heights (48 in a row of controls) and the two control looks are
+  listed beside it. Use them.
 - Colour is fine. Do not retint, add dark mode or chase contrast unless asked.
 - Work from real phone screenshots (Playwright touch contexts: iPhone 13, Pixel
   7, a 360px Android, portrait AND landscape) and real taps. A finding without

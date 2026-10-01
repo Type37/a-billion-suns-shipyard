@@ -658,7 +658,7 @@ function fleetsView(state: AppState): string {
         <span class="fleet-card-cost">${credits(total)}</span>
         <span class="fleet-card-faction">${escapeHtml(faction?.name ?? "Mixed forces")}</span>
         <span class="fleet-card-mode">${l.freePlay ? "Free Play" : MODE_LABEL[l.mode]}</span>
-        <cds-menu-button class="fleet-card-actions card-menu" label="Actions" kind="ghost" size="sm" menu-alignment="bottom-end">
+        <cds-menu-button class="fleet-card-actions card-menu" label="Actions" kind="ghost" size="lg" menu-alignment="bottom-end">
           <cds-menu>
             <cds-menu-item label="Duplicate" data-action="duplicate-list" data-id="${l.id}"></cds-menu-item>
             <cds-menu-item label="Share link" data-action="share-list" data-id="${l.id}"></cds-menu-item>
@@ -1237,7 +1237,7 @@ function factionSelect(list: SavedList, customs: Faction[]): string {
   const body =
     ERA_ORDER.map((e) => group(e, (byEra.get(e) ?? []).filter((f) => !customIds.has(f.id)))).join("") +
     group("Custom", allFactions(customs).filter((f) => customIds.has(f.id)));
-  return `<cds-select class="hdr-select hdr-faction" hide-label label-text="Faction" size="md" value="${escapeHtml(list.fleet.factionId)}" data-key="hdr-faction">${body}</cds-select>`;
+  return `<cds-select class="hdr-select hdr-faction" hide-label label-text="Faction" size="lg" value="${escapeHtml(list.fleet.factionId)}" data-key="hdr-faction">${body}</cds-select>`;
 }
 
 /**
@@ -1262,13 +1262,13 @@ function eraSelect(list: SavedList): string {
   const here = ERA_MODES.find((e) => e.mode === list.mode);
   // Training scenarios are not eras and cannot move (see above).
   if (!here) return `<span class="mf-era-badge">${escapeHtml(MODE_LABEL[list.mode] ?? list.mode)}</span>`;
-  return `<cds-select class="hdr-select hdr-era" hide-label label-text="Era" size="md" value="${list.mode}" data-key="hdr-era">${ERA_MODES.map(
+  return `<cds-select class="hdr-select hdr-era" hide-label label-text="Era" size="lg" value="${list.mode}" data-key="hdr-era">${ERA_MODES.map(
     (e) => `<cds-select-item value="${e.mode}" data-action="set-era" data-mode="${e.mode}">${escapeHtml(e.era)}</cds-select-item>`,
   ).join("")}</cds-select>`;
 }
 
 function fleetMenu(list: SavedList, withReference: boolean, withLimit = false): string {
-  return `<cds-menu-button class="hdr-menu" label="Actions" kind="ghost" size="md" menu-alignment="bottom-end" data-key="hdr-menu">
+  return `<cds-menu-button class="hdr-menu" label="Actions" kind="ghost" size="lg" menu-alignment="bottom-end" data-key="hdr-menu">
       <cds-menu>
         <cds-menu-item label="Play mode" data-action="go" data-href="#/play/${list.id}"></cds-menu-item>
         ${withReference ? `<cds-menu-item label="Ship reference" data-action="open-ship-reference"></cds-menu-item>` : ""}
@@ -1302,7 +1302,7 @@ function shipyardView(state: AppState): string {
 
   // The cap is the control: a Carbon select with the only two choices, ¢300bn
   // or No Limit. No explainer text - No Limit means no credit ceiling.
-  const capControl = `<span class="limit-ctl">${unlimited ? "" : `of ${creditsGlyph(13.5)}`}<cds-select class="limit-select" hide-label label-text="Credit cap" size="sm" value="${unlimited ? "none" : "300"}" data-key="cap-select"><cds-select-item value="300" data-action="sy-cap-limited">300</cds-select-item><cds-select-item value="none" data-action="sy-cap-nolimit">No Limit</cds-select-item></cds-select></span>`;
+  const capControl = `<span class="limit-ctl">${unlimited ? "" : `of ${creditsGlyph(13.5)}`}<cds-select class="limit-select" hide-label label-text="Credit cap" size="lg" value="${unlimited ? "none" : "300"}" data-key="cap-select"><cds-select-item value="300" data-action="sy-cap-limited">300</cds-select-item><cds-select-item value="none" data-action="sy-cap-nolimit">No Limit</cds-select-item></cds-select></span>`;
 
   // Ship list: every class in the faction, ascending mass. The pool holds a
   // count per class (zero when unowned). Unlimited Shipyards is not "cap lifted":
@@ -1850,7 +1850,7 @@ function creditLimitModal(state: AppState): string {
   const field =
     state.ui.limitCustomOpen === true
       ? `<cds-text-input class="limit-custom" type="number" min="1" step="10" hide-label label="Custom limit" placeholder="Custom amount" size="md" value="${limit}" data-action="set-limit-free" data-key="limit-custom"></cds-text-input>`
-      : `<cds-select class="limit-select" hide-label label-text="Credit limit" size="md" value="${limit}" data-key="limit-select">${options
+      : `<cds-select class="limit-select" hide-label label-text="Credit limit" size="lg" value="${limit}" data-key="limit-select">${options
           .map((n) => `<cds-select-item value="${n}" data-action="set-limit" data-limit="${n}">${n}</cds-select-item>`)
           .join("")}<cds-select-item value="custom" data-action="open-limit-custom">Custom...</cds-select-item></cds-select>`;
   return `

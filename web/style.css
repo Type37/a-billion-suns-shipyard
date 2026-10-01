@@ -618,6 +618,11 @@ button { font-family: inherit; }
   --cds-button-primary-hover: var(--blue-deep);
   --cds-button-primary-active: var(--blue-deep);
   --cds-button-secondary: var(--ink);
+  --cds-button-tertiary: var(--blue);
+  --cds-button-tertiary-hover: var(--blue-deep);
+  --cds-button-tertiary-active: var(--blue-deep);
+  --cds-link-primary: var(--blue);
+  --cds-interactive: var(--blue);
   --cds-button-secondary-hover: var(--ink-2);
   --cds-button-disabled: var(--hair-soft);
   --cds-text-on-color-disabled: var(--ink-off);
@@ -3702,10 +3707,6 @@ button { font-family: inherit; }
 /* Add-unit picker: the faction's classes in a 2x2 grid by Mass. */
 .au-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 18px; }
 .au-quad-head { margin: 0 0 2px; font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; font-size: 12px; color: var(--ink-2); border-bottom: 2px solid var(--ink); padding-bottom: 3px; }
-.au-species { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; }
-.au-species-label { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; font-size: 12px; color: var(--ink-2); }
-.au-species .switcher { flex: 1 1 auto; max-width: 420px; }
-.au-species .switcher-opt { min-height: 44px; }
 .au-quad-list { display: flex; flex-direction: column; gap: 0; }
 .au-body { padding-top: 8px; }
 .au-budget { font-variant-numeric: tabular-nums; }
@@ -7890,3 +7891,8 @@ main.play-body .roster-section::before { content: none; }
 /* Hints (COACHMARKS in render.ts): Carbon inline notifications, full width
    under what they describe. The builder's sits under the whole name row. */
 cds-inline-notification.app-hint { max-width: none; width: 100%; margin: 6px 0; }
+
+/* Alliance species buttons, opened on one ship card in Add unit. */
+.au-species-pick { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 0 12px 12px; }
+.au-species-pick cds-button::part(button) { width: 100%; max-width: none; padding-inline: 8px; justify-content: center; }
+.au-card-wrap.is-picking { background: var(--blue-wash); }

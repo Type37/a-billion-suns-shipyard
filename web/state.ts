@@ -325,7 +325,7 @@ export interface AppState {
     /** An open modal dialog. */
     modal?:
       | { kind: "new-fleet"; era: Era; limit: number; factionId?: string; showAll: boolean; customOpen?: boolean; noLimit?: boolean }
-      | { kind: "add-unit"; species?: AllianceSpecies }
+      | { kind: "add-unit"; pickFor?: string }
       | { kind: "ship-reference" }
       | {
           kind: "emblem";

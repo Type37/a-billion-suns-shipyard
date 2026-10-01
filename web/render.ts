@@ -1810,11 +1810,6 @@ function builderView(state: AppState): string {
   ${shipReferenceModal(state)}`;
 }
 
-/** Which species the Add Unit dialog adds as: the one picked in the dialog,
- *  else the most recently added unit's, else the first. */
-export function addUnitSpecies(picked: AllianceSpecies | undefined, units: readonly FleetUnit[]): AllianceSpecies {
-  return picked ?? [...units].reverse().find((u) => u.species)?.species ?? ALLIANCE_SPECIES[0]!;
-}
 
 // The Add-unit picker: the faction's ship classes in a 2x2 grid by Mass (0-3),
 // each a full catalogue row you tap to add as a new unit. Free Play offers every
@@ -1846,8 +1841,15 @@ function addUnitModal(state: AppState): string {
     if (a) parts.push(`<span class="au-wrow"><span class="au-wl">Auxiliary</span>${util(a)}</span>`);
     return parts.join("");
   };
+  // The Alliance tags every unit with a species (Fractious Coalition), so for
+  // them a tap on a ship opens three buttons on that card and the species is
+  // chosen as part of adding it. A species bar at the top of the dialog was
+  // tried first and dropped: it read as a filter on the ship list, not as a
+  // choice about the ship you were about to add.
+  const needsSpecies = !!faction?.requiresSpecies && !list.freePlay;
   const auCard = (ship: ShipClass, addId: string, owned: number) => `
-      <button class="au-card" data-action="add-unit" data-ship="${addId}" title="Add ${escapeHtml(ship.name)}">
+      <div class="au-card-wrap ${m.pickFor === addId ? "is-picking" : ""}" data-key="au-${addId}">
+      <button class="au-card" data-action="${needsSpecies ? "add-unit-pick" : "add-unit"}" data-ship="${addId}" title="Add ${escapeHtml(ship.name)}" ${needsSpecies ? `aria-expanded="${m.pickFor === addId}"` : ""}>
         <span class="au-card-top">
           <span class="au-card-name">${escapeHtml(ship.name)}</span>
           ${owned ? `<span class="au-card-owned">${owned} in fleet</span>` : ""}
@@ -1858,7 +1860,15 @@ function addUnitModal(state: AppState): string {
           <span class="au-card-stats">${statChips(ship, true)}</span>
           <span class="au-card-wep">${weaponsLine(ship)}</span>
         </span>
-      </button>`;
+      </button>
+      ${
+        needsSpecies && m.pickFor === addId
+          ? `<div class="au-species-pick" role="group" aria-label="Add ${escapeHtml(ship.name)} as">${ALLIANCE_SPECIES.map(
+              (sp) => `<cds-button kind="tertiary" size="md" data-action="add-unit" data-ship="${addId}" data-species="${sp}">${sp}</cds-button>`,
+            ).join("")}</div>`
+          : ""
+      }
+      </div>`;
   const quad = (mass: number) => {
     const rows = pool.filter((p) => p.ship.mass === mass);
     const cards = rows
@@ -1873,10 +1883,6 @@ function addUnitModal(state: AppState): string {
       </div>`;
   };
   const label = isStocking ? "ship" : "unit";
-  // The Alliance declares a species per unit (Fractious Coalition), so it is
-  // chosen here, before the add, instead of being a separate chore on every
-  // roster row afterwards. It holds for every add until changed.
-  const species = faction?.requiresSpecies && !list.freePlay ? addUnitSpecies(m.species, list.fleet.units) : null;
   // The dialog covers the roster, so the budget it would otherwise hide rides
   // in Carbon's label slot above the title: what is left, or how far over.
   const { remaining } = listTotals(list, state.customFactions);
@@ -1896,7 +1902,6 @@ function addUnitModal(state: AppState): string {
         <cds-modal-heading>Add ${label}</cds-modal-heading>
       </cds-modal-header>
       <cds-modal-body class="au-body" data-modal-primary-focus tabindex="-1">
-        ${species ? `<div class="au-species"><span class="au-species-label">Species</span>${switcher("Species", "add-unit-species", "species", ALLIANCE_SPECIES.map((s) => [s, s] as [string, string]), species)}</div>` : ""}
         <div class="au-grid">${[0, 1, 2, 3].map(quad).join("")}</div>
       </cds-modal-body>
       <cds-modal-footer>

@@ -15,7 +15,7 @@ import { capitalShipName } from "../src/ship-names.ts";
 import { rollHvpName } from "../src/hvp-names.ts";
 import { announce } from "./announce.ts";
 import { findFaction, isCustom } from "./catalog.ts";
-import { ERA_MODES, addUnitSpecies, hvpById, resolveShip } from "./render.ts";
+import { ERA_MODES, hvpById, resolveShip } from "./render.ts";
 import {
   clearAllData,
   exportAllData,
@@ -926,10 +926,15 @@ function dispatchAction(target: HTMLElement): void {
       store.setState((s) => updateFleet(s, id, (f) => ({ ...f, factionId, units: [], hvp: [] })));
       break;
     }
-    case "add-unit-species": {
-      const picked = target.dataset["species"] as AllianceSpecies | undefined;
-      if (!picked) return;
-      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "add-unit", species: picked } } }));
+    // Alliance: open (or close) the species buttons on one ship card.
+    case "add-unit-pick": {
+      const ship = target.dataset["ship"];
+      if (!ship) return;
+      store.setState((s) =>
+        s.ui.modal?.kind === "add-unit"
+          ? { ...s, ui: { ...s.ui, modal: { kind: "add-unit", ...(s.ui.modal.pickFor === ship ? {} : { pickFor: ship }) } } }
+          : s,
+      );
       break;
     }
     // Species: buttons now (see speciesSwitch in render.ts), so a click.
@@ -990,14 +995,15 @@ function dispatchAction(target: HTMLElement): void {
               ? capitalShipName(f.factionId, `${f.factionId}:${unitId}`, f.units.map((u) => u.name ?? ""))
               : undefined;
           const named = christened ? { name: christened } : {};
-          const modal = s.ui.modal;
-          const tagged =
-            faction?.requiresSpecies && !list.freePlay
-              ? { species: addUnitSpecies(modal?.kind === "add-unit" ? modal.species : undefined, f.units) }
-              : {};
+          const picked = target.dataset["species"] as AllianceSpecies | undefined;
+          const tagged = faction?.requiresSpecies && !list.freePlay && picked ? { species: picked } : {};
           return { ...f, units: [...f.units, { id: unitId, shipClassId: shipId, count: 1, ...named, ...tagged }] };
         }),
       );
+      // The species buttons close once the ship is in; "1 in fleet" on the card says it landed.
+      if (target.dataset["species"]) {
+        store.setState((s) => (s.ui.modal?.kind === "add-unit" ? { ...s, ui: { ...s.ui, modal: { kind: "add-unit" } } } : s));
+      }
       break;
     }
     /**

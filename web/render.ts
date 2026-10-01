@@ -525,15 +525,10 @@ function toast(state: AppState): string {
 // It also used to say all of that at length - a title, a note, and a card with
 // its own description - directly above a home index whose Learn to Play row says
 // the same thing. One sentence pointing at the row is the whole job.
-function tutorialCallout(state: AppState): string {
-  const o = state.onboarding;
-  if (o.tutorialsDismissed || o.visits > 2) return "";
-  return `
-  <aside class="onboard">
-    <p class="onboard-line">Check out the <a href="#/learn">Learn to Play</a> section to learn more about the game.</p>
-    <button class="onboard-close" data-action="dismiss-tutorials" aria-label="Dismiss">${icon("close", 16)}</button>
-  </aside>`;
-}
+// Cut entirely in the October 2026 phone review. The sentence pointed at the
+// Learn to Play row sitting directly beneath it, its close X was a 16px glyph,
+// and it pushed the whole index down for the first three visits. The row says
+// it already.
 
 // ---------------------------------------------------------------------------
 // Home hub: decide what you want to do (Dropfleet-builder mental model)
@@ -603,7 +598,6 @@ function homeView(state: AppState): string {
   ${topbar()}
   <main class="index-wrap">
     <div class="index-col">
-      ${tutorialCallout(state)}
       <nav class="index">
         ${coachmark(state, "fleet-sync", row("#/fleets", "Fleets", "Build, save, print, and share fleets."))}
         ${row("#/solo", "Solo Play", "Play the Junkspace in solo/campaign mode.")}
@@ -663,7 +657,7 @@ function fleetsView(state: AppState): string {
           <span class="fleet-card-actions">
             <button class="card-act" data-action="duplicate-list" data-id="${l.id}" title="Duplicate this fleet" aria-label="Duplicate this fleet">${icon("ix-duplicate", 18)}</button>
             <button class="card-act" data-action="share-list" data-id="${l.id}" title="Copy a share link" aria-label="Copy a share link">${icon("ix-share", 18)}</button>
-            <button class="card-act card-act-labeled is-danger" data-action="delete-list" data-id="${l.id}" title="Delete this fleet" aria-label="Delete this fleet">${icon("ix-trash", 18)}<span class="card-act-text">Delete</span></button>
+            <button class="card-act is-danger" data-action="delete-list" data-id="${l.id}" title="Delete this fleet" aria-label="Delete this fleet">${icon("ix-trash", 18)}</button>
           </span>
         </div>
       </article>`;

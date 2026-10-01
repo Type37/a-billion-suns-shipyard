@@ -243,6 +243,24 @@ html, body { margin: 0; padding: 0; }
    See the no-jump rule in HANDOFF.md. */
 html { scrollbar-gutter: stable; }
 
+/* Touch behaviour, from the October 2026 phone review.
+   - touch-action: manipulation turns off double-tap-to-zoom, so a quick second
+     tap on +, Next phase or a pip lands as a tap instead of zooming the page and
+     leaving the thumb on the wrong control. Pinch zoom still works.
+   - Long-pressing a button used to select its label text and pop the iOS
+     callout (Copy / Look Up). Controls are not text. Inputs are left alone.
+   - :active gives every control a pressed state, because on a phone the
+     hover colours never show (they are all gated behind (hover: hover) now, so
+     a tapped button no longer stays stuck in its hover colour either). */
+html, button, a, summary, label, select, [data-action], cds-button { touch-action: manipulation; }
+button, summary, [data-action]:not(input):not(textarea):not(select), .index-row, .fleet-card, cds-button {
+  -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+button:not([disabled]):active, summary:active, a.index-row:active, [data-action]:not(input):not(select):not(textarea):active {
+  filter: brightness(0.9);
+}
+
 body {
   background: var(--paper);
   color: var(--ink);
@@ -270,7 +288,7 @@ p { margin: 0; }
 #app > * { min-width: 0; max-width: 100%; }
 
 a { color: var(--blue); text-decoration: none; }
-a:hover { text-decoration: underline; }
+@media (hover: hover) { a:hover { text-decoration: underline; } }
 
 /* Generic-link hover: a 1px rule that wipes IN from the left and, on leave,
    collapses OUT to the right - one continuous left-to-right sweep, not a
@@ -385,14 +403,14 @@ button { font-family: inherit; }
   border-color: var(--blue);
   min-height: var(--tap);
 }
-.cta-btn:hover { background: var(--blue-deep); border-color: var(--blue-deep); color: #fff; text-decoration: none; }
+@media (hover: hover) { .cta-btn:hover { background: var(--blue-deep); border-color: var(--blue-deep); color: #fff; text-decoration: none; } }
 
 /* "GET BUILDING": the launch button. Bolder, with a red keyline and a shine
  * that sweeps across on hover. */
 .cta-go { position: relative; overflow: hidden; font-size: 13px; font-weight: 800; letter-spacing: 0.12em; padding: 14px 26px; box-shadow: inset 0 0 0 2px var(--red), 0 2px 0 var(--blue-deep); }
 .cta-go::after { content: ""; position: absolute; top: 0; bottom: 0; left: -40%; width: 30%; background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent); transform: skewX(-18deg); transition: left 0.5s ease; }
-.cta-go:hover:not([disabled]) { transform: translateY(-1px); }
-.cta-go:hover:not([disabled])::after { left: 130%; }
+@media (hover: hover) { .cta-go:hover:not([disabled]) { transform: translateY(-1px); } }
+@media (hover: hover) { .cta-go:hover:not([disabled])::after { left: 130%; } }
 .cta-go[disabled] { box-shadow: none; }
 
 .bar-btn {
@@ -406,9 +424,9 @@ button { font-family: inherit; }
   border-color: var(--hair);
   min-height: var(--tap);
 }
-.bar-btn:hover { background: var(--ink); color: #fff; text-decoration: none; }
+@media (hover: hover) { .bar-btn:hover { background: var(--ink); color: #fff; text-decoration: none; } }
 .bar-btn.danger { border-color: var(--red); color: var(--red-deep); }
-.bar-btn.danger:hover { background: var(--red); color: #fff; }
+@media (hover: hover) { .bar-btn.danger:hover { background: var(--red); color: #fff; } }
 
 .ghost-btn {
   background: transparent;
@@ -421,11 +439,11 @@ button { font-family: inherit; }
      1.4.11 is written for. --field-edge is 3.52:1. */
   border-color: var(--field-edge);
 }
-.ghost-btn:hover { border-color: var(--ink); color: var(--ink); }
+@media (hover: hover) { .ghost-btn:hover { border-color: var(--ink); color: var(--ink); } }
 /* The destructive pair: --red-wash was a 1.14:1 tint, i.e. an invisible
    warning. --red is 3.6:1, which clears 1.4.11 and actually reads as red. */
 .ghost-btn.danger { color: var(--red-deep); border-color: var(--red); }
-.ghost-btn.danger:hover { background: var(--red); color: #fff; border-color: var(--red); }
+@media (hover: hover) { .ghost-btn.danger:hover { background: var(--red); color: #fff; border-color: var(--red); } }
 
 .add-btn {
   background: var(--blue);
@@ -439,7 +457,7 @@ button { font-family: inherit; }
   align-self: center;
 }
 .ship-row .add-btn { padding: 6px 9px; }
-.add-btn:hover { background: var(--blue-deep); border-color: var(--blue-deep); }
+@media (hover: hover) { .add-btn:hover { background: var(--blue-deep); border-color: var(--blue-deep); } }
 .add-btn:disabled { background: var(--paper); color: var(--ink-3); border-color: var(--ink-off); cursor: default; }
 
 /* --------------------------------------------------------------------- chrome */
@@ -456,7 +474,7 @@ button { font-family: inherit; }
   border-bottom: 3px solid var(--red);
 }
 .wordmark { display: inline-flex; align-items: center; gap: 12px; color: #fff; }
-.wordmark:hover { text-decoration: none; }
+@media (hover: hover) { .wordmark:hover { text-decoration: none; } }
 .wordmark-text { font-family: var(--display); font-weight: 900; font-size: 18px; letter-spacing: 0.02em; text-transform: uppercase; }
 .wordmark-sub {
   font-family: var(--sans); font-weight: 600; font-size: 10px; letter-spacing: 0.16em;
@@ -478,7 +496,7 @@ button { font-family: inherit; }
   padding: 9px 14px; border: 1px solid transparent; transition: color 0.16s ease;
 }
 .topnav-btn { background: none; cursor: pointer; }
-.topnav a:hover, .topnav-btn:hover { color: #fff; text-decoration: none; }
+@media (hover: hover) { .topnav a:hover, .topnav-btn:hover { color: #fff; text-decoration: none; } }
 /* Nav fold: on a phone the whole nav collapses behind a hamburger (see the
    max-width block below). On desktop the hamburger is hidden and the nav is the
    normal flat row, shown whether or not the <details> is open.
@@ -511,15 +529,18 @@ button { font-family: inherit; }
 .game-info-footer { margin-top: 24px; border-top: 1px solid var(--hair-soft); padding: 16px 16px 22px; }
 .gif-inner { max-width: var(--shell); margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 24px; font-size: 12.5px; color: var(--ink-2); }
 .gif-inner > span, .gif-inner > a { padding: 0 2px; }
+/* Footer links were 15px tall text runs; 24px is the WCAG 2.5.8 floor and the
+   wrap gap keeps neighbours from sharing a thumb. */
+.gif-inner > a { min-height: 24px; }
 /* The footer links that carry a glyph centre it against the words rather than
    sitting it on the text baseline, where it rode about a pixel high. */
 .gif-inner > a { display: inline-flex; align-items: center; gap: 5px; }
 .gif-title { font-weight: 800; color: var(--ink); }
 .game-info-footer a { color: var(--color-action); font-weight: 600; position: relative; display: inline-block; --underline-color: currentColor; }
-.game-info-footer a:hover { text-decoration: underline; }
+@media (hover: hover) { .game-info-footer a:hover { text-decoration: underline; } }
 /* The WarLore signature: Terminal Grotesque Open, gold on a black highlight. */
 .game-info-footer a.wl-sig { font-family: "Terminal Grotesque Open", var(--sans); font-weight: 400; color: #d4ad4a; background: #111; padding: 1px 7px 2px; letter-spacing: 0.02em; --underline-color: #e7c56a; }
-.game-info-footer a.wl-sig:hover { color: #e7c56a; text-decoration: none; }
+@media (hover: hover) { .game-info-footer a.wl-sig:hover { color: #e7c56a; text-decoration: none; } }
 /* The footer links carry the left-to-right wipe (see .hover-link above). */
 @media (hover: hover) and (min-width: 992px) {
   .game-info-footer a::after {
@@ -736,7 +757,7 @@ button { font-family: inherit; }
 .onboard-line { flex: 1; min-width: 0; font-size: 15px; line-height: 1.45; color: var(--ink); }
 .onboard-line a { font-family: var(--display); font-weight: 700; color: var(--color-action); }
 .onboard-close { background: transparent; border: 1px solid var(--hair); color: var(--ink-3); cursor: pointer; display: inline-flex; padding: 7px; flex-shrink: 0; }
-.onboard-close:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+@media (hover: hover) { .onboard-close:hover { background: var(--ink); color: #fff; border-color: var(--ink); } }
 
 /* Home index: flat, solid rows - no chamfers, no skewed sweeps. The rows sit
    in a narrower left column so they don't run the full content width; the
@@ -752,7 +773,7 @@ button { font-family: inherit; }
   background: var(--blue); color: #fff; border: 1px solid var(--blue-deep); text-decoration: none;
   transition: background 0.12s ease;
 }
-.index-book-link:hover { background: var(--blue-deep); text-decoration: none; }
+@media (hover: hover) { .index-book-link:hover { background: var(--blue-deep); text-decoration: none; } }
 .index-book-cta { display: inline-flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 800; font-size: clamp(16px, 1.8vw, 20px); text-transform: uppercase; letter-spacing: 0.01em; text-align: center; }
 @media (max-width: 860px) { .index-book { position: static; margin-top: 20px; } }
 .index { border-top: 2px solid var(--ink); display: flex; flex-direction: column; gap: 6px; }
@@ -783,13 +804,14 @@ button { font-family: inherit; }
   content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 0; z-index: -1;
   background: var(--red); transition: width 0.16s ease;
 }
+@media (hover: hover) {
 .index-row:hover {
   text-decoration: none; color: #fff; border-color: var(--blue-deep);
   transform: translateX(10px);
   filter: drop-shadow(-9px 7px 0 rgba(11, 61, 145, 0.22));
-}
-.index-row:hover::before { transform: translateX(0) skewX(-9deg); }
-.index-row:hover::after { width: 7px; }
+} }
+@media (hover: hover) { .index-row:hover::before { transform: translateX(0) skewX(-9deg); } }
+@media (hover: hover) { .index-row:hover::after { width: 7px; } }
 @media (prefers-reduced-motion: reduce) {
   /* Do NOT null the transform here. The ::before fill is parked off-screen BY a
      transform (translateX(-102%)), so "transform: none" slid it over every card
@@ -797,17 +819,17 @@ button { font-family: inherit; }
      anyone with Reduce Motion turned on. Drop the sliding panel entirely in this
      mode and swap a flat background on hover instead. */
   .index-row, .index-row::before, .index-row::after { transition: none; }
-  .index-row:hover { transform: none; filter: none; }
+  @media (hover: hover) {   .index-row:hover { transform: none; filter: none; } }
   .index-row::before, .index-row::after { display: none; }
-  .index-row:hover { background: var(--blue); color: #fff; }
-  .index-row:hover .index-desc { color: #cfe0fb; }
+  @media (hover: hover) {   .index-row:hover { background: var(--blue); color: #fff; } }
+  @media (hover: hover) {   .index-row:hover .index-desc { color: #cfe0fb; } }
 }
 .index-main { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
 .index-name { font-family: var(--display); font-weight: 800; font-size: clamp(20px, 3vw, 30px); letter-spacing: -0.01em; line-height: 1.02; text-transform: uppercase; }
 .index-desc { font-size: 13.5px; color: var(--ink-2); transition: color 0.16s; }
-.index-row:hover .index-desc { color: #cfe0fb; }
+@media (hover: hover) { .index-row:hover .index-desc { color: #cfe0fb; } }
 .index-go { color: var(--ink-3); transition: transform 0.18s ease, color 0.16s; }
-.index-row:hover .index-go { color: #fff; transform: translateX(6px); }
+@media (hover: hover) { .index-row:hover .index-go { color: #fff; transform: translateX(6px); } }
 
 .fleets-main { max-width: var(--shell); margin: 0 auto; padding: clamp(24px, 4vw, 44px) clamp(16px, 4vw, 40px) 0; }
 .fleets-head { display: flex; align-items: center; justify-content: flex-start; gap: clamp(24px, 5vw, 48px); flex-wrap: wrap; padding-bottom: 18px; border-bottom: 2px solid var(--hair); }
@@ -836,24 +858,25 @@ button { font-family: inherit; }
    lifts them one step onto the ramp, which is the canonical rest-to-hover jump
    (4 to 8; here none to 8, since rest is a stroke). The flat blue offset block
    this replaced was a different lighting model to everything else on screen. */
+@media (hover: hover) {
 .fleet-card:hover {
   border-color: var(--hair); border-top-color: var(--red);
   transform: translateY(-3px); box-shadow: var(--shadow8);
-}
+} }
 @keyframes fleet-card-in {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 @media (prefers-reduced-motion: reduce) {
   .fleet-card { animation: none; }
-  .fleet-card:hover { transform: none; }
+  @media (hover: hover) {   .fleet-card:hover { transform: none; } }
 }
 .fleet-card-open { display: flex; align-items: center; gap: 14px; padding: 16px; color: var(--ink); text-decoration: none; }
-.fleet-card-open:hover { text-decoration: none; }
+@media (hover: hover) { .fleet-card-open:hover { text-decoration: none; } }
 .fleet-card-emblem { flex-shrink: 0; display: inline-flex; }
 .fleet-card-body { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .fleet-card-name { font-family: var(--display); font-weight: 800; font-size: 19px; line-height: 1.1; letter-spacing: -0.01em; color: var(--ink); }
-.fleet-card-open:hover .fleet-card-name { color: var(--blue); }
+@media (hover: hover) { .fleet-card-open:hover .fleet-card-name { color: var(--blue); } }
 .fleet-card-faction { font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-2); }
 .fleet-card-meta { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 0 16px 12px; }
 .fleet-card-mode { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--blue); }
@@ -861,24 +884,22 @@ button { font-family: inherit; }
 .fleet-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px 8px 16px; border-top: 1px solid var(--hair-soft); margin-top: auto; }
 .fleet-card-date { font-family: var(--sans); font-size: 11px; font-weight: 600; color: var(--ink-3); }
 .fleet-card-actions { display: inline-flex; gap: 4px; flex-wrap: nowrap; }
-/* Duplicate and Share stay icon-only: two safe, familiar actions, each with a
-   title and aria-label so the name is still available. Delete does NOT - it is
-   irreversible and sits in the same row, so on a touchscreen (no hover to reveal
-   intent before the tap) an 18px trash glyph is not warning enough. It carries a
-   visible "Delete" label and a standing red keyline instead. See .card-act-labeled. */
+/* All three card actions are icon-only, Delete included. Delete used to carry a
+   visible "DELETE" label and a red keyline so it could not be mistaken on a
+   touchscreen, which made it the loudest thing on every fleet card (Jet, October
+   2026: "make delete smaller"). It is now the same 34px square as its
+   neighbours, red glyph instead of grey; the confirm dialog behind it is the
+   real guard, and there is deliberately no undo. */
 .card-act {
   display: inline-flex; align-items: center; justify-content: center;
   width: 34px; height: 34px; padding: 0; cursor: pointer;
   background: none; border: 1px solid transparent; color: var(--ink-3);
   transition: color 0.12s ease, background 0.12s ease, border-color 0.12s ease;
 }
-.card-act:hover { color: var(--blue); border-color: var(--hair); background: var(--blue-wash); }
-.card-act.is-danger:hover { color: var(--red); border-color: var(--red); background: transparent; }
+@media (hover: hover) { .card-act:hover { color: var(--blue); border-color: var(--hair); background: var(--blue-wash); } }
+@media (hover: hover) { .card-act.is-danger:hover { color: var(--red); border-color: var(--red); background: transparent; } }
 .card-act:focus-visible { outline: 2px solid var(--red); outline-offset: 1px; }
-/* The labelled Delete: auto width for the word, a red keyline at rest so the
-   action reads as destructive before it is hovered or tapped. */
-.card-act-labeled { width: auto; gap: 6px; padding: 0 11px; border-color: var(--red); color: var(--red-deep); }
-.card-act-text { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.card-act.is-danger { color: var(--red-deep); }
 
 .fleets-empty { margin-top: 26px; font-family: var(--display); font-weight: 800; font-size: clamp(20px, 3vw, 26px); color: var(--ink); line-height: 1.25; }
 .fleets-empty-sub { font-family: var(--sans); font-size: 13.5px; font-weight: 500; color: var(--ink-2); }
@@ -928,7 +949,7 @@ button { font-family: inherit; }
   min-height: 54px;
   transition: border-color 0.12s ease, background 0.12s ease, transform 0.06s ease;
 }
-.faction-plaque:hover { border-color: var(--hair); border-left-color: var(--color-action); background: var(--blue-wash); }
+@media (hover: hover) { .faction-plaque:hover { border-color: var(--hair); border-left-color: var(--color-action); background: var(--blue-wash); } }
 .faction-plaque:active { transform: translateY(1px); }
 /* The blue of a selected plaque is painted by ::before, not by the element's
    own background, so it can be wiped in from the left edge (see .just-picked).
@@ -1007,7 +1028,7 @@ button { font-family: inherit; }
   font-size: 10px; font-weight: 700; padding: 9px 12px; white-space: nowrap;
 }
 .dock-table tbody td { padding: 11px 12px; border-top: 1px solid var(--hair-soft); vertical-align: middle; }
-.dock-table tbody tr:hover { background: var(--blue-wash); }
+@media (hover: hover) { .dock-table tbody tr:hover { background: var(--blue-wash); } }
 .cell-emblem { width: 40px; }
 .cell-name a { font-family: var(--display); font-weight: 700; font-size: 15px; }
 .cell-num { font-variant-numeric: tabular-nums; font-weight: 700; }
@@ -1105,7 +1126,7 @@ button { font-family: inherit; }
   border: 1.5px dashed var(--hair); background: var(--paper); color: var(--ink-3); cursor: pointer; overflow: hidden;
   transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
 }
-.cf-shipimg-drop:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-wash); }
+@media (hover: hover) { .cf-shipimg-drop:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-wash); } }
 .cf-shipimg-drop.has-img { border-style: solid; border-color: var(--blue); padding: 0; min-height: 0; }
 .cf-shipimg-drop img { width: 100%; max-width: 240px; height: auto; object-fit: cover; display: block; }
 .cf-shipimg-cue { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sans); font-size: 12.5px; font-weight: 700; }
@@ -1134,7 +1155,7 @@ button { font-family: inherit; }
   width: 18px; height: 18px; padding: 0; cursor: pointer;
   background: var(--paper); border: 1px solid var(--red-wash); color: var(--red);
 }
-.cf-shipimg-x:hover { background: var(--red); border-color: var(--red); color: #fff; }
+@media (hover: hover) { .cf-shipimg-x:hover { background: var(--red); border-color: var(--red); color: #fff; } }
 
 /* Icon library picker */
 /* Reworked emblem picker: a large preview beside labelled actions, so "upload
@@ -1148,7 +1169,7 @@ button { font-family: inherit; }
 .ep-lib-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid var(--hair); position: sticky; top: 0; background: var(--paper); }
 .ep-lib-title { font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.03em; color: var(--ink-2); }
 .ep-lib-close { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border: 1px solid var(--hair); background: var(--paper); color: var(--ink); cursor: pointer; }
-.ep-lib-close:hover { border-color: var(--ink); }
+@media (hover: hover) { .ep-lib-close:hover { border-color: var(--ink); } }
 .ep-lib-scroll { overflow-y: auto; padding: 14px; }
 .lib-cat-title { font-family: var(--sans); font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--hair-soft); }
 .lib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; align-items: stretch; }
@@ -1163,7 +1184,7 @@ button { font-family: inherit; }
    cost was never tile layout, it was image weight, and downscaled thumbnails
    (scripts/make-emblem-thumbs.py) took that from 9.7MB to 1.3MB. Not worth the
    extra moving part for 1ms. */
-.lib-icon:hover { border-color: var(--ink); }
+@media (hover: hover) { .lib-icon:hover { border-color: var(--ink); } }
 .lib-icon.selected { border-color: var(--blue); box-shadow: 0 0 0 2px var(--blue); }
 .lib-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; min-height: 0; }
 /* No .lib-icon-name rules: the caption under each tile is gone (see
@@ -1211,7 +1232,7 @@ button { font-family: inherit; }
   padding: 10px 18px; cursor: pointer; color: var(--ink-2); min-height: var(--tap);
 }
 .segment button:first-child { border-left: none; }
-.segment button:hover { background: var(--blue-wash); color: var(--blue); }
+@media (hover: hover) { .segment button:hover { background: var(--blue-wash); color: var(--blue); } }
 .segment button.selected { background: var(--blue); color: #fff; }
 .inline-field { display: inline-flex; flex-direction: column; gap: 4px; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
 .inline-field select, .limit-input { font-family: var(--sans); font-size: 14px; font-weight: 600; padding: 8px 10px; border: 1px solid var(--hair); background: var(--paper); color: var(--ink); }
@@ -1274,7 +1295,7 @@ button { font-family: inherit; }
 .catalog-fold > summary::-webkit-details-marker { display: none; }
 .catalog-fold > summary::after { content: "+"; position: absolute; right: 2px; top: -2px; font-size: 16px; font-weight: 700; color: var(--ink-3); }
 .catalog-fold[open] > summary::after { content: "\2212"; }
-.catalog-fold > summary:hover::after { color: var(--color-action); }
+@media (hover: hover) { .catalog-fold > summary:hover::after { color: var(--color-action); } }
 .catalog-list { display: flex; flex-direction: column; gap: 0; }
 
 .catalog-group { border: 1px solid var(--hair-soft); }
@@ -1305,7 +1326,7 @@ button { font-family: inherit; }
    overlapping the ADD control instead of wrapping inside its own space. */
 .ship-row-body { min-width: 0; }
 .catalog-list > .ship-row:last-child { border-bottom: none; }
-.ship-row:hover { border-color: var(--color-line); border-left-color: var(--color-action); background: var(--blue-wash); }
+@media (hover: hover) { .ship-row:hover { border-color: var(--color-line); border-left-color: var(--color-action); background: var(--blue-wash); } }
 /* The glyph column is now sized for ship art (44px), so a mass-glyph icon
    (which is much smaller) needs centering rather than sitting flush-left. */
 .ship-row-glyph { position: relative; color: var(--blue); display: flex; align-items: center; justify-content: center; }
@@ -1511,16 +1532,16 @@ button { font-family: inherit; }
 .roster-unit-class .muted { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; }
 .stepper { display: inline-flex; align-items: center; border: 1px solid var(--hair); }
 .stepper button { background: var(--paper); border: none; padding: 6px 9px; cursor: pointer; color: var(--ink); display: inline-flex; }
-.stepper button:hover { background: var(--ink); color: #fff; }
+@media (hover: hover) { .stepper button:hover { background: var(--ink); color: #fff; } }
 /* aria-disabled, not disabled: the button keeps its place in the tab order and
    can still hold focus (a disabled one cannot, so stepping up to the cap threw
    focus back to the top of the document). It looks and behaves inert; the
    ceiling is enforced in the handler. */
 .stepper button:disabled,
 .stepper button[aria-disabled="true"] { color: var(--ink-3); cursor: default; background: var(--paper); }
-.stepper button[aria-disabled="true"]:hover { background: var(--paper); color: var(--ink-3); }
+@media (hover: hover) { .stepper button[aria-disabled="true"]:hover { background: var(--paper); color: var(--ink-3); } }
 /* At count 1 the (-) deletes the unit: warn in red on hover. */
-.stepper button.will-remove:hover { background: var(--red); color: #fff; }
+@media (hover: hover) { .stepper button.will-remove:hover { background: var(--red); color: #fff; } }
 .stepper-count { padding: 0 12px; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; border-left: 1px solid var(--hair); border-right: 1px solid var(--hair); line-height: 28px; }
 .roster-unit-tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; align-items: center; }
 .inline-field select { font-family: var(--sans); font-size: 13px; padding: 7px 9px; border: 1px solid var(--hair-soft); background: var(--paper); color: var(--ink); }
@@ -2005,7 +2026,8 @@ button { font-family: inherit; }
   background: var(--paper); padding: 16px 18px; margin-bottom: 14px;
   transition: border-color 0.12s ease;
 }
-.cf-ship:hover, .cf-ship:focus-within { border-left-color: var(--color-action); }
+.cf-ship:focus-within { border-left-color: var(--color-action); }
+@media (hover: hover) { .cf-ship:hover { border-left-color: var(--color-action); } }
 /* Row 1, always: art, name, the five stats. Art and name hold the left, and
    the stats wrap under them as a block when the row runs out of room - never
    two of them on one line and three on the next. */
@@ -2021,7 +2043,7 @@ button { font-family: inherit; }
   width: 34px; height: 34px; padding: 0; cursor: pointer;
   background: transparent; border: 1px solid var(--red-wash); color: var(--red);
 }
-.cf-ship-x:hover { background: var(--red); border-color: var(--red); color: #fff; }
+@media (hover: hover) { .cf-ship-x:hover { background: var(--red); border-color: var(--red); color: #fff; } }
 .cf-ship-stats > .field-block { flex: 1 1 0; min-width: 0; }
 .cf-ship-stats > .field-block > input, .cf-ship-stats > .field-block > select { width: 100%; }
 .cf-ship .field-block { gap: 5px; }
@@ -2110,7 +2132,7 @@ button { font-family: inherit; }
   border: 1px solid var(--blue); padding: 3px 9px;
 }
 .guide-shell[open] > .guide-title::after { content: "Hide"; }
-.guide-title:hover::after { background: var(--blue); color: #fff; }
+@media (hover: hover) { .guide-title:hover::after { background: var(--blue); color: #fff; } }
 .guide-intro { font-family: var(--serif); font-size: 14px; line-height: 1.55; color: var(--ink); max-width: 78ch; margin-bottom: 14px; }
 .guide-step { border: 1px solid var(--hair-soft); background: var(--paper); margin-bottom: 6px; }
 .guide-step > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 10px 14px; font-family: var(--display); font-weight: 700; font-size: 14px; }
@@ -2180,12 +2202,12 @@ button { font-family: inherit; }
 .comp-view-toggle { display: inline-flex; border: 1px solid var(--hair); }
 .comp-view-btn { display: inline-flex; align-items: center; gap: 6px; font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 8px 14px; background: var(--paper); color: var(--ink-2); border: none; cursor: pointer; }
 .comp-view-btn + .comp-view-btn { border-left: 1px solid var(--hair); }
-.comp-view-btn:hover { background: var(--blue-wash); color: var(--ink); }
+@media (hover: hover) { .comp-view-btn:hover { background: var(--blue-wash); color: var(--ink); } }
 .comp-view-btn.on { background: var(--blue); color: #fff; }
 /* Compare (bar chart) view. */
 .chart-picker { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
 .chart-picker-btn { display: inline-flex; align-items: center; gap: 5px; font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.03em; padding: 7px 12px; background: var(--paper); color: var(--ink-2); border: 1px solid var(--hair-soft); cursor: pointer; }
-.chart-picker-btn:hover { border-color: var(--ink); color: var(--ink); }
+@media (hover: hover) { .chart-picker-btn:hover { border-color: var(--ink); color: var(--ink); } }
 .chart-picker-btn.selected { background: var(--ink); border-color: var(--ink); color: #fff; }
 .comp-chart-wrap { border: 1px solid var(--hair); padding: 4px 14px; }
 .chart-row { display: grid; grid-template-columns: minmax(120px, 1.4fr) minmax(0, 2fr) auto; align-items: center; gap: 12px; padding: 5px 2px; border-bottom: 1px solid var(--hair-soft); }
@@ -2217,8 +2239,8 @@ button { font-family: inherit; }
 .comp-groupcheck.on { background: var(--blue); color: #fff; }
 .comp-groupcheck.on .comp-groupcheck-box { background: #fff; border-color: #fff; color: var(--blue); }
 .comp-groupcheck.on .comp-groupcheck-box .icon { opacity: 1; }
-.comp-groupcheck:hover { background: var(--blue-wash); }
-.comp-groupcheck.on:hover { background: var(--blue-deep); border-color: var(--blue-deep); }
+@media (hover: hover) { .comp-groupcheck:hover { background: var(--blue-wash); } }
+@media (hover: hover) { .comp-groupcheck.on:hover { background: var(--blue-deep); border-color: var(--blue-deep); } }
 .comp-groupcheck input:focus-visible + .comp-groupcheck-box { outline: 2px solid var(--red); outline-offset: 2px; }
 .comp-scroll { border: 1px solid var(--hair); }
 .comp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -2235,11 +2257,11 @@ button { font-family: inherit; }
 /* Column headers double as sort controls: click to sort, red rule marks the
    active column. */
 .comp-table thead th.comp-sortable { cursor: pointer; user-select: none; transition: background var(--dur-fast, 100ms) ease; }
-.comp-table thead th.comp-sortable:hover { background: #1c2b45; }
+@media (hover: hover) { .comp-table thead th.comp-sortable:hover { background: #1c2b45; } }
 .comp-table thead th.comp-sortable.sorted { box-shadow: inset 0 -3px 0 var(--color-accent, #fc3d21); }
 .comp-table thead th.comp-stat.comp-sortable .comp-hlabel { color: #fff; }
 .comp-table tbody td { padding: 9px 12px; border-top: 1px solid var(--hair-soft); vertical-align: top; }
-.comp-table tbody tr:hover { background: var(--blue-wash); }
+@media (hover: hover) { .comp-table tbody tr:hover { background: var(--blue-wash); } }
 .comp-name { font-family: var(--display); font-weight: 700; font-size: 14px; white-space: nowrap; }
 .comp-era { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
 .comp-fac { font-size: 12px; color: var(--ink-2); white-space: nowrap; }
@@ -2278,7 +2300,7 @@ button { font-family: inherit; }
 @media (max-width: 760px), (pointer: coarse) {
   .comp-group .cg-build { min-height: var(--tap); }
 }
-.comp-group .cg-build:hover { background: rgba(255,255,255,0.12); }
+@media (hover: hover) { .comp-group .cg-build:hover { background: rgba(255,255,255,0.12); } }
 .comp-table.grouped tbody td { border-top: 1px solid var(--hair-soft); }
 .comp-table.grouped .comp-group + tr td { border-top: none; }
 
@@ -2314,7 +2336,7 @@ button { font-family: inherit; }
   padding: 6px 11px 6px 8px; border: 1.5px solid var(--hair); background: var(--paper); cursor: pointer;
   transition: border-color 0.12s ease, background 0.12s ease;
 }
-.pilot-opt:hover { border-color: var(--blue); background: var(--blue-wash); }
+@media (hover: hover) { .pilot-opt:hover { border-color: var(--blue); background: var(--blue-wash); } }
 .pilot-opt.on { border-color: var(--blue); background: var(--blue); }
 /* The three source PNGs are WHITE artwork on transparent, drawn for the selected
    chip's blue fill. Unfiltered they are white-on-white, so an unpicked Hauler or
@@ -2353,7 +2375,7 @@ button { font-family: inherit; }
   border: 1px solid var(--field-edge); background: var(--ground);
   transition: border-color 0.12s ease, background 0.12s ease;
 }
-.no-emblem-btn:hover { border-color: var(--blue); background: var(--blue-wash); }
+@media (hover: hover) { .no-emblem-btn:hover { border-color: var(--blue); background: var(--blue-wash); } }
 .no-emblem-mark { display: flex; align-items: center; justify-content: center; min-height: 60px; color: var(--blue); }
 /* The label is always on, never a hover reveal: the mark alone does not say it
    can be changed, and a mark you cannot tell is a button is a mark you accept
@@ -2374,7 +2396,7 @@ button { font-family: inherit; }
   border: 1px solid var(--field-edge); background: var(--paper); color: var(--ink);
   font-family: var(--display); font-weight: 700; font-size: 16px;
 }
-.new-outfit-name:hover { border-color: var(--ink-3); }
+@media (hover: hover) { .new-outfit-name:hover { border-color: var(--ink-3); } }
 .new-outfit-name::placeholder { color: var(--placeholder); font-weight: 500; }
 @media (max-width: 420px) {
   .no-identity { flex-direction: column; align-items: stretch; }
@@ -2390,7 +2412,7 @@ button { font-family: inherit; }
 }
 @media (prefers-reduced-motion: reduce) { .outfit-card { animation: none; } }
 .outfit-card-main { display: flex; align-items: center; gap: 12px; padding: 14px 16px 10px; text-decoration: none; color: inherit; }
-.outfit-card-main:hover .outfit-card-name { color: var(--blue); }
+@media (hover: hover) { .outfit-card-main:hover .outfit-card-name { color: var(--blue); } }
 .outfit-card-emblem { flex-shrink: 0; color: var(--blue); }
 .outfit-card-id { display: flex; flex-direction: column; min-width: 0; }
 .outfit-card-name { font-family: var(--display); font-weight: 800; font-size: 17px; color: var(--ink); }
@@ -2444,7 +2466,7 @@ button { font-family: inherit; }
 
 .solo-tabs { padding: 0 clamp(16px, 4vw, 40px); display: flex; gap: 0; border-bottom: 2px solid var(--hair); }
 .solo-tab { background: transparent; border: none; border-bottom: 3px solid transparent; margin-bottom: -2px; font-family: var(--sans); font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 14px 18px; cursor: pointer; color: var(--ink-3); }
-.solo-tab:hover { color: var(--ink); }
+@media (hover: hover) { .solo-tab:hover { color: var(--ink); } }
 .solo-tab.selected { color: var(--blue); border-bottom-color: var(--red); }
 
 .solo-body { padding: clamp(18px, 2.4vw, 26px) clamp(16px, 4vw, 40px) 0; }
@@ -2593,7 +2615,7 @@ button { font-family: inherit; }
   font-family: var(--narrow); font-size: 13px; font-weight: 700;
   color: var(--ink-2); cursor: pointer;
 }
-.solo-def:hover { border-color: var(--ink); color: var(--ink); }
+@media (hover: hover) { .solo-def:hover { border-color: var(--ink); color: var(--ink); } }
 .solo-def.is-open { background: var(--blue); border-color: var(--blue); color: #fff; }
 .solo-def-pop {
   position: absolute; top: calc(100% + 7px); left: 0; z-index: 40;
@@ -2814,7 +2836,7 @@ button { font-family: inherit; }
   font: inherit; color: var(--ink-3); text-align: left; cursor: pointer;
   perspective: 700px;
 }
-.blip:hover { border-color: var(--ink); }
+@media (hover: hover) { .blip:hover { border-color: var(--ink); } }
 .blip.is-revealed { border-color: var(--red); color: var(--ink); }
 /* Both faces in the SAME grid cell. That is what stops the reflow: the tile is
    already as tall as its revealed state before anything is flipped. */
@@ -2889,7 +2911,7 @@ button { font-family: inherit; }
 .round-control { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
 .round-value { font-family: var(--display); font-weight: 900; font-size: 40px; font-variant-numeric: tabular-nums; min-width: 50px; text-align: center; }
 .stepper-btn { width: 40px; height: 40px; border: 1px solid var(--hair); background: var(--paper); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
-.stepper-btn:hover { background: var(--ink); color: #fff; }
+@media (hover: hover) { .stepper-btn:hover { background: var(--ink); color: #fff; } }
 
 .roller-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 4px; }
 .roll-result { display: flex; gap: 16px; align-items: center; margin-top: 16px; border: 2px solid var(--blue); padding: 14px; background: var(--blue-wash); }
@@ -2977,7 +2999,7 @@ button { font-family: inherit; }
     text-align: left; gap: 11px; white-space: normal; line-height: 1.2;
     padding: 12px 12px; font-size: 12.5px; letter-spacing: 0.03em; border: none;
   }
-  .nav-fold > .topnav a:hover, .nav-fold > .topnav .topnav-btn:hover { background: rgba(255, 255, 255, 0.12); }
+  @media (hover: hover) {   .nav-fold > .topnav a:hover, .nav-fold > .topnav .topnav-btn:hover { background: rgba(255, 255, 255, 0.12); } }
   .nav-fold > .topnav a svg, .nav-fold > .topnav .topnav-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
 
   /* Readability floor. Nothing a player reads at arm's length across a table
@@ -3221,7 +3243,7 @@ button { font-family: inherit; }
   border-left: 3px solid transparent; color: var(--color-ink);
   transition: background 0.12s ease, border-color 0.12s ease;
 }
-.roster-sheet .roster-unit:hover { background: var(--blue-wash); border-left-color: var(--color-action); }
+@media (hover: hover) { .roster-sheet .roster-unit:hover { background: var(--blue-wash); border-left-color: var(--color-action); } }
 .roster-sheet .roster-unit.unresolved { background: var(--red-wash); }
 .ru-id { min-width: 0; display: flex; align-items: center; gap: 10px; }
 .ru-main { min-width: 0; flex: 1 1 auto; display: flex; flex-direction: column; gap: 1px; }
@@ -3254,8 +3276,8 @@ button { font-family: inherit; }
 .ru-stepper { height: 30px; }
 .ru-stepper .stepper-count { line-height: 28px; padding: 0 9px; min-width: 34px; text-align: center; }
 .ru-remove { background: transparent; border: none; cursor: pointer; color: var(--ink-3); padding: 5px; display: inline-flex; }
-.ru-remove:hover { color: var(--red); }
-.roster-sheet .roster-unit:hover .ru-go { color: var(--color-accent); }
+@media (hover: hover) { .ru-remove:hover { color: var(--red); } }
+@media (hover: hover) { .roster-sheet .roster-unit:hover .ru-go { color: var(--color-accent); } }
 
 /* ===========================================================================
    MANIFEST BUILDER — the working surface as one ruled document, not a
@@ -3299,7 +3321,7 @@ button { font-family: inherit; }
 .era-switch { position: relative; flex-shrink: 0; align-self: center; }
 .era-switch > summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
 .era-switch > summary::-webkit-details-marker { display: none; }
-.mf-era-badge.is-control:hover { background: var(--blue-deep); }
+@media (hover: hover) { .mf-era-badge.is-control:hover { background: var(--blue-deep); } }
 .era-switch[open] > summary { background: var(--blue-deep); }
 .era-caret { transition: transform 0.14s var(--ease); }
 .era-switch[open] .era-caret { transform: rotate(180deg); }
@@ -3316,7 +3338,7 @@ button { font-family: inherit; }
   padding: 8px 10px; min-height: var(--tap); justify-content: center;
   border: 1px solid var(--hair-soft); border-left: 3px solid var(--hair); background: var(--paper);
 }
-.era-opt:hover { border-left-color: var(--blue); background: var(--blue-wash); }
+@media (hover: hover) { .era-opt:hover { border-left-color: var(--blue); background: var(--blue-wash); } }
 .era-opt.on { border-color: var(--blue); border-left-color: var(--red); background: var(--blue-wash); }
 .era-opt-name { font-family: var(--display); font-weight: 700; font-size: 13.5px; color: var(--ink); }
 .era-opt-hint { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); }
@@ -3353,7 +3375,7 @@ button { font-family: inherit; }
   width: 30px; height: 30px; padding: 0; border: none; border-radius: 7px;
   background: none; color: var(--ink-3); cursor: pointer;
 }
-.mf-name-gen:hover { background: var(--hair-soft); color: var(--ink); }
+@media (hover: hover) { .mf-name-gen:hover { background: var(--hair-soft); color: var(--ink); } }
 .mf-name-gen:active { transform: rotate(-18deg); }
 .mf-name-gen:focus-visible { outline: 2px solid var(--red); outline-offset: 1px; }
 
@@ -3377,7 +3399,7 @@ button { font-family: inherit; }
 .mf-menu > summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 40px; padding: 0 14px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: 0.02em; }
 .mf-menu-label { text-transform: uppercase; letter-spacing: 0.05em; font-size: 11px; }
 .mf-menu > summary::-webkit-details-marker { display: none; }
-.mf-menu > summary:hover { border-color: var(--ink); }
+@media (hover: hover) { .mf-menu > summary:hover { border-color: var(--ink); } }
 .mf-menu[open] > summary { border-color: var(--blue); color: var(--blue); }
 .mf-menu-panel {
   position: absolute; z-index: 40; top: calc(100% + 6px); right: 0; width: 210px;
@@ -3390,9 +3412,9 @@ button { font-family: inherit; }
   border: none; background: none; cursor: pointer; padding: 10px 10px; min-height: var(--tap);
   font-family: var(--sans); font-size: 14px; font-weight: 600; color: var(--ink); text-decoration: none;
 }
-.mf-menu-panel a:hover, .mf-menu-panel button:hover { background: var(--blue-wash); }
+@media (hover: hover) { .mf-menu-panel a:hover, .mf-menu-panel button:hover { background: var(--blue-wash); } }
 .mf-menu-panel .danger { color: var(--red-deep); }
-.mf-menu-panel .danger:hover { background: var(--red-wash); }
+@media (hover: hover) { .mf-menu-panel .danger:hover { background: var(--red-wash); } }
 
 /* The two "you're done building" output actions, at the foot of the manifest:
    Play Mode (primary, filled) and Print (secondary, outlined). Play Mode takes
@@ -3405,7 +3427,7 @@ button { font-family: inherit; }
   border: 2px solid var(--blue); transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
 }
 .mf-play-cta { background: var(--blue); color: #fff; }
-.mf-play-cta:hover { background: var(--blue-deep); border-color: var(--blue-deep); }
+@media (hover: hover) { .mf-play-cta:hover { background: var(--blue-deep); border-color: var(--blue-deep); } }
 /* Print is demoted, not removed. It sat at the same 18px/800 weight and the same
    2px blue border as Enter Play Mode, so two full-width blue slabs argued for
    the same click and nothing said which one "finishing" meant. Play Mode is what
@@ -3414,7 +3436,7 @@ button { font-family: inherit; }
   background: transparent; color: var(--ink-2); border-color: var(--hair);
   padding: 12px; font-size: 14px; letter-spacing: 0.03em;
 }
-.mf-print-cta:hover { background: transparent; border-color: var(--blue); color: var(--blue); }
+@media (hover: hover) { .mf-print-cta:hover { background: transparent; border-color: var(--blue); color: var(--blue); } }
 .mf-print-cta .icon { width: 16px; height: 16px; }
 
 /* The faction control OPENS A PICKER; it is not an editable field. It used to
@@ -3438,8 +3460,8 @@ button { font-family: inherit; }
 .mf-fac .faction-switch[open] > summary::after,
 .limit-switch[open] > summary::after { transform: rotate(180deg); }
 .mf-fac .faction-switch > summary::-webkit-details-marker { display: none; }
-.mf-fac .faction-switch:hover > summary,
 .mf-fac .faction-switch[open] > summary { color: var(--blue); border-bottom-color: var(--blue); border-bottom-style: solid; }
+@media (hover: hover) { .mf-fac .faction-switch:hover > summary { color: var(--blue); border-bottom-color: var(--blue); border-bottom-style: solid; } }
 
 /* Credits cap: the "/500" itself is the control. Click it for a popover with
    the presets and a custom field, instead of a standing row of buttons. */
@@ -3449,7 +3471,8 @@ button { font-family: inherit; }
   border-bottom: 2px solid var(--field-edge);
 }
 .limit-switch > summary::-webkit-details-marker { display: none; }
-.limit-switch:hover > summary, .limit-switch[open] > summary { color: var(--blue); border-bottom-color: var(--blue); }
+.limit-switch[open] > summary { color: var(--blue); border-bottom-color: var(--blue); }
+@media (hover: hover) { .limit-switch:hover > summary { color: var(--blue); border-bottom-color: var(--blue); } }
 .limit-switch-panel {
   position: absolute; z-index: 20; top: calc(100% + 8px); left: 0; width: max-content; max-width: min(320px, 90vw);
   background: var(--paper); border: 2px solid var(--hair); padding: 12px;
@@ -3509,8 +3532,8 @@ button { font-family: inherit; }
    limit, so it now looks like them: plain text with a caret. Reference and
    "..." are bare icons. The hit areas are unchanged; only the paint went. */
 .sy-head .mf-era-badge.is-control { background: none; color: var(--ink); box-shadow: inset 0 -2px 0 var(--hair); }
-.sy-head .mf-era-badge.is-control:hover,
 .sy-head .era-switch[open] > summary { background: var(--blue-wash); color: var(--blue); }
+@media (hover: hover) { .sy-head .mf-era-badge.is-control:hover { background: var(--blue-wash); color: var(--blue); } }
 .sy-head .sy-ref-btn,
 .sy-head .mf-menu > summary { border-color: transparent; background: none; }
 .sy-head .emblem-edit-cue { display: none; }
@@ -3526,7 +3549,7 @@ button { font-family: inherit; }
   font-family: var(--sans); font-size: 12px; font-weight: 700;
   letter-spacing: 0.05em; text-transform: uppercase; text-decoration: none;
 }
-.mf-play-btn:hover { background: var(--blue-deep); border-color: var(--blue-deep); color: #fff; }
+@media (hover: hover) { .mf-play-btn:hover { background: var(--blue-deep); border-color: var(--blue-deep); color: #fff; } }
 .mf-play-btn:active { transform: translateY(1px); }
 .sy-head .mf-play-btn { height: 28px; padding: 0 9px; font-size: 11px; gap: 5px; }
 
@@ -3648,11 +3671,11 @@ button { font-family: inherit; }
   transition: transform 0.08s var(--ease), background 0.1s ease;
 }
 .sy-hvp-check:not([aria-disabled="true"]):active { transform: scale(0.86); }
-.sy-hvp-check:hover { border-color: var(--blue); background: var(--blue-wash); }
+@media (hover: hover) { .sy-hvp-check:hover { border-color: var(--blue); background: var(--blue-wash); } }
 .sy-hvp-check.is-on { background: var(--blue); border-color: var(--blue); color: #fff; }
-.sy-hvp-check.is-on:hover { background: var(--blue-deep); }
+@media (hover: hover) { .sy-hvp-check.is-on:hover { background: var(--blue-deep); } }
 .sy-hvp-check[aria-disabled="true"] { color: var(--ink-off); border-color: var(--ink-off); cursor: default; background: var(--paper); }
-.sy-hvp-check[aria-disabled="true"]:hover { background: var(--paper); }
+@media (hover: hover) { .sy-hvp-check[aria-disabled="true"]:hover { background: var(--paper); } }
 .sy-hvp-check:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 .sy-hvp-body { min-width: 0; }
 .sy-hvp-name { display: block; font-family: var(--narrow); font-weight: 700; font-size: 15px; line-height: 1.2; }
@@ -3676,13 +3699,13 @@ button { font-family: inherit; }
    with per-unit rows, an Add-unit picker and a Ship Reference table.
    --------------------------------------------------------------------------- */
 .sy-ref-btn { display: inline-flex; align-items: center; gap: 6px; font-family: var(--display); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.02em; padding: 5px 10px; border: 1px solid var(--hair-soft); background: var(--paper); color: var(--ink); cursor: pointer; }
-.sy-ref-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-wash); }
+@media (hover: hover) { .sy-ref-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-wash); } }
 
 .sy-list-head { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
 .sy-h { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; font-size: 15px; margin: 0; display: flex; align-items: baseline; gap: 8px; }
 .sy-h-count { font-weight: 600; font-size: 12px; color: var(--ink-3); }
 .sy-add-unit { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; font-size: 13px; padding: 9px 15px; border: none; background: var(--blue); color: #fff; cursor: pointer; }
-.sy-add-unit:hover { background: var(--blue-deep); }
+@media (hover: hover) { .sy-add-unit:hover { background: var(--blue-deep); } }
 /* A firm press: the button sinks a touch and shrinks, so the click has weight. */
 .sy-add-unit:active { transform: translateY(1px) scale(0.97); }
 /* When the fleet is empty, the one thing to do pulses a soft ring to draw the eye. */
@@ -3699,7 +3722,7 @@ button { font-family: inherit; }
 .sy-unit-name::placeholder { color: var(--placeholder); font-weight: 400; }
 .sy-unit .sy-ship-cost { margin-left: auto; }
 .sy-unit-remove { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 1px solid var(--hair-soft); background: var(--paper); color: var(--ink-3); cursor: pointer; }
-.sy-unit-remove:hover { border-color: var(--red); color: var(--red); }
+@media (hover: hover) { .sy-unit-remove:hover { border-color: var(--red); color: var(--red); } }
 .sy-unit-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 6px 0 2px; }
 
 .sy-hvp-note { font-size: 12.5px; color: var(--ink-3); margin: 0 0 10px; }
@@ -3726,7 +3749,7 @@ button { font-family: inherit; }
   align-items: baseline; gap: 0 8px;
   padding: 5px 6px; border-bottom: 1px solid var(--hair-soft);
 }
-.sr-row:hover:not(.sr-head) { background: var(--blue-wash); }
+@media (hover: hover) { .sr-row:hover:not(.sr-head) { background: var(--blue-wash); } }
 .sr-head {
   font-family: var(--display); font-weight: 800; text-transform: uppercase;
   font-size: 10px; letter-spacing: 0.04em; color: var(--ink-2);
@@ -3781,7 +3804,7 @@ button { font-family: inherit; }
    stat pills lose their outlines here too. Boxes inside boxes inside a modal was
    three frames around one ship. */
 .au-card { display: block; width: 100%; text-align: left; border: none; border-bottom: 1px solid var(--hair-soft); background: none; padding: 4px 2px 5px; cursor: pointer; position: relative; font-family: inherit; color: var(--ink); }
-.au-card:hover { background: var(--blue-wash); }
+@media (hover: hover) { .au-card:hover { background: var(--blue-wash); } }
 /* This shared a rule with :hover and killed the outline for both, so keyboard
    focus was INVISIBLE on the main action of the Add Unit dialog - a tint that
    also appears on hover is not a focus indicator. It keeps the tint and gets
@@ -3836,7 +3859,7 @@ button { font-family: inherit; }
   font-family: var(--sans); font-size: 13px; font-weight: 700;
 }
 .hvp-pick > summary::-webkit-details-marker { display: none; }
-.hvp-pick > summary:hover { border-color: var(--ink-3); background: var(--paper); }
+@media (hover: hover) { .hvp-pick > summary:hover { border-color: var(--ink-3); background: var(--paper); } }
 .hvp-pick-btn.is-set { color: var(--ink); border-color: var(--blue); background: var(--blue-wash); }
 .hvp-pick-current { flex: 1 1 auto; min-width: 0; text-align: left; }
 .hvp-pick-caret { flex: none; transition: transform 0.14s var(--ease); }
@@ -3854,7 +3877,7 @@ button { font-family: inherit; }
   border: 1px solid var(--hair-soft); border-left: 3px solid var(--hair);
   background: var(--paper); cursor: pointer;
 }
-.hvp-pick-opt:hover { border-left-color: var(--blue); background: var(--blue-wash); }
+@media (hover: hover) { .hvp-pick-opt:hover { border-left-color: var(--blue); background: var(--blue-wash); } }
 .hvp-pick-opt.on { border-color: var(--blue); border-left-color: var(--red); background: var(--blue-wash); }
 .hvp-pick-name { font-family: var(--narrow); font-weight: 700; font-size: 14.5px; color: var(--ink); }
 .hvp-pick-why { font-family: var(--sans); font-size: 10.5px; font-weight: 600; color: var(--ink-3); }
@@ -3922,7 +3945,7 @@ button { font-family: inherit; }
   display: inline-flex; align-items: center; justify-content: center; gap: 9px;
 }
 .switcher-opt:first-child { border-left: none; }
-.switcher-opt:hover:not(.selected) { color: var(--blue); }
+@media (hover: hover) { .switcher-opt:hover:not(.selected) { color: var(--blue); } }
 .switcher-opt.selected { color: #fff; }
 
 /* Stat comparison chart: pick a stat, every ship class ranked as a bar. */
@@ -3932,7 +3955,7 @@ button { font-family: inherit; }
   color: var(--ink-2); font-family: var(--sans); font-size: 11px; font-weight: 700; text-transform: uppercase;
   letter-spacing: 0.03em; padding: 5px 9px; cursor: pointer;
 }
-.chart-picker-btn:hover { border-color: var(--ink); color: var(--ink); }
+@media (hover: hover) { .chart-picker-btn:hover { border-color: var(--ink); color: var(--ink); } }
 .chart-picker-btn.selected { background: var(--ink); border-color: var(--ink); color: #fff; }
 .chart { display: flex; flex-direction: column; padding: 4px 0 14px; }
 .chart-row { display: grid; grid-template-columns: minmax(90px, 1fr) minmax(0, 2fr) auto; align-items: center; gap: 10px; padding: 5px 2px; border-bottom: 1px solid var(--hair-soft); }
@@ -3963,7 +3986,7 @@ button { font-family: inherit; }
 .mf-manifest .mf-list .roster-unit .ru-details .stat-chips { flex: 0 0 auto; align-content: flex-start; }
 .mf-manifest .mf-list .roster-unit .ru-details .weap-table { flex: 0 1 auto; margin-top: 0; }
 .ru-controls { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
-.mf-manifest .mf-list .roster-unit:hover { border-left-color: var(--blue); }
+@media (hover: hover) { .mf-manifest .mf-list .roster-unit:hover { border-left-color: var(--blue); } }
 .mf-manifest .mf-list .roster-unit.unresolved { background: var(--red-wash); }
 
 /* clickable options: the whole row is the add target, and the ADD cue stands
@@ -3974,7 +3997,7 @@ button { font-family: inherit; }
   font-family: var(--display); font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.02em;
   color: var(--blue); border: 2px solid var(--blue); padding: 5px 10px;
 }
-.is-option:hover .add-cue { background: var(--blue); color: #fff; }
+@media (hover: hover) { .is-option:hover .add-cue { background: var(--blue); color: #fff; } }
 .add-cue.is-off { color: var(--ink-2); border-color: var(--ink-off); }
 .personnel-row.is-full { opacity: 0.55; }
 .owned-tag { font-family: var(--display); font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--go); white-space: nowrap; }
@@ -3991,7 +4014,7 @@ button { font-family: inherit; }
   border: 1px solid var(--hair); background: none; color: var(--ink);
   min-width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center;
 }
-.builder .add-btn:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+@media (hover: hover) { .builder .add-btn:hover { background: var(--ink); color: #fff; border-color: var(--ink); } }
 .builder .add-btn:disabled { border-color: var(--ink-off); color: var(--ink-3); background: none; }
 
 /* faction rule: ruled prose, not a card */
@@ -4008,7 +4031,7 @@ button { font-family: inherit; }
 .yard-status.is-ok { color: var(--go); }
 .yard-status.is-muted { color: var(--ink-3); font-weight: 600; }
 .yard-status-pop { position: relative; margin-bottom: 8px; }
-.yard-status-pop > .yard-status { list-style: none; cursor: pointer; margin: 0; }
+.yard-status-pop > .yard-status { list-style: none; cursor: pointer; margin: 0; min-height: var(--tap); }
 .yard-status-pop > .yard-status::-webkit-details-marker { display: none; }
 .yard-status.is-fail { color: var(--red-deep); }
 .yard-status-pop[open] > .yard-status.is-fail { color: var(--red); }
@@ -4046,7 +4069,7 @@ button { font-family: inherit; }
 }
 .mf-addships > summary::-webkit-details-marker { display: none; }
 .mf-addships > summary .mf-h-count { margin-left: auto; }
-.mf-addships > summary:hover { color: var(--blue-deep); }
+@media (hover: hover) { .mf-addships > summary:hover { color: var(--blue-deep); } }
 .mf-addships > summary svg { transition: transform 0.12s ease; }
 .mf-addships[open] > summary svg { transform: rotate(45deg); }
 
@@ -4144,10 +4167,10 @@ button { font-family: inherit; }
 .cf-modal { width: min(440px, 100%); }
 .modal-header.is-danger { background: var(--red-deep); }
 .modal-header.is-danger .modal-close { border-color: rgb(255 255 255 / 0.35); }
-.modal-header.is-danger .modal-close:hover { background: #fff; color: var(--red-deep); }
+@media (hover: hover) { .modal-header.is-danger .modal-close:hover { background: #fff; color: var(--red-deep); } }
 .cf-body { font-size: 14.5px; line-height: 1.5; color: var(--ink-2); }
 .cta-btn.cf-danger { background: var(--red-deep); border-color: var(--red-deep); box-shadow: none; }
-.cta-btn.cf-danger:hover { background: var(--red); border-color: var(--red); }
+@media (hover: hover) { .cta-btn.cf-danger:hover { background: var(--red); border-color: var(--red); } }
 
 .opt-modal { width: min(460px, 100%); }
 .no-modal { width: min(420px, 100%); }
@@ -4167,7 +4190,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
   padding: 9px 11px; border: 1px solid var(--hair-soft); cursor: pointer;
   transition: border-color 0.12s ease, background 0.12s ease;
 }
-.opt-toggle:hover { border-color: var(--blue); background: var(--blue-wash); }
+@media (hover: hover) { .opt-toggle:hover { border-color: var(--blue); background: var(--blue-wash); } }
 .opt-toggle input { flex: 0 0 auto; width: 16px; height: 16px; margin-top: 2px; accent-color: var(--blue); cursor: pointer; }
 .opt-toggle-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .opt-toggle-name { font-family: var(--sans); font-size: 14px; font-weight: 700; color: var(--ink); }
@@ -4211,7 +4234,8 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 /* Discord's own blurple, on Discord's own button only: it is their mark, and a
    player scanning the dialog looks for that colour, not for our blue. */
 .sync-discord-btn { background: #5865f2; border-color: #5865f2; }
-.sync-discord-btn:hover, .sync-discord-btn:active { background: #4752c4; border-color: #4752c4; }
+.sync-discord-btn:active { background: #4752c4; border-color: #4752c4; }
+@media (hover: hover) { .sync-discord-btn:hover { background: #4752c4; border-color: #4752c4; } }
 .sync-discord-who { display: flex; align-items: center; gap: 10px; font-size: 15px; }
 .sync-avatar { width: 32px; height: 32px; border-radius: 50%; }
 @media (max-width: 480px) {
@@ -4224,7 +4248,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 .modal-header { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; background: var(--color-action); color: #fff; }
 .modal-title { font-family: var(--sans); font-weight: 600; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
 .modal-close { background: transparent; border: 1px solid #3a5aa0; color: #fff; cursor: pointer; display: inline-flex; padding: 6px; }
-.modal-close:hover { background: #fff; color: var(--color-action); }
+@media (hover: hover) { .modal-close:hover { background: #fff; color: var(--color-action); } }
 .modal-body { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
 .modal-footer { display: flex; justify-content: space-between; gap: 12px; padding: 14px 20px; border-top: 2px solid var(--color-line); }
 .modal-field { display: flex; flex-direction: column; gap: 8px; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
@@ -4237,14 +4261,14 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
   padding: 10px 16px; border: 1px solid var(--hair); background: var(--paper); color: var(--ink-2); cursor: pointer;
   min-height: var(--tap);
 }
-.nf-opt:hover { border-color: var(--color-line); color: var(--color-ink); }
+@media (hover: hover) { .nf-opt:hover { border-color: var(--color-line); color: var(--color-ink); } }
 .nf-opt.on { background: var(--color-action); border-color: var(--color-action); color: #fff; }
 .nf-custom { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); border: 1px solid var(--color-line); padding: 4px 10px; }
 .nf-custom.on { border-color: var(--color-action); color: var(--color-action); }
 /* Closed state: "Custom" is a plain word-button; click it to open the field. */
 .nf-hyper-note { font-size: 11.5px; color: var(--ink-3); margin-top: 8px; line-height: 1.4; }
 .nf-custom-btn { background: transparent; cursor: pointer; font-family: inherit; }
-.nf-custom-btn:hover { border-color: var(--color-action); color: var(--color-action); }
+@media (hover: hover) { .nf-custom-btn:hover { border-color: var(--color-action); color: var(--color-action); } }
 .nf-custom input { width: 64px; font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; padding: 3px 0; background: transparent; color: var(--ink); }
 /* Era chooser: three distinct, separated cards rather than a joined segmented
    control, each naming what you build with that era so the choice is legible. */
@@ -4254,7 +4278,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
   padding: 11px 12px; border: 1.5px solid var(--hair); background: var(--paper); cursor: pointer;
   transition: border-color 0.12s ease, background 0.12s ease, transform 0.06s ease;
 }
-.nf-era-btn:hover { border-color: var(--blue); background: var(--blue-wash); }
+@media (hover: hover) { .nf-era-btn:hover { border-color: var(--blue); background: var(--blue-wash); } }
 .nf-era-btn:active { transform: translateY(1px); }
 .nf-era-btn.on { border-color: var(--blue); background: var(--blue); }
 .nf-era-name { font-family: var(--display); font-weight: 800; font-size: 14px; line-height: 1.1; letter-spacing: -0.01em; color: var(--ink); text-wrap: balance; }
@@ -4276,8 +4300,10 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
   align-self: flex-start; margin-top: 4px; background: transparent; border: none; cursor: pointer;
   font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: 0.03em; color: var(--color-action);
   text-transform: none; padding: 4px 0; text-decoration: underline;
+  /* 44px tall so a thumb finds it; the underline text stays where it was. */
+  min-height: var(--tap); display: inline-flex; align-items: center;
 }
-.nf-more:hover { color: var(--color-action-strong); }
+@media (hover: hover) { .nf-more:hover { color: var(--color-action-strong); } }
 .nf-all { margin-top: 8px; }
 /* "More" widens the modal and flows the rest of the roster into columns of
    four, scrolling sideways if there are more than fit. */
@@ -4435,7 +4461,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
   grid-auto-columns: minmax(190px, 1fr); gap: 8px; overflow-x: auto; padding-bottom: 6px;
 }
 .cta-btn[disabled] { background: var(--paper); color: var(--ink-3); border-color: var(--hair); cursor: default; }
-.cta-btn[disabled]:hover { background: var(--paper); color: var(--ink-3); border-color: var(--hair); }
+@media (hover: hover) { .cta-btn[disabled]:hover { background: var(--paper); color: var(--ink-3); border-color: var(--hair); } }
 
 /* First-visit coachmark: a small white popover pinned to a live element by
    main.ts (positionTour). Hidden until placed, so it never flashes at 0,0. */
@@ -4508,7 +4534,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
   background: transparent; border: none; cursor: pointer;
   color: var(--red-deep);
 }
-.tour-close:hover { color: var(--red); }
+@media (hover: hover) { .tour-close:hover { color: var(--red); } }
 .tour-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 6px 0 14px; }
 .tour-title { font-family: var(--display); font-weight: 800; font-size: 15px; letter-spacing: -0.01em; color: var(--color-ink); }
 .tour-body { font-family: var(--sans); font-size: 13px; line-height: 1.45; color: var(--ink-2); padding: 8px 14px 14px; }
@@ -4525,11 +4551,11 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
   background: transparent; border: 1px solid var(--hair); color: var(--color-ink); cursor: pointer;
   font-family: var(--sans); font-size: 12px; font-weight: 700;
 }
-.tour-next:hover, .tour-got:hover { border-color: var(--color-action); color: var(--color-action); }
+@media (hover: hover) { .tour-next:hover, .tour-got:hover { border-color: var(--color-action); color: var(--color-action); } }
 /* The one thing the tooltip is asking you to do, so it is the filled button and
    the quiet outline beside it is the way out. */
 .tour-go { background: var(--color-action); border-color: var(--color-action); color: #fff; }
-.tour-go:hover { background: var(--color-ink); border-color: var(--color-ink); color: #fff; }
+@media (hover: hover) { .tour-go:hover { background: var(--color-ink); border-color: var(--color-ink); color: #fff; } }
 
 /* ============================================================ PRINT MEDIA */
 
@@ -4609,7 +4635,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 .learn-dot.on .learn-dot-n { background: var(--blue); border-color: var(--blue); color: #fff; }
 .learn-dot.on .learn-dot-l { color: var(--ink); }
 .learn-dot.done .learn-dot-n { border-color: var(--blue); color: var(--blue); }
-.learn-dot:hover .learn-dot-l { color: var(--ink); }
+@media (hover: hover) { .learn-dot:hover .learn-dot-l { color: var(--ink); } }
 .learn-dot-sep { display: none; }
 
 .learn-title { font-family: var(--display); font-weight: 900; font-size: clamp(28px, 4.4vw, 44px); line-height: 1.04; letter-spacing: -0.01em; margin: 0 0 14px; color: var(--ink); }
@@ -4671,8 +4697,8 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 }
 .learn-btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; text-decoration: none; font-family: var(--display); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 0.03em; border: 1.5px solid var(--ink); color: var(--ink); }
 .learn-btn-next { background: var(--ink); color: #fff; margin-left: auto; }
-.learn-btn:hover { border-color: var(--blue); }
-.learn-btn-next:hover { background: var(--blue); border-color: var(--blue); }
+@media (hover: hover) { .learn-btn:hover { border-color: var(--blue); } }
+@media (hover: hover) { .learn-btn-next:hover { background: var(--blue); border-color: var(--blue); } }
 
 /* Looping activation demo */
 .learn-demo { display: block; width: 100%; max-width: 460px; height: auto; margin: 4px 0 8px; }
@@ -4715,12 +4741,12 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 /* Triggers */
 .emblem-current-btn { cursor: pointer; position: relative; display: inline-flex; align-items: center; }
 .emblem-edit-cue { color: var(--ink-3); margin-left: 4px; }
-.mf-emblem .emblem-current-btn:hover .emblem-edit-cue { color: var(--blue); }
+@media (hover: hover) { .mf-emblem .emblem-current-btn:hover .emblem-edit-cue { color: var(--blue); } }
 .emblem-choose-btn {
   display: inline-flex; align-self: flex-start; align-items: center; gap: 10px; margin-top: 6px; cursor: pointer;
   border: 1px solid var(--hair); background: var(--paper); padding: 6px 12px 6px 6px; text-align: left;
 }
-.emblem-choose-btn:hover { border-color: var(--ink); }
+@media (hover: hover) { .emblem-choose-btn:hover { border-color: var(--ink); } }
 .emblem-choose-preview { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; border: 1px solid var(--hair-soft); border-radius: 50%; color: var(--blue); flex-shrink: 0; }
 .emblem-choose-preview .emblem, .emblem-choose-preview .emblem-img { width: 34px; height: 34px; }
 .emblem-choose-label { display: inline-flex; align-items: center; gap: 7px; font-family: var(--sans); font-weight: 700; font-size: 14px; color: var(--ink); }
@@ -4737,7 +4763,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 .em-preview .emblem, .em-preview .emblem-img { width: 44px; height: 44px; }
 .em-tabs { display: flex; border-bottom: 1px solid var(--hair); }
 .em-tab { flex: 1; padding: 12px 8px; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-family: var(--sans); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3); }
-.em-tab:hover { color: var(--ink); }
+@media (hover: hover) { .em-tab:hover { color: var(--ink); } }
 .em-tab.on { color: var(--ink); border-bottom-color: var(--blue); }
 .em-body { padding: 16px 18px; min-height: 160px; }
 .em-scroll { max-height: none; overflow: visible; }
@@ -4791,10 +4817,11 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
   border: 1.5px dashed var(--hair); background: var(--paper); color: var(--ink-3);
   transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
 }
-.em-drop:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-wash); }
+@media (hover: hover) { .em-drop:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-wash); } }
 .em-drop-cue { display: inline-flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 20px; text-align: center; pointer-events: none; }
 .em-drop-head { font-family: var(--display); font-weight: 800; font-size: 19px; letter-spacing: -0.01em; color: var(--ink); }
-.em-drop:hover .em-drop-head, .em-drop:focus-within .em-drop-head, .em-drop.is-dropping .em-drop-head { color: inherit; }
+.em-drop:focus-within .em-drop-head, .em-drop.is-dropping .em-drop-head { color: inherit; }
+@media (hover: hover) { .em-drop:hover .em-drop-head { color: inherit; } }
 .em-drop-sub { font-family: var(--sans); font-weight: 600; font-size: 13px; color: var(--ink-3); max-width: 42ch; line-height: 1.45; }
 .em-drop-note { font-family: var(--sans); font-size: 12.5px; line-height: 1.5; color: var(--ink-3); }
 /* What you already have, at a size you can judge. The header preview is 40px:
@@ -5050,7 +5077,7 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
   width: 100%; margin-top: 10px; padding: 9px 12px; cursor: pointer;
   border: 1px solid var(--hair); background: var(--paper); color: var(--ink-2);
 }
-.lib-more:hover { border-color: var(--blue); color: var(--blue); }
+@media (hover: hover) { .lib-more:hover { border-color: var(--blue); color: var(--blue); } }
 .lib-more-count { font-family: var(--sans); font-size: 12px; font-weight: 700; }
 
 
@@ -5189,7 +5216,7 @@ a .icon,
 .rt-editor { display: flex; flex-direction: column; text-transform: none; letter-spacing: 0; }
 .rt-toolbar { display: flex; gap: 2px; padding: 4px; border: 1px solid var(--hair); border-bottom: none; background: var(--blue-wash); }
 .rt-btn { min-width: 30px; height: 28px; padding: 0 7px; border: 1px solid transparent; background: none; cursor: pointer; font-family: var(--sans); font-size: 13px; color: var(--ink-2); display: inline-flex; align-items: center; justify-content: center; }
-.rt-btn:hover { background: var(--paper); border-color: var(--hair-soft); color: var(--ink); }
+@media (hover: hover) { .rt-btn:hover { background: var(--paper); border-color: var(--hair-soft); color: var(--ink); } }
 .rt-btn:active { background: var(--blue); color: #fff; }
 .rt-input { width: 100%; min-height: 96px; padding: 9px 11px; border: 1px solid var(--hair); background: var(--paper); font-family: var(--mono); font-size: 13px; line-height: 1.5; color: var(--ink); resize: vertical; }
 .rt-input:focus { outline: none; border-color: var(--blue); }
@@ -5582,7 +5609,7 @@ a .icon,
 .learn-rules { list-style: disc; margin: 10px 0 0; padding-left: 20px; display: grid; gap: 6px; max-width: 66ch; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
 .learn-rules li::marker { color: var(--ink-3); }
 .learn-phase b a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--hair); }
-.learn-phase b a:hover { color: var(--blue); border-bottom-color: var(--blue); }
+@media (hover: hover) { .learn-phase b a:hover { color: var(--blue); border-bottom-color: var(--blue); } }
 /* Two stacked rows: the five main steps, then the four phases of step 4 beneath
    them on their own rail. Nesting the phases inside step 4's chip made that chip
    four links wide and pushed "Battle" to the far edge of the row. */
@@ -5617,7 +5644,7 @@ a .icon,
 .learn-dot.is-sub { padding: 3px 4px; }
 .learn-dot.is-sub .learn-dot-n { display: none; }
 .learn-dot.is-sub .learn-dot-l { font-size: 11.5px; font-weight: 600; color: var(--ink-3); }
-.learn-dot.is-sub:hover .learn-dot-l { color: var(--ink); }
+@media (hover: hover) { .learn-dot.is-sub:hover .learn-dot-l { color: var(--ink); } }
 .learn-dot.is-sub.on .learn-dot-l { color: var(--blue); font-weight: 800; }
 
 /* Phase accordions. Each phase is one of these and appears nowhere else on the
@@ -5628,7 +5655,7 @@ a .icon,
 .learn-acc-head { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; cursor: pointer; list-style: none; }
 .learn-acc-head::-webkit-details-marker { display: none; }
 .learn-acc-head::marker { content: ""; }
-.learn-acc-head:hover .learn-acc-title { color: var(--blue); }
+@media (hover: hover) { .learn-acc-head:hover .learn-acc-title { color: var(--blue); } }
 .learn-acc-n { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 1.5px solid var(--hair); font-family: var(--display); font-weight: 800; font-size: 12px; color: var(--ink-3); }
 .learn-acc[open] .learn-acc-n { background: var(--blue); border-color: var(--blue); color: #fff; }
 .learn-acc-text { display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-width: 0; }
@@ -5652,11 +5679,11 @@ a .icon,
 /* "Battle" is an action in the rail, not a page you walk to. */
 .learn-dot-go { border: none; background: none; cursor: pointer; font: inherit; }
 .learn-dot-go .learn-dot-n { background: var(--red); border-color: var(--red); color: #fff; }
-.learn-dot-go:hover .learn-dot-l { color: var(--red); }
+@media (hover: hover) { .learn-dot-go:hover .learn-dot-l { color: var(--red); } }
 
 /* A quieter third button: the reference sheet is an aside, not the way forward. */
 .learn-btn-ref { border-color: var(--hair); color: var(--ink-2); font-size: 13px; padding: 10px 16px; }
-.learn-btn-ref:hover { border-color: var(--blue); color: var(--blue); }
+@media (hover: hover) { .learn-btn-ref:hover { border-color: var(--blue); color: var(--blue); } }
 
 /* Visual friction on a page turn and on opening a phase, so moving through the
    tutorial registers as movement instead of the text silently swapping. */
@@ -5713,7 +5740,7 @@ a .icon,
 .learn-substep { position: relative; padding-left: 18px; }
 .learn-substep::before { content: ""; position: absolute; left: 0; top: 11px; width: 12px; height: 2px; background: var(--hair); }
 .learn-substep a { display: flex; align-items: baseline; gap: 8px; padding: 5px 8px; border: 1px solid var(--hair); color: var(--ink); text-decoration: none; }
-.learn-substep a:hover { border-color: var(--blue); color: var(--blue); }
+@media (hover: hover) { .learn-substep a:hover { border-color: var(--blue); color: var(--blue); } }
 .learn-substep b { font-family: var(--display); font-weight: 800; font-size: 13px; }
 .learn-substep span { font-size: 12px; color: var(--ink-3); }
 
@@ -5903,11 +5930,11 @@ body[data-view="home"] .game-info-footer { position: sticky; bottom: 0; z-index:
   border: 1px solid var(--blue); background: var(--blue-wash); color: var(--blue);
   transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease, opacity 0.12s ease;
 }
-.cmd-pip:hover { background: var(--blue); color: #fff; }
+@media (hover: hover) { .cmd-pip:hover { background: var(--blue); color: #fff; } }
 /* Spent: drained of colour but still drawn and still tappable, because taking a
    token back has to be as easy as spending it - a mis-tap mid-turn is common. */
 .cmd-pip.is-spent { border-color: var(--hair); background: var(--paper); color: var(--ink-3); opacity: 0.5; }
-.cmd-pip.is-spent:hover { opacity: 0.85; border-color: var(--ink-3); background: var(--paper); color: var(--ink-2); }
+@media (hover: hover) { .cmd-pip.is-spent:hover { opacity: 0.85; border-color: var(--ink-3); background: var(--paper); color: var(--ink-2); } }
 .cmd-pips-none { font-family: var(--sans); font-size: 12px; font-style: italic; color: var(--ink-3); }
 /* Section headings lose the indent and the accent square: mid-game that is 34px
    of left margin and a decorative dot on a line that just says "Your fleet". */
@@ -5915,7 +5942,7 @@ main.play-body .roster-section { padding: 5px 0 4px; font-size: 10.5px; border-b
 main.play-body .roster-section::before { content: none; }
 .play-bar-id { margin: 0; font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); }
 .play-bar-id a { color: var(--blue); text-decoration: none; }
-.play-bar-id a:hover { text-decoration: underline; }
+@media (hover: hover) { .play-bar-id a:hover { text-decoration: underline; } }
 /* The crumb reads as a sentence on a wide screen and collapses to this arrow on
    a phone, where the row cannot afford the name. See the .play-sticky block. */
 .play-bar-back { display: none; }
@@ -5993,19 +6020,19 @@ main.play-body .roster-section::before { content: none; }
   font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.02em; color: var(--ink); cursor: pointer;
   transition: transform 0.08s var(--ease), background 0.1s ease, color 0.1s ease;
 }
-.sy-req-btn:not(:disabled):hover { background: var(--blue); border-color: var(--blue); color: #fff; }
+@media (hover: hover) { .sy-req-btn:not(:disabled):hover { background: var(--blue); border-color: var(--blue); color: #fff; } }
 .sy-req-btn:not(:disabled):active { transform: scale(0.94); }
 .sy-req-btn:disabled { color: var(--ink-off); border-color: var(--ink-off); cursor: default; }
 /* Requisition (first) is the primary move: fill it so it reads as the CTA. */
 .sy-req-btn:first-child:not(:disabled) { background: var(--blue); border-color: var(--blue); color: #fff; }
-.sy-req-btn:first-child:not(:disabled):hover { background: var(--blue-deep); }
+@media (hover: hover) { .sy-req-btn:first-child:not(:disabled):hover { background: var(--blue-deep); } }
 /* Destroyed is the one move in this row you would not press by accident, so it
    carries the damage red on its edge - loud enough to find, quiet enough not to
    compete with Requisition for the eye. It does not need a confirm: pressing
    Requisition again is the undo in Management Training, and in Hypergrowth the
    ledger records exactly what happened and when. */
 .sy-req-lost-btn:not(:disabled) { border-color: var(--red); color: var(--red-deep); }
-.sy-req-lost-btn:not(:disabled):hover { background: var(--red); border-color: var(--red); color: #fff; }
+@media (hover: hover) { .sy-req-lost-btn:not(:disabled):hover { background: var(--red); border-color: var(--red); color: #fff; } }
 .sy-req-lost { color: var(--red-deep); font-weight: 700; }
 .sy-log-lost .sy-log-verb { color: var(--red-deep); }
 /* Each class shows its unit cost by the name; Deploy repeats it on the button. */
@@ -6162,7 +6189,7 @@ main.play-body .roster-section::before { content: none; }
   transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
 }
 .pf-pos-opt:first-child { margin-left: 0; }
-.pf-pos-opt:hover { border-color: var(--ink-3); color: var(--ink); }
+@media (hover: hover) { .pf-pos-opt:hover { border-color: var(--ink-3); color: var(--ink); } }
 /* Only "Jumped in" gets the loud fill. Every unit starts in Reserve, so if both
    states shouted the roster would open as a wall of solid blue bars and the one
    fact worth seeing - which units are actually on the table - would be the
@@ -6190,7 +6217,7 @@ main.play-body .roster-section::before { content: none; }
   letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;
   transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
 }
-.pf-acted:hover { border-color: var(--ink-3); color: var(--ink); }
+@media (hover: hover) { .pf-acted:hover { border-color: var(--ink-3); color: var(--ink); } }
 .pf-acted.on { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 .pf-acted .icon { margin: 0; }
 /* A unit that has activated dims its whole row, so "what is left to go" reads
@@ -6207,7 +6234,7 @@ main.play-body .roster-section::before { content: none; }
   font-family: var(--sans); font-size: 10.5px; font-weight: 700;
   letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2);
 }
-.pf-clear-acted:hover { border-color: var(--ink-3); color: var(--ink); }
+@media (hover: hover) { .pf-clear-acted:hover { border-color: var(--ink-3); color: var(--ink); } }
 
 /* --------------------------------------------------------- the result
    Where the phase steps were, once the last End Phase is closed out. It takes
@@ -6232,7 +6259,7 @@ main.play-body .roster-section::before { content: none; }
    because it is the one press here that cannot be undone by pressing it again
    (picking a phase is the way back, and the result block says so). */
 .cta-btn.play-next-final { background: var(--red); border-color: var(--red); }
-.cta-btn.play-next-final:hover { background: var(--red-deep); border-color: var(--red-deep); }
+@media (hover: hover) { .cta-btn.play-next-final:hover { background: var(--red-deep); border-color: var(--red-deep); } }
 
 /* ------------------------------------------------- Play Mode on a phone
    Play Mode is used standing at a table with the phone in one hand, and the
@@ -6471,12 +6498,13 @@ main.play-body .roster-section::before { content: none; }
   min-height: 24px;
   transition: border-color 0.12s ease, background 0.12s ease;
 }
+@media (hover: hover) {
 .mf-name:hover,
 .sy-unit-name:hover,
 .fleet-name-input:hover,
 .unit-name-input:hover,
 .ship-name-input:hover,
-.hvp-name-input:hover { border-color: var(--ink-3); background: var(--paper); }
+.hvp-name-input:hover { border-color: var(--ink-3); background: var(--paper); } }
 .mf-name:focus,
 .sy-unit-name:focus,
 .fleet-name-input:focus,
@@ -6554,7 +6582,7 @@ main.play-body .roster-section::before { content: none; }
   cursor: pointer;
   transition: color 0.12s ease, border-color 0.12s ease, background 0.12s ease;
 }
-.hvp-name-roll:hover { color: var(--blue); border-color: var(--field-edge); background: var(--paper); }
+@media (hover: hover) { .hvp-name-roll:hover { color: var(--blue); border-color: var(--field-edge); background: var(--paper); } }
 .hvp-name-roll:focus-visible { outline: 2px solid var(--red); outline-offset: -2px; }
 /* Nothing to press on paper. */
 @media print { .hvp-name-roll { display: none; } }
@@ -6785,7 +6813,11 @@ main.play-body .roster-section::before { content: none; }
   .wordmark { display: inline-flex; align-items: center; min-height: var(--tap); }
   /* WarLore's credit sits inside the footer row that already pads its direct
      children; this one is nested a level deeper and missed it. */
-  .wl-sig { display: inline-flex; align-items: center; min-height: var(--tap); }
+  /* The tap area grows, the black plate does not: min-height on the link itself
+     stretched WarLore's black badge into a 44px slab (seen on an iPhone 13,
+     October 2026). The extra reach is an invisible ::before instead. */
+  .game-info-footer a.wl-sig { position: relative; }
+  .game-info-footer a.wl-sig::before { content: ""; position: absolute; inset: -12px -6px; }
   /* The hamburger menu's own items: 12px of padding on a 17px line came to 41.
      These are the five links every screen is reached through. */
   .nav-fold > .topnav a, .nav-fold > .topnav .topnav-btn { min-height: var(--tap); }
@@ -6903,7 +6935,7 @@ main.play-body .roster-section::before { content: none; }
   border-bottom: 3px solid transparent;
   transition: color 120ms var(--ease), border-color 120ms var(--ease);
 }
-.ltp-tab:hover { color: var(--ink); }
+@media (hover: hover) { .ltp-tab:hover { color: var(--ink); } }
 .ltp-tab.on { color: var(--blue); border-bottom-color: var(--blue); }
 .ltp-tab-ico { flex: none; }
 /* Where #/learn ends and #/rules begins. A hairline, not a gap: the rail is one
@@ -6935,7 +6967,7 @@ main.play-body .roster-section::before { content: none; }
   white-space: nowrap;
   transition: background 120ms var(--ease), color 120ms var(--ease);
 }
-.ltp-subtab:hover { background: var(--blue-wash); color: var(--ink); }
+@media (hover: hover) { .ltp-subtab:hover { background: var(--blue-wash); color: var(--ink); } }
 .ltp-subtab-n {
   flex: none;
   font-family: var(--display); font-weight: 800; font-size: 11px;
@@ -6998,7 +7030,7 @@ main.play-body .roster-section::before { content: none; }
 .ltp-scope p { margin: 0 0 7px; }
 .ltp-scope p:last-child { margin-bottom: 0; }
 .ltp-scope a { color: var(--blue); text-decoration: underline; text-underline-offset: 2px; }
-.ltp-scope a:hover { color: var(--red-deep); }
+@media (hover: hover) { .ltp-scope a:hover { color: var(--red-deep); } }
 .ltp-sec-head { margin-bottom: 10px; }
 .ltp-sec-title {
   font-family: var(--display); font-weight: 800; font-size: 34px; line-height: 1.1;
@@ -7157,7 +7189,7 @@ main.play-body .roster-section::before { content: none; }
   font-family: var(--sans); font-weight: 700; font-size: 15.5px; color: var(--ink);
   transition: background 120ms var(--ease), color 120ms var(--ease), border-color 120ms var(--ease);
 }
-.ltp-pick-tab:hover { background: var(--blue-wash); }
+@media (hover: hover) { .ltp-pick-tab:hover { background: var(--blue-wash); } }
 .ltp-pick-k {
   flex: none;
   display: inline-flex; align-items: center; justify-content: center;
@@ -7232,7 +7264,7 @@ main.play-body .roster-section::before { content: none; }
   padding: 13px 14px; min-height: var(--tap);
 }
 .ltp-era-head::-webkit-details-marker { display: none; }
-.ltp-era-head:hover { background: var(--ground); }
+@media (hover: hover) { .ltp-era-head:hover { background: var(--ground); } }
 .ltp-era-head-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .ltp-era-name {
   font-family: var(--display); font-weight: 800; font-size: 20px;
@@ -7420,7 +7452,8 @@ main.play-body .roster-section::before { content: none; }
      with it. Colour only, and only the underline. */
   color: inherit;
 }
-.ltp-gloss:hover, .ltp-gloss:focus-visible { border-bottom-color: var(--red); outline: none; }
+.ltp-gloss:focus-visible { border-bottom-color: var(--red); outline: none; }
+@media (hover: hover) { .ltp-gloss:hover { border-bottom-color: var(--red); outline: none; } }
 .ltp-gloss:focus-visible { border-bottom-width: 2px; }
 .ltp-gloss-pop {
   /* Absolute, always: opening one of these must not move a single word of the
@@ -7454,9 +7487,9 @@ main.play-body .roster-section::before { content: none; }
   cursor: auto;
   text-align: left;
 }
-.ltp-gloss:hover .ltp-gloss-pop,
 .ltp-gloss:focus .ltp-gloss-pop,
 .ltp-gloss:focus-within .ltp-gloss-pop { display: block; }
+@media (hover: hover) { .ltp-gloss:hover .ltp-gloss-pop { display: block; } }
 .ltp-gloss-k {
   display: block; margin-bottom: 3px;
   font-family: var(--display); font-weight: 800; font-size: 12px;
@@ -7576,7 +7609,7 @@ main.play-body .roster-section::before { content: none; }
   list-style: none; user-select: none;
 }
 .ltp-src-summary::-webkit-details-marker { display: none; }
-.ltp-src-summary:hover { background: var(--blue-wash); }
+@media (hover: hover) { .ltp-src-summary:hover { background: var(--blue-wash); } }
 .ltp-src-summary > svg:first-of-type { flex: none; color: var(--blue); }
 .ltp-src-summary-l { flex: 1 1 auto; min-width: 0; }
 .ltp-src-summary-n {
@@ -7601,7 +7634,7 @@ main.play-body .roster-section::before { content: none; }
   list-style: none; user-select: none;
 }
 .ltp-fold-head::-webkit-details-marker { display: none; }
-.ltp-fold-head:hover { background: var(--blue-wash); }
+@media (hover: hover) { .ltp-fold-head:hover { background: var(--blue-wash); } }
 .ltp-fold-l { flex: 1 1 auto; min-width: 0; }
 .ltp-fold-n {
   font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
@@ -7641,7 +7674,7 @@ main.play-body .roster-section::before { content: none; }
   text-decoration: none; color: var(--ink);
   transition: background 120ms var(--ease), border-color 120ms var(--ease);
 }
-.ltp-pager-btn:hover { background: var(--blue-wash); border-color: var(--blue); }
+@media (hover: hover) { .ltp-pager-btn:hover { background: var(--blue-wash); border-color: var(--blue); } }
 .ltp-pager-btn > svg { flex: none; color: var(--blue); }
 .ltp-pager-next { grid-column: 2; justify-content: flex-end; text-align: right; }
 .ltp-pager-txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
@@ -7665,7 +7698,7 @@ main.play-body .roster-section::before { content: none; }
   padding: 9px 11px; background: var(--paper); text-decoration: none;
   min-height: var(--tap);
 }
-.ltp-src:hover { background: var(--blue-wash); }
+@media (hover: hover) { .ltp-src:hover { background: var(--blue-wash); } }
 .ltp-src-name {
   display: flex; align-items: center; gap: 6px;
   font-family: var(--sans); font-weight: 700; font-size: 15.5px; color: var(--blue);
@@ -7703,9 +7736,9 @@ main.play-body .roster-section::before { content: none; }
   border: 1px solid var(--hair); background: var(--paper); color: var(--ink);
 }
 .ltp-btn svg { flex: none; }
-.ltp-btn:hover { background: var(--ground); }
+@media (hover: hover) { .ltp-btn:hover { background: var(--ground); } }
 .ltp-btn-go, .ltp-btn-buy { background: var(--blue); border-color: var(--blue); color: #fff; }
-.ltp-btn-go:hover, .ltp-btn-buy:hover { background: var(--blue-deep); border-color: var(--blue-deep); }
+@media (hover: hover) { .ltp-btn-go:hover, .ltp-btn-buy:hover { background: var(--blue-deep); border-color: var(--blue-deep); } }
 .ltp-btn-buy { font-size: 17.5px; padding: 14px 24px; }
 
 /* The diagrams are shared with the archived walkthrough and are sized for its

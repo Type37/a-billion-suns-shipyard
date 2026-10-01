@@ -1,11 +1,10 @@
-import { parseRoute, store } from "./state.ts";
+import { activeList, parseRoute, store } from "./state.ts";
 import { MODE_BUILDER_SHAPE } from "../src/types.ts";
 import { render } from "./render.ts";
 import { morphInto } from "./morph.ts";
 import { armTapGuard, wireActions } from "./actions.ts";
 import { decodeShare, decodeSharePayload, sharePayloadFromHash, type DecodedShare } from "./share.ts";
 import { loadLists, persistCustomFactions, persistLists, persistOnboarding } from "./storage.ts";
-import { runDecode, DIGIT_POOL } from "./write-on.ts";
 import { renderMarkdown } from "./richtext.ts";
 import { FleetSync } from "./fleet-sync.ts";
 import { syncCropper } from "./cropper.ts";
@@ -464,7 +463,6 @@ function paint(): void {
   markJustPickedFaction();
   animateFactionTitle();
   animateNewRosterRows();
-  animateCountChanges();
   // After layout settles: measuring mid-paint reads pre-layout boxes, and web
   // fonts landing later reflow the sheet and move every page boundary.
   requestAnimationFrame(() => paginatePrintPreview());
@@ -507,7 +505,21 @@ function paint(): void {
 
   // A new dialog or a new page puts different controls under the thumb that
   // just tapped. See armTapGuard in actions.ts.
-  const surface = `${location.hash}|${store.getState().ui.modal?.kind ?? ""}`;
+  //
+  // Two more things move controls without a new page: Next phase redraws the
+  // play screen (a fast double tap used to skip a whole phase), and a roster row
+  // that reaches zero disappears, sliding the row below up under the thumb that
+  // was hammering -. So the play round and phase, and how many roster rows there
+  // are, count as a new surface too. Repeated taps on a + or - whose row stays
+  // put are left alone: that is someone counting, not a double tap.
+  const st = store.getState();
+  const playing = st.route.view === "play" ? activeList(st)?.play : undefined;
+  const surface = [
+    location.hash,
+    st.ui.modal?.kind ?? "",
+    playing ? `${playing.round}.${playing.phase}` : "",
+    document.querySelectorAll("[data-roster-key]").length,
+  ].join("|");
   if (surface !== lastSurface) {
     if (lastSurface !== null) armTapGuard();
     lastSurface = surface;
@@ -930,66 +942,10 @@ function animateNewRosterRows(): void {
   }
 }
 
-/**
- * A Shipyard stacks: adding a ship you already hold only raises its number, so
- * no new row appears and animateNewRosterRows has nothing to play. Pop the
- * figure instead, so every add is acknowledged on the roster and not only in
- * the toast. Same prev-set diffing pattern as the row entrance above.
- */
-let prevUnitCounts: Map<string, string> | null = null;
-function animateCountChanges(): void {
-  const rosterOnScreen = document.querySelector(".mf-manifest, .roster-sheet, .shipyard") !== null;
-  const rows = Array.from(document.querySelectorAll<HTMLElement>("[data-roster-key]"));
-  if (!rosterOnScreen) {
-    prevUnitCounts = null;
-    return;
-  }
-  if (rows.length === 0) {
-    prevUnitCounts = new Map();
-    return;
-  }
-  const current = new Map<string, string>();
-  for (const r of rows) {
-    const key = r.dataset["rosterKey"];
-    const countEl = r.querySelector<HTMLElement>(".stepper-count");
-    if (key && countEl) current.set(key, countEl.textContent ?? "");
-  }
-  const seen = prevUnitCounts;
-  prevUnitCounts = current;
-  if (seen === null) return; // first sight - seed only
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  for (const r of rows) {
-    const key = r.dataset["rosterKey"];
-    const countEl = r.querySelector<HTMLElement>(".stepper-count");
-    if (!key || !countEl) continue;
-    const before = seen.get(key);
-    const after = current.get(key);
-    if (before === undefined || after === undefined || before === after) continue;
-    // The digits write on with the Hypergrowth decode (mechanical, transactional)
-    // over the top of the pop, scrambling through numerals before settling on the
-    // new count.
-    runDecode(after, (partial) => {
-      countEl.textContent = partial;
-    }, { pool: DIGIT_POOL, base: 60, step: 22, isAlive: () => countEl.isConnected });
-    // Going up pops big and blue; going down gives a smaller, quieter settle so
-    // both the + and the - are acknowledged where the eye already is.
-    const up = Number(after) > Number(before);
-    countEl.animate(
-      up
-        ? [
-            { transform: "scale(1)", color: "var(--ink)" },
-            { transform: "scale(1.5)", color: "var(--blue)", offset: 0.4 },
-            { transform: "scale(1)", color: "var(--ink)" },
-          ]
-        : [
-            { transform: "scale(1)" },
-            { transform: "scale(0.72)", offset: 0.4 },
-            { transform: "scale(1)" },
-          ],
-      { duration: up ? 340 : 220, easing: "cubic-bezier(.2,.9,.3,1.2)" },
-    );
-  }
-}
+// The count used to scramble through digits and pop to 1.5x with an overshoot
+// whenever + or - was tapped. On a phone that is the number under the thumb
+// changing size and flickering while the next tap is on its way. The stepper
+// count now just changes; it was cut in the October 2026 phone review.
 
 /**
  * Publish the pinned roster header's real height as --mf-head-h, so the roster

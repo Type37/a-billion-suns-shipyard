@@ -8016,7 +8016,7 @@ cds-select.hdr-select { flex: 1 1 0; min-width: 10rem; }
   .sy-head > .sy-fac { order: 3; flex: 1 1 100%; }
   cds-select.hdr-select { min-width: 0; }
 }
-cds-menu-button.hdr-menu { border: 1px solid var(--blue); }
+cds-overflow-menu.hdr-menu { width: var(--tap); height: var(--tap); }
 
 /* Stacked rules, removed (Jet, October 2026: "dividers next to dividers").
    Measured on an iPhone 13 by listing every full-width border on each screen
@@ -8056,11 +8056,10 @@ cds-text-input.limit-custom { width: 6.5rem; }
 /* A personnel row's first line is the same height chosen or not. Choosing one
    swapped its plain name (24px) for the editable name field and its roll
    button (44px), and every row below jumped 20px under the thumb. Both states
-   are now 36px: the plain name sits centred in the same box the field fills. */
-.sy-hvp .sy-hvp-name { min-height: 40px; display: flex; align-items: center; box-sizing: border-box; }
-.sy-hvp .sy-hvp-name.is-nameable { height: 40px; }
-.sy-hvp .sy-hvp-name.is-nameable input,
-.sy-hvp .sy-hvp-name.is-nameable button { height: 40px; min-height: 0; }
+   are now 48px, the same as the square tick beside them: the plain name sits
+   centred in the same box the field fills. */
+.sy-hvp .sy-hvp-name { min-height: var(--tap); display: flex; align-items: center; box-sizing: border-box; }
+.sy-hvp .sy-hvp-name.is-nameable { height: var(--tap); }
 
 /* Play on a phone (and a phone on its side). End play is outlined: Next phase
    in the bottom bar is the screen's one filled button. The CMD strip keeps its
@@ -8098,11 +8097,11 @@ cds-text-input.limit-custom { width: 6.5rem; }
 
 /* Per-card "Actions" menus (fleet cards, Solo outfits): Carbon's ghost menu
    button with the same keyline as the builder's, so it reads as a control. */
-cds-menu-button.card-menu { border: 1px solid var(--blue); position: relative; z-index: 1; }
+cds-overflow-menu.card-menu { position: relative; z-index: 1; width: var(--tap); height: var(--tap); }
 /* An open card menu sits above the next card's own Actions button, which
    otherwise painted over the menu's last items (both are z-index 1). Carbon
    reflects the open state as the _open attribute. */
-cds-menu-button.card-menu[_open] { z-index: 60; }
+cds-overflow-menu.card-menu[open] { z-index: 60; }
 
 /* The credits row speaks in two sizes, not five (Jet: "font sizes,
    consistency"). The total is the one big number; the limit, the fleet's
@@ -8156,7 +8155,7 @@ svg.credits-glyph { height: 0.8em; width: auto; vertical-align: -0.05em; }
 .name-box > .mf-name.mf-name { border: none; }
 .ghost-btn, .bar-btn, .stepper, .stepper-btn, .sy-unit-remove, .hvp-name-roll,
 .sy-hvp-check:not(.is-on),
-cds-menu-button.hdr-menu, cds-menu-button.card-menu {
+cds-overflow-menu.hdr-menu, cds-overflow-menu.card-menu {
   border: 1px solid var(--hair); border-radius: 0;
 }
 .sy-unit-remove { color: var(--ink); }
@@ -8182,3 +8181,27 @@ cds-menu-button.hdr-menu, cds-menu-button.card-menu {
   .play-sticky .play-bar > .play-bar-reset,
   .play-sticky .play-bar > .play-bar-end { border-left: none; }
 }
+
+/* Carried personnel under a unit: the person mark sits on the name's line.
+   The name is a 48px tap target, but its text sat at the top of that box
+   while the 12px mark was centred on the whole box, so the mark floated
+   below the words (Jet's screenshot). The text is centred in its box now and
+   the mark is drawn at the text's own size. */
+.ru-carry .hvp-pop > summary { display: inline-flex; align-items: center; }
+.ru-carry > .icon { width: 1em; height: 1em; flex: none; }
+
+/* A chosen person's name is one field with its dice inside, the same as the
+   fleet name: grey ground, one bottom line, no box around the dice. It was a
+   grey input, then a separate black-outlined dice box, then a bigger tick,
+   three heights in one row, and the field ran over the blue chosen edge on
+   the left (Jet's screenshot). The row's left padding now clears that 3px
+   edge, and the field, the dice and the tick are all 48px. */
+.sy-hvp { padding-left: 12px; grid-template-columns: minmax(0, 1fr) var(--tap); }
+.sy-hvp .sy-hvp-name.is-nameable { background: var(--ground); border-bottom: 1px solid var(--field-edge); }
+.sy-hvp .sy-hvp-name.is-nameable > .hvp-name-input.hvp-name-input {
+  flex: 1 1 auto; min-width: 0; height: 100%; min-height: 0; background: transparent; border: none; border-radius: 0; padding: 0 8px;
+}
+.sy-hvp .sy-hvp-name.is-nameable > .hvp-name-roll.hvp-name-roll {
+  flex: none; width: var(--tap); height: 100%; min-height: 0; border: none; background: transparent; color: var(--ink-3);
+}
+.sy-hvp-check.sy-hvp-check { width: var(--tap); height: var(--tap); align-self: start; }

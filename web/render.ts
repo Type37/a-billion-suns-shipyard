@@ -658,13 +658,14 @@ function fleetsView(state: AppState): string {
         <span class="fleet-card-cost">${credits(total)}</span>
         <span class="fleet-card-faction">${escapeHtml(faction?.name ?? "Mixed forces")}</span>
         <span class="fleet-card-mode">${l.freePlay ? "Free Play" : MODE_LABEL[l.mode]}</span>
-        <cds-menu-button class="fleet-card-actions card-menu" label="Actions" kind="ghost" size="lg" menu-alignment="bottom-end">
+        <cds-overflow-menu class="fleet-card-actions card-menu" label="Actions" size="lg" enable-v12-overflowmenu menu-alignment="bottom-end">
+          ${icon("ix-context-menu", 20).replace("<svg ", '<svg slot="icon" ')}
           <cds-menu>
             <cds-menu-item label="Duplicate" data-action="duplicate-list" data-id="${l.id}"></cds-menu-item>
             <cds-menu-item label="Share link" data-action="share-list" data-id="${l.id}"></cds-menu-item>
             <cds-menu-item label="Delete" kind="danger" data-action="delete-list" data-id="${l.id}"></cds-menu-item>
           </cds-menu>
-        </cds-menu-button>
+        </cds-overflow-menu>
       </article>`;
     })
     .join("");
@@ -1024,7 +1025,7 @@ function hvpNameLine(def: Hvp, selIndex: number, factionId: string, customName?:
   // die - the field is still there, and you can still type whatever you like
   // into it, which is the right answer for a Brood-Mother.
   const roll = canRollName(factionId, def.id)
-    ? `<button class="hvp-name-roll" data-action="hvp-roll-name" data-index="${selIndex}" data-hvp="${def.id}" title="Roll a random name" aria-label="Roll a random name for ${escapeHtml(def.name)}">${icon("random", 11)}</button>`
+    ? `<button class="hvp-name-roll" data-action="hvp-roll-name" data-index="${selIndex}" data-hvp="${def.id}" title="Roll a random name" aria-label="Roll a random name for ${escapeHtml(def.name)}">${icon("random", 16)}</button>`
     : "";
   // The job title IS the field's name, and the same string is its starting
   // value, so the row says the identical words whether or not you have touched
@@ -1218,10 +1219,11 @@ export const ERA_MODES: { era: Era; mode: GameMode; builds: string }[] = [
  * cds-select-selected bridge in main.ts), so the confirm dialogs for a
  * destructive faction or era change still run exactly as before.
  *
- * Everything you do TO the fleet lives in one labelled Carbon menu button,
- * "Actions" (Carbon's own label for a menu button; "Fleet" was tried and read
- * as a heading, not a menu, and "Menu" and "Options" are taken by the top
- * bar), Play mode first. Play used to be a filled button of its own in the
+ * Everything you do TO the fleet lives in one Carbon overflow menu, Play mode
+ * first: the standard ⋮ "more" icon in a 48px keylined square, named
+ * "Actions" for screen readers. It was a labelled menu button ("Fleet", then
+ * "Actions"), but Carbon draws those at least 12rem wide with a chevron, which
+ * crowded the header and cards; Jet: people understand a "more" icon. Play used to be a filled button of its own in the
  * header beside a bare ⋮; Jet moved Play into the menu and asked for the
  * menu to be easier to see, so it carries a word instead of three dots. That
  * also leaves Add unit as the screen's one filled button.
@@ -1268,7 +1270,8 @@ function eraSelect(list: SavedList): string {
 }
 
 function fleetMenu(list: SavedList, withReference: boolean, withLimit = false): string {
-  return `<cds-menu-button class="hdr-menu" label="Actions" kind="ghost" size="lg" menu-alignment="bottom-end" data-key="hdr-menu">
+  return `<cds-overflow-menu class="hdr-menu" label="Actions" size="lg" enable-v12-overflowmenu menu-alignment="bottom-end" data-key="hdr-menu">
+      ${icon("ix-context-menu", 20).replace("<svg ", '<svg slot="icon" ')}
       <cds-menu>
         <cds-menu-item label="Play mode" data-action="go" data-href="#/play/${list.id}"></cds-menu-item>
         ${withReference ? `<cds-menu-item label="Ship reference" data-action="open-ship-reference"></cds-menu-item>` : ""}
@@ -1281,7 +1284,7 @@ function fleetMenu(list: SavedList, withReference: boolean, withLimit = false): 
         <cds-menu-item-divider></cds-menu-item-divider>
         <cds-menu-item label="Delete fleet" kind="danger" data-action="delete-list" data-id="${list.id}"></cds-menu-item>
       </cds-menu>
-    </cds-menu-button>`;
+    </cds-overflow-menu>`;
 }
 
 function shipyardView(state: AppState): string {
@@ -1606,7 +1609,7 @@ function builderView(state: AppState): string {
         // first ship was added greeted every new fleet with an error.
         issues.length > 0 && nUnits > 0
         ? `<details class="yard-status-pop">
-          <summary class="yard-status is-fail">${icon("warning", 12)} ${issues.length} to resolve</summary>
+          <summary class="yard-status is-fail" aria-label="${issues.length === 1 ? "One thing" : `${issues.length} things`} to resolve">${icon("warning", 16)} To resolve</summary>
           <ul class="yard-status-panel issue-list">${issues.map(issueLine).join("")}</ul>
         </details>`
         : nUnits > 0
@@ -3610,23 +3613,17 @@ function playView(state: AppState): string {
     ? (SCORING_NOTES[list.mode] ?? []).map((n) => `<li>${ruleText(n)}</li>`).join("")
     : "";
 
-  // On a phone the phase steps fold behind a tap so the play screen fits; on
-  // desktop the toggle disappears and they are always shown (see .phase-fold).
-  // A finished game shows the result in its place: the steps of a phase you are
-  // no longer in are not what you want to read at that moment.
+  // The phase's steps are always shown, as a plain list of tickable lines,
+  // with no heading and no count. They used to fold behind a "Steps" bar on a
+  // phone with a "0 of 2 done" tally: one more tap before the thing you are
+  // meant to be doing, and a count of a two-line list you can see (Jet: "total
+  // slop"). A finished game shows the result in their place.
   const checklistBlock = isOver
     ? playResult(list, play, maxRound)
-    : `<details class="phase-fold" data-persist="phase-fold">
-      <summary class="phase-fold-summary">
-        ${icon("chevronDown", 15, "phase-fold-caret")}
-        <span class="phase-fold-label">${currentPhase?.reference ? "This phase" : "Steps"}</span>
-        ${stepCount > 0 ? `<span class="phase-checklist-count">${doneCount} of ${stepCount} done</span>` : ""}
-      </summary>
-      <div class="phase-checklist phase-fold-body">
+    : `<div class="phase-checklist">
         ${checklistHtml}
         ${scoringNotes ? `<div class="phase-scoring"><ul class="rule-list">${scoringNotes}</ul></div>` : ""}
-      </div>
-    </details>`;
+      </div>`;
 
   // Hypergrowth is played from a Shipyard, so its Play Mode is laid out
   // differently: the faction ability and the Commands sit together (commands

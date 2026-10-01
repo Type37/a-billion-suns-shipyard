@@ -1214,7 +1214,9 @@ export const ERA_MODES: { era: Era; mode: GameMode; builds: string }[] = [
  * destructive faction or era change still run exactly as before.
  *
  * Everything you do TO the fleet lives in one labelled Carbon menu button,
- * "Fleet", Play mode first. Play used to be a filled button of its own in the
+ * "Actions" (Carbon's own label for a menu button; "Fleet" was tried and read
+ * as a heading, not a menu, and "Menu" and "Options" are taken by the top
+ * bar), Play mode first. Play used to be a filled button of its own in the
  * header beside a bare ⋮; Jet moved Play into the menu and asked for the
  * menu to be easier to see, so it carries a word instead of three dots. That
  * also leaves Add unit as the screen's one filled button.
@@ -1261,7 +1263,7 @@ function eraSelect(list: SavedList): string {
 }
 
 function fleetMenu(list: SavedList, withReference: boolean): string {
-  return `<cds-menu-button class="hdr-menu" label="Fleet" kind="ghost" size="md" menu-alignment="bottom-end" data-key="hdr-menu">
+  return `<cds-menu-button class="hdr-menu" label="Actions" kind="ghost" size="md" menu-alignment="bottom-end" data-key="hdr-menu">
       <cds-menu>
         <cds-menu-item label="Play mode" data-action="go" data-href="#/play/${list.id}"></cds-menu-item>
         ${withReference ? `<cds-menu-item label="Ship reference" data-action="open-ship-reference"></cds-menu-item>` : ""}
@@ -1784,16 +1786,22 @@ function addUnitModal(state: AppState): string {
           : ""
       }
       </div>`;
-  // One list, lightest to heaviest. It used to be four blocks under MASS 0 to
-  // MASS 3 headings with a 2px rule under each, which put a heading and a
-  // divider between every few cards and said the mass twice: every card
-  // already carries its own Mass chip. Jet kept the chip and cut the headings.
-  const cards = [...pool]
-    .sort((x, y) => x.ship.mass - y.ship.mass)
-    .map((p) => {
-      const addId = p.composite ? `${p.owner.id}/${p.ship.id}` : p.ship.id;
-      return auCard(p.ship, addId, ownedCount(addId));
-    })
+  // Grouped by mass, lightest first, with a plain rule between groups and no
+  // heading. It used to be four blocks under MASS 0 to MASS 3 headings; Jet cut
+  // the headings (every card carries its own Mass chip), then asked for the
+  // divisions between masses back, so the groups stay and only the words went.
+  const cards = [0, 1, 2, 3]
+    .map((mass) =>
+      pool
+        .filter((p) => p.ship.mass === mass)
+        .map((p) => {
+          const addId = p.composite ? `${p.owner.id}/${p.ship.id}` : p.ship.id;
+          return auCard(p.ship, addId, ownedCount(addId));
+        })
+        .join(""),
+    )
+    .filter(Boolean)
+    .map((group) => `<div class="au-list">${group}</div>`)
     .join("");
   const label = isStocking ? "ship" : "unit";
   // The dialog covers the roster, so the budget it would otherwise hide rides
@@ -1814,7 +1822,7 @@ function addUnitModal(state: AppState): string {
         <cds-modal-heading class="au-heading">Add ${label} <span class="au-budget ${remaining < 0 ? "is-over" : ""}">${escapeHtml(budget)}</span></cds-modal-heading>
       </cds-modal-header>
       <cds-modal-body class="au-body" data-modal-primary-focus tabindex="-1">
-        <div class="au-list">${cards}</div>
+        <div class="au-groups">${cards}</div>
       </cds-modal-body>
   </cds-modal>`;
 }

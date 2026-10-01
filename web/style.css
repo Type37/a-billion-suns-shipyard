@@ -3444,7 +3444,7 @@ button { font-family: inherit; }
   border: 2px solid var(--blue); transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
 }
 /* Outlined, not filled: Add unit is the builder's one filled button (Jet's
-   rule), and Play mode is also first in the Fleet menu at the top. */
+   rule), and Play mode is also first in the Actions menu at the top. */
 .mf-play-cta { background: transparent; color: var(--blue); }
 @media (hover: hover) { .mf-play-cta:hover { background: var(--blue); color: #fff; } }
 /* Print is demoted, not removed. It sat at the same 18px/800 weight and the same
@@ -7984,7 +7984,7 @@ cds-inline-notification.app-hint { max-width: none; width: 100%; margin: 6px 0; 
 
 /* The builder header on Carbon (factionSelect, eraSelect, fleetMenu in
    render.ts). One row on a wide screen: emblem and name, faction, era, then
-   the Fleet menu at the far right. On a phone the Fleet menu joins the name
+   the Actions menu at the far right. On a phone the Actions menu joins the name
    on the first row and the two pickers split the second row evenly: a Carbon
    select spends 64px on padding and its chevron, so three controls on one
    360px row cut "Age of Unity" to "A." and the faction to nothing. */
@@ -8020,3 +8020,6 @@ cds-menu-button.hdr-menu { border: 1px solid var(--blue); }
 .comp-filters { border-top: none; border-bottom: none; padding: 8px 0; }
 /* Rules: a section heading's top rule 20px under the commands box above it. */
 .ltp-cmds + .ltp-h3 { border-top: none; padding-top: 0; }
+
+/* Add unit's mass groups: one rule between groups, none above the first. */
+.au-groups > .au-list + .au-list { margin-top: 14px; padding-top: 14px; border-top: 2px solid var(--ink); }

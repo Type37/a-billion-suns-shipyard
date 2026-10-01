@@ -8422,7 +8422,7 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
   --gutter-wide: 32px;
 }
 @media (min-width: 672px) {
-  #app > main:not(.print-page), #app > .shipyard, #app > .shipyard.builder-fleet {
+  #app > main:not(.print-page), #app > .shipyard, #app > .shipyard.builder-fleet, #app > .solo-outfit {
     max-width: var(--grid-max); margin-left: auto; margin-right: auto;
     padding-left: var(--key); padding-right: var(--key); box-sizing: border-box;
   }
@@ -8548,3 +8548,26 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
 .no-dial .dial .stepper-btn { width: var(--tap); height: var(--tap); border: none; background: none; color: var(--ink); }
 @media (hover: hover) { .no-dial .dial .stepper-btn:hover { background: var(--cds-field-hover, #e8e8e8); color: var(--ink); } }
 .no-dial .dial-rule { height: 24px; background: var(--hair-soft); }
+
+/* Width audit at 1080 (Jet, 1 October 2026: "some screens are too wide,
+   others feel too narrow"; test at 1080 and phones, not 1440).
+   - The Solo outfit page was the one screen off the grid: its wrapper is a
+     div, not main, so it ran edge to edge (1065px of content at 1080) with
+     each band carrying its own 40px sides. It sits on the grid now and the
+     bands drop their own sides.
+   - Learn and the rules had a reading measure of 840px until the grid gave
+     every main 1056; their paragraphs then ran 107 to 151 characters a line.
+     The page stays on the grid (its header and tabs line up with the
+     masthead) and the prose is capped at 68ch, about 66 characters, which is
+     what the 840px column was there to give. */
+@media (min-width: 672px) {
+  #app > .solo-outfit > .solo-band, #app > .solo-outfit > .solo-tabs, #app > .solo-outfit > .solo-workspace { padding-left: 0; padding-right: 0; }
+}
+.ltp p, .ltp li, .ltp blockquote { max-width: 68ch; }
+/* Phones: one side margin. Carbon's sm grid is 0 margin + 16px column
+   padding, so type sits 16px in, and so does the masthead's wordmark. Fleets
+   and Solo already did; Custom Rules, the Compendium, Learn and the rules sat
+   at 12px, so the page edge stepped 4px between screens. */
+@media (max-width: 671px) {
+  #app > main:not(.print-page), #app > .ltp { padding-left: 16px; padding-right: 16px; }
+}

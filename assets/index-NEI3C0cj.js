@@ -703,8 +703,8 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
   </main>`}function cd(e){let t=Math.max(0,Math.min(10,e));return`<div class="alert-pips" role="img" aria-label="Alert Level ${t} of 10">${Array.from({length:10},(e,n)=>`<span class="alert-pip ${n<t?`is-on`:``}"></span>`).join(``)}</div>`}function ld(e){let t=e.blips??[];if(!t.length)return`
     <section class="solo-card solo-blips">
       <h3 class="roster-section">Blips</h3>
-      <p class="blip-note">Eight markers, numbered 1 to 8, shuffled facedown into the Hostile half.</p>
-      <button class="primary-btn" data-action="solo-shuffle-blips" title="Shuffle the eight blips into a random order">${N(`random`,12)} Shuffle the bag</button>
+      
+      <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="solo-shuffle-blips">Shuffle the bag${N(`random`,15).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
     </section>`;let n=new Map(Kn.map(e=>[e.name,e])),r=t.map((e,t)=>{let r=qn[e.n]??``,i=n.get(r),a=i?[i.primary?`<span class="blip-w"><b>Pri</b> ${P(i.primary)}</span>`:``,i.auxiliary?`<span class="blip-w"><b>Aux</b> ${P(i.auxiliary)}</span>`:``].join(``):``;return`
       <button class="blip ${e.revealed?`is-revealed`:``}" data-action="solo-blip-reveal" data-index="${t}"
               aria-label="${e.revealed?`Blip ${e.n}, ${P(r)}. Turn it back over.`:`Face-down Blip marker. Turn it over.`}">
@@ -745,9 +745,11 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     </div>
     <div class="gb-round">
       <span class="control-label">Round</span>
-      <div class="round-control">
+      
+      <div class="num-field">
+        <span class="num-val round-value">${t.round}</span>
         <button class="stepper-btn" data-action="round-adjust" data-delta="-1" aria-label="Previous round">${N(`minus`,16)}</button>
-        <span class="round-value">${t.round}</span>
+        <span class="num-rule" aria-hidden="true"></span>
         <button class="stepper-btn" data-action="round-adjust" data-delta="1" aria-label="Next round">${N(`plus`,16)}</button>
       </div>
     </div>
@@ -784,7 +786,8 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
   <div class="solo-split solo-split-solo">
     <div class="solo-ref">
       ${i?`<section class="solo-card solo-card-quiet"><h3 class="roster-section">Perks with no pilot</h3><ul class="perk-list">${i}</ul></section>`:``}
-      <section class="solo-card solo-card-quiet">
+      
+      ${e.gameLog.length?`<section class="solo-card solo-card-quiet">
         <h3 class="roster-section">Game log</h3>
         ${e.gameLog.length?`<ol class="game-log">${e.gameLog.map(e=>`<li class="game-log-row">
                     <span class="glr-head">
@@ -793,13 +796,12 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
                       ${e.date?`<span class="glr-date">${P(Wi(e.date))}</span>`:``}
                     </span>
                     ${e.note?`<span class="glr-note">${P(e.note)}</span>`:``}
-                  </li>`).join(``)}</ol>`:`<p class="muted">No games logged yet.</p>`}
-      </section>
+                  </li>`).join(``)}</ol>`:``}
+      </section>`:``}
       
       <section class="solo-card solo-card-quiet">
         <h3 class="roster-section">Campaign notes</h3>
         <textarea class="outfit-notes" data-action="outfit-notes" rows="6"
-                  placeholder="Who you lost, who owes you, what is waiting out there."
                   aria-label="Campaign notes">${P(e.notes??``)}</textarea>
       </section>
     </div>

@@ -1847,15 +1847,14 @@ function addUnitModal(state: AppState): string {
   const auCard = (ship: ShipClass, addId: string, owned: number) => `
       <div class="au-card-wrap ${m.pickFor === addId ? "is-picking" : ""}" data-key="au-${addId}">
       <button class="au-card" data-action="${needsSpecies ? "add-unit-pick" : "add-unit"}" data-ship="${addId}" title="Add ${escapeHtml(ship.name)}" ${needsSpecies ? `aria-expanded="${m.pickFor === addId}"` : ""}>
-        <span class="au-card-top">
-          <span class="au-card-name">${escapeHtml(ship.name)}</span>
-          ${owned ? `<span class="au-card-owned">${owned} in fleet</span>` : ""}
-          <span class="au-card-cost">${credits(ship.cost)}</span>
-          <span class="au-card-add">${icon("plus", 14)}</span>
-        </span>
-        <span class="au-card-body">
+        <span class="au-card-grid">
+          <span class="au-card-id">
+            <span class="au-card-name">${escapeHtml(ship.name)}</span>
+            <span class="au-card-cost">${credits(ship.cost)}</span>
+            ${owned ? `<span class="au-card-owned">${owned} in fleet</span>` : ""}
+          </span>
           <span class="au-card-stats">${statChips(ship, true)}</span>
-          <span class="au-card-wep">${weaponsLine(ship)}</span>
+          <span class="au-card-guns">${gunLines(ship)}</span>
         </span>
       </button>
       ${
@@ -1914,6 +1913,32 @@ function addUnitModal(state: AppState): string {
  * carries it. Returns "" for a genuinely empty slot, which callers use to drop
  * the line entirely rather than spend a row on a dash.
  */
+/**
+ * One ship's guns, the one way they are drawn: one line per weapon, the arc's
+ * own glyph in front (the wedge for Primary, the dome for Auxiliary), then
+ * the name and its dice and range. Primary first, Auxiliary second, so a card
+ * reads like Jet's sketch:
+ *
+ *   Unit name            [wedge] primary gun
+ *   Mass  Thrust ...     [dome]  auxiliary gun
+ *
+ * The glyph carries the arc; the word is in its accessible name and title.
+ * An arc with no weapon says "None" so the two rows always line up.
+ */
+export function gunLines(ship: ShipClass): string {
+  const arc = (kind: "primary" | "aux", weapons: Weapon[], utility: boolean): string => {
+    const label = kind === "primary" ? "Primary" : "Auxiliary";
+    const glyph = `<span class="gun-arc" role="img" aria-label="${label}" title="${label}">${icon(kind === "primary" ? "arc-primary" : "arc-aux", 16)}</span>`;
+    if (weapons.length)
+      return weapons
+        .map((w) => `<span class="gun">${glyph}<span class="gun-txt"><span class="gun-name">${escapeHtml(w.name)}</span> <span class="gun-fig">${w.count}${w.die} ${w.rangeMin}&ndash;${w.rangeMax}"</span></span></span>`)
+        .join("");
+    if (utility) return `<span class="gun">${glyph}<span class="gun-txt"><span class="gun-name">${icon("utility", 12, "util-ico")}Utility Bays</span></span></span>`;
+    return `<span class="gun is-none">${glyph}<span class="gun-txt"><span class="gun-name">None</span></span></span>`;
+  };
+  return `<span class="gun-arc-row">${arc("primary", ship.primary, !!ship.utilityBays && ship.primary.length === 0)}</span><span class="gun-arc-row">${arc("aux", ship.auxiliary, !!ship.utilityBays && ship.auxiliary.length === 0)}</span>`;
+}
+
 function shortWeaponText(w: Weapon[], isUtility: boolean): string {
   // Two weapons in one arc go on two lines, not "A · B".
   if (w.length) return w.map((x) => `${escapeHtml(x.name)} ${x.count}${x.die} ${x.rangeMin}&ndash;${x.rangeMax}"`).join("<br>");

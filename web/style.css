@@ -7902,3 +7902,23 @@ cds-inline-notification.app-hint { max-width: none; width: 100%; margin: 6px 0; 
 .wm-lockup.wm-bar { font-size: 26px; line-height: 1; letter-spacing: -0.01em; }
 .wm-bar .wm-suns { -webkit-text-stroke: 1.2px #fff; }
 @media (max-width: 760px) { .wm-lockup.wm-bar { font-size: 22px; } .wm-bar .wm-suns { -webkit-text-stroke: 1px #fff; } }
+
+/* Guns (gunLines in render.ts): one line per weapon, arc glyph first. */
+/* Glyph column, then one run of text: the name and its dice wrap together
+   like a sentence. As flex items the dice were pushed to the far edge
+   whenever a long name wrapped. */
+.gun { display: grid; grid-template-columns: 16px minmax(0, 1fr); column-gap: 6px; align-items: start; line-height: 1.3; }
+.gun-arc { display: inline-flex; color: var(--blue); padding-top: 1px; }
+.gun-txt { min-width: 0; }
+.gun.is-none .gun-arc, .gun.is-none .gun-name { color: var(--ink-off); }
+.gun-name { font-weight: 600; color: var(--ink); }
+.gun-fig { color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.gun-arc-row { display: grid; gap: 2px; }
+
+/* Add unit card, laid out from Jet's sketch: name over stats on the left,
+   primary over auxiliary on the right. Same grid at every width. */
+.au-card-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); grid-template-rows: auto auto; gap: 4px 14px; align-items: start; width: 100%; }
+.au-card-id { grid-column: 1; grid-row: 1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; min-width: 0; }
+.au-card-stats { grid-column: 1; grid-row: 2; }
+.au-card-guns { grid-column: 2; grid-row: 1 / span 2; display: grid; grid-template-rows: auto auto; gap: 6px; font-size: 13px; min-width: 0; }
+.au-card-guns .gun-name, .au-card-guns .gun-fig { overflow-wrap: anywhere; }

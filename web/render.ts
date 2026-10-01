@@ -7,6 +7,7 @@ import {
   JUNKSPACE_SHIPS,
   PILOT_PERKS,
   STARTING_DEBT_K,
+  OUTFIT_BUDGET_K,
   DEBT_CLEAR_GAMES,
 } from "../src/data/junkspace.ts";
 import { PERKS_BY_CLASS } from "../src/data/junkspace-solo.ts";
@@ -1999,7 +2000,7 @@ function outfitPrintView(state: AppState): string {
     fleet: {
       name: o.name || "Unnamed outfit",
       factionId: "junkspace",
-      creditsLimit: o.debtStartK ?? STARTING_DEBT_K,
+      creditsLimit: OUTFIT_BUDGET_K,
       units: o.ships.map((sh) => ({
         id: sh.id,
         shipClassId: sh.shipClassId,

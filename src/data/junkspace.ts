@@ -67,15 +67,15 @@ export const PILOT_PERKS: PilotPerk[] = [
 // ---------------------------------------------------------------------------
 
 /**
- * The loan, which is also the budget, which is also the Debt.
+ * What an outfit has to spend on ships: ¢30k, always.
  *
- * p.201 says it three ways about one number: "you take out a loan of ¢30k to
- * create an Outfit, and then fly Jobs to clear your debt" and "You get ¢30k
- * with which to buy ships". So the money you spend on hulls is exactly the
- * money you owe, and an outfit that starts on the harder ¢45k debt has ¢45k to
- * spend. This constant is the standard game's figure and the default for
- * outfits that predate the campaign dials; the live number is
- * outfitBudgetK(outfit) below.
+ * p.201: "You get ¢30k with which to buy ships". The harder campaign option is
+ * "increase your debt to ¢45k" and says nothing about the budget. This used to
+ * read the loan, the budget and the Debt as one number, so a ¢45k campaign got
+ * ¢45k of ships - the harder game came with a better outfit. The book does not
+ * say that, and where it is unclear p.195's Rule of Hard Knocks decides:
+ * "choose the interpretation or outcome that disadvantages you the most". So
+ * the Debt dial moves the Debt only. (Rules audit, 1 October 2026.)
  */
 export const OUTFIT_BUDGET_K = 30;
 

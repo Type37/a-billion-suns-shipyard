@@ -86,7 +86,7 @@ export const SOLO_PHASES: { name: string; text: string }[] = [
   },
   {
     name: "Tactical Phase",
-    text: "The Tactical Phase works as normal, alternating the activation of battlegroups, starting with the Hostiles. You are free to form battlegroups as normal, but the Hostiles don't form battlegroups, activating one ship at a time. When it is the Hostiles' turn to activate, you activate the unactivated Hostile ship with the largest Silhouette. If there are multiple ships that match these criteria, pick the one closest to your ships. If still tied, randomise between them. During games of Junkspace, you have access to a new command. Seize Initiative (1 CMD): Junkspace only. At the start of the Tactical Phase, spend 1 CMD token to activate the first battlegroup, before the Hostiles get a chance to activate a unit.",
+    text: "The Tactical Phase works as normal, alternating the activation of battlegroups, starting with the Hostiles. You are free to form battlegroups as normal, but the Hostiles don't form battlegroups, activating one ship at a time. When it is the Hostiles' turn to activate, you activate the unactivated Hostile ship with the largest Silhouette. If there are multiple ships that match these criteria, pick the one closest to your ships. If still tied, randomise between them. During their activations, you control the Hostiles, but you follow their Behaviour rules (see page XX). During games of Junkspace, you have access to a new command: Seize Initiative (1 CMD): Junkspace only. At the start of the Tactical Phase, spend 1 CMD token to activate the first battlegroup, before the Hostiles get a chance to activate a unit.",
   },
   {
     name: "End Phase",
@@ -103,11 +103,11 @@ export const SOLO_SETUP_STEPS: { name: string; text: string }[] = [
 ];
 
 export const SOLO_ALERT_RULES = [
-  "At the start of the game your Alert Level is 1. The game ends when the Alert Level hits 10.",
+  "At the start of the game, your Alert Level is 1. The game ends when the Alert Level hits 10. Track it with a D10.",
   "In each End Phase, increase the Alert Level by 1.",
   "When you reveal a Hostile Mass 2-3 ship, increase the Alert Level by 1.",
   "When you destroy a Hostile Mass 2-3 ship, decrease the Alert Level by 2.",
-  "As the campaign progresses the starting Alert Level rises: if you have less than ¢25k Debt remaining it starts at 2; if you have cleared your Debt it starts at 3.",
+  "As you progress through the campaign, the starting Alert Level increases, making the game more difficult. If you have less than ¢25k Debt remaining, the Alert Level starts the game at 2. If you have cleared your Debt completely, the Alert Level starts at 3.",
 ];
 
 export const SOLO_BLIP_RULES = [
@@ -250,19 +250,19 @@ export const BLIP_TO_PIRATE: Record<number, string> = {
 export const BLIP_COUNT = 8;
 
 export const PIRATE_RULE =
-  "Take No Prisoners: Pirate ships re-roll the first miss when attacking with auxiliary weapons. (You are free to invent your own sets of enemy ships: borrow ship classes from the main factions and a special rule from an HVP.)";
+  "Take No Prisoners: Pirate ships re-roll the first miss when attacking with auxiliary weapons.";
 
 // ---------------------------------------------------------------------------
-// Post-game Perks (p.213-215), rolled on a D12 by pilot class.
+// Post-game Perks (pp.212-213), rolled on a D12 by pilot class. Texts verbatim.
 // ---------------------------------------------------------------------------
 
 export const GUNNER_PERKS: Perk[] = [
-  { n: 1, name: "Apex Hunter", text: "Increase your Primary weapon systems' maximum range by 8\" and your Auxiliary weapon systems' maximum range by 2\"." },
+  { n: 1, name: "Apex Hunter", text: "Increase your Primary weapon systems' maximum range by 8\" and increase your Auxiliary weapon systems' maximum range by 2\"." },
   { n: 2, name: "Backstab", text: "When making attacks from outside the target's Auxiliary arc of fire, your unsaved hits each do 1 additional damage." },
-  { n: 3, name: "Deadeye", text: "When you Open Fire, subtract 1 from the result of each attack die, to a minimum of 1. This raises the chance of critical hits but does not prevent duds." },
+  { n: 3, name: "Deadeye", text: "When you Open Fire, you subtract 1 from the result of each of your attack dice, to a minimum of 1. This increases the chance of critical hits but doesn't prevent duds." },
   { n: 4, name: "Dogfighter", text: "You may make an additional pivot at the end of your Move Step." },
   { n: 5, name: "Down In Flames", text: "When you would be destroyed, you can make a final Open Fire action before making your explosion check and being removed from play." },
-  { n: 6, name: "Full-Auto", text: "When you Open Fire, roll an extra attack die of the same type." },
+  { n: 6, name: "Full-Auto", text: "When you Open Fire, you roll an extra attack dice of the same type." },
   { n: 7, name: "Kill Confirmed", text: "When you destroy a Hostile ship, you gain a CMD token." },
   { n: 8, name: "Killer Instincts", text: "After damaging a target, if the target has only 1HP remaining, you can attack them again." },
   { n: 9, name: "Overload", text: "Your critical hits cause 3 hits, not 2." },
@@ -275,11 +275,11 @@ export const HAULER_PERKS: Perk[] = [
   { n: 1, name: "Auto-Repair Routines", text: "At the start of your activation, regain 1 HP." },
   { n: 2, name: "Brace", text: "While you have an Activated token, you gain +1 to your Shields value." },
   { n: 3, name: "Bulkhead", text: "Once per activation, this unit can suffer 1 damage to use a Command for 0 CMD tokens (this damage cannot be ignored)." },
-  { n: 4, name: "Covering Fire", text: "Spend 1 CMD token to count your Auxiliary arc of fire as 360 degrees for this activation only." },
+  { n: 4, name: "Covering Fire", text: "Spend 1 CMD token to count your Auxiliary arc of fire as 360° for this activation only." },
   { n: 5, name: "Endurance", text: "Count your ship's Shield value as 1 higher permanently." },
   { n: 6, name: "Grav Anchor", text: "Hostile units within 6\" reduce their Thrust value to 2\"." },
   { n: 7, name: "Ironheart", text: "When rolling your Shield saving throws, rolls of a 1 cancel two hits, not one." },
-  { n: 8, name: "Old Dependable", text: "While within 3\" of this ship, friendly ships subtract 1 from the result of each of their attack dice, to a minimum of 1. This raises the chance of critical hits but does not prevent duds." },
+  { n: 8, name: "Old Dependable", text: "While within 3\" of this ship, friendly ships subtract 1 from the result of each of their attack dice, to a minimum of 1. This increases the chance of critical hits, but doesn't prevent duds." },
   { n: 9, name: "Shields of Steel", text: "While within 3\" of this ship, friendly ships increase their shield value by 1." },
   { n: 10, name: "Snapfire", text: "After you are Ambushed, you can take the Open Fire action before the activation ends." },
   { n: 11, name: "Turbo-Spanner", text: "You can take the Patch Up action in your Action Step: regain D3 HP." },
@@ -287,13 +287,13 @@ export const HAULER_PERKS: Perk[] = [
 ];
 
 export const JUNKER_PERKS: Perk[] = [
-  { n: 1, name: "Crackpot Rigger", text: "While you have one or more damage or asset tokens, you may re-roll missed attacks once." },
-  { n: 2, name: "Dazzle", text: "When it is your turn, spend 2 CMD to activate this ship even if it has an Activated token. Once per Round." },
+  { n: 1, name: "Crackpot Rigger", text: "While you have one or more damage or assets tokens, you may re-roll missed attacks once." },
+  { n: 2, name: "Dazzle", text: "When it is your turn, spend 2 CMD to activate this ship, even if it has an Activated token. This may be used once per Round." },
   { n: 3, name: "Elite Skills", text: "Hostile ships cannot attack you if they are more than 3\" away." },
   { n: 4, name: "Goblin", text: "At the end of the Action Step, you automatically collect all Free-floating tokens within 6\"." },
   { n: 5, name: "Ghost", text: "When this ship would cause a Blip marker to be revealed, you can choose not to reveal it." },
   { n: 6, name: "Knob-Twiddler", text: "You increase the range of your Scan action by +6\"." },
-  { n: 7, name: "Multi-tasking", text: "You may take a Scan action for free (it does not count as your action)." },
+  { n: 7, name: "Multi-tasking", text: "You may take a Scan action for free (it doesn't count as your action)." },
   { n: 8, name: "Quarterback", text: "You gain +1 CMD token at the start of each round." },
   { n: 9, name: "Rogue", text: "Increase this pilot's Initiative Value by 2D6." },
   { n: 10, name: "Signal Jam", text: "After rolling for a Hostile ship's behaviour, you can spend 1 CMD token to re-roll the die." },

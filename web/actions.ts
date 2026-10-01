@@ -1728,6 +1728,9 @@ export function dispatchAction(target: HTMLElement): void {
         // The two campaign dials, chosen in the dialog before the outfit exists.
         debtK: draft?.debtStartK ?? STARTING_DEBT_K,
         debtStartK: draft?.debtStartK ?? STARTING_DEBT_K,
+        // p.195: under ¢25k of Debt the Alert Level starts at 2. A new outfit
+        // set to a small Debt on the dial started at 1 regardless.
+        alertLevel: startingAlertLevel(draft?.debtStartK ?? STARTING_DEBT_K),
         gamesLimit: draft?.gamesLimit ?? DEBT_CLEAR_GAMES,
         ...(draft
           ? {

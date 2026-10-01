@@ -57,16 +57,8 @@ const shipById = new Map<string, ShipClass>(JUNKSPACE_SHIPS.map((s) => [s.id, s]
  * both fall back to the standard.
  */
 const debtStart = (o: SavedOutfit): number => o.debtStartK ?? STARTING_DEBT_K;
-/**
- * What this outfit has to spend, which is what it borrowed.
- *
- * p.201 is one number said three ways: the loan you take out, the money you buy
- * ships with, and the Debt you fly Jobs to clear. It was two constants, so
- * raising the Debt to the harder ¢45k left you buying ships on ¢30k and owing
- * ¢45k, which is not the harder game the book offers - it is a worse outfit AND
- * a bigger hole.
- */
-const budgetK = (o: SavedOutfit): number => o.debtStartK ?? OUTFIT_BUDGET_K;
+/** What this outfit has to spend: ¢30k whatever its Debt (see OUTFIT_BUDGET_K). */
+const budgetK = (_o: SavedOutfit): number => OUTFIT_BUDGET_K;
 const gamesLimit = (o: SavedOutfit): number => o.gamesLimit ?? DEBT_CLEAR_GAMES;
 
 export function outfitCost(o: SavedOutfit): number {
@@ -401,7 +393,9 @@ function outfitTab(o: SavedOutfit): string {
               cap only matters at the moment it stops you, so it only speaks
               then. */ ""}
         <h3 class="roster-section">Ships${full ? ` <span class="roster-warn">Outfit full</span>` : ""}</h3>
-        <p class="panel-note">For each ¢1k earned in a game, a surviving pilot may take a Perk from their class list (no duplicates).</p>
+        ${/* p.212, verbatim. The old one-line paraphrase dropped the
+              one-Perk-per-pilot-per-game limit and the D12 roll. */ ""}
+        <p class="panel-note">For each ¢1k you earned during this game, choose one of your surviving pilots to gain a Perk. Each pilot can only gain a maximum of one Perk after each game. When you gain a Perk, roll a D12. If you roll a Perk you already have, you can select and gain another Perk from your class list.</p>
         ${shipRows || ""}
         ${over ? '<div class="inspection fail"><p class="issue-error">Over budget by ' + ck(-remaining) + ".</p></div>" : ""}
         <div class="roster-actions">
@@ -615,7 +609,9 @@ function campaignTab(o: SavedOutfit): string {
     <div class="gb-clock">
       <span class="control-label">Campaign clock</span>
       ${gameTicks(o.gamesPlayed, gamesLimit(o))}
-      ${outOfGames ? '<p class="issue-error">Eight games are up with debt remaining. Some very unpleasant people pay a visit: the campaign is lost.</p>' : ""}
+      ${/* p.201, verbatim, with this campaign's game count in place of the
+            standard 8 (it said "Eight" whatever the dial was set to). */ ""}
+      ${outOfGames ? `<p class="issue-error">If, after ${gamesLimit(o)} games, you still have outstanding debt, some very unpleasant people pay a visit to your space dock and you lose the campaign (and your ships).</p>` : ""}
     </div>
     <div class="gb-act">
       <cds-button has-main-content kind="primary" size="lg" class="btn" data-action="log-game">Log a completed game${icon("plus", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>

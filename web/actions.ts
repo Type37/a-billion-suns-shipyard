@@ -2477,7 +2477,7 @@ function handleChange(e: Event): void {
     case "set-limit-free": {
       if (!listId) return;
       const n = Math.max(1, Math.round(Number(inputValue) || 1));
-      store.setState((s) => updateFleet(s, listId, (f) => ({ ...f, creditsLimit: n })));
+      store.setState((s) => ({ ...updateFleet(s, listId, (f) => ({ ...f, creditsLimit: n })), ui: { ...s.ui, limitCustomOpen: false } }));
       break;
     }
     case "nf-size-custom": {

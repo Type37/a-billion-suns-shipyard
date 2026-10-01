@@ -17,6 +17,7 @@ import "@carbon/web-components/es/components/modal/index.js";
 import "@carbon/web-components/es/components/button/index.js";
 import "@carbon/web-components/es/components/notification/index.js";
 import "@carbon/web-components/es/components/select/index.js";
+import "@carbon/web-components/es/components/text-input/index.js";
 import "@carbon/web-components/es/components/menu-button/index.js";
 import "@carbon/web-components/es/components/menu/index.js";
 

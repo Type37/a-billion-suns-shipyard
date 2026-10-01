@@ -8023,3 +8023,14 @@ cds-menu-button.hdr-menu { border: 1px solid var(--blue); }
 
 /* Add unit's mass groups: one rule between groups, none above the first. */
 .au-groups > .au-list + .au-list { margin-top: 14px; padding-top: 14px; border-top: 2px solid var(--ink); }
+
+/* The meter and Add unit share the pinned band's second line. */
+.sy-meter-row { display: flex; align-items: center; gap: 12px; margin-top: 6px; padding-bottom: 8px; }
+.sy-meter-row > .sy-meter { flex: 1 1 auto; margin-top: 0; }
+.sy-meter-row > .sy-add-unit { flex: none; margin-left: 0; }
+
+/* Credit limit: "/" and the credits mark, a Carbon select, and for Custom a
+   Carbon number field beside it. */
+.limit-ctl { display: inline-flex; align-items: center; gap: 4px; font-size: 15px; font-weight: 700; color: var(--ink-2); }
+cds-select.limit-select { width: 7.5rem; }
+cds-text-input.limit-custom { width: 6.5rem; }

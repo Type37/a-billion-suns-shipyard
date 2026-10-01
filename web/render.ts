@@ -34,6 +34,7 @@ import {
   commandRow,
   diceRow,
   emblemMark,
+  creditsGlyph,
   icon,
   statChips,
   statChipList,
@@ -1294,17 +1295,9 @@ function shipyardView(state: AppState): string {
   // Masthead chrome, the same pieces the Fleet-List builder uses.
   const emblemPicker = `<button class="emblem-current-btn" data-action="open-emblem-modal" data-target="list" title="Choose an emblem">${listEmblem(list, 46)}${icon("pencil", 12, "emblem-edit-cue")}</button>`;
 
-  // The cap is the control: click it for a popover with the only two choices,
-  // ¢300bn or No Limit. No explainer text - No Limit means no credit ceiling.
-  const capControl = `<details class="limit-switch sy-cap">
-      <summary>${unlimited ? "No Limit" : `of ${credits(cap)}`}</summary>
-      <div class="limit-switch-panel">
-        <div class="nf-opts">
-          <button class="nf-opt ${!unlimited ? "on" : ""}" data-action="sy-cap-limited">${credits(300)}</button>
-          <button class="nf-opt ${unlimited ? "on" : ""}" data-action="sy-cap-nolimit">No Limit</button>
-        </div>
-      </div>
-    </details>`;
+  // The cap is the control: a Carbon select with the only two choices, ¢300bn
+  // or No Limit. No explainer text - No Limit means no credit ceiling.
+  const capControl = `<span class="limit-ctl">${unlimited ? "" : `of ${creditsGlyph(13.5)}`}<cds-select class="limit-select" hide-label label-text="Credit cap" size="sm" value="${unlimited ? "none" : "300"}" data-key="cap-select"><cds-select-item value="300" data-action="sy-cap-limited">300</cds-select-item><cds-select-item value="none" data-action="sy-cap-nolimit">No Limit</cds-select-item></cds-select></span>`;
 
   // Ship list: every class in the faction, ascending mass. The pool holds a
   // count per class (zero when unowned). Unlimited Shipyards is not "cap lifted":
@@ -1358,7 +1351,7 @@ function shipyardView(state: AppState): string {
         <span class="sy-budget-now">${credits(total)}</span>
         <span class="sy-budget-cap">${capControl}</span>
         <span class="sy-budget-free">${
-          unlimited ? "No Limit" : over ? `${credits(-remaining)} over` : `${credits(remaining)} remaining`
+          unlimited ? "No Limit" : over ? `${credits(-remaining)} over` : `${credits(remaining)} left`
         }</span>
       </div>
       ${unlimited ? "" : `<div class="sy-meter"><span class="sy-meter-fill" style="width:${pct}%"></span></div>`}
@@ -1587,44 +1580,23 @@ function builderView(state: AppState): string {
 
   const limitIsPreset = [300, 400, 500].includes(list.fleet.creditsLimit);
   const limitCustomOpen = state.ui.limitCustomOpen === true;
-  // Hypergrowth (the only mode offering Unlimited Shipyards and a fixed ¢300 cap)
-  // has its own screen; this builder serves the fleet-list / training modes.
-  const isHyper = false;
-  // The cap lives inline as "/500" in the tally itself, not a standing row of
-  // buttons — click the cap to change it in a popover. The popover mirrors the
-  // New Fleet modal: the same nf-opt preset buttons and a click-to-open Custom.
-  const limitControl = `<details class="limit-switch">
-      <summary class="mf-tally-cap">${unlimited ? "∞" : `/${credits(list.fleet.creditsLimit)}`}</summary>
-      <div class="limit-switch-panel">
-        ${
-          isHyper
-            ? `<label class="nf-unlimited-toggle">
-                <input type="checkbox" data-action="toggle-unlimited-shipyards" ${unlimited ? "checked" : ""} />
-                <span class="nf-unlimited-box">${icon("check", 13)}</span>
-                <span>Unlimited Shipyards <span class="nf-unlimited-hint">no credit cap</span></span>
-              </label>`
-            : ""
-        }
-        <div class="nf-opts ${unlimited ? "is-disabled" : ""}">
-          ${(isHyper ? [300] : [300, 400, 500])
-            .map(
-              (n) =>
-                `<button class="nf-opt ${!unlimited && list.fleet.creditsLimit === n ? "on" : ""}" data-action="set-limit" data-limit="${n}" ${unlimited ? "disabled" : ""}>${credits(n)}</button>`,
-            )
-            .join("")}
-          ${
-            // Hypergrowth is "just 300, or Unlimited" (no other caps) - so no
-            // custom amount there. Every other mode keeps the click-to-open Custom.
-            isHyper
-              ? ""
-              : !limitIsPreset || limitCustomOpen
-                ? `<label class="nf-custom on">Custom
-              <input type="number" min="1" step="10" value="${!limitIsPreset ? list.fleet.creditsLimit : ""}" placeholder="¢" data-action="set-limit-free" autofocus /></label>`
-                : `<button type="button" class="nf-custom nf-custom-btn" data-action="open-limit-custom">Custom</button>`
-          }
-        </div>
-      </div>
-    </details>`;
+  // The credit limit is a Carbon select (300, 400, 500, any custom amount
+  // already set, and "Custom...") with the credits mark in front of it. Custom
+  // opens a Carbon number field in the select's place; entering an amount
+  // closes it again and the amount becomes an option in the list, so the row
+  // only ever holds one control. It was a homemade popover of preset buttons.
+  // The mark sits outside the select because a native option list can only
+  // show text.
+  const limitOptions = limitIsPreset ? [300, 400, 500] : [300, 400, 500, list.fleet.creditsLimit].sort((x, y) => x - y);
+  const limitControl = unlimited
+    ? "∞"
+    : `<span class="limit-ctl">/${creditsGlyph(13.5)}${
+        limitCustomOpen
+          ? `<cds-text-input class="limit-custom" type="number" min="1" step="10" hide-label label="Custom credit limit" size="sm" value="${list.fleet.creditsLimit}" data-action="set-limit-free" data-key="limit-custom" autofocus></cds-text-input>`
+          : `<cds-select class="limit-select" hide-label label-text="Credit limit" size="sm" value="${list.fleet.creditsLimit}" data-key="limit-select">${limitOptions
+              .map((n) => `<cds-select-item value="${n}" data-action="set-limit" data-limit="${n}">${n}</cds-select-item>`)
+              .join("")}<cds-select-item value="custom" data-action="open-limit-custom">Custom...</cds-select-item></cds-select>`
+      }</span>`;
 
 
 
@@ -1681,25 +1653,22 @@ function builderView(state: AppState): string {
         <div class="sy-budget-status">${fleetStatus}</div>
         <span class="sy-budget-free">${remaining < 0 ? `${credits(-remaining)} over` : `${credits(remaining)} left`}</span>
       </div>
-      <div class="sy-meter"><span class="sy-meter-fill" style="width:${list.fleet.creditsLimit > 0 ? Math.min(100, (total / list.fleet.creditsLimit) * 100) : 0}%"></span></div>
+      ${/* Add unit rides in the pinned band beside the meter: it had a row of
+            its own under the band, and pinned it can be reached from anywhere
+            down a long roster without scrolling back up. */ ""}
+      <div class="sy-meter-row">
+        <div class="sy-meter"><span class="sy-meter-fill" style="width:${list.fleet.creditsLimit > 0 ? Math.min(100, (total / list.fleet.creditsLimit) * 100) : 0}%"></span></div>
+        ${
+          list.freePlay || faction
+            ? `<button class="sy-add-unit ${nUnits === 0 ? "is-pulsing" : ""}" data-action="open-add-unit">${icon("plus", 16)} Add ${isStocking ? "ship" : "unit"}</button>`
+            : ""
+        }
+      </div>
     </div>
 
     <div class="sy-cols">
     <div class="sy-col-fleet">
-    ${/* One row: the fleet's status on the left, Add unit on the right. There
-          used to be a "YOUR FLEET" heading row with Add unit beside it and then
-          a row of its own for "Legal" or "1 to resolve" under that: two rows
-          and 70px before the first ship, for a heading that names the page
-          you are on. The heading stays for screen readers only, and the
-          status moved up into the credits row (fleetStatus). */ ""}
-    <div class="sy-list-head">
-      <h3 class="visually-hidden">${isStocking ? "Your shipyard" : "Your fleet"}</h3>
-      ${
-        list.freePlay || faction
-          ? `<button class="sy-add-unit ${nUnits === 0 ? "is-pulsing" : ""}" data-action="open-add-unit">${icon("plus", 16)} Add ${isStocking ? "ship" : "unit"}</button>`
-          : ""
-      }
-    </div>
+    <h3 class="visually-hidden">${isStocking ? "Your shipyard" : "Your fleet"}</h3>
 
     <div class="sy-list">${
       // Nothing when empty. The dashed "No units yet / Tap Add unit to begin"

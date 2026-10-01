@@ -4241,6 +4241,12 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 @media (max-width: 671px) {
   cds-modal:not([size="xs"])::part(dialog) { height: 100%; box-sizing: border-box; }
 }
+/* Add unit stretched to ~94% of a wide desktop window with two columns of
+   cards swimming in it. The grid inside (.au-list) is auto-fill, so capping the
+   dialog is enough: two columns up to the cap, one when it narrows. */
+@media (min-width: 672px) {
+  .au-modal::part(dialog) { max-inline-size: 960px; }
+}
 .opt-section { display: flex; flex-direction: column; gap: 8px; }
 .opt-h { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); border-bottom: 1px solid var(--hair-soft); padding-bottom: 8px; }
 .opt-note { font-size: 13px; color: var(--ink-2); line-height: 1.45; }
@@ -8061,7 +8067,7 @@ cds-overflow-menu.hdr-menu { width: var(--tap); height: var(--tap); }
 /* Credit limit: "/" and the credits mark, a Carbon select, and for Custom a
    Carbon number field beside it. */
 .limit-ctl { display: inline-flex; align-items: center; gap: 4px; font-size: 16px; font-weight: 700; color: var(--ink-2); }
-cds-select.limit-select { width: 7.5rem; }
+cds-select.limit-select { width: 10rem; }
 cds-text-input.limit-custom { width: 6.5rem; }
 
 /* A personnel row's first line is the same height chosen or not. Choosing one

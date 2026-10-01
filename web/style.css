@@ -3793,12 +3793,18 @@ button { font-family: inherit; }
 .au-card-cost { margin-left: auto; font-family: var(--display); font-weight: 800; font-size: 12.5px; }
 .au-card-add { display: inline-flex; align-items: center; color: var(--blue); }
 /* Stats on the left, weapons to their right (wraps below only when cramped). */
-.au-card-body { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 18px; margin-top: 2px; }
+/* Guns to the right of the stats, always, at every width: stats are the
+   left column, the weapons the right. It used to be a wrapping flex row, so on
+   a phone the weapons dropped underneath the stats and every card was a tall
+   stack read top to bottom. */
+.au-card-body { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: 0 16px; margin-top: 2px; }
 .au-card-stats { display: flex; flex-wrap: wrap; gap: 0 10px; margin: 0; flex: 0 0 auto; }
 .au-card .stat-chip, .au-card .stat-chip-mini { border: none; background: none; padding: 0; }
 .au-card .stat-chips { gap: 0 10px; }
 .au-card-wep { display: grid; gap: 1px; font-size: 11.5px; line-height: 1.35; color: var(--ink-2); flex: 1 1 200px; min-width: 0; }
-.au-wrow { display: grid; grid-template-columns: 5.6em 1fr; align-items: baseline; }
+/* In a column this narrow the label sits over its weapon, not beside it. */
+.au-wrow { display: grid; gap: 0; }
+.au-wrow + .au-wrow { margin-top: 4px; }
 .au-wl { font-family: var(--display); font-weight: 800; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3); }
 /* Species on a roster row: three plain buttons, the unit's own one filled. */
 .species-pick { display: inline-grid; grid-template-columns: repeat(3, auto); border: 1px solid var(--hair); }

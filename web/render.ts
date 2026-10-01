@@ -28,7 +28,7 @@ import { ACTIVATION_STEPS, CORE_ACTIONS, CORE_COMMANDS, ROUND_PHASES } from "../
 import { deriveCommandEffects, effectiveCost } from "../src/command-effects.ts";
 import type { CommandCostChange, CommandEffects, RuleSource } from "../src/command-effects.ts";
 import { allFactions, factionsByEra, findFaction, makeCatalog, ERA_ORDER } from "./catalog.ts";
-import { auxSlotText, costBreakdown, credits, creditsText, escapeHtml, formatDate, formatWeapon, pluralise, primarySlotText, ruleText } from "./format.ts";
+import { costBreakdown, credits, creditsText, escapeHtml, formatDate, pluralise, ruleText } from "./format.ts";
 import { markdownEditor, renderMarkdown } from "./richtext.ts";
 import {
   commandRow,
@@ -891,56 +891,13 @@ function switcher(
 // [dice, range] in brackets (see weaponsTable() below, the same notation).
 // No separate DMG figure: it's a fixed lookup from the die, not a printed column.
 function cardWeapons(ship: ShipClass): string {
-  const one = (w: Weapon, arc: "primary" | "aux") => `
-    <p class="pcw">
-      <span class="pcw-arc">${icon(arc === "primary" ? "arc-primary" : "arc-aux", 14, "slot-arc")}${arc === "primary" ? "Primary" : "Auxiliary"}</span>
-      <span class="pcw-name">${escapeHtml(w.name)}</span>
-      <span class="pcw-fig">[${w.count}${w.die}, ${w.rangeMin}-${w.rangeMax}"]</span>
-    </p>`;
-  const rows = [
-    ...ship.primary.map((w) => one(w, "primary")),
-    ...ship.auxiliary.map((w) => one(w, "aux")),
-  ];
-  // A fitting or utility bay is not a weapon but it occupies the slot, so the
-  // card has to say so rather than leaving the auxiliary line blank.
-  if (ship.auxiliary.length === 0 && (ship.auxiliaryFitting || ship.auxiliaryUtility)) {
-    rows.push(`
-    <p class="pcw">
-      <span class="pcw-arc">${icon("arc-aux", 14, "slot-arc")}Auxiliary</span>
-      <span class="pcw-name">${escapeHtml(ship.auxiliaryFitting ?? "Utility Bays")}</span>
-    </p>`);
-  }
-  return rows.length ? `<div class="pc-weapons">${rows.join("")}</div>` : "";
+  return `<div class="guns">${gunLines(ship)}</div>`;
 }
 
 export function weaponsTable(ship: ShipClass): string {
-  // Plain lines, not a column table: the book's own notation is
-  //   Primary  Cruise Missiles [4D10, 18-36"]
-  // so each weapon is one line - an arc glyph, the Pri/Aux label, the name, and
-  // the dice and range in brackets. No column headers, no separate DMG column
-  // (damage is a fixed lookup from the die, never shown here). An empty slot is
-  // an em dash; a utility slot names itself.
-  const weaponLine = (w: Weapon, arc: "pri" | "aux") =>
-    `<p class="weap-line"><span class="wl-arc">${icon(arc === "pri" ? "arc-primary" : "arc-aux", 15, "slot-arc")}${arc === "pri" ? "Primary" : "Auxiliary"}</span> <span class="wl-name">${escapeHtml(w.name)}</span> <span class="wl-fig">[${w.count}${w.die}, ${w.rangeMin}–${w.rangeMax}"]</span></p>`;
-  const slotLine = (arc: "pri" | "aux", text: string) => {
-    const nm = text === "Utility Bays" ? `${icon("utility", 13, "util-ico")}${text}` : text;
-    return `<p class="weap-line"><span class="wl-arc">${icon(arc === "pri" ? "arc-primary" : "arc-aux", 15, "slot-arc")}${arc === "pri" ? "Primary" : "Auxiliary"}</span> <span class="wl-name">${nm}</span></p>`;
-  };
-
-  const lines: string[] = [];
-  // Primary
-  if (ship.primary.length) ship.primary.forEach((w) => lines.push(weaponLine(w, "pri")));
-  else {
-    const t = primarySlotText(ship);
-    lines.push(slotLine("pri", t === "None" ? "—" : escapeHtml(t)));
-  }
-  // Auxiliary
-  if (ship.auxiliary.length) ship.auxiliary.forEach((w) => lines.push(weaponLine(w, "aux")));
-  else {
-    const t = auxSlotText(ship);
-    lines.push(slotLine("aux", t === "None" ? "—" : escapeHtml(t)));
-  }
-  return `<div class="weap-lines">${lines.join("")}</div>`;
+  // The builder's fleet rows, Play, Solo and the faction pages all draw guns
+  // through here, and here is gunLines: the same layout as Add unit.
+  return `<div class="guns">${gunLines(ship)}</div>`;
 }
 
 // ---------------------------------------------------------------------------
@@ -1826,18 +1783,7 @@ function addUnitModal(state: AppState): string {
     : faction
       ? faction.ships.map((s) => ({ ship: s, owner: faction, composite: false }))
       : [];
-  const weaponsLine = (s: ShipClass) => {
-    const p = shortWeaponText(s.primary, s.utilityBays && s.primary.length === 0);
-    const a = shortWeaponText(s.auxiliary, s.utilityBays && s.auxiliary.length === 0);
-    const parts: string[] = [];
-    const util = (t: string) => `<span>${t === "Utility Bays" ? `${icon("utility", 11, "util-ico")}${t}` : t}</span>`;
-    // One labelled line per arc. These were once "P ... · A ..." on a single
-    // line, which saved a row and cost every reader a decode: single letters
-    // nobody recognised and a dot that looked like it meant something.
-    if (p) parts.push(`<span class="au-wrow"><span class="au-wl">Primary</span>${util(p)}</span>`);
-    if (a) parts.push(`<span class="au-wrow"><span class="au-wl">Auxiliary</span>${util(a)}</span>`);
-    return parts.join("");
-  };
+
   // The Alliance tags every unit with a species (Fractious Coalition), so for
   // them a tap on a ship opens three buttons on that card and the species is
   // chosen as part of adding it. A species bar at the top of the dialog was
@@ -1944,11 +1890,6 @@ export function gunArc(ship: ShipClass, kind: "primary" | "aux"): string {
   return `<span class="gun is-none">${glyph}<span class="gun-txt"><span class="gun-name">None</span></span></span>`;
 }
 
-function shortWeaponText(w: Weapon[], isUtility: boolean): string {
-  // Two weapons in one arc go on two lines, not "A · B".
-  if (w.length) return w.map((x) => `${escapeHtml(x.name)} ${x.count}${x.die} ${x.rangeMin}&ndash;${x.rangeMax}"`).join("<br>");
-  return isUtility ? "Utility Bays" : "";
-}
 
 // The faction ship reference: one line per ship, grouped by Mass, laid out like
 // the rulebook - stats plus both weapon slots at a glance. Opened from the
@@ -1971,8 +1912,8 @@ function shipReferenceModal(state: AppState): string {
     if (!ships.length) continue;
     rows += `<div class="sr-mass">Mass ${mass}</div>`;
     for (const s of ships) {
-      const pri = shortWeaponText(s.primary, s.utilityBays && s.primary.length === 0);
-      const aux = shortWeaponText(s.auxiliary, s.utilityBays && s.auxiliary.length === 0);
+      const pri = gunArc(s, "primary");
+      const aux = gunArc(s, "aux");
       rows += `<div class="sr-row">
         <span class="sr-name">${escapeHtml(s.name)}</span>
         <span class="sr-stats">
@@ -2018,23 +1959,7 @@ function shipReferenceModal(state: AppState): string {
  * One weapon cell of a printed roster. Module level, because the Junkspace
  * crew sheet prints the same two columns and should not draw them differently.
  */
-const prWeapCell = (ship: ShipClass, arc: "primary" | "aux"): string => {
-  const glyph = icon(arc === "primary" ? "arc-primary" : "arc-aux", 10, "prw-mark slot-arc");
-  const list = arc === "primary" ? ship.primary : ship.auxiliary;
-  const lines = list.length
-    ? list.map((w) => escapeHtml(formatWeapon(w)))
-    : [escapeHtml(arc === "primary" ? primarySlotText(ship) : auxSlotText(ship))];
-  // The gutter is always emitted, with or without a glyph in it. "None" gets
-  // no arc - there is no arc to mark, and the glyph beside it read as a weapon
-  // struck through - but it still gets the space, so the Primary column and
-  // the Auxiliary column agree about where their text starts on a given row.
-  return lines
-    .map(
-      (s) =>
-        `<span class="prw"><span class="prw-ico">${s === "None" ? "" : glyph}</span><span class="prw-t">${s}</span></span>`,
-    )
-    .join("");
-};
+const prWeapCell = (ship: ShipClass, arc: "primary" | "aux"): string => gunArc(ship, arc);
 
 
 /**
@@ -3999,8 +3924,8 @@ function shipsView(state: AppState): string {
         thrust: s.thrust,
         silhouette: s.silhouette,
         shields: s.shields,
-        primary: primarySlotText(s),
-        auxiliary: s.auxiliaryFitting ? escapeHtml(s.auxiliaryFitting) : auxSlotText(s),
+        primary: gunArc(s, "primary"),
+        auxiliary: s.auxiliaryFitting ? escapeHtml(s.auxiliaryFitting) : gunArc(s, "aux"),
         cost: s.cost,
         costLabel: credits(s.cost),
         isCustom,
@@ -4022,8 +3947,8 @@ function shipsView(state: AppState): string {
       thrust: s.thrust,
       silhouette: s.silhouette,
       shields: s.shields,
-      primary: primarySlotText(s),
-      auxiliary: s.auxiliaryFitting ? escapeHtml(s.auxiliaryFitting) : auxSlotText(s),
+      primary: gunArc(s, "primary"),
+      auxiliary: s.auxiliaryFitting ? escapeHtml(s.auxiliaryFitting) : gunArc(s, "aux"),
       cost: s.cost,
       costLabel: `&cent;${s.cost}k`,
       isCustom: false,

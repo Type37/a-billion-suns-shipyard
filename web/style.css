@@ -3766,8 +3766,9 @@ button { font-family: inherit; }
   .sr-weps { display: grid; gap: 1px; grid-column: 1 / -1; }
   .sr-num { display: inline; text-align: left; font-size: 12px; color: var(--ink); font-weight: 700; }
   .sr-num::before { content: attr(data-l) " "; color: var(--ink-3); font-weight: 700; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.03em; }
-  .sr-w { display: grid; grid-template-columns: 6.2em 1fr; font-size: 12px; }
-  .sr-w::before { content: attr(data-l); font-family: var(--display); font-weight: 800; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); align-self: baseline; }
+  /* The arc glyph in gunArc says Primary or Auxiliary; no word label too. */
+  .sr-w { display: block; font-size: 12px; }
+  .sr-w::before { content: none; }
   .sr-w.is-empty { display: none; }
   .sr-mass { padding: 0 6px; font-size: 9px; }
   .shipref-cap { font-size: 10.5px; margin-bottom: 4px; }
@@ -7913,8 +7914,11 @@ cds-inline-notification.app-hint { max-width: none; width: 100%; margin: 6px 0; 
 .gun-arc svg { width: 16px; height: 16px; }
 .gun-txt { min-width: 0; }
 .gun.is-none .gun-arc, .gun.is-none .gun-name { color: var(--ink-off); }
-.gun-name { font-weight: 600; color: var(--ink); }
-.gun-fig { color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+/* The dice and range are what a player reads; the gun's name is a label.
+   So the name is styled exactly like the grey THRUST/SHIELDS labels on the
+   stat chips beside it, and the figure like their values. */
+.gun-name { font-family: var(--narrow); font-size: 0.85em; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
+.gun-fig { font-weight: 700; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .gun-arc-row { display: grid; gap: 2px; }
 
 /* Add unit card, laid out from Jet's sketch: name over stats on the left,
@@ -7930,3 +7934,16 @@ cds-inline-notification.app-hint { max-width: none; width: 100%; margin: 6px 0; 
 .au-card-aux { grid-column: 2; grid-row: 2; }
 .au-card-pri, .au-card-aux { font-size: 13px; min-width: 0; }
 .au-card-pri .gun-name, .au-card-aux .gun-name, .au-card-pri .gun-fig, .au-card-aux .gun-fig { overflow-wrap: anywhere; }
+
+/* Compendium phone rows: gunArc's glyph names the arc, so the cell's
+   "PRIMARY"/"AUXILIARY" word label would say it twice. */
+.comp-table td.comp-weap::before { content: none !important; }
+
+/* Cost sits right after the ship's name, not pushed to the far side of its
+   column, where on a wide screen it floated alone between name and guns. */
+.au-card-id { justify-content: flex-start; }
+.au-card-id .au-card-cost { margin-left: 0; }
+/* The Primary glyph's pale half-disc made Primary read as switched off next
+   to Auxiliary's solid dome. In a gun row both draw at full strength. */
+.gun-arc svg path { opacity: 1 !important; }
+.gun-arc svg path:first-child:not(:only-child) { opacity: 0.35 !important; }

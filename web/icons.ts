@@ -1,7 +1,8 @@
 import creditsRaw from "./Credits.svg?raw";
+import { CARBON_ICONS, carbonSvg } from "./carbon-icons.ts";
 
-// Geometric inline SVG icons. All stroke-based, inherit currentColor, drawn on
-// a 24-unit grid so they align with the type baseline. No icon fonts.
+// icon(name, size): interface icons come from Carbon (carbon-icons.ts); the
+// few game marks Carbon cannot supply live in PATHS below. No icon fonts.
 
 /**
  * The Mass mark: ⓜ, U+24DC, CIRCLED LATIN SMALL LETTER M - the circled
@@ -29,140 +30,9 @@ export const MASS_MARK =
   '<path fill="currentColor" stroke="currentColor" stroke-width="0.45" d="M20.13 3.87Q23.5 7.23 23.5 12Q23.5 16.77 20.13 20.13Q16.77 23.5 12 23.5Q7.23 23.5 3.87 20.13Q0.5 16.77 0.5 12Q0.5 7.23 3.87 3.87Q7.23 0.5 12 0.5Q16.77 0.5 20.13 3.87ZM4.52 4.52Q1.43 7.61 1.43 12Q1.43 16.39 4.52 19.48Q7.61 22.57 12 22.57Q16.39 22.57 19.48 19.48Q22.57 16.39 22.57 12Q22.57 7.61 19.48 4.52Q16.39 1.43 12 1.43Q7.61 1.43 4.52 4.52ZM5.83 11.07V17.42H3.96V6.76H5.83V8.07Q7.23 6.39 9.01 6.39Q10.78 6.39 11.72 7.33Q12.37 7.98 12.56 8.54Q14.24 6.39 16.58 6.39Q18.17 6.39 19.2 7.42Q20.04 8.26 20.04 10.13V17.42H18.17V10.5Q18.17 9.29 17.52 8.63Q16.96 8.07 16.02 8.07Q14.9 8.07 14.06 8.91Q12.84 10.13 12.84 11.35V17.42H10.97V10.04Q10.97 9.1 10.41 8.54Q9.94 8.07 8.91 8.07Q7.61 8.07 6.67 9.01Q5.83 9.85 5.83 11.07Z"/>';
 
 const PATHS: Record<string, string> = {
-  // wordmark companion: a planet disc with a single orbit line
-  logo: '<circle cx="12" cy="12" r="5.5"/><ellipse cx="12" cy="12" rx="10" ry="3.4" transform="rotate(-18 12 12)"/>',
-  // Nav marks: Material-style solid glyphs. A standings podium for Solo, a
-  // shelved-volumes mark for the Compendium, a document list for Fleets, and a
-  // sliders mark for Options. All 24-grid, filled, stroke-none.
-  solo:
-    '<path fill="currentColor" stroke="none" d="M7 2h10v2H7zm0 8h10v2H7zm8-6h2v6h-2zM7 4h2v6H7zM4 14h2v8H4zm14 0h2v8h-2zM6 14h12v2H6z"/>',
-  compendium:
-    '<g fill="currentColor" stroke="none"><path d="M0 3h13v2H0zm0 16h11v2H0z"/><path d="M11 3h13v2H11zm2 16h11v2H13zM11 5h2v18h-2zM0 5h2v14H0zm22 0h2v14h-2zm-7 2h5v2h-5zm0 4h5v2h-5zm0 4h2v2h-2z"/></g>',
-  fleets:
-    '<path fill="currentColor" stroke="none" d="M10 5h12v2H10zm0 4h8v2h-8zm0 4h12v2H10zm0 4h8v2h-8zM4 7v2h2V7zm4 4H2V5h6zm-6 2h6v2H2zm0 4h6v2H2zm0 0v-2h2v2zm4 0v-2h2v2z"/>',
-  options:
-    '<g fill="currentColor" stroke="none"><path d="M4 14h2v6H4zm5 0h2v6H9zm-5-2h7v2H4zm0 8h7v2H4zm-2-4h2v2H2zm20-8h-4V6h4z"/><path d="M10 16h12v2H10zm5-8H2V6h13zm5-4v2h-2V4zm0 6V8h-2v2zm-7-8h7v2h-7zm0 10h7v-2h-7zm0-8h2v2h-2zm0 6h2V8h-2z"/></g>',
-  "custom-rules":
-    '<path fill="currentColor" stroke="none" fill-opacity=".16" d="M8.4 14H5.6A1.6 1.6 0 0 0 4 15.6v2.8A1.6 1.6 0 0 0 5.6 20h2.8a1.6 1.6 0 0 0 1.6-1.6v-2.8A1.6 1.6 0 0 0 8.4 14m10-10h-2.8A1.6 1.6 0 0 0 14 5.6v2.8a1.6 1.6 0 0 0 1.6 1.6h2.8A1.6 1.6 0 0 0 20 8.4V5.6A1.6 1.6 0 0 0 18.4 4"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.5" d="M14 17h6m-3 3v-6M5.6 4h2.8A1.6 1.6 0 0 1 10 5.6v2.8A1.6 1.6 0 0 1 8.4 10H5.6A1.6 1.6 0 0 1 4 8.4V5.6A1.6 1.6 0 0 1 5.6 4m0 10h2.8a1.6 1.6 0 0 1 1.6 1.6v2.8A1.6 1.6 0 0 1 8.4 20H5.6A1.6 1.6 0 0 1 4 18.4v-2.8A1.6 1.6 0 0 1 5.6 14m10-10h2.8A1.6 1.6 0 0 1 20 5.6v2.8a1.6 1.6 0 0 1-1.6 1.6h-2.8A1.6 1.6 0 0 1 14 8.4V5.6A1.6 1.6 0 0 1 15.6 4"/>',
-  plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
-  minus: '<line x1="5" y1="12" x2="19" y2="12"/>',
-  // The CMD token mark: a looped-square command glyph, used beside every CMD
-  // count so the token reads as its own symbol wherever it appears.
-  "cmd-delta":
-    '<g fill="currentColor" stroke="none"><path d="M16 16h3a3 3 0 1 1-3 3.001zM5 16l3 .001v3a3 3 0 1 1-3-3"/><path fill-rule="evenodd" d="M19 8h-3V5a3 3 0 1 1 3 3M8 8V5a3 3 0 1 0-3 3z" clip-rule="evenodd"/><path d="M16 8H8v8h8z" opacity=".5"/></g>',
-  // A twelve-sided die showing "12": the roll behind the corp-name generator.
-  d12: '<path fill="currentColor" stroke="none" fill-rule="evenodd" d="M12 2L1.5 9.64L5.5 22h13l4-12.36zm5 18H7l-3.15-9.6L12 4.47l8.15 5.93zm0-4.25V17h-5.34v-1.09s3.57-3.46 3.57-4.51c0-1.28-1.05-1.15-1.05-1.15c-.68.05-1.18.62-1.18 1.3h-1.56c.06-1.46 1.28-2.61 2.83-2.55c2.47 0 2.5 1.85 2.5 2.3c0 1.77-3.19 4.47-3.19 4.47zM10.5 17H8.89v-6.11L7 11.47v-1.28L10.31 9h.19z"/>',
-  // Eraser (tabler): the "blank the name" button beside the roll die.
-  eraser: '<path d="M19 20H8.5l-4.21-4.3a1 1 0 0 1 0-1.41l10-10a1 1 0 0 1 1.41 0l5 5a1 1 0 0 1 0 1.41L11.5 20m6.5-6.7L11.7 7"/>',
-  // Utility ship (streamline-plump wrench-circle): a Mass 1+ ship with Utility Bays.
-  utility: '<path fill="currentColor" stroke="none" d="M1.5 24C1.5 11.574 11.574 1.5 24 1.5S46.5 11.574 46.5 24c0 10.493-7.182 19.308-16.899 21.797V39.69c0-1.59.974-2.987 2.287-3.884A13.98 13.98 0 0 0 38 24.24c0-5.09-2.717-9.547-6.78-11.997c-1.182-.712-2.553.242-2.553 1.622v8.223c0 .445-.147.878-.452 1.202c-.638.676-1.914 1.861-3.591 2.578c-.398.17-.849.17-1.247 0c-1.723-.736-3.022-1.967-3.64-2.632a1.7 1.7 0 0 1-.44-1.072c-.13-2.299-.172-5.234-.17-8.154c.002-1.401-1.397-2.367-2.582-1.62c-3.93 2.479-6.542 6.86-6.542 11.85c0 4.806 2.422 9.047 6.112 11.567c1.313.897 2.287 2.294 2.287 3.884v6.108C8.684 43.31 1.5 34.494 1.5 24"/>',
-  // Discord's own wordless mark, from Simple Icons (simple-icons:discord).
-  // A brand mark, so it is TRACED FROM THE REAL ONE and not drawn from memory:
-  // the previous footer link used the `commander` org-chart glyph, which said
-  // nothing about Discord at all. If another brand ever needs a mark here, take
-  // it from Simple Icons too - do not approximate a logo.
-  discord:
-    '<path fill="currentColor" stroke="none" d="M20.317 4.3698a19.7913 19.7913 0 0 0-4.8851-1.5152.0741.0741 0 0 0-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 0 0-.0785-.037 19.7363 19.7363 0 0 0-4.8852 1.515.0699.0699 0 0 0-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 0 0 .0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 0 0 .0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 0 0-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 0 1-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 0 1 .0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 0 1 .0785.0095c.1202.099.246.198.3728.2924a.077.077 0 0 1-.0066.1276 12.2986 12.2986 0 0 1-1.873.8914.0766.0766 0 0 0-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 0 0 .0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 0 0 .0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 0 0-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/>',
-  close: '<line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/>',
-  check: '<polyline points="5 13 10 18 19 7"/>',
-  warning: '<path d="M12 3 22 20 2 20 Z"/><line x1="12" y1="9.5" x2="12" y2="14.5"/><line x1="12" y1="17" x2="12" y2="17.01"/>',
-  print: '<rect x="6" y="3" width="12" height="5"/><rect x="4" y="8" width="16" height="8"/><rect x="7" y="13" width="10" height="8"/>',
-  link: '<path d="M9 15a4 4 0 0 0 6 0l3-3a4 4 0 0 0-6-6l-1.5 1.5"/><path d="M15 9a4 4 0 0 0-6 0l-3 3a4 4 0 0 0 6 6l1.5-1.5"/>',
-  home: '<path d="M4 11 12 4 20 11"/><path d="M6 10 V20 H18 V10"/>',
-  pencil: '<path d="M4 20 5 16 16.5 4.5 19.5 7.5 8 19 Z"/><line x1="14.5" y1="6.5" x2="17.5" y2="9.5"/>',
-  duplicate: '<rect x="8" y="8" width="12" height="12"/><path d="M16 4 H4 V16"/>',
-  // Siemens iX-style solid marks for the three card actions. Solid, geometric,
-  // 2px corner radii: they read at 18px on a card where the stroke set goes
-  // muddy, and the card shows them without labels.
-  "ix-duplicate":
-    '<g fill="currentColor" stroke="none"><path d="M9 2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-1v-2h1V4H9v1H7V4a2 2 0 0 1 2-2Z"/><rect x="3" y="7" width="13" height="15" rx="2"/></g>',
-  "ix-share":
-    '<g fill="currentColor" stroke="none"><circle cx="18.5" cy="5" r="3.2"/><circle cx="18.5" cy="19" r="3.2"/><circle cx="5.5" cy="12" r="3.2"/><path d="m7.9 9.9 8.2-4.1.9 1.8-8.2 4.1zm0 4.2.9-1.8 8.2 4.1-.9 1.8z"/></g>',
-  // Same Siemens iX family as the card actions above: a solid right-pointing
-  // triangle inside a square plate, 2px corners. Reads at 18px on the builder
-  // header where a stroked outline would go muddy.
-  "ix-play":
-    '<g fill="currentColor" stroke="none"><path d="M4 3.6A1.6 1.6 0 0 1 5.6 2h12.8A1.6 1.6 0 0 1 20 3.6v16.8a1.6 1.6 0 0 1-1.6 1.6H5.6A1.6 1.6 0 0 1 4 20.4Zm2 .4v16h12V4Z"/><path d="M9.6 7.2v9.6l7.2-4.8z"/></g>',
-  // Siemens ix:context-menu, verbatim. Vertical dots, not the horizontal ones
-  // (ix:more-menu): a horizontal triplet at 18px is read as a text ellipsis -
-  // "the name is truncated" - where a vertical triplet is read as a menu.
-  "ix-context-menu":
-    '<path fill="currentColor" stroke="none" fill-rule="evenodd" d="M256 117.333c17.673 0 32-14.327 32-32s-14.327-32-32-32s-32 14.327-32 32s14.327 32 32 32m0 341.333c17.673 0 32-14.327 32-32s-14.327-32-32-32s-32 14.327-32 32s14.327 32 32 32M256 288c17.673 0 32-14.327 32-32s-14.327-32-32-32s-32 14.327-32 32s14.327 32 32 32"/>',
-  "ix-trash":
-    '<g fill="currentColor" stroke="none"><path d="M9.5 2h5a1.5 1.5 0 0 1 1.5 1.5V5h5v2H3V5h5V3.5A1.5 1.5 0 0 1 9.5 2Zm.5 3h4v-1h-4z"/><path d="M5 8h14l-.8 12.1A2 2 0 0 1 16.2 22H7.8a2 2 0 0 1-2-1.9zm4 2v9h1.6v-9zm4.4 0v9H15v-9z"/></g>',
-  trash: '<path d="M5 7 H19"/><path d="M9 7 V5 H15 V7"/><path d="M7 7 8 20 H16 L17 7"/>',
-  save: '<path d="M5 4 H16 L20 8 V20 H5 Z"/><rect x="8" y="13" width="8" height="7"/><rect x="8" y="4" width="7" height="4"/>',
-  chevronDown: '<polyline points="6 9 12 15 18 9"/>',
-  chevronRight: '<polyline points="9 6 15 12 9 18"/>',
-  chevronLeft: '<polyline points="15 6 9 12 15 18"/>',
-  more: '<circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
-  menu: '<line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/>',
-  info: '<circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16.5"/><line x1="12" y1="7.5" x2="12" y2="7.51"/>',
-  // An OPEN book (Tabler `book`): two facing pages with a spine down the middle.
-  // The previous one was a hand-drawn closed hardback and at 16-20px it drew as
-  // a plain empty square with no spine and no pages - a rectangle labelled "Get
-  // the rulebook". It is on the home page, the onboarding card, the footer and
-  // the buy CTA, which made it the most-seen broken glyph in the app.
-  book: '<path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><line x1="3" y1="6" x2="3" y2="19"/><line x1="12" y1="6" x2="12" y2="19"/><line x1="21" y1="6" x2="21" y2="19"/>',
-  flag: '<line x1="5" y1="3" x2="5" y2="21"/><path d="M5 4 H19 L16 8.5 19 13 H5"/>',
-  wrench: '<path d="M14.5 6.5a4.5 4.5 0 0 0-6 6L3 18l3 3 5.5-5.5a4.5 4.5 0 0 0 6-6L14 13l-3-3Z"/>',
-  scroll: '<path d="M7 3 H19 V17 A2 2 0 0 1 17 19 H7"/><path d="M7 3 A2 2 0 0 0 5 5 V19 A2 2 0 0 0 7 21 H17"/><line x1="9.5" y1="8" x2="16" y2="8"/><line x1="9.5" y1="12" x2="16" y2="12"/>',
-  upload: '<path d="M12 15 V4"/><polyline points="7 8.5 12 3.5 17 8.5"/><path d="M4 15 V20 H20 V15"/>',
-  download: '<path d="M12 4 V15"/><polyline points="7 10.5 12 15.5 17 10.5"/><path d="M4 15 V20 H20 V15"/>',
-  // HVP carrier picker. A command hierarchy - nodes and reporting lines -
-  // reads as "who's in charge here" more directly than a lone head-and-
-  // shoulders silhouette did.
-  commander:
-    '<path d="M10 5a2 2 0 1 0 4 0a2 2 0 1 0-4 0m-4 7a2 2 0 1 0 4 0a2 2 0 1 0-4 0m4 7a2 2 0 1 0 4 0a2 2 0 1 0-4 0m8 0a2 2 0 1 0 4 0a2 2 0 1 0-4 0M2 19a2 2 0 1 0 4 0a2 2 0 1 0-4 0m12-7a2 2 0 1 0 4 0a2 2 0 1 0-4 0m-9 5l2-3m2-4l2-3m2 0l2 3m2 4l2 3m-4-3l-2 3m-4-3l2 3"/>',
-  filter: '<path d="M3 5 H21 L14 13 V20 L10 18 V13 Z"/>',
-  shuffle: '<path d="M3 6 H7 L17 18 H21"/><polyline points="18 3 21 6 18 9"/><path d="M3 18 H7 L10.5 14"/><path d="M13.5 10 L17 6 H21"/><polyline points="18 15 21 18 18 21"/>',
-  grid: '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>',
-  settings: '<circle cx="12" cy="12" r="3.4"/><line x1="12" y1="1.5" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22.5" y2="12"/><line x1="4.6" y1="4.6" x2="7" y2="7"/><line x1="17" y1="17" x2="19.4" y2="19.4"/><line x1="19.4" y1="4.6" x2="17" y2="7"/><line x1="7" y1="17" x2="4.6" y2="19.4"/>',
-  // Options: three horizontal sliders with offset knobs - the plain, universally
-  // read "settings / tune" control, cleaner than a many-spoked gear.
-  sliders: '<line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="9" cy="7" r="2.3" fill="var(--paper,#fff)"/><circle cx="15" cy="12" r="2.3" fill="var(--paper,#fff)"/><circle cx="8" cy="17" r="2.3" fill="var(--paper,#fff)"/>',
-  compare: '<line x1="6" y1="4" x2="6" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/><rect x="3" y="9" width="6" height="7"/><rect x="15" y="7" width="6" height="9"/>',
-  // Two curved arrows chasing each other: cross-device sync. The Fleet Sync
-  // dialog's own mark, so a synced fleet reads as "syncing" wherever it shows.
-  sync: '<path d="M20 11.5A8 8 0 0 0 6.3 6.3L4 8.5M4 12.5a8 8 0 0 0 13.7 5.2l2.3-2.2"/><path d="M4 4.5v4h4M20 19.5v-4h-4"/>',
-  image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.8" fill="currentColor" stroke="none"/><path d="M4 18 9 12 13 16 16 13 20 18" fill="none"/>',
-  die: '<rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="9" cy="9" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="9" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="9" cy="15" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="15" r="1.5" fill="currentColor" stroke="none"/>',
-  // THE randomise mark. Every control in the app that rolls something wears
-  // this one - fleet name, company name, HVP name, emblem, the blip bag - so
-  // "this button will pick for me" is one shape you learn once. A solid mark on
-  // a 32x24 grid, so it carries its own fill and stroke:none and ignores
-  // icon()'s stroke wrapper; the empty 32x24 background path in the source is
-  // dropped, since the viewBox already states the canvas.
-  random:
-    '<path fill="currentColor" stroke="none" d="M24.983 8.539V6.054h-4.902l-3.672 5.945l-2.099 3.414l-3.24 5.256c-.326.51-.889.844-1.53.845H0v-3.568h8.538L12.211 12l2.099-3.414l3.24-5.256a1.81 1.81 0 0 1 1.525-.845h5.904V0l7.417 4.27l-7.417 4.27z"/><path fill="currentColor" stroke="none" d="m12.902 6.316l-.63 1.022l-1.468 2.39l-2.265-3.675H.001V2.485h9.54a1.81 1.81 0 0 1 1.526.838l.004.007l1.836 2.985zM24.983 24v-2.485h-5.904a1.81 1.81 0 0 1-1.521-.838l-.004-.007l-1.836-2.985l.63-1.022l1.468-2.39l2.264 3.675h4.902v-2.485l7.417 4.27l-7.417 4.27z"/>',
-  // ship-stat glyphs, drawn on the 24 grid to sit inline with numbers
+  // What Carbon has no icon for: the rulebook's Mass mark (see MASS_MARK) and
+  // the firing arcs, which Jet kept. Everything else is in carbon-icons.ts.
   "stat-mass": MASS_MARK,
-  "stat-thrust":
-    '<path fill="currentColor" stroke="none" d="m13.061 4.939l-2.122 2.122L15.879 12l-4.94 4.939l2.122 2.122L20.121 12z"/><path fill="currentColor" stroke="none" d="M6.061 19.061L13.121 12l-7.06-7.061l-2.122 2.122L8.879 12l-4.94 4.939z"/>',
-  // si:target-fill, as supplied: a solid mark, so it carries its own fill and
-  // stroke:none and ignores icon()'s stroke wrapper.
-  "stat-silhouette":
-    '<path fill="currentColor" stroke="none" d="M11.997 4.5C7.312 4.5 3.5 8.312 3.5 13s3.813 8.5 8.5 8.5c4.688 0 8.5-3.812 8.5-8.5s-3.812-8.5-8.503-8.5m.003 15c-3.584 0-6.5-2.916-6.5-6.5S8.414 6.5 12 6.5c3.584 0 6.5 2.916 6.5 6.5s-2.916 6.5-6.5 6.5m3.348-7.469L15.5 12h.879A4.5 4.5 0 0 0 13 8.622V9.5c0 .551-.449 1-1 1a.99.99 0 0 1-.969-.846L11 9.5v-.88A4.5 4.5 0 0 0 7.62 12h.88l.153.031c.476.076.847.472.847.969s-.371.893-.846.969L8.5 14h-.878A4.51 4.51 0 0 0 11 17.379V16.5l.031-.154c.077-.476.472-.846.969-.846s.893.371.969.848L13 16.5v.879A4.5 4.5 0 0 0 16.379 14H15.5l-.152-.031c-.477-.076-.848-.472-.848-.969s.371-.893.848-.969m-.446 2.867a3.5 3.5 0 0 1-1.004 1.002c-.256-.81-1.004-1.401-1.897-1.401s-1.642.592-1.898 1.401c-.4-.262-.74-.603-1.003-1.002A1.995 1.995 0 0 0 10.501 13c0-.895-.592-1.643-1.402-1.898c.263-.399.603-.74 1.004-1.002a1.99 1.99 0 0 0 1.898 1.401c.894 0 1.644-.593 1.899-1.403c.399.264.74.604 1.002 1.004A1.995 1.995 0 0 0 13.501 13a1.99 1.99 0 0 0 1.401 1.898"/>',
-  /**
-   * Shields: the half-filled shield mark inside a ring - the shield is the
-   * device, the circle is the field it projects. Both parts as supplied, on the
-   * shield's own 512 grid, with the shield scaled to 0.64 about the centre so
-   * its top corners (circumradius 252 at full size, 161 scaled) clear the ring's
-   * inner edge at every stroke weight strokeFor can hand it.
-   *
-   * The shield's trailing half is a TINT, not the outline it arrives as. Stroke
-   * width here is set for a 512 grid, so at 13px the shield's own outline would
-   * be a fifth of its width and the whole device would fill in solid. Filling
-   * the outline path at low opacity and laying the leading half over it at full
-   * gives the same two-tone read at any size, the way the arc glyphs below use
-   * a tinted sector rather than a second outline.
-   */
-  "stat-shields":
-    '<circle cx="256" cy="256" r="224" fill="none"/>' +
-    '<g transform="translate(92.16 92.16) scale(0.64)">' +
-    '<path fill="currentColor" stroke="none" opacity="0.3" d="M463.1 112.37C373.68 96.33 336.71 84.45 256 48c-80.71 36.45-117.68 48.33-207.1 64.37C32.7 369.13 240.58 457.79 256 464c15.42-6.21 223.3-94.87 207.1-351.63"/>' +
-    '<path fill="currentColor" stroke="none" d="M256 48c-80.71 36.45-117.68 48.33-207.1 64.37C32.7 369.13 240.58 457.79 256 464Z"/>' +
-    "</g>",
   // Firing-arc glyphs: two solid filled sectors on the same baseline, told apart
   // purely by how wide they open. PRIMARY is a narrow ~45 degree cone straight
   // ahead; AUXILIARY is a full 180 degree half-disc. Filled (not outlined) so
@@ -188,39 +58,10 @@ export const EMBLEMS: Record<string, string> = {
   crosshair: '<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2.4" fill="currentColor" stroke="none"/><g stroke="currentColor" stroke-width="2"><line x1="12" y1="1.5" x2="12" y2="5.5"/><line x1="12" y1="18.5" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="5.5" y2="12"/><line x1="18.5" y1="12" x2="22.5" y2="12"/></g>',
 };
 
-// Most icons here are drawn on a 24-unit grid; the few that arrive on another
-// one declare it rather than being redrawn. Paths that carry their own fill or
-// stroke override the wrapper's defaults, which is how the solid nav marks sit
-// alongside the stroke-only set.
-/**
- * The four ship-stat glyphs come from different icon sets and draw wildly
- * different amounts of ink inside the same 24 grid - measured bounding boxes are
- * Mass 23 units tall, Shields 21.5, Silhouette 17, Thrust 14.1. Rendered at one
- * pixel size they therefore looked like four different sizes, Mass reading 63%
- * bigger than Thrust.
- *
- * Each stat glyph gets a square viewBox that tightly frames its own art (plus 4%
- * air), centred on that art. The largest dimension of every glyph then fills its
- * box, so one pixel size really is one apparent size. Recompute these if a glyph
- * is ever redrawn: box side = max(bboxW, bboxH) * 1.04, centred on the bbox.
- */
+// The Mass mark is lifted from a font's 256-unit em box and framed to its own
+// art (plus 4% air) so it reads the same size as the Carbon glyphs beside it.
 const ICON_VIEWBOX: Record<string, string> = {
-  utility: "0 0 48 48",
   "stat-mass": "0.04 0.04 23.92 23.92",
-  "stat-thrust": "3.62 3.59 16.83 16.83",
-  "stat-silhouette": "3.16 4.16 17.68 17.68",
-  // Shields is the one stroked stat glyph, so its box has to clear the OUTER
-  // edge of the ring's stroke, not just the path bbox: r 224 plus half of
-  // strokeFor's ceiling on this grid, then the same 4% air as the others. That
-  // lands just outside the shield's native 512 box, which is fine - a viewBox
-  // is a window, not a canvas.
-  "stat-shields": "-6 -6 524 524",
-  // Siemens ix icons ship on a 512 grid, not the 24 the rest of this set uses.
-  "ix-context-menu": "0 0 512 512",
-  // The randomise mark is the one wide glyph in the set: 32x24, an arrow
-  // crossing over itself. icon() widens the box to match rather than squaring
-  // it, so it keeps its proportions instead of sitting letterboxed in a square.
-  random: "0 0 32 24",
 };
 
 /**
@@ -241,6 +82,10 @@ function strokeFor(size: number, vb: string): number {
 }
 
 export function icon(name: string, size = 18, cls = ""): string {
+  // Carbon first (see carbon-icons.ts); PATHS keeps only what Carbon has no
+  // equivalent for.
+  const carbon = CARBON_ICONS[name];
+  if (carbon) return carbonSvg(carbon, size, cls);
   const body = PATHS[name];
   if (!body) return "";
   const vb = ICON_VIEWBOX[name] ?? "0 0 24 24";

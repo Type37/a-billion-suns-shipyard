@@ -39,16 +39,16 @@
   --text-secondary: #525252;
   --text-helper: #6f6f6f;
   --icon-primary: #161616;
-  --focus: #0f62fe;
-  --interactive: #0f62fe;
-  --link-primary: #0f62fe;
-  --link-primary-hover: #0043ce;
+  --focus: #29706c;
+  --interactive: #29706c;
+  --link-primary: #29706c;
+  --link-primary-hover: #1f5451;
   --support-error: #da1e28;
-  --button-primary: #0f62fe;
-  --button-primary-hover: #0050e6;
-  --button-primary-active: #002d9c;
-  --button-secondary: #393939;
-  --button-secondary-hover: #474747;
+  --button-primary: #29706c;
+  --button-primary-hover: #235f5c;
+  --button-primary-active: #194341;
+  --button-secondary: #493548;
+  --button-secondary-hover: #5f4d5e;
   --button-secondary-active: #6f6f6f;
 
   /* Carbon spacing */
@@ -228,10 +228,10 @@ h1, h2, h3, p { margin: 0; }
 /* Tags, md 24, read-only */
 .tags { display: flex; flex-wrap: wrap; gap: var(--spacing-03); }
 .tag { min-height: 24px; display: inline-flex; align-items: center; padding: 0 var(--spacing-03); border-radius: 16px; font: 400 12px/16px var(--sans); letter-spacing: 0.32px; }
-.tag.blue { background: #d0e2ff; color: #0043ce; }
+.tag.blue { background: #eaf1f0; color: #1f5451; }
 .tag.gray { background: #e0e0e0; color: #393939; }
 .tag.red { background: #ffd7d9; color: #a2191f; }
-.tag.green { background: #a7f0ba; color: #0e6027; }
+.tag.green { background: #c6fce3; color: #2d634a; }
 
 /* Inline notification, low contrast */
 .note { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: var(--spacing-05); align-items: start; padding: var(--spacing-05); border-left: 3px solid; min-height: 48px; max-width: 608px; }
@@ -240,7 +240,7 @@ h1, h2, h3, p { margin: 0; }
 /* Ours, on top of Carbon. Carbon governs the controls; it says nothing about
    page titles, emblems, ship stats or game pieces, so those stay the app's. */
 .page-title { font: 900 clamp(40px, 8vw, 72px)/0.95 var(--display); letter-spacing: -0.02em; text-transform: uppercase; margin: 0 0 var(--spacing-03); }
-.title-rule { height: 3px; background: #da1e28; width: 96px; margin-bottom: var(--spacing-07); }
+.title-rule { height: 3px; background: #d25097; width: 96px; margin-bottom: var(--spacing-07); }
 .ours { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: var(--spacing-05); }
 .ours .tile { border-top: 3px solid var(--text-primary); }
 .ours .tile-name { font: 800 22px/26px var(--display); letter-spacing: -0.01em; }
@@ -302,8 +302,8 @@ h1, h2, h3, p { margin: 0; }
         <span class="stat shields"><span class="k">Shields</span> <b>6</b></span>
       </div>
       <div class="guns">
-        <div class="gun"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14 3 3a12 12 0 0 1 10 0z" fill="#0f62fe"/></svg><span class="n">Heavy Railguns</span><b>2D12</b><b>9–18"</b></div>
-        <div class="gun"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M1 13a7 7 0 0 1 14 0z" fill="#0f62fe"/></svg><span class="n">Plasma Batteries</span><b>4D6</b><b>0–9"</b></div>
+        <div class="gun"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14 3 3a12 12 0 0 1 10 0z" fill="#29706c"/></svg><span class="n">Heavy Railguns</span><b>2D12</b><b>9–18"</b></div>
+        <div class="gun"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M1 13a7 7 0 0 1 14 0z" fill="#29706c"/></svg><span class="n">Plasma Batteries</span><b>4D6</b><b>0–9"</b></div>
       </div>
       <p class="slogan">&gt; Construction fleet delta 8 approaching target. Initialising drone swarms.</p>
     </article>

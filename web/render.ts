@@ -658,7 +658,7 @@ function fleetsView(state: AppState): string {
         <span class="fleet-card-cost">${credits(total)}</span>
         <span class="fleet-card-faction">${escapeHtml(faction?.name ?? "Mixed forces")}</span>
         <span class="fleet-card-mode">${l.freePlay ? "Free Play" : MODE_LABEL[l.mode]}</span>
-        <cds-overflow-menu class="fleet-card-actions card-menu" label="Actions" size="lg" enable-v12-overflowmenu menu-alignment="bottom-end">
+        <cds-overflow-menu kind="ghost" class="fleet-card-actions card-menu" label="Actions" size="lg" enable-v12-overflowmenu menu-alignment="bottom-end">
           ${icon("ix-context-menu", 20).replace("<svg ", '<svg slot="icon" ')}
           <cds-menu>
             <cds-menu-item label="Duplicate" data-action="duplicate-list" data-id="${l.id}"></cds-menu-item>
@@ -1272,7 +1272,7 @@ function eraSelect(list: SavedList): string {
 }
 
 function fleetMenu(list: SavedList, withReference: boolean, withLimit = false): string {
-  return `<cds-overflow-menu class="hdr-menu" label="Actions" size="lg" enable-v12-overflowmenu menu-alignment="bottom-end" data-key="hdr-menu">
+  return `<cds-overflow-menu kind="ghost" class="hdr-menu" label="Actions" size="lg" enable-v12-overflowmenu menu-alignment="bottom-end" data-key="hdr-menu">
       ${icon("ix-context-menu", 20).replace("<svg ", '<svg slot="icon" ')}
       <cds-menu>
         <cds-menu-item label="Play mode" data-action="go" data-href="#/play/${list.id}"></cds-menu-item>

@@ -193,7 +193,7 @@ export function soloListView(state: AppState): string {
           <cds-button has-main-content kind="tertiary" size="lg" class="btn" href="#/solo/${o.id}">Continue${icon("chevronRight", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
           ${/* Labelled, in a Carbon menu like the fleet cards: the two bare icons
                 explained themselves only in hover text, which a phone never shows. */ ""}
-          <cds-overflow-menu class="card-menu" label="Actions" size="lg" enable-v12-overflowmenu menu-alignment="bottom-end">
+          <cds-overflow-menu kind="ghost" class="card-menu" label="Actions" size="lg" enable-v12-overflowmenu menu-alignment="bottom-end">
             ${icon("ix-context-menu", 20).replace("<svg ", '<svg slot="icon" ')}
             <cds-menu>
               <cds-menu-item label="Duplicate" data-action="duplicate-outfit" data-id="${o.id}"></cds-menu-item>

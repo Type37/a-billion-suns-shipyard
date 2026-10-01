@@ -103,15 +103,15 @@
      value, they do not bounce past it and come back - that bounce is the thing
      that reads as a consumer app rather than a control panel. */
   --ease: cubic-bezier(0.2, 0, 0, 1);
-  --blue: #0f62fe;
-  --blue-deep: #0043ce;
-  --blue-wash: #edf5ff;
-  --red: #da1e28;
-  --red-deep: #a2191f;
+  --blue: #29706c;
+  --blue-deep: #1f5451;
+  --blue-wash: #eaf1f0;
+  --red: #d25097;
+  --red-deep: #93386a;
   /* Damage is its own red, hotter than the NASA accent, so a damage figure is
      never mistaken for the "over budget" / error red. */
   --damage: #ff3131;
-  --red-wash: #fff1f1;
+  --red-wash: #faeaf3;
   /* Placeholders were set per-field at #c7cdd6 / #b4bcc8 / #aab2be - 1.6:1 to
      2.1:1 on white, well under the 4.5:1 body text needs. One token at 5.96:1
      instead. The unit-name field in particular shows a real, load-bearing value
@@ -120,7 +120,7 @@
   --amber: #b4520a;
   --amber-wash: #fbeddc;
   --go: #198038;
-  --go-wash: #defbe6;
+  --go-wash: #c6fce3;
 
   --hair: #161616;                 /* full-strength Swiss rule */
   --hair-soft: #c6c6c6;            /* quiet divider */
@@ -154,16 +154,16 @@
      feedback tokens are states. Everything else maps to ink/line/ground. */
   --color-ground: #ffffff;
   --color-ink: #161616;
-  --color-action: #0f62fe;
-  --color-action-strong: #0043ce;
-  --color-accent: #da1e28;
+  --color-action: #29706c;
+  --color-action-strong: #1f5451;
+  --color-accent: #d25097;
   --color-feedback-error: #a2191f;
   --color-feedback-warning: #b4520a;
   --color-feedback-ok: #198038;
   --color-line: #161616;
   /* Brand chrome, from the official Second Edition identity. */
-  --color-brand: #0f62fe;
-  --color-brand-deep: #0043ce;
+  --color-brand: #29706c;
+  --color-brand-deep: #1f5451;
 
   --shell: 1340px;
   /* The builder alone (setup band, training guide, roster + catalog) uses
@@ -223,6 +223,19 @@
      (color/tokens) and @carbon/themes, so Carbon's own controls and ours agree.
      Rebrand: change --blue, --blue-deep, --blue-wash and --red here and the
      --cds-* mapping below carries it into every Carbon component. */
+  /* The 2026 palette (Jet, 1 October): Pine Blue #29706C is the action colour
+     (--blue, white on it 4.55:1), Fuchsia Plum #D25097 the accent (--red, the
+     keylines and title rules; white text on it fails at 3.37:1, so text on plum
+     uses --red-deep #93386A at 5.56:1), Vintage Grape #493548 the secondary
+     button, Tropical Mint #70F8BA the success wash (dark text only, 13.8:1 on
+     its wash). Errors are NOT the accent any more: they keep Carbon's red in
+     --error, and focus rings use --focus, so a pink edge never means "wrong". */
+  --grape: #493548;
+  --mint: #70f8ba;
+  --error: #da1e28;
+  --error-deep: #a2191f;
+  --error-wash: #fff1f1;
+  --focus: var(--blue);
   --on-color: #ffffff;
   --discord: #5865f2;
   --discord-deep: #4752c4;
@@ -243,19 +256,19 @@
   --cds-highlight: var(--blue-wash);
   --cds-text-primary: var(--ink);
   --cds-text-secondary: var(--ink-2);
-  --cds-text-error: var(--red);
-  --cds-support-error: var(--red);
+  --cds-text-error: var(--error);
+  --cds-support-error: var(--error);
   --cds-support-success: var(--go);
   --cds-button-primary: var(--blue);
-  --cds-button-primary-hover: #0050e6;
-  --cds-button-primary-active: #002d9c;
-  --cds-button-secondary: #393939;
-  --cds-button-secondary-hover: #474747;
-  --cds-button-secondary-active: #6f6f6f;
+  --cds-button-primary-hover: #235f5c;
+  --cds-button-primary-active: #194341;
+  --cds-button-secondary: var(--grape);
+  --cds-button-secondary-hover: #5f4d5e;
+  --cds-button-secondary-active: #776876;
   --cds-button-tertiary: var(--blue);
-  --cds-button-tertiary-hover: #0050e6;
-  --cds-button-tertiary-active: #002d9c;
-  --cds-button-danger-primary: var(--red);
+  --cds-button-tertiary-hover: #235f5c;
+  --cds-button-tertiary-active: #194341;
+  --cds-button-danger-primary: var(--error);
   --cds-button-danger-hover: #b81921;
   --cds-button-danger-active: #750e13;
 }
@@ -355,7 +368,7 @@ a { color: var(--blue); text-decoration: none; }
 a:focus-visible, button:focus-visible, summary:focus-visible,
 [tabindex]:focus-visible, [role="button"]:focus-visible,
 input:focus-visible, select:focus-visible, textarea:focus-visible {
-  outline: 2px solid var(--red);
+  outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
 /* On the blue chrome the red ring is only 2.79:1 against #0b3d91, under the 3:1
@@ -465,8 +478,8 @@ button { font-family: inherit; }
   min-height: var(--tap);
 }
 @media (hover: hover) { .bar-btn:hover { background: var(--ink); color: #fff; text-decoration: none; } }
-.bar-btn.danger { border-color: var(--red); color: var(--red-deep); }
-@media (hover: hover) { .bar-btn.danger:hover { background: var(--red); color: #fff; } }
+.bar-btn.danger { border-color: var(--error); color: var(--error-deep); }
+@media (hover: hover) { .bar-btn.danger:hover { background: var(--error); color: #fff; } }
 
 .ghost-btn {
   background: transparent;
@@ -482,8 +495,8 @@ button { font-family: inherit; }
 @media (hover: hover) { .ghost-btn:hover { border-color: var(--hair); color: var(--ink); } }
 /* The destructive pair: --red-wash was a 1.14:1 tint, i.e. an invisible
    warning. --red is 3.6:1, which clears 1.4.11 and actually reads as red. */
-.ghost-btn.danger { color: var(--red-deep); border-color: var(--red); }
-@media (hover: hover) { .ghost-btn.danger:hover { background: var(--red); color: #fff; border-color: var(--red); } }
+.ghost-btn.danger { color: var(--error-deep); border-color: var(--error); }
+@media (hover: hover) { .ghost-btn.danger:hover { background: var(--error); color: #fff; border-color: var(--error); } }
 
 .add-btn {
   background: var(--blue);
@@ -927,7 +940,7 @@ button { font-family: inherit; }
 .fleet-card-name::after { content: ""; position: absolute; inset: 0; }
 @media (hover: hover) { .fleet-card-name:hover { color: var(--blue); text-decoration: none; } }
 .fleet-card-name:focus-visible { outline: none; }
-.fleet-card:has(.fleet-card-name:focus-visible) { outline: 2px solid var(--red); outline-offset: 1px; }
+.fleet-card:has(.fleet-card-name:focus-visible) { outline: 2px solid var(--focus); outline-offset: 1px; }
 .fleet-card-cost { grid-column: 3; grid-row: 1; align-self: start; justify-self: end; padding-right: 8px; font-family: var(--display); font-weight: 800; font-size: 18px; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .fleet-card-faction { grid-column: 2 / 4; grid-row: 2; min-width: 0; padding-right: 96px; font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-2); }
 .fleet-card-mode { grid-column: 2 / 4; grid-row: 3; padding-right: 96px; font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--blue); }
@@ -1075,7 +1088,7 @@ button { font-family: inherit; }
   background: var(--paper);
   max-width: var(--shell-wide); margin: 0 auto; padding: 12px clamp(12px, 2vw, 24px) 12px;
 }
-.setup-band.over { border-bottom-color: var(--red); }
+.setup-band.over { border-bottom-color: var(--error); }
 .setup-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
 .setup-identity { min-width: 0; flex: 1; }
 
@@ -1187,7 +1200,7 @@ button { font-family: inherit; }
   width: 18px; height: 18px; padding: 0; cursor: pointer;
   background: var(--paper); border: 1px solid var(--red-wash); color: var(--red);
 }
-@media (hover: hover) { .cf-shipimg-x:hover { background: var(--red); border-color: var(--red); color: #fff; } }
+@media (hover: hover) { .cf-shipimg-x:hover { background: var(--error); border-color: var(--error); color: #fff; } }
 
 /* Icon library picker */
 /* Reworked emblem picker: a large preview beside labelled actions, so "upload
@@ -1593,7 +1606,7 @@ button { font-family: inherit; }
 .stepper button[aria-disabled="true"] { color: var(--ink-3); cursor: default; background: var(--paper); }
 @media (hover: hover) { .stepper button[aria-disabled="true"]:hover { background: var(--paper); color: var(--ink-3); } }
 /* At count 1 the (-) deletes the unit: warn in red on hover. */
-@media (hover: hover) { .stepper button.will-remove:hover { background: var(--red); color: #fff; } }
+@media (hover: hover) { .stepper button.will-remove:hover { background: var(--error); color: #fff; } }
 .stepper-count { padding: 0 12px; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; border-left: 1px solid var(--hair); border-right: 1px solid var(--hair); line-height: 28px; }
 .roster-unit-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; align-items: center; }
 .inline-field select { font-family: var(--sans); font-size: 13px; padding: 8px 8px; border: 1px solid var(--hair-soft); background: var(--paper); color: var(--ink); }
@@ -1622,7 +1635,7 @@ button { font-family: inherit; }
 /* The wash alone is a 1.13:1 change against white - not a focus indicator. It
    stays as the "you are typing here" tint, but the ring has to come back. */
 .notes-input:focus { background: var(--blue-wash); }
-.notes-input:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+.notes-input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 /* Print setup: options bar (screen only), per-unit cards, and trackers. */
 .print-opts { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .print-toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
@@ -2099,7 +2112,7 @@ button { font-family: inherit; }
   width: 34px; height: 40px; padding: 0; cursor: pointer;
   background: transparent; border: 1px solid var(--red-wash); color: var(--red);
 }
-@media (hover: hover) { .cf-ship-x:hover { background: var(--red); border-color: var(--red); color: #fff; } }
+@media (hover: hover) { .cf-ship-x:hover { background: var(--error); border-color: var(--error); color: #fff; } }
 .cf-ship-stats > .field-block { flex: 1 1 0; min-width: 0; }
 .cf-ship-stats > .field-block > input, .cf-ship-stats > .field-block > select { width: 100%; }
 .cf-ship .field-block { gap: 4px; }
@@ -2297,7 +2310,7 @@ button { font-family: inherit; }
 .comp-groupcheck.on .comp-groupcheck-box .icon { opacity: 1; }
 @media (hover: hover) { .comp-groupcheck:hover { background: var(--blue-wash); } }
 @media (hover: hover) { .comp-groupcheck.on:hover { background: var(--blue-deep); border-color: var(--blue-deep); } }
-.comp-groupcheck input:focus-visible + .comp-groupcheck-box { outline: 2px solid var(--red); outline-offset: 2px; }
+.comp-groupcheck input:focus-visible + .comp-groupcheck-box { outline: 2px solid var(--focus); outline-offset: 2px; }
 .comp-scroll { border: 1px solid var(--hair); }
 .comp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .comp-table thead th {
@@ -2955,7 +2968,7 @@ button { font-family: inherit; }
 .solo-outfit .roster-section::before { display: none; }
 
 .solo-readout { margin: 12px 0 0; }
-.solo-readout.over { border-color: var(--red); }
+.solo-readout.over { border-color: var(--error); }
 
 /* The Alert Level's percentage fill bar lived here. It is ten squares now
    (.alert-pips, in the game band above) - see the note there. */
@@ -3330,7 +3343,7 @@ button { font-family: inherit; }
 .ru-stepper { height: 32px; }
 .ru-stepper .stepper-count { line-height: 28px; padding: 0 8px; min-width: 34px; text-align: center; }
 .ru-remove { background: transparent; border: none; cursor: pointer; color: var(--ink-3); padding: 4px; display: inline-flex; }
-@media (hover: hover) { .ru-remove:hover { color: var(--red); } }
+@media (hover: hover) { .ru-remove:hover { color: var(--error); } }
 @media (hover: hover) { .roster-sheet .roster-unit:hover .ru-go { color: var(--color-accent); } }
 
 /* ===========================================================================
@@ -3431,7 +3444,7 @@ button { font-family: inherit; }
 }
 @media (hover: hover) { .mf-name-gen:hover { background: var(--hair-soft); color: var(--ink); } }
 .mf-name-gen:active { transform: rotate(-18deg); }
-.mf-name-gen:focus-visible { outline: 2px solid var(--red); outline-offset: 1px; }
+.mf-name-gen:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
 
 /* Budget sits at the right end of the one-line header (margin-left:auto pushes
    it past the faction/era), with the Actions button after it. */
@@ -3441,11 +3454,11 @@ button { font-family: inherit; }
 .mf-tally-free { margin-left: 8px; font-family: var(--display); font-size: 13px; font-weight: 900; color: var(--go); }
 /* --red is 3.60:1 on white; at 17px this is normal-size text needing 4.5:1.
    --red-deep is 5.07:1 and reads identically at a glance. */
-.builder.is-over .mf-tally-now, .builder.is-over .mf-tally-free { color: var(--red-deep); }
+.builder.is-over .mf-tally-now, .builder.is-over .mf-tally-free { color: var(--error-deep); }
 
 .mf-meter { margin-top: 8px; height: 7px; background: var(--ground); border: 1px solid var(--hair-soft); }
 .mf-meter-fill { display: block; height: 100%; background: var(--blue); }
-.builder.is-over .mf-meter-fill { background: var(--red); }
+.builder.is-over .mf-meter-fill { background: var(--error); }
 
 /* Overflow menu: a dots button that opens a small action list. position:absolute
    panel means opening it never moves the header. */
@@ -3467,8 +3480,8 @@ button { font-family: inherit; }
   font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink); text-decoration: none;
 }
 @media (hover: hover) { .mf-menu-panel a:hover, .mf-menu-panel button:hover { background: var(--blue-wash); } }
-.mf-menu-panel .danger { color: var(--red-deep); }
-@media (hover: hover) { .mf-menu-panel .danger:hover { background: var(--red-wash); } }
+.mf-menu-panel .danger { color: var(--error-deep); }
+@media (hover: hover) { .mf-menu-panel .danger:hover { background: var(--error-wash); } }
 
 /* The two "you're done building" output actions, at the foot of the manifest:
    Play Mode (primary, filled) and Print (secondary, outlined). Play Mode takes
@@ -3540,7 +3553,7 @@ button { font-family: inherit; }
 .nf-unlimited-toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
 .nf-unlimited-box { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 24px; border: 1px solid var(--hair); color: transparent; flex-shrink: 0; }
 .nf-unlimited-toggle input:checked + .nf-unlimited-box { background: var(--blue); border-color: var(--blue); color: #fff; }
-.nf-unlimited-toggle input:focus-visible + .nf-unlimited-box { outline: 2px solid var(--red); outline-offset: 2px; }
+.nf-unlimited-toggle input:focus-visible + .nf-unlimited-box { outline: 2px solid var(--focus); outline-offset: 2px; }
 .nf-unlimited-hint { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
 
 /* ===========================================================================
@@ -3636,10 +3649,10 @@ button { font-family: inherit; }
 /* The issues panel opens from the right edge now that its summary sits there. */
 .sy-budget-status .yard-status-panel { left: auto; right: 0; }
 .sy-budget-free { font-size: 16px; font-weight: 900; color: var(--go); }
-.shipyard.is-over .sy-budget-now, .shipyard.is-over .sy-budget-free { color: var(--red-deep); }
+.shipyard.is-over .sy-budget-now, .shipyard.is-over .sy-budget-free { color: var(--error-deep); }
 .sy-meter { margin-top: 8px; height: 8px; background: var(--ground); border: 1px solid var(--hair-soft); }
 .sy-meter-fill { display: block; height: 100%; background: var(--blue); transition: width 0.18s var(--ease); }
-.shipyard.is-over .sy-meter-fill { background: var(--red); }
+.shipyard.is-over .sy-meter-fill { background: var(--error); }
 
 /* No section headings: the ship list and the personnel list are told apart by
    their own shape (steppers vs a single square + rule prose), not a label. */
@@ -3743,7 +3756,7 @@ button { font-family: inherit; }
 @media (hover: hover) { .sy-hvp-check.is-on:hover { background: var(--blue-deep); } }
 .sy-hvp-check[aria-disabled="true"] { color: var(--ink-off); border-color: var(--ink-off); cursor: default; background: var(--paper); }
 @media (hover: hover) { .sy-hvp-check[aria-disabled="true"]:hover { background: var(--paper); } }
-.sy-hvp-check:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+.sy-hvp-check:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .sy-hvp-body { min-width: 0; }
 .sy-hvp-name { display: block; font-family: var(--narrow); font-weight: 700; font-size: 16px; line-height: 1.2; }
 .sy-hvp-rule { display: block; font-family: var(--serif); font-size: 13px; line-height: 1.4; color: var(--ink-2); margin-top: 2px; }
@@ -3793,7 +3806,7 @@ button { font-family: inherit; }
 .sy-unit-name::placeholder { color: var(--placeholder); font-weight: 400; }
 .sy-unit .sy-ship-cost { margin-left: auto; }
 .sy-unit-remove { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 40px; border: 1px solid var(--hair-soft); background: var(--paper); color: var(--ink-3); cursor: pointer; }
-@media (hover: hover) { .sy-unit-remove:hover { border-color: var(--red); color: var(--red); } }
+@media (hover: hover) { .sy-unit-remove:hover { border-color: var(--error); color: var(--error); } }
 .sy-unit-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0 2px; }
 
 .sy-hvp-note { font-size: 13px; color: var(--ink-3); margin: 0 0 8px; }
@@ -3806,7 +3819,7 @@ button { font-family: inherit; }
    of its own above "Add unit", one more row for one number. */
 .au-heading { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 12px; }
 .au-budget { font-size: 13px; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-.au-budget.is-over { color: var(--red-deep); }
+.au-budget.is-over { color: var(--error-deep); }
 
 /* Ship Reference: one line per ship, PDF-style, grouped by Mass. Built as a grid
    rather than a table so it can reflow: aligned columns on a wide screen, a
@@ -3880,7 +3893,7 @@ button { font-family: inherit; }
    also appears on hover is not a focus indicator. It keeps the tint and gets
    the system ring back (SC 2.4.7). Inset, because the card is flush to the
    dialog's edge and an offset ring would be clipped. */
-.au-card:focus-visible { background: var(--blue-wash); outline: 2px solid var(--red); outline-offset: -2px; }
+.au-card:focus-visible { background: var(--blue-wash); outline: 2px solid var(--focus); outline-offset: -2px; }
 .au-card:last-child { border-bottom: none; }
 .au-card-top { display: flex; align-items: baseline; gap: 8px; }
 .au-card-name { font-weight: 700; font-size: 13px; }
@@ -4102,8 +4115,8 @@ button { font-family: inherit; }
 .yard-status-pop { position: relative; margin-bottom: 8px; }
 .yard-status-pop > .yard-status { list-style: none; cursor: pointer; margin: 0; min-height: var(--tap); }
 .yard-status-pop > .yard-status::-webkit-details-marker { display: none; }
-.yard-status.is-fail { color: var(--red-deep); }
-.yard-status-pop[open] > .yard-status.is-fail { color: var(--red); }
+.yard-status.is-fail { color: var(--error-deep); }
+.yard-status-pop[open] > .yard-status.is-fail { color: var(--error); }
 .yard-status-panel {
   position: absolute; z-index: 30; top: calc(100% + 6px); left: 0; width: min(300px, 80vw);
   background: var(--paper); border: 1px solid var(--hair); padding: 8px 12px;
@@ -4233,12 +4246,12 @@ button { font-family: inherit; }
    the thing is visible before the words are read - but Cancel stays a normal
    button rather than being made loud, because the quiet option should not have
    to compete. */
-.modal-header.is-danger { background: var(--red-deep); }
+.modal-header.is-danger { background: var(--error-deep); }
 .modal-header.is-danger .modal-close { border-color: rgb(255 255 255 / 0.35); }
-@media (hover: hover) { .modal-header.is-danger .modal-close:hover { background: #fff; color: var(--red-deep); } }
+@media (hover: hover) { .modal-header.is-danger .modal-close:hover { background: #fff; color: var(--error-deep); } }
 .cf-body { font-size: 16px; line-height: 1.5; color: var(--ink-2); }
-.cta-btn.cf-danger { background: var(--red-deep); border-color: var(--red-deep); box-shadow: none; }
-@media (hover: hover) { .cta-btn.cf-danger:hover { background: var(--red); border-color: var(--red); } }
+.cta-btn.cf-danger { background: var(--error-deep); border-color: var(--error-deep); box-shadow: none; }
+@media (hover: hover) { .cta-btn.cf-danger:hover { background: var(--error); border-color: var(--error); } }
 
 /* No widths on the dialog classes. .opt-modal, .no-modal, .cf-modal,
    .em-modal and .shipref-modal once named the homemade panels and carried
@@ -6043,7 +6056,7 @@ main.play-body .roster-section::before { content: none; }
 .play-bar-of { font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-3); }
 /* A credit total below zero is the normal state of early Hypergrowth, so it is
    marked rather than hidden: the player needs to see the debt they are in. */
-.round-value.is-debt { color: var(--red); }
+.round-value.is-debt { color: var(--error); }
 .play-bar-of { font-family: var(--sans); font-size: 13px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }
 .play-bar-reset, .play-bar-print { flex: none; }
 /* The way out, and it looks like one. Solid where Reset and Print are ghosts,
@@ -6121,8 +6134,8 @@ main.play-body .roster-section::before { content: none; }
    compete with Requisition for the eye. It does not need a confirm: pressing
    Requisition again is the undo in Management Training, and in Hypergrowth the
    ledger records exactly what happened and when. */
-.sy-req-lost-btn:not(:disabled) { border-color: var(--red); color: var(--red-deep); }
-@media (hover: hover) { .sy-req-lost-btn:not(:disabled):hover { background: var(--red); border-color: var(--red); color: #fff; } }
+.sy-req-lost-btn:not(:disabled) { border-color: var(--error); color: var(--error-deep); }
+@media (hover: hover) { .sy-req-lost-btn:not(:disabled):hover { background: var(--error); border-color: var(--error); color: #fff; } }
 .sy-req-lost { color: var(--red-deep); font-weight: 700; }
 .sy-log-lost .sy-log-verb { color: var(--red-deep); }
 /* Each class shows its unit cost by the name; Deploy repeats it on the button. */
@@ -6607,7 +6620,7 @@ main.play-body .roster-section::before { content: none; }
 .hvp-name-input:focus {
   /* The ring is the system red everywhere; the blue border is the field's own
      focused state underneath it, not a second focus indicator. */
-  outline: 2px solid var(--red);
+  outline: 2px solid var(--focus);
   outline-offset: -2px;
   border-color: var(--blue);
   background: var(--paper);
@@ -6677,7 +6690,7 @@ main.play-body .roster-section::before { content: none; }
   transition: color 0.12s ease, border-color 0.12s ease, background 0.12s ease;
 }
 @media (hover: hover) { .hvp-name-roll:hover { color: var(--blue); border-color: var(--field-edge); background: var(--paper); } }
-.hvp-name-roll:focus-visible { outline: 2px solid var(--red); outline-offset: -2px; }
+.hvp-name-roll:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
 /* Nothing to press on paper. */
 @media print { .hvp-name-roll { display: none; } }
 /* Personnel rule text was set at 1.4, which on a 13px serif is 18.2px a line
@@ -7319,7 +7332,7 @@ main.play-body .roster-section::before { content: none; }
 /* The input is off-screen, so the focus ring has to be drawn on its label. */
 #jt-a:focus-visible ~ .ltp-pick-rail [for="jt-a"],
 #jt-b:focus-visible ~ .ltp-pick-rail [for="jt-b"],
-#jt-c:focus-visible ~ .ltp-pick-rail [for="jt-c"] { outline: 2px solid var(--red); outline-offset: -3px; }
+#jt-c:focus-visible ~ .ltp-pick-rail [for="jt-c"] { outline: 2px solid var(--focus); outline-offset: -3px; }
 .ltp-pick-panel > .ltp-quote:last-child { margin-bottom: 0; }
 
 @media (max-width: 560px) {
@@ -8028,13 +8041,13 @@ cds-inline-notification.app-hint { max-width: none; width: 100%; margin: 8px 0; 
   display: flex; align-items: stretch; flex: 1 1 auto; min-width: 0;
   border: 1px solid var(--field-edge); background: var(--ground); border-radius: 2px;
 }
-.name-box:focus-within { outline: 2px solid var(--red); outline-offset: -2px; border-color: var(--blue); background: var(--paper); }
+.name-box:focus-within { outline: 2px solid var(--focus); outline-offset: -2px; border-color: var(--blue); background: var(--paper); }
 .name-box > .mf-name.mf-name { flex: 1 1 auto; min-width: 0; max-width: none; border: none; background: transparent; outline: none; }
 .name-box > .mf-name-gen.mf-name-gen {
   flex: 0 0 auto; width: var(--tap); height: auto; min-height: 0; border: none; border-radius: 0;
   background: transparent; color: var(--ink-3); display: inline-flex; align-items: center; justify-content: center;
 }
-.name-box > .mf-name-gen.mf-name-gen:focus-visible { outline: 2px solid var(--red); outline-offset: -4px; }
+.name-box > .mf-name-gen.mf-name-gen:focus-visible { outline: 2px solid var(--focus); outline-offset: -4px; }
 
 /* The builder header on Carbon (factionSelect, eraSelect, fleetMenu in
    render.ts). One row on a wide screen: emblem and name, faction, era, then
@@ -8394,4 +8407,15 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
     max-width: 1100px; margin-left: auto; margin-right: auto;
     padding-left: 40px; padding-right: 40px; box-sizing: border-box;
   }
+}
+
+/* The ship list at desktop width (Jet, 1 October 2026: "this screen feels too
+   wide"). One card per row stretched a ship's stats across 1100px with its
+   stepper alone at the far right, ~650px of nothing between them. Two columns
+   keeps the page at the shared 1100px width (see "One page width" above) and
+   halves the scroll. The card's own + margin-top stacking is replaced by the
+   grid's gap so the two columns stay level. */
+@media (min-width: 1000px) {
+  .sy-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: start; }
+  .sy-list > .sy-ship + .sy-ship { margin-top: 0; }
 }

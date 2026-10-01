@@ -443,7 +443,8 @@ function applyImageUpload(action: string, data: DOMStringMap, ref: string): void
     }
     case "cf-ship-image-upload": {
       const fid = currentFoundryId();
-      const si = Number(data["ship"]);
+      const m = store.getState().ui.modal;
+      const si = data["ship"] !== undefined ? Number(data["ship"]) : m?.kind === "emblem" ? (m.ship ?? NaN) : NaN;
       if (!fid || !Number.isInteger(si)) return;
       editFaction(fid, (f) => ({
         ...f,
@@ -705,7 +706,8 @@ export function dispatchAction(target: HTMLElement): void {
     case "open-emblem-modal": {
       const tgt = target.dataset["target"];
       const emblemTarget =
-        tgt === "faction" || tgt === "outfit" || tgt === "new-outfit" ? tgt : "list";
+        tgt === "faction" || tgt === "outfit" || tgt === "new-outfit" || tgt === "ship" ? tgt : "list";
+      const shipIdx = Number(target.dataset["ship"]);
       // The new-outfit name field is uncontrolled, so anything that re-renders
       // the dialog has to bank what is typed first. Opening the picker replaces
       // the dialog outright, so this is the last chance to read it.
@@ -715,7 +717,12 @@ export function dispatchAction(target: HTMLElement): void {
         ui: {
           ...s.ui,
           ...(typed !== undefined && s.ui.newOutfit ? { newOutfit: { ...s.ui.newOutfit, name: typed } } : {}),
-          modal: { kind: "emblem", target: emblemTarget, tab: "library" },
+          modal: {
+            kind: "emblem",
+            target: emblemTarget,
+            tab: "library",
+            ...(emblemTarget === "ship" && Number.isInteger(shipIdx) ? { ship: shipIdx } : {}),
+          },
         },
       }));
       break;
@@ -879,6 +886,22 @@ export function dispatchAction(target: HTMLElement): void {
       const fid = currentFoundryId();
       const lib = target.dataset["lib"];
       if (fid && lib) editFaction(fid, (f) => ({ ...f, ...libFields(lib) }));
+      break;
+    }
+    // Ship art from the emblem picker (Custom Rules). The ship index rides on
+    // the open picker, so the library tiles and the footer buttons need no
+    // per-ship attributes of their own.
+    case "cf-ship-set-lib":
+    case "cf-ship-random-art": {
+      const fid = currentFoundryId();
+      const m = store.getState().ui.modal;
+      const si = m?.kind === "emblem" ? m.ship : undefined;
+      const lib = action === "cf-ship-random-art" ? randomIconId() : target.dataset["lib"];
+      if (!fid || si === undefined || !lib) return;
+      editFaction(fid, (f) => ({
+        ...f,
+        ships: f.ships.map((s, i) => (i === si ? { ...s, image: `lib:${lib}` } : s)),
+      }));
       break;
     }
     case "cf-random-emblem": {
@@ -2421,7 +2444,8 @@ export function dispatchAction(target: HTMLElement): void {
     }
     case "cf-ship-image-clear": {
       const fid = currentFoundryId();
-      const si = Number(target.dataset["ship"]);
+      const m = store.getState().ui.modal;
+      const si = target.dataset["ship"] !== undefined ? Number(target.dataset["ship"]) : m?.kind === "emblem" ? (m.ship ?? NaN) : NaN;
       if (!fid || !Number.isInteger(si)) return;
       editFaction(fid, (f) => ({
         ...f,

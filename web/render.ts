@@ -2802,6 +2802,27 @@ function foundryListView(state: AppState): string {
   ${footer()}`;
 }
 
+/*
+ * One weapon slot of a custom ship class.
+ *
+ * A ship carries ONE primary and ONE auxiliary weapon system (Jet, 1 October
+ * 2026; checked against the book's data: all 108 official classes have at most
+ * one of each). The editor used to offer "Add a primary weapon" again under a
+ * filled slot. Now the add button exists only while the slot is empty. A saved
+ * faction that already has two in a slot still shows both, so nothing a player
+ * entered is hidden or dropped; it just cannot grow.
+ *
+ * Fields carry Carbon labels above them (forms pattern: top-aligned, sentence
+ * case) instead of tiny tracked caps beside them, and the row is a fixed grid:
+ * the name across the top, then dice, die, minimum and maximum range and the
+ * remove button on one line, so every row lines up with the next.
+ */
+/** Ship art: an upload ("img:" ref) or a library sigil stored as "lib:<id>". */
+function shipArtSrc(v: string | undefined): string | undefined {
+  if (!v) return undefined;
+  return v.startsWith("lib:") ? libraryUrl(v.slice(4)) : imageSrc(v);
+}
+
 function weaponEditor(shipIndex: number, slot: "primary" | "auxiliary", weapons: ShipClass["primary"]): string {
   const cell = (wi: number, field: string, extra: string): string =>
     `data-action="cf-weapon" data-ship="${shipIndex}" data-slot="${slot}" data-index="${wi}" data-field="${field}" ${extra}`;
@@ -2809,32 +2830,26 @@ function weaponEditor(shipIndex: number, slot: "primary" | "auxiliary", weapons:
     .map(
       (w, wi) => `
       <div class="weapon-edit-row">
-        <input class="we-name" type="text" value="${escapeHtml(w.name)}" placeholder="Weapon name" ${cell(wi, "name", "")} />
-        <span class="we-group" title="Attack: number of dice and die type">
-          <span class="we-inline-lbl">Attack</span>
-          <input class="we-num" type="number" min="1" value="${w.count}" aria-label="Number of dice" ${cell(wi, "count", "")} />
-          <span class="we-x">&times;</span>
-          <select class="we-die" aria-label="Die type" ${cell(wi, "die", "")}>
+        <label class="we-f we-f-name"><span class="we-l">Name</span>
+          <input class="we-name" type="text" value="${escapeHtml(w.name)}" ${cell(wi, "name", "")} /></label>
+        <label class="we-f"><span class="we-l">Dice</span>
+          <input class="we-num" type="number" min="1" value="${w.count}" ${cell(wi, "count", "")} /></label>
+        <label class="we-f"><span class="we-l">Die</span>
+          <select class="we-die" ${cell(wi, "die", "")}>
             ${["D6", "D8", "D10", "D12"].map((d) => `<option ${w.die === d ? "selected" : ""}>${d}</option>`).join("")}
-          </select>
-        </span>
-        <span class="we-group we-range" title="Range in inches, minimum to maximum">
-          <span class="we-inline-lbl">Range</span>
-          <input class="we-num" type="number" min="0" value="${w.rangeMin}" aria-label="Minimum range in inches" ${cell(wi, "rangeMin", "")} />
-          <span class="we-dash">&ndash;</span>
-          <input class="we-num" type="number" min="0" value="${w.rangeMax}" aria-label="Maximum range in inches" ${cell(wi, "rangeMax", "")} />
-          <span class="we-unit">in</span>
-        </span>
-        <button class="ghost-btn danger" data-action="cf-weapon-remove" data-ship="${shipIndex}" data-slot="${slot}" data-index="${wi}" title="Remove weapon">${icon("close", 14)}</button>
+          </select></label>
+        <label class="we-f"><span class="we-l">Min range</span>
+          <input class="we-num" type="number" min="0" value="${w.rangeMin}" ${cell(wi, "rangeMin", "")} /></label>
+        <label class="we-f"><span class="we-l">Max range</span>
+          <input class="we-num" type="number" min="0" value="${w.rangeMax}" ${cell(wi, "rangeMax", "")} /></label>
+        <button class="ghost-btn danger we-remove" data-action="cf-weapon-remove" data-ship="${shipIndex}" data-slot="${slot}" data-index="${wi}" title="Remove weapon" aria-label="Remove weapon">${icon("trash", 16)}</button>
       </div>`,
     )
     .join("");
-  // No column header row: the fields carry their own inline labels now, in
-  // every layout. A header only lines up with its columns while the row is a
-  // single line, and this row has not been one since the name moved onto a line
-  // of its own to stop "Pulse Laser Turrets" being clipped to "Pulse Las".
-  return `${rows}
-    <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="cf-weapon-add" data-ship="${shipIndex}" data-slot="${slot}">Add ${slot === "auxiliary" ? "an" : "a"} ${slot} weapon${icon("plus", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>`;
+  const add = weapons.length
+    ? ""
+    : `<cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="cf-weapon-add" data-ship="${shipIndex}" data-slot="${slot}">Add ${slot === "auxiliary" ? "an" : "a"} ${slot} weapon${icon("plus", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>`;
+  return `${rows}${add}`;
 }
 
 function foundryEditView(state: AppState, factionId: string): string {
@@ -2846,52 +2861,46 @@ function foundryEditView(state: AppState, factionId: string): string {
     .map(
       (s, si) => `
     <article class="cf-ship">
-      <!--
-        Three rows that always mean the same thing: what it is called, what it
-        is, what it shoots with. Nothing wraps by accident - the stats are one
-        fixed run of five and the art holds the left of that run - so the shape
-        of a ship class is the same shape every time you scroll past one.
-      -->
-      <button class="cf-ship-x" data-action="cf-ship-remove" data-ship="${si}" title="Remove this ship class" aria-label="Remove ship class ${escapeHtml(s.name)}">${icon("close", 20)}</button>
+      ${/* Laid out like a ship in the fleet builder (Jet, 1 October 2026: "where
+            are the icons? shouldn't the layout mimic the one when you're
+            building a fleet"): name and cost on the first line, then the four
+            stats down the left with their own icons and the two weapon slots on
+            the right with their firing-arc glyphs - stats left, guns right, at
+            every width, the same rule the builder follows. The art tile opens
+            the emblem picker (library, upload, crop) instead of a bare file
+            input. */ ""}
       <div class="cf-ship-head">
-        <!--
-          A drop target, not just a file picker. The input is stretched
-          invisibly over the whole tile (see .cf-shipimg-drop .file-cover), which
-          keeps it in the tab order without a second button standing in for it,
-          and data-drop lets a hull dragged straight off the desktop land here.
-        -->
-        <span class="cf-shipimg-cell">
-          <label class="cf-shipimg-drop ${s.image ? "has-img" : ""}" data-drop title="Choose, drag or drop an image for ${escapeHtml(s.name)}">
-            ${s.image ? `<img src="${imageSrc(s.image)}" alt="" />` : `<span class="cf-shipimg-cue">${icon("upload", 18)}<span>Add art</span></span>`}
-            <input class="file-cover" type="file" accept="image/*" data-action="cf-ship-image-upload" data-ship="${si}" aria-label="Image for ${escapeHtml(s.name)}" />
-          </label>
-          ${s.image ? `<button class="cf-shipimg-x" data-action="cf-ship-image-clear" data-ship="${si}" title="Remove this image" aria-label="Remove image">${icon("close", 12)}</button>` : ""}
-        </span>
-        <label class="field-block cf-ship-name">Ship class name
+        <button class="cf-art ${s.image ? "has-img" : ""}" data-action="open-emblem-modal" data-target="ship" data-ship="${si}" aria-label="${s.image ? "Change" : "Choose"} art for ${escapeHtml(s.name)}" title="${s.image ? "Change" : "Choose"} art">
+          ${s.image ? `<img src="${shipArtSrc(s.image)}" alt="" />` : `${icon("image", 20)}<span>Art</span>`}
+        </button>
+        <label class="cf-f cf-ship-name"><span class="cf-l">Ship class name</span>
           <input type="text" value="${escapeHtml(s.name)}" data-action="cf-ship" data-ship="${si}" data-field="name" /></label>
+        <label class="cf-f cf-ship-cost"><span class="cf-l">Cost</span>
+          <input type="number" min="1" value="${s.cost}" data-action="cf-ship" data-ship="${si}" data-field="cost" /></label>
+        <button class="ghost-btn danger cf-ship-x" data-action="cf-ship-remove" data-ship="${si}" title="Remove this ship class" aria-label="Remove ship class ${escapeHtml(s.name)}">${icon("trash", 16)}</button>
+      </div>
+      <div class="cf-ship-body">
         <div class="cf-ship-stats">
-          <label class="field-block">Mass
+          <label class="cf-f cf-stat"><span class="cf-l">${icon("stat-mass", 16, "stat-ico stat-ico-mass")}Mass</span>
             <select data-action="cf-ship" data-ship="${si}" data-field="mass">
               ${[0, 1, 2, 3].map((m) => `<option value="${m}" ${s.mass === m ? "selected" : ""}>${m}</option>`).join("")}
             </select></label>
-          <label class="field-block">Thrust
+          <label class="cf-f cf-stat"><span class="cf-l">${icon("stat-thrust", 16, "stat-ico stat-ico-thrust")}Thrust</span>
             <input type="number" min="0" value="${s.thrust}" data-action="cf-ship" data-ship="${si}" data-field="thrust" /></label>
-          <label class="field-block">Silhouette
+          <label class="cf-f cf-stat"><span class="cf-l">${icon("stat-silhouette", 16, "stat-ico stat-ico-silhouette")}Silhouette</span>
             <input type="number" min="1" max="12" value="${s.silhouette}" data-action="cf-ship" data-ship="${si}" data-field="silhouette" /></label>
-          <label class="field-block">Shields
+          <label class="cf-f cf-stat"><span class="cf-l">${icon("stat-shields", 16, "stat-ico stat-ico-shields")}Shields</span>
             <input type="number" min="0" value="${s.shields}" data-action="cf-ship" data-ship="${si}" data-field="shields" /></label>
-          <label class="field-block">Cost
-            <input type="number" min="1" value="${s.cost}" data-action="cf-ship" data-ship="${si}" data-field="cost" /></label>
         </div>
-      </div>
-      <div class="cf-slots">
-        <div class="cf-slot">
-          <h5>Primary weapons <cds-checkbox id="cb-primary-util-${si}" class="check-inline" ${s.primaryUtility ? "checked" : ""} data-action="cf-ship" data-ship="${si}" data-field="primaryUtility">Utility Bays instead</cds-checkbox></h5>
-          ${s.primaryUtility ? "" : weaponEditor(si, "primary", s.primary)}
-        </div>
-        <div class="cf-slot">
-          <h5>Auxiliary weapons <cds-checkbox id="cb-auxiliary-util-${si}" class="check-inline" ${s.auxiliaryUtility ? "checked" : ""} data-action="cf-ship" data-ship="${si}" data-field="auxiliaryUtility">Utility Bays instead</cds-checkbox></h5>
-          ${s.auxiliaryUtility ? "" : weaponEditor(si, "auxiliary", s.auxiliary)}
+        <div class="cf-slots">
+          <div class="cf-slot">
+            <h5>${icon("arc-primary", 16)}Primary weapon <cds-checkbox id="cb-primary-util-${si}" class="check-inline" ${s.primaryUtility ? "checked" : ""} data-action="cf-ship" data-ship="${si}" data-field="primaryUtility">Utility Bays instead</cds-checkbox></h5>
+            ${s.primaryUtility ? "" : weaponEditor(si, "primary", s.primary)}
+          </div>
+          <div class="cf-slot">
+            <h5>${icon("arc-aux", 16)}Auxiliary weapon <cds-checkbox id="cb-auxiliary-util-${si}" class="check-inline" ${s.auxiliaryUtility ? "checked" : ""} data-action="cf-ship" data-ship="${si}" data-field="auxiliaryUtility">Utility Bays instead</cds-checkbox></h5>
+            ${s.auxiliaryUtility ? "" : weaponEditor(si, "auxiliary", s.auxiliary)}
+          </div>
         </div>
       </div>
     </article>`,
@@ -4790,6 +4799,28 @@ function emblemModal(state: AppState): string {
         clrA: "no-clear-emblem",
         currentColor: d.emblemColor,
       };
+  } else if (m.target === "ship") {
+    // Ship art in Custom Rules: the same library, upload and crop as every
+    // emblem (Jet, 1 October 2026: "should use the same picker setup and
+    // libraries"). A library pick is kept as "lib:<id>", an upload as its
+    // image-store reference; shipArtSrc resolves either.
+    const fid = state.route.view === "foundry" ? state.route.factionId : undefined;
+    const f = fid ? state.customFactions.find((x) => x.id === fid) : undefined;
+    const sh = f && m.ship !== undefined ? f.ships[m.ship] : undefined;
+    if (sh)
+      cfg = {
+        fields: {
+          emblem: "delta",
+          emblemImage: sh.image && !sh.image.startsWith("lib:") ? sh.image : undefined,
+          emblemLib: sh.image?.startsWith("lib:") ? sh.image.slice(4) : undefined,
+        },
+        currentLib: sh.image?.startsWith("lib:") ? sh.image.slice(4) : undefined,
+        hasImage: Boolean(sh.image),
+        libA: "cf-ship-set-lib",
+        upA: "cf-ship-image-upload",
+        rndA: "cf-ship-random-art",
+        clrA: "cf-ship-image-clear",
+      };
   } else {
     const o = activeOutfit(state);
     if (o)
@@ -4878,7 +4909,7 @@ function emblemModal(state: AppState): string {
   <cds-modal open size="md" class="em-modal" data-key="em-modal">
     <cds-modal-header>
       <cds-modal-close-button></cds-modal-close-button>
-      <cds-modal-heading>Choose an emblem</cds-modal-heading>
+      <cds-modal-heading>${m.target === "ship" ? "Choose ship art" : "Choose an emblem"}</cds-modal-heading>
     </cds-modal-header>
     <cds-modal-body data-modal-primary-focus tabindex="-1" data-drop>
       <div class="em-tabs" role="tablist">${tabBtns}</div>

@@ -1203,7 +1203,12 @@ const TACTICAL_PAGES: Record<string, () => string> = {
           The "Silhouette and Shields" block that used to head it is gone: those
           three stats are quoted in full on Getting Prepared now, and printing
           p.27 twice was the same passage on two pages of one guide. */ ""}
-    ${h(3, "How an attack works")}
+    ${/* Folded, verbatim (Jet, 1 October 2026: the Passive step "feels a bit too
+          detailed"). The step itself is the three paragraphs and the diagram
+          above; the combat chapter under it is reference for when an attack is
+          actually resolved. Summarising it was the other option and was turned
+          down: rules text stays word for word, it just starts closed. */ ""}
+    ${fold("How an attack works", `
     ${quote(
       // p.41, verbatim - the line that opens the chapter and says when these
       // rules apply, which is the reason they can live under Passive Attacks.
@@ -1298,7 +1303,8 @@ const TACTICAL_PAGES: Record<string, () => string> = {
       `${p("Large ships can offer protection to their smaller fleet-mates in the form of heavy shielding, point defence coverage, and pure physical bulk. Ships benefitting from such protection are referred to as being &lsquo;Under Mother&rsquo;s Wing&rsquo;.")}
        ${p("Every ship has a Mother&rsquo;s Wing Zone of radius 2ⓜ&rdquo; which can protect friendly units of a lower mass. If every ship in a friendly unit is within the Mother&rsquo;s Wing Zone of a friendly unit of a higher mass, the lower mass unit can use the Shields value of the higher mass unit in place of its own (and may further boost this with Power to Shields).")}
        ${p("<b>Protecting Objectives.</b> When an objective (such as a neutral ship or a facility) is attacked by a player, another player may use the Mother&rsquo;s Wing effect from one of their nearby units to protect that objective (if that objective has a lighter mass).")}`,
-    )}`,
+    )}
+    `)}`,
   action: () => `
     ${quote(
       // p.38, verbatim.

@@ -332,7 +332,9 @@ export interface AppState {
           kind: "emblem";
           /** "new-outfit" is the outfit being started in the dialog, which does
            *  not exist in `outfits` yet - it writes into ui.newOutfit instead. */
-          target: "list" | "faction" | "outfit" | "new-outfit";
+          target: "list" | "faction" | "outfit" | "new-outfit" | "ship";
+          /** With target "ship": the index of the ship class in the faction being edited. */
+          ship?: number;
           tab: "library" | "upload" | "colour";
           libQuery?: string;
           /**

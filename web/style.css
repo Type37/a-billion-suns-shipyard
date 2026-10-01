@@ -6661,6 +6661,10 @@ main.play-body .roster-section::before { content: none; }
   .shipyard > .sy-head { order: 1; }
   .shipyard > .sy-budget { order: 2; }
   .shipyard > .sy-cols { order: 3; }
+  /* The Hypergrowth yard has no .sy-cols wrapper: its ship list and personnel
+     are direct children. Left at order 0 they sorted ABOVE the header, so on a
+     phone the fleet name, Play and the credits landed under every ship. */
+  .shipyard > .sy-ship-list, .shipyard > .sy-personnel { order: 3; }
   .shipyard > .sy-faction { order: 4; border-top: 2px solid var(--hair); margin-top: 18px; }
   .shipyard > .sy-finish { order: 5; }
 

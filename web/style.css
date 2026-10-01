@@ -8087,11 +8087,12 @@ cds-text-input.limit-custom { width: 6.5rem; }
 
 /* CMD tokens in one row on a phone. Nine 40px tokens and their gaps need
    392px and a 360px phone has 328, so the ninth wrapped onto a 43px row of its
-   own. Each token now takes an equal share of the row, from 44px down to 28px
-   (still past the 24px target floor), so up to eleven fit on one line. */
+   own. Each token now takes an equal share of the full row (never under
+   28px, still past the 24px target floor), so the strip lines up edge to
+   edge with the phase tabs and buttons above it at every width. */
 @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   .cmd-pips { flex-wrap: nowrap; }
-  .cmd-pip.cmd-pip { flex: 1 1 0; width: auto; min-width: 28px; max-width: 44px; }
+  .cmd-pip.cmd-pip { flex: 1 1 0; width: auto; min-width: 28px; max-width: none; }
   .cmd-pip .icon { width: 18px; height: 18px; }
 }
 
@@ -8159,3 +8160,25 @@ cds-menu-button.hdr-menu, cds-menu-button.card-menu {
   border: 1px solid var(--hair); border-radius: 0;
 }
 .sy-unit-remove { color: var(--ink); }
+
+/* Play's top row on a phone: Print, Reset game and End play as three equal
+   cells across the full width, joined edge to edge like the phase tabs under
+   them, one text size. They were right-aligned at three widths with an empty
+   cell on the left and End play in smaller type (Jet: "this alignment looks
+   like shit"). */
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  .play-sticky .play-bar.play-bar {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; padding: 0 0 8px;
+  }
+  .play-sticky .play-bar > .play-bar-print,
+  .play-sticky .play-bar > .play-bar-reset,
+  .play-sticky .play-bar > .play-bar-end {
+    margin: 0; width: 100%; min-width: 0; justify-content: center; gap: 8px;
+    font-family: var(--sans); font-size: 13px; font-weight: 700;
+    min-height: var(--tap); padding: 0 8px; white-space: nowrap;
+  }
+  /* Shared edges, as in the phase track: each cell after the first drops its
+     left line so two 1px lines never sit side by side. */
+  .play-sticky .play-bar > .play-bar-reset,
+  .play-sticky .play-bar > .play-bar-end { border-left: none; }
+}

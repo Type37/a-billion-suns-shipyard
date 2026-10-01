@@ -8686,3 +8686,33 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
 /* A ship's own rule printed under its stats (the Recon Ship's scanners). */
 .ship-rule { font-size: 13px; line-height: 1.45; color: var(--ink-2); margin-top: 8px; }
 .ship-rule + .ship-rule { margin-top: 4px; }
+
+/* ------------------------------------------------------------ Solo outfit
+   On Carbon (Jet, 1 October 2026: "use carbon's grid rules for the solo modes
+   all screens"). Head: emblem | outfit name | Print, one row that is the same
+   on every tab. Tabs: Carbon line tabs - sentence case, the selected one
+   semibold over a 2px interactive line - instead of tracked caps over a pink
+   bar. */
+.solo-head { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 16px; align-items: end; padding: 16px 0; }
+.solo-head .solo-emblem { width: 64px; height: 64px; }
+.solo-head .solo-emblem .emblem, .solo-head .solo-emblem img { width: 48px; height: 48px; }
+.solo-name input {
+  width: 100%; min-height: var(--tap); padding: 8px 16px; font: 600 22px/1.2 var(--display);
+  border: none; border-bottom: 1px solid var(--field-edge); background: var(--ground); color: var(--ink);
+}
+.solo-name input:focus { outline: 2px solid var(--focus); outline-offset: -2px; }
+.solo-head .solo-print { align-self: end; }
+.solo-tabs { border-bottom: 2px solid var(--hair-soft); gap: 0; }
+.solo-tab {
+  font-size: 16px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--ink-2);
+  padding: 12px 16px; border-bottom: 2px solid transparent; margin-bottom: -2px;
+}
+@media (hover: hover) { .solo-tab:hover { color: var(--ink); border-bottom-color: var(--field-edge); } }
+.solo-tab.selected { color: var(--ink); font-weight: 600; border-bottom-color: var(--blue); }
+.solo-tab:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+@media (max-width: 671px) {
+  .solo-head { grid-template-columns: 48px minmax(0, 1fr); }
+  .solo-head .solo-emblem { width: 48px; height: 48px; }
+  .solo-head .solo-emblem .emblem, .solo-head .solo-emblem img { width: 36px; height: 36px; }
+  .solo-head .solo-print { grid-column: 1 / -1; }
+}

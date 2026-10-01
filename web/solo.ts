@@ -675,31 +675,20 @@ export function soloOutfitView(state: AppState): string {
   return `
   <div class="solo-outfit">
   <section class="setup-band solo-band">
-    <div class="setup-head">
-      <div class="setup-identity">
-        <input class="fleet-name-input" type="text" value="${escapeHtml(o.name ?? "")}" placeholder="Name this outfit" aria-label="Outfit name" data-action="outfit-name" />
-        ${/* Beside the name on the Outfit tab, because the budget is the first
-              thing that confuses somebody arriving from the fleet builder: the
-              number is not a points limit you rebuy against each game, it is a
-              loan you spent once. p.201 buys the Outfit at the start of the
-              campaign and never mentions buying again. */ ""}
-        ${tab === "outfit"
-          ? `<p class="outfit-budget-note">You have credits equal to the loan you took out at the start of the game.
-             You don&rsquo;t buy more ships during these short Junkspace campaigns.</p>`
-          : ""}
-      </div>
-      <div class="control-group control-group-emblem">
-        <span class="control-label">Emblem</span>
-        <div class="emblem-picker">${outfitEmblemPicker(o)}</div>
-      </div>
-      ${/* An outfit is a roster and every other roster in this app prints. This
-            went to window.print() on the live tracker for one build, which puts
-            the tab bar, the alert pips and a half-flipped blip grid on paper;
-            it goes to the real print route now, same shell and same preview as
-            a Fleet List. */ ""}
-      <div class="setup-actions">
-        <cds-button has-main-content kind="tertiary" size="lg" class="btn" href="#/print-outfit/${o.id}">Print${icon("print", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
-      </div>
+    ${/* One fixed row on every tab: emblem, name, Print. The Outfit tab used
+          to add a note under the name ("You have credits equal to the loan you
+          took out...") that the other tabs lacked, so the name moved 65px up
+          and down as you switched tabs (Jet: "the jump continues"). The note
+          was also untrue once the budget became a flat ¢30k, and not the
+          book's words, so it is gone rather than moved. The fields are
+          Carbon's: label above, grey field, bottom line. */ ""}
+    <div class="solo-head">
+      <button class="cf-art solo-emblem" data-action="open-emblem-modal" data-target="outfit" aria-label="Choose emblem" title="Choose emblem">${emblemView(o, 48)}</button>
+      <label class="cf-f solo-name"><span class="cf-l">Outfit name</span>
+        <input class="fleet-name-input" type="text" value="${escapeHtml(o.name ?? "")}" data-action="outfit-name" /></label>
+      ${/* An outfit is a roster and every other roster in this app prints, on
+            the real print route (#/print-outfit), not window.print(). */ ""}
+      <cds-button has-main-content kind="tertiary" size="lg" class="btn solo-print" href="#/print-outfit/${o.id}">Print${icon("print", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
     </div>
   </section>
   ${tabBar(o, tab)}
@@ -707,10 +696,3 @@ export function soloOutfitView(state: AppState): string {
   </div>`;
 }
 
-function outfitEmblemPicker(o: SavedOutfit): string {
-  const img = imageSrc(o.emblemImage) ?? libraryUrl(o.emblemLib);
-  return `<button class="emblem-choose-btn" data-action="open-emblem-modal" data-target="outfit">
-    <span class="emblem-choose-preview">${emblemView(o, 40)}</span>
-    <span class="emblem-choose-label">${icon("image", 15)} Choose emblem</span>
-  </button>`;
-}

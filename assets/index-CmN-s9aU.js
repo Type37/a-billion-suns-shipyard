@@ -649,9 +649,11 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
           ${n?``:`<span class="roster-unit-glyph">${N(`warning`,20)}</span>`}
           <input class="unit-name-input" type="text" value="${P(t.shipName??``)}" placeholder="${P(n?.name??`Ship`)}" aria-label="${P(n?.name??`Ship`)}" data-action="outfit-ship-name" data-ship="${t.id}" />
           <span class="roster-unit-cost">${Yu(n?.cost??0)}</span>
-          <cds-button has-main-content kind="danger-tertiary" size="lg" class="btn" data-action="outfit-remove-ship" data-ship="${t.id}">Remove${N(`trash`,14).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
+          <cds-button has-main-content kind="danger-ghost" size="lg" class="btn" data-action="outfit-remove-ship" data-ship="${t.id}">Remove${N(`trash`,14).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
         </div>
         ${n?`<div class="ru-spec">${Rf(n)}</div>`:``}
+        
+        ${n?.auxiliaryFitting===`Long-Range Scanners`?`<p class="ship-rule">${F(f)}</p><p class="ship-rule">${F(p)}</p>`:``}
         <!--
           The pilot's name sits with the pilot's class, on the same line, above
           the ability the class grants. It used to be a separate field UNDER the
@@ -672,7 +674,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       </article>`}).join(``);return`
   <main class="workspace solo-workspace">
     <section class="catalog">
-      <h3 class="catalog-title">Stock ship classes <span class="muted">costs in thousands of Juran credits</span></h3>
+      <h3 class="catalog-title">Stock ship classes</h3>
       <div class="catalog-list">${ad()}</div>
     </section>
     <aside class="roster">
@@ -810,10 +812,11 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       <label class="cf-f solo-name"><span class="cf-l">Outfit name</span>
         <input class="fleet-name-input" type="text" value="${P(t.name??``)}" data-action="outfit-name" /></label>
       
+      
+      ${id(t,n)}
       <cds-button has-main-content kind="tertiary" size="lg" class="btn solo-print" href="#/print-outfit/${t.id}">Print${N(`print`,15).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
     </div>
   </section>
-  ${id(t,n)}
   ${r}
   </div>`}var pd=`https://planetsmashergames.com/a-billion-suns/`,md=[{id:`eras`,label:`Pick an era`,short:`Eras`,ico:`logo`},{id:`prepare`,label:`Getting prepared`,short:`Prepare`,ico:`wrench`}],hd=[{id:`command`,label:`Command Phase`,short:`Command`,ico:`cmd-delta`},{id:`jump`,label:`Jump Phase`,short:`Jump`,ico:`shuffle`},{id:`tactical`,label:`Tactical Phase`,short:`Tactical`,ico:`arc-primary`},{id:`end`,label:`End Phase`,short:`End`,ico:`flag`}],gd=e=>`<div class="ltp-cool">${e}</div>`,R=e=>`
   <blockquote class="ltp-quote">${e}</blockquote>`,z=(e,t,n=``)=>`<h${e} class="ltp-h${e} ${n}">${t}</h${e}>`,B=e=>`<p class="ltp-p">${Ui(e)}</p>`,_d=(e,t=``)=>`<ul class="ltp-list ${t}">${e.map(e=>`<li>${Ui(e)}</li>`).join(``)}</ul>`,vd=e=>`<ol class="ltp-list ltp-list-num">${e.map(e=>`<li>${Ui(e)}</li>`).join(``)}</ol>`,yd=[[`ship`,`One miniature, with its own Mass, Thrust, HP, weapons and arcs of fire. Ships are what you move, one at a time. An attack targets the whole unit, but every hit that gets through is assigned to one ship, comes off that ship&rsquo;s HP, and destroys that ship at 0.`],[`unit`,`One to three ships, grouped when the fleet is built (or when they are requisitioned mid-game) and kept together from then on. A unit moves in one step, all of its ships take the same action, and at the end of its movement they must all be within 6&rdquo; of each other. A Mass 3 ship is always a unit of one.`],[`battlegroup`,`The units you drag together for a single activation, to a Combined Mass of 10. Battlegroups are temporary formations and only exist during that activation.`]],bd=new Set([`svg`,`h1`,`h2`,`h3`,`h4`,`summary`,`button`,`a`,`caption`,`dt`,`nav`]),xd=(e,t)=>`<span class="ltp-gloss" tabindex="0"

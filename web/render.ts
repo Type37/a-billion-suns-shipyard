@@ -456,15 +456,16 @@ function listEmblem(l: SavedList, size: number, cls = ""): string {
 // The sliding highlight that marks the current page is aria-hidden decoration.
 // enhanceNav() in main.ts already resolves which item the route lands on, so it
 // sets aria-current there rather than every caller threading the route in here.
-/**
- * `onHome`: the home page has the big A BILLION SUNS nameplate right under
- * this bar, so the bar's own wordmark said the name twice in one screen. On
- * home the bar keeps only the menu.
- */
-function topbar(onHome = false): string {
+/* The game's lockup (the delta, BILLION solid, SUNS in outline) is the title
+ * in the bar on every page. It used to be a planet icon and "A BILLION SUNS
+ * 2E" in the bar plus this lockup again as a big banner on home, which said
+ * the name twice in one screen; Jet picked the lockup and the banner went. */
+const WM_DELTA = `<svg class="wm-delta" viewBox="-60 -60 733 769" aria-hidden="true" fill="none"><mask id="abs-delta-cut" maskUnits="userSpaceOnUse" x="-60" y="-60" width="733" height="769"><rect x="-60" y="-60" width="733" height="769" fill="#fff"/><path d="M 256.71 422.6 L 101.53 748.2 L -9.35 779.55 L 145.83 453.94 Z" fill="#000"/></mask><path d="M 319.61 14.03 L 604.97 614.56 C 607.84 620.58 607.41 627.65 603.85 633.28 C 600.29 638.92 594.09 642.33 587.42 642.33 L 25.39 642.33 C 18.73 642.33 12.52 638.92 8.96 633.28 C 5.4 627.65 4.98 620.58 7.84 614.56 L 293.21 14.03 C 295.63 8.94 300.77 5.69 306.41 5.69 C 312.05 5.69 317.18 8.94 319.61 14.03 Z" stroke="currentColor" stroke-width="111" stroke-linejoin="round" mask="url(#abs-delta-cut)"/></svg>`;
+
+function topbar(): string {
   return `
-  <header class="topbar ${onHome ? "is-home" : ""}">
-    ${onHome ? "" : `<a class="wordmark" href="#/">${icon("logo", 26)}<span class="wordmark-text">A Billion Suns 2e</span><span class="wordmark-sub">Shipyard</span></a>`}
+  <header class="topbar">
+    <a class="wordmark" href="#/" aria-label="A Billion Suns, home"><span class="wm-lockup wm-bar">${WM_DELTA}<span class="wm-billion">Billion</span><span class="wm-suns">Suns</span></span></a>
     <!--
       On a phone the five nav targets fold into a menu behind the hamburger; on
       desktop the summary is hidden and the nav is the usual flat row (.nav-fold).
@@ -599,16 +600,7 @@ function homeView(state: AppState): string {
       : `<a class="index-row" href="${href}">${inner}</a>`;
   };
   return `
-  ${topbar(true)}
-  <header class="nameplate">
-    <div class="nameplate-inner">
-      <h1 class="wordmark-hero">
-        <span class="wm-edition">Second Edition</span>
-        <span class="wm-lockup"><svg class="wm-delta" viewBox="-60 -60 733 769" aria-hidden="true" fill="none"><mask id="abs-delta-cut" maskUnits="userSpaceOnUse" x="-60" y="-60" width="733" height="769"><rect x="-60" y="-60" width="733" height="769" fill="#fff"/><path d="M 256.71 422.6 L 101.53 748.2 L -9.35 779.55 L 145.83 453.94 Z" fill="#000"/></mask><path d="M 319.61 14.03 L 604.97 614.56 C 607.84 620.58 607.41 627.65 603.85 633.28 C 600.29 638.92 594.09 642.33 587.42 642.33 L 25.39 642.33 C 18.73 642.33 12.52 638.92 8.96 633.28 C 5.4 627.65 4.98 620.58 7.84 614.56 L 293.21 14.03 C 295.63 8.94 300.77 5.69 306.41 5.69 C 312.05 5.69 317.18 8.94 319.61 14.03 Z" stroke="currentColor" stroke-width="111" stroke-linejoin="round" mask="url(#abs-delta-cut)"/></svg><span class="wm-billion">Billion</span><span class="wm-suns">Suns</span></span>
-        <span class="wm-tag">Interstellar Fleet Battles</span>
-      </h1>
-    </div>
-  </header>
+  ${topbar()}
   <main class="index-wrap">
     <div class="index-col">
       ${tutorialCallout(state)}

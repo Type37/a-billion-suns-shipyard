@@ -7897,7 +7897,8 @@ cds-inline-notification.app-hint { max-width: none; width: 100%; margin: 6px 0; 
 .au-species-pick cds-button::part(button) { width: 100%; max-width: none; padding-inline: 8px; justify-content: center; }
 .au-card-wrap.is-picking { background: var(--blue-wash); }
 
-/* Home: no wordmark in the bar (topbar(onHome) in render.ts), so the menu
-   keeps to the right on its own. */
-.topbar.is-home { justify-content: flex-end; }
-.topbar.is-home .nav-fold { margin-left: auto; }
+/* The lockup at bar size (WM_DELTA in render.ts). The banner version is
+   gone; this is the only title now. */
+.wm-lockup.wm-bar { font-size: 26px; line-height: 1; letter-spacing: -0.01em; }
+.wm-bar .wm-suns { -webkit-text-stroke: 1.2px #fff; }
+@media (max-width: 760px) { .wm-lockup.wm-bar { font-size: 22px; } .wm-bar .wm-suns { -webkit-text-stroke: 1px #fff; } }

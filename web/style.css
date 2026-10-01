@@ -7896,3 +7896,8 @@ cds-inline-notification.app-hint { max-width: none; width: 100%; margin: 6px 0; 
 .au-species-pick { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 0 12px 12px; }
 .au-species-pick cds-button::part(button) { width: 100%; max-width: none; padding-inline: 8px; justify-content: center; }
 .au-card-wrap.is-picking { background: var(--blue-wash); }
+
+/* Home: no wordmark in the bar (topbar(onHome) in render.ts), so the menu
+   keeps to the right on its own. */
+.topbar.is-home { justify-content: flex-end; }
+.topbar.is-home .nav-fold { margin-left: auto; }

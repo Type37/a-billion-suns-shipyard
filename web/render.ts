@@ -456,10 +456,15 @@ function listEmblem(l: SavedList, size: number, cls = ""): string {
 // The sliding highlight that marks the current page is aria-hidden decoration.
 // enhanceNav() in main.ts already resolves which item the route lands on, so it
 // sets aria-current there rather than every caller threading the route in here.
-function topbar(): string {
+/**
+ * `onHome`: the home page has the big A BILLION SUNS nameplate right under
+ * this bar, so the bar's own wordmark said the name twice in one screen. On
+ * home the bar keeps only the menu.
+ */
+function topbar(onHome = false): string {
   return `
-  <header class="topbar">
-    <a class="wordmark" href="#/">${icon("logo", 26)}<span class="wordmark-text">A Billion Suns 2e</span><span class="wordmark-sub">Shipyard</span></a>
+  <header class="topbar ${onHome ? "is-home" : ""}">
+    ${onHome ? "" : `<a class="wordmark" href="#/">${icon("logo", 26)}<span class="wordmark-text">A Billion Suns 2e</span><span class="wordmark-sub">Shipyard</span></a>`}
     <!--
       On a phone the five nav targets fold into a menu behind the hamburger; on
       desktop the summary is hidden and the nav is the usual flat row (.nav-fold).
@@ -594,7 +599,7 @@ function homeView(state: AppState): string {
       : `<a class="index-row" href="${href}">${inner}</a>`;
   };
   return `
-  ${topbar()}
+  ${topbar(true)}
   <header class="nameplate">
     <div class="nameplate-inner">
       <h1 class="wordmark-hero">

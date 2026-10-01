@@ -8089,3 +8089,34 @@ cds-menu-button.card-menu { border: 1px solid var(--blue); position: relative; z
    otherwise painted over the menu's last items (both are z-index 1). Carbon
    reflects the open state as the _open attribute. */
 cds-menu-button.card-menu[_open] { z-index: 60; }
+
+/* The credits row speaks in two sizes, not five (Jet: "font sizes,
+   consistency"). The total is the one big number; the limit, the fleet's
+   status and what is left are all 16px sans at one weight. They were 16px
+   sans 700, 13px sans 700 and 16px display 900 side by side. */
+.sy-budget-now.sy-budget-now { font-size: 28px; }
+.limit-ctl, .sy-budget-free, .sy-budget-status .yard-status {
+  font-family: var(--sans); font-size: 16px; font-weight: 700;
+}
+/* The credits mark is sized by the text it sits in, not a fixed pixel height
+   passed in from wherever it was drawn (13.5px beside a 28px total, the same
+   13.5px beside 13px text). One em-relative size everywhere keeps it the same
+   proportion to its number. */
+svg.credits-glyph { height: 0.8em; width: auto; vertical-align: -0.05em; }
+
+/* The faction rule block drew a grey hairline and the rule inside it drew an
+   ink one 27px lower, with nothing between them (Jet's screenshot, desktop
+   builder). The rule's own line stays; the section's goes, at every width. */
+.sy-faction, .shipyard > .sy-faction { border-top: none; }
+
+/* Desktop builder header: one row. With wrapping allowed, the Actions menu
+   dropped onto a line of its own under the pickers at 1440px. */
+@media (min-width: 761px) {
+  .sy-head { flex-wrap: nowrap; }
+  .sy-head > .sy-id { flex: 1 1 auto; min-width: 12rem; }
+  .sy-head > .sy-fac { flex: 0 1 26rem; }
+}
+/* Learn: the pager's top rule sat under the last era card's own border. */
+.ltp-pager { border-top: none; }
+/* Hypergrowth: the meter sat 4px above the first ship card's border. */
+.shipyard > .sy-budget + .sy-ship-list { margin-top: 12px; }

@@ -185,7 +185,7 @@ export function soloListView(state: AppState): string {
           <span class="outfit-card-emblem">${emblemView(o, 44)}</span>
           <span class="outfit-card-id">
             <span class="outfit-card-name">${escapeHtml(o.name || "Unnamed outfit")}</span>
-            <span class="outfit-card-meta">${o.ships.length} ${o.ships.length === 1 ? "ship" : "ships"} · updated ${formatDate(o.updatedAt)}</span>
+            <span class="outfit-card-meta">${o.ships.length} ${o.ships.length === 1 ? "ship" : "ships"}, updated ${formatDate(o.updatedAt)}</span>
           </span>
         </a>
         <div class="outfit-card-debt ${cleared ? "is-clear" : ""}">

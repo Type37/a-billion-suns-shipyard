@@ -500,10 +500,10 @@ function doubleMoveDiagram(): string {
          onto the SVG origin. The running animation overrides this attribute. -->
     <g class="dg-dbl-mover" transform="translate(${C[0]} ${C[1]}) rotate(33)">${SHIP(0, 0, 90, "dg-ship")}</g>
 
-    ${LABEL(94, 56, "1 · Thrust", "dg-measure-text")}
-    ${LABEL(216, 84, "2 · Thrust again", "dg-measure-text")}
-    ${/* No summary line along the bottom. The two legs are labelled "1 · Thrust"
-          and "2 · Thrust again", the pivot between them is drawn, and the card
+    ${LABEL(94, 56, "1. Thrust", "dg-measure-text")}
+    ${LABEL(216, 84, "2. Thrust again", "dg-measure-text")}
+    ${/* No summary line along the bottom. The two legs are labelled "1. Thrust"
+          and "2. Thrust again", the pivot between them is drawn, and the card
           above the diagram is the Command itself in the book's words - a third
           restatement of the same thing, in our words, added nothing. */ ""}
   </svg>`;

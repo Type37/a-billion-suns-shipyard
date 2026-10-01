@@ -698,7 +698,7 @@ function paginatePrintPreview(): void {
   const pages = breaks.length + 1;
   if (readout) {
     const paperLabel = sheet.dataset["paperLabel"] ?? "";
-    readout.textContent = `${pages} ${pages === 1 ? "page" : "pages"}${paperLabel ? ` · ${paperLabel}` : ""}`;
+    readout.textContent = `${pages} ${pages === 1 ? "page" : "pages"}${paperLabel ? `, ${paperLabel}` : ""}`;
   }
 }
 

@@ -5983,7 +5983,8 @@ main.play-body .roster-section::before { content: none; }
 .sy-req .pf-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; justify-content: space-between; }
 .sy-req-tally { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.02em; color: var(--ink-3); text-transform: uppercase; font-variant-numeric: tabular-nums; }
 .sy-req-yard { color: var(--blue); font-weight: 800; }
-.sy-req-sep { color: var(--ink-off); }
+/* Separators are space, not a dot (no middots). */
+.sy-req-sep { display: inline-block; width: 10px; }
 .sy-req-acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .sy-req-btn {
   flex: 1 1 auto; min-height: 34px; padding: 6px 10px; border: 1px solid var(--hair); background: var(--paper);
@@ -6144,7 +6145,7 @@ main.play-body .roster-section::before { content: none; }
 .pf-tally-n { font-family: var(--display); font-weight: 900; font-size: 14px; }
 .pf-tally-n.is-play { color: var(--blue); }
 .pf-tally-n.is-reserve { color: var(--ink-2); }
-.pf-tally-sep { color: var(--hair); margin: 0 3px; }
+.pf-tally-sep { display: inline-block; width: 10px; }
 
 .pf-unit { border-left: 3px solid transparent; padding-left: 8px; }
 .pf-unit.is-play { border-left-color: var(--blue); }

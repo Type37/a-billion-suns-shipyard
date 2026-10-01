@@ -896,7 +896,7 @@ function switcher(
 function cardWeapons(ship: ShipClass): string {
   const one = (w: Weapon, arc: "primary" | "aux") => `
     <p class="pcw">
-      <span class="pcw-arc">${icon(arc === "primary" ? "arc-primary" : "arc-aux", 14, "slot-arc")}${arc === "primary" ? "Pri" : "Aux"}:</span>
+      <span class="pcw-arc">${icon(arc === "primary" ? "arc-primary" : "arc-aux", 14, "slot-arc")}${arc === "primary" ? "Primary" : "Auxiliary"}</span>
       <span class="pcw-name">${escapeHtml(w.name)}</span>
       <span class="pcw-fig">[${w.count}${w.die}, ${w.rangeMin}-${w.rangeMax}"]</span>
     </p>`;
@@ -909,7 +909,7 @@ function cardWeapons(ship: ShipClass): string {
   if (ship.auxiliary.length === 0 && (ship.auxiliaryFitting || ship.auxiliaryUtility)) {
     rows.push(`
     <p class="pcw">
-      <span class="pcw-arc">${icon("arc-aux", 14, "slot-arc")}Aux:</span>
+      <span class="pcw-arc">${icon("arc-aux", 14, "slot-arc")}Auxiliary</span>
       <span class="pcw-name">${escapeHtml(ship.auxiliaryFitting ?? "Utility Bays")}</span>
     </p>`);
   }
@@ -918,16 +918,16 @@ function cardWeapons(ship: ShipClass): string {
 
 export function weaponsTable(ship: ShipClass): string {
   // Plain lines, not a column table: the book's own notation is
-  //   Pri: Cruise Missiles [4D10, 18-36"]
+  //   Primary  Cruise Missiles [4D10, 18-36"]
   // so each weapon is one line - an arc glyph, the Pri/Aux label, the name, and
   // the dice and range in brackets. No column headers, no separate DMG column
   // (damage is a fixed lookup from the die, never shown here). An empty slot is
   // an em dash; a utility slot names itself.
   const weaponLine = (w: Weapon, arc: "pri" | "aux") =>
-    `<p class="weap-line"><span class="wl-arc">${icon(arc === "pri" ? "arc-primary" : "arc-aux", 15, "slot-arc")}${arc === "pri" ? "Pri" : "Aux"}:</span> <span class="wl-name">${escapeHtml(w.name)}</span> <span class="wl-fig">[${w.count}${w.die}, ${w.rangeMin}–${w.rangeMax}"]</span></p>`;
+    `<p class="weap-line"><span class="wl-arc">${icon(arc === "pri" ? "arc-primary" : "arc-aux", 15, "slot-arc")}${arc === "pri" ? "Primary" : "Auxiliary"}</span> <span class="wl-name">${escapeHtml(w.name)}</span> <span class="wl-fig">[${w.count}${w.die}, ${w.rangeMin}–${w.rangeMax}"]</span></p>`;
   const slotLine = (arc: "pri" | "aux", text: string) => {
     const nm = text === "Utility Bays" ? `${icon("utility", 13, "util-ico")}${text}` : text;
-    return `<p class="weap-line"><span class="wl-arc">${icon(arc === "pri" ? "arc-primary" : "arc-aux", 15, "slot-arc")}${arc === "pri" ? "Pri" : "Aux"}:</span> <span class="wl-name">${nm}</span></p>`;
+    return `<p class="weap-line"><span class="wl-arc">${icon(arc === "pri" ? "arc-primary" : "arc-aux", 15, "slot-arc")}${arc === "pri" ? "Primary" : "Auxiliary"}</span> <span class="wl-name">${nm}</span></p>`;
   };
 
   const lines: string[] = [];
@@ -1707,7 +1707,6 @@ function builderView(state: AppState): string {
     </details>`;
 
   const nUnits = list.fleet.units.length;
-  const unitWord = isStocking ? (nUnits === 1 ? "ship class" : "ship classes") : nUnits === 1 ? "unit" : "units";
 
   return `
   ${topbar()}
@@ -1747,7 +1746,8 @@ function builderView(state: AppState): string {
     <div class="sy-cols">
     <div class="sy-col-fleet">
     <div class="sy-list-head">
-      <h3 class="sy-h">${isStocking ? "Your shipyard" : "Your fleet"} <span class="sy-h-count">${nUnits} ${unitWord}</span></h3>
+      ${/* No "10 units" beside the heading: the list under it already says
+            how many, one row each. */ ""}<h3 class="sy-h">${isStocking ? "Your shipyard" : "Your fleet"}</h3>
       ${
         list.freePlay || faction
           ? `<button class="sy-add-unit ${nUnits === 0 ? "is-pulsing" : ""}" data-action="open-add-unit">${icon("plus", 16)} Add ${isStocking ? "ship" : "unit"}</button>`
@@ -1913,7 +1913,8 @@ function addUnitModal(state: AppState): string {
  * the line entirely rather than spend a row on a dash.
  */
 function shortWeaponText(w: Weapon[], isUtility: boolean): string {
-  if (w.length) return w.map((x) => `${escapeHtml(x.name)} ${x.count}${x.die} ${x.rangeMin}&ndash;${x.rangeMax}"`).join(" · ");
+  // Two weapons in one arc go on two lines, not "A · B".
+  if (w.length) return w.map((x) => `${escapeHtml(x.name)} ${x.count}${x.die} ${x.rangeMin}&ndash;${x.rangeMax}"`).join("<br>");
   return isUtility ? "Utility Bays" : "";
 }
 
@@ -2407,7 +2408,7 @@ function printView(
       // "Corvette" under it in every view, every time, forever - the app
       // correcting your own roster back at you. You know what you built.
       const classLine = "";
-      const extras = [classLine, u.species ? escapeHtml(u.species) : ""].filter(Boolean).join(" · ");
+      const extras = [classLine, u.species ? escapeHtml(u.species) : ""].filter(Boolean).join(", ");
       return `
       <article class="print-card">
         <header class="pc-head">
@@ -2599,7 +2600,7 @@ function printView(
 
   // The project's single interpunct lives in this subtitle, and its single
   // em-dash lives in the attribution line below. Nowhere else, ever.
-  const subtitle = `${escapeHtml(faction?.name ?? "Mixed forces")}${era ? ` · ${era}` : ""}`;
+  const subtitle = `${escapeHtml(faction?.name ?? "Mixed forces")}${era ? `, ${era}` : ""}`;
   const guideAvailable = !!TRAINING_GUIDES[list.mode];
 
   return `
@@ -2653,7 +2654,7 @@ function printView(
           <p class="sheet-subtitle">${subtitle}</p>
         </div>
         <div class="sheet-totals">
-          <p class="sheet-total-line">${money(total)}${list.mode === "hypergrowth" && list.unlimitedShipyards ? " · unlimited shipyard" : ` of ${money(list.fleet.creditsLimit)}`}</p>
+          <p class="sheet-total-line">${money(total)}${list.mode === "hypergrowth" && list.unlimitedShipyards ? ", unlimited shipyard" : ` of ${money(list.fleet.creditsLimit)}`}</p>
           <p class="sheet-count">${list.fleet.units.length} ${list.fleet.units.length === 1 ? "unit" : "units"}</p>
         </div>
       </header>
@@ -3328,7 +3329,7 @@ function playFleetPanel(list: SavedList, faction: Faction | undefined, customs: 
   // before the first Jump In is a sum about nothing.
   const actLine =
     tally.play > 0
-      ? `<span class="pf-tally-sep">·</span>
+      ? `<span class="pf-tally-sep" aria-hidden="true"></span>
          <span class="pf-tally-n ${actedInPlay === tally.play ? "is-done" : "is-acted"}">${actedInPlay}</span> of ${tally.play} activated`
       : "";
   return `<section class="play-fleet">
@@ -3336,7 +3337,7 @@ function playFleetPanel(list: SavedList, faction: Faction | undefined, customs: 
       <h3 class="roster-section">Your fleet</h3>
       <p class="pf-tally">
         <span class="pf-tally-n is-play">${tally.play}</span> jumped in
-        <span class="pf-tally-sep">·</span>
+        <span class="pf-tally-sep" aria-hidden="true"></span>
         <span class="pf-tally-n is-reserve">${tally.reserve}</span> in reserve
         ${actLine}
       </p>
@@ -3437,8 +3438,8 @@ function playShipyardTracker(list: SavedList, faction: Faction | undefined, cust
       <article class="pf-unit sy-req" data-roster-key="req-${cid}">
         <header class="pf-head">
           <span class="pf-name">${escapeHtml(ship.name)} <span class="sy-req-cost">${credits(ship.cost)}</span>${total !== Infinity && total > 1 ? ` <span class="pf-x">&times;${total}</span>` : ""}</span>
-          <span class="sy-req-tally"><span class="sy-req-yard">${yardLabel}</span> yard <span class="sy-req-sep">·</span> ${inPlay} in play <span class="sy-req-sep">·</span> ${reserve} reserve${
-            lost ? ` <span class="sy-req-sep">·</span> <span class="sy-req-lost">${lost} lost</span>` : ""
+          <span class="sy-req-tally"><span class="sy-req-yard">${yardLabel}</span> yard <span class="sy-req-sep" aria-hidden="true"></span> ${inPlay} in play <span class="sy-req-sep" aria-hidden="true"></span> ${reserve} reserve${
+            lost ? ` <span class="sy-req-sep" aria-hidden="true"></span> <span class="sy-req-lost">${lost} lost</span>` : ""
           }</span>
         </header>
         <div class="pf-data">${statChips(ship, true)}${weaponsTable(ship)}</div>
@@ -3453,7 +3454,7 @@ function playShipyardTracker(list: SavedList, faction: Faction | undefined, cust
           pressing it will do.
         -->
         <div class="sy-req-acts">
-          <button class="sy-req-btn" data-action="play-deploy" data-ship="${cid}" ${yard > 0 ? "" : "disabled"} title="Requisition one from the Shipyard: pay its cost in Credits and strike it off. Costs 1 CMD token &mdash; spend it above.">Requisition · ${credits(ship.cost)}</button>
+          <button class="sy-req-btn" data-action="play-deploy" data-ship="${cid}" ${yard > 0 ? "" : "disabled"} title="Requisition one from the Shipyard: pay its cost in Credits and strike it off. Costs 1 CMD token &mdash; spend it above.">Requisition ${credits(ship.cost)}</button>
           ${btn("play-jumpout", "Jump out", inPlay > 0)}
           ${btn("play-jumpin", "Jump in", reserve > 0)}
           <button class="sy-req-btn sy-req-lost-btn" data-action="play-lost" data-ship="${cid}" ${inPlay > 0 ? "" : "disabled"} title="${

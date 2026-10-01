@@ -54,7 +54,6 @@ import { storageBytes } from "./storage.ts";
 import { FleetSync } from "./fleet-sync.ts";
 import { soloListView, soloOutfitView, newOutfitModal } from "./solo.ts";
 import { learnView } from "./learn.ts";
-import { activeTour } from "./tours.ts";
 
 // The whole app renders from state into #app. Interactive elements carry
 // data-action attributes; actions.ts owns all event handling.
@@ -529,10 +528,6 @@ function tutorialCallout(state: AppState): string {
     <button class="onboard-close" data-action="dismiss-tutorials" aria-label="Dismiss">${icon("close", 16)}</button>
   </aside>`;
 }
-
-// The Foundry nudge used to be a card here on the home page. It is a coachmark
-// pinned to the Custom Rules tab now (see TOURS in tours.ts), because the thing
-// it has to teach is where that tab is.
 
 // ---------------------------------------------------------------------------
 // Home hub: decide what you want to do (Dropfleet-builder mental model)
@@ -4113,67 +4108,10 @@ function shipsView(state: AppState): string {
 // Root
 // ---------------------------------------------------------------------------
 
-// A first-visit coachmark: a small white popover anchored to a live element
-// (positioned in main.ts, since this app re-renders as a plain HTML string).
-// Hidden until positioning finds its target, so it never flashes at 0,0.
-function tourPopover(state: AppState): string {
-  const active = activeTour(state);
-  if (!active) return "";
-  const { tour, step } = active;
-  const s = tour.steps[step];
-  if (!s) return "";
-  // One step has no progress to report, and a single dot beside a lone button
-  // reads as a stray bullet rather than "you are here".
-  const dots =
-    tour.steps.length > 1
-      ? tour.steps.map((_, i) => `<span class="tour-dot ${i === step ? "on" : ""}"></span>`).join("")
-      : "";
-  const isLast = step >= tour.steps.length - 1;
-  /**
-   * One word of emphasis in a coachmark, written as *asterisks* in the copy.
-   *
-   * The bodies are escaped, not trusted HTML, and that stays true: the escape
-   * runs FIRST and the emphasis is applied to the already-safe string, so the
-   * only tags that can reach the page are the two this line writes. Anything
-   * else an author types is still inert text.
-   */
-  const tourEmphasis = (body: string): string =>
-    escapeHtml(body).replace(/\*([^*]+)\*/g, "<em>$1</em>");
-  /**
-   * One button in the footer, and a way out in the corner.
-   *
-   * This used to be a pair - "Got it" beside "Check it out now!" - which put
-   * two buttons of similar weight side by side and made the reader choose
-   * between them, when only one of the two is the thing the coachmark exists
-   * to say. The close moved to the corner, where a dismissal belongs and where
-   * nobody has to read it to get past it. A multi-step tour keeps Next in the
-   * one footer slot until its last step.
-   *
-   * Icon-only, against the house rule that every button pairs an icon with a
-   * label: a corner close is the one control whose meaning is carried entirely
-   * by its position, and the label would be louder than the thing it closes.
-   * It carries a title and an aria-label so it is still named to anyone who
-   * hovers it or hears it.
-   */
-  const primary = isLast
-    ? `<button class="tour-go" data-action="tour-go" data-tour="${tour.id}" data-target="${escapeHtml(s.selector)}" ${s.go ? `data-href="${escapeHtml(s.go)}"` : ""}>${icon("chevronRight", 15)} Check it out now!</button>`
-    : `<button class="tour-next" data-action="tour-next" data-tour="${tour.id}" data-step="${step}" data-len="${tour.steps.length}">${icon("chevronRight", 15)} Next</button>`;
-  return `
-  <div class="tour-pop" data-target="${escapeHtml(s.selector)}">
-    <div class="tour-pop-arrow"></div>
-    <div class="tour-head">
-      ${s.title ? `<h4 class="tour-title">${escapeHtml(s.title)}</h4>` : ""}
-      <button class="tour-close" data-action="tour-dismiss" data-tour="${tour.id}" title="Dismiss" aria-label="Dismiss">${icon("close", 15)}</button>
-    </div>
-    <p class="tour-body">${tourEmphasis(s.body)}</p>
-    <div class="tour-foot">
-      <span class="tour-dots">${dots}</span>
-      <span class="tour-btns">
-        ${primary}
-      </span>
-    </div>
-  </div>`;
-}
+// No coachmarks. There used to be first-visit popovers pointing at Add unit,
+// the fleet name, Sync and the sample factions ("Check it out now!"). They
+// covered the controls they described, took the first tap meant for them and
+// chirped at people who already know the game; the mobile review cut them.
 
 // App-wide Options dialog: back up / restore / wipe the browser-stored data,
 // plus the about-and-links that also live in the footer. Rendered from the root
@@ -5023,5 +4961,5 @@ export function render(state: AppState): string {
   })();
   // The cropper renders last: it opens OVER the emblem picker that launched it,
   // and hands back to it on cancel.
-  return `${body}${optionsModal(state)}${syncModal(state)}${emblemModal(state)}${newOutfitModal(state)}${confirmModal(state)}${cropModal(state)}${tourPopover(state)}`;
+  return `${body}${optionsModal(state)}${syncModal(state)}${emblemModal(state)}${newOutfitModal(state)}${confirmModal(state)}${cropModal(state)}`;
 }

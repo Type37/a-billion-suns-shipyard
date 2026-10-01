@@ -6,7 +6,6 @@ import { armTapGuard, wireActions } from "./actions.ts";
 import { decodeShare, decodeSharePayload, sharePayloadFromHash, type DecodedShare } from "./share.ts";
 import { loadLists, persistCustomFactions, persistLists } from "./storage.ts";
 import { runDecode, DIGIT_POOL } from "./write-on.ts";
-import { visibleAnchor } from "./tours.ts";
 import { renderMarkdown } from "./richtext.ts";
 import { FleetSync } from "./fleet-sync.ts";
 import { syncCropper } from "./cropper.ts";
@@ -451,7 +450,6 @@ function paint(): void {
   document.body.dataset["view"] = store.getState().route.view;
   placeFleetMenus();
   enhanceNav();
-  positionTour();
 
   const manifest = document.querySelector(".mf-manifest");
   if (manifest) manifest.scrollTop = manifestScroll;
@@ -1195,79 +1193,6 @@ function animateFactionTitle(): void {
   animateStatGlyphs();
 }
 
-// The tour popover is a real DOM node in the rendered string, but it targets
-// an arbitrary element elsewhere on the page, so it is positioned here (like
-// enhanceNav's pill) rather than laid out purely in CSS.
-function positionTour(): void {
-  const pop = document.querySelector<HTMLElement>(".tour-pop");
-  if (!pop) return;
-  // Out of the way before the hit test, so a popover the last placement left
-  // sitting over its own target cannot be read as something covering it.
-  pop.style.display = "none";
-  pop.classList.remove("placed");
-
-  const anchor = visibleAnchor(pop.dataset["target"]);
-  if (!anchor) return; // Target not on this page yet (e.g. an empty roster); stays hidden.
-
-  const a = anchor.getBoundingClientRect();
-  const gap = 14;
-  pop.style.display = "flex";
-  const p = pop.getBoundingClientRect();
-
-  // Side placement needs the popover's full width clear of the anchor on one
-  // side or the other. On a phone neither side has it, and the old code fell
-  // through to a clamp that centred the popover ON its own target - the
-  // Compendium's coachmark sat squarely over the search box it was describing.
-  // When neither side fits, go below the anchor instead (or above it, if the
-  // anchor is low on the screen), which always leaves the target visible.
-  const fitsRight = a.right + gap + p.width <= window.innerWidth - 12;
-  const fitsLeft = a.left - gap - p.width >= 12;
-  let left: number;
-  let top: number;
-  let arrowRight = false;
-  let arrowV = "";
-
-  if (fitsRight || fitsLeft) {
-    left = fitsRight ? a.right + gap : a.left - p.width - gap;
-    arrowRight = !fitsRight;
-    top = a.top + a.height / 2 - p.height / 2;
-  } else {
-    // Under the anchor by preference; flip above when there is no room under.
-    const below = a.bottom + gap;
-    const roomBelow = below + p.height <= window.innerHeight - 12;
-    top = roomBelow ? below : a.top - p.height - gap;
-    arrowV = roomBelow ? "arrow-top" : "arrow-bottom";
-    // Line the popover up with the anchor's left edge where it can.
-    left = a.left;
-  }
-  left = Math.max(12, Math.min(left, window.innerWidth - p.width - 12));
-  top = Math.max(12, Math.min(top, window.innerHeight - p.height - 12));
-
-  pop.style.left = `${left}px`;
-  pop.style.top = `${top}px`;
-  pop.classList.toggle("arrow-right", arrowRight);
-  pop.classList.toggle("arrow-top", arrowV === "arrow-top");
-  pop.classList.toggle("arrow-bottom", arrowV === "arrow-bottom");
-
-  // The arrow sits at the popover's midpoint in CSS, which is only the anchor's
-  // midpoint when nothing clamped. A tall popover beside a topbar link gets
-  // pushed down to the 12px margin and its arrow then points at the space under
-  // the tab rather than the tab, so aim it at the anchor explicitly. Kept 14px
-  // clear of the corners, where a diamond straddling two borders looks broken.
-  const arrow = pop.querySelector<HTMLElement>(".tour-pop-arrow");
-  if (arrow) {
-    const pin = (v: number, span: number) => Math.max(14, Math.min(v, span - 14));
-    if (arrowV) {
-      arrow.style.top = "";
-      arrow.style.left = `${pin(a.left + a.width / 2 - left, p.width) - 8}px`;
-    } else {
-      arrow.style.left = "";
-      arrow.style.top = `${pin(a.top + a.height / 2 - top, p.height)}px`;
-    }
-  }
-  pop.classList.add("placed");
-}
-
 // A popover you opened by accident had exactly one way out: find the small
 // summary again, or press Escape. A phone has no Escape key, so on the device
 // where the mis-tap is most likely the dismissal was the least available - and
@@ -1298,7 +1223,6 @@ document.addEventListener(
 
 window.addEventListener("resize", () => {
   enhanceNav();
-  positionTour();
   // The pinned header wraps to a second line as the viewport narrows, and the
   // roster panel sticks below it, so its height has to be re-read on resize.
   measureStickyHeader();
@@ -1306,27 +1230,6 @@ window.addEventListener("resize", () => {
   // guide lands. Re-paginating re-fits first, so this is the whole job.
   paginatePrintPreview();
 });
-
-// Placed against fallback metrics on the first paint, so it lands ~60px adrift
-// of a target that the real fonts then move. One re-aim once they are in.
-if (document.fonts) void document.fonts.ready.then(() => positionTour());
-
-// The coachmark is position:fixed and its anchor usually is not - the topbar
-// scrolls away with the page - so it has to be re-aimed as the page moves or it
-// ends up pointing at whatever has slid under it. Capture, so it also follows
-// anchors inside a scrolling panel; one frame at a time, since this measures.
-let tourFrame = 0;
-window.addEventListener(
-  "scroll",
-  () => {
-    if (tourFrame) return;
-    tourFrame = requestAnimationFrame(() => {
-      tourFrame = 0;
-      positionTour();
-    });
-  },
-  { passive: true, capture: true },
-);
 
 // The reading-progress bar. Resize as well as scroll: rotating a phone changes
 // both the viewport height and the page's own height, so the same scrollY is a

@@ -60,7 +60,6 @@ import { randomCorpName } from "../src/corp-names.ts";
 import { creditsText } from "./format.ts";
 import { writeOnInput } from "./write-on.ts";
 import { shareUrl } from "./share.ts";
-import { visibleAnchor } from "./tours.ts";
 import { activeCropper } from "./cropper.ts";
 import { putImage } from "./image-store.ts";
 import { fleetToMarkdown } from "./export-text.ts";
@@ -488,22 +487,6 @@ function firstImage(dt: DataTransfer | null): File | null {
     if (f.type.startsWith("image/")) return f;
   }
   return null;
-}
-
-// ---------------------------------------------------------------------------
-// First-visit coachmark tours
-// ---------------------------------------------------------------------------
-
-/** Marks a tour as seen for good (dedup, since dismiss and the last "next" both call this) and closes it. */
-function finishTour(tourId: string): void {
-  store.setState((s) => {
-    const toursSeen = s.onboarding.toursSeen.includes(tourId)
-      ? s.onboarding.toursSeen
-      : [...s.onboarding.toursSeen, tourId];
-    const onboarding = { ...s.onboarding, toursSeen };
-    persistOnboarding(onboarding);
-    return { ...s, onboarding, ui: { ...s.ui, tour: undefined } };
-  });
 }
 
 // ---------------------------------------------------------------------------
@@ -1262,55 +1245,6 @@ function dispatchAction(target: HTMLElement): void {
       clearAllData();
       location.hash = "#/";
       location.reload();
-      break;
-    }
-    case "tour-next": {
-      const tourId = target.dataset["tour"];
-      const step = Number(target.dataset["step"]);
-      const len = Number(target.dataset["len"]);
-      if (!tourId) return;
-      if (step + 1 >= len) {
-        finishTour(tourId);
-      } else {
-        store.setState((s) => ({ ...s, ui: { ...s.ui, tour: { tourId, step: step + 1 } } }));
-      }
-      break;
-    }
-    case "tour-dismiss": {
-      const tourId = target.dataset["tour"];
-      if (!tourId) return;
-      finishTour(tourId);
-      break;
-    }
-    case "tour-go": {
-      const tourId = target.dataset["tour"];
-      if (!tourId) return;
-      const href = target.dataset["href"];
-      const sel = target.dataset["target"];
-      // Close first. That repaints the page, so the element resolved below is
-      // the live one and not a node the re-render is about to throw away.
-      finishTour(tourId);
-      // "Check it out now!" on the examples coachmark IS the yes. It loads the
-      // three factions and then walks you to the page they landed on, because
-      // arriving at Custom Rules to be asked the same question a second time is
-      // not a confirmation, it is a stutter. Closing the coachmark is the no,
-      // and it is silent: nothing loads and nothing is asked again.
-      if (tourId === "example-factions") setExampleFactions(true);
-      if (href) {
-        location.hash = href;
-        break;
-      }
-      // No route to send them to means the feature is already on this screen,
-      // so put them in it: a field takes focus, anything else takes the click
-      // the coachmark was describing.
-      const el = visibleAnchor(sel);
-      if (!el) break;
-      if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
-        el.focus();
-        el.select();
-      } else {
-        el.click();
-      }
       break;
     }
     case "toggle-carry": {

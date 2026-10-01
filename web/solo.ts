@@ -194,8 +194,14 @@ export function soloListView(state: AppState): string {
         </div>
         <div class="outfit-card-actions">
           <a class="ghost-btn" href="#/solo/${o.id}">${icon("chevronRight", 15)} Continue</a>
-          <button class="ghost-btn" data-action="duplicate-outfit" data-id="${o.id}" title="Duplicate">${icon("duplicate", 15)}</button>
-          <button class="ghost-btn danger" data-action="delete-outfit" data-id="${o.id}" title="Delete">${icon("trash", 15)}</button>
+          ${/* Labelled, in a Carbon menu like the fleet cards: the two bare icons
+                explained themselves only in hover text, which a phone never shows. */ ""}
+          <cds-menu-button class="card-menu" label="Actions" kind="ghost" size="sm" menu-alignment="bottom-end">
+            <cds-menu>
+              <cds-menu-item label="Duplicate" data-action="duplicate-outfit" data-id="${o.id}"></cds-menu-item>
+              <cds-menu-item label="Delete" kind="danger" data-action="delete-outfit" data-id="${o.id}"></cds-menu-item>
+            </cds-menu>
+          </cds-menu-button>
         </div>
       </article>`;
     })

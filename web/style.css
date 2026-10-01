@@ -883,25 +883,9 @@ button { font-family: inherit; }
 .fleet-card-name:focus-visible { outline: none; }
 .fleet-card:has(.fleet-card-name:focus-visible) { outline: 2px solid var(--red); outline-offset: 1px; }
 .fleet-card-cost { grid-column: 3; grid-row: 1; align-self: start; justify-self: end; padding-right: 6px; font-family: var(--display); font-weight: 800; font-size: 17px; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.fleet-card-faction { grid-column: 2 / 4; grid-row: 2; min-width: 0; padding-right: 136px; font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-2); }
-.fleet-card-mode { grid-column: 2 / 4; grid-row: 3; padding-right: 136px; font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--blue); }
-.fleet-card-actions { grid-column: 2 / 4; grid-row: 2 / 4; justify-self: end; align-self: end; position: relative; z-index: 1; display: inline-flex; gap: 0; flex-wrap: nowrap; }
-/* All three card actions are icon-only, Delete included. Delete used to carry a
-   visible "DELETE" label and a red keyline so it could not be mistaken on a
-   touchscreen, which made it the loudest thing on every fleet card (Jet, October
-   2026: "make delete smaller"). It is now the same 34px square as its
-   neighbours, red glyph instead of grey; the confirm dialog behind it is the
-   real guard, and there is deliberately no undo. */
-.card-act {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 34px; height: 34px; padding: 0; cursor: pointer;
-  background: none; border: 1px solid transparent; color: var(--ink-3);
-  transition: color 0.12s ease, background 0.12s ease, border-color 0.12s ease;
-}
-@media (hover: hover) { .card-act:hover { color: var(--blue); border-color: var(--hair); background: var(--blue-wash); } }
-@media (hover: hover) { .card-act.is-danger:hover { color: var(--red); border-color: var(--red); background: transparent; } }
-.card-act:focus-visible { outline: 2px solid var(--red); outline-offset: 1px; }
-.card-act.is-danger { color: var(--red-deep); }
+.fleet-card-faction { grid-column: 2 / 4; grid-row: 2; min-width: 0; padding-right: 104px; font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.fleet-card-mode { grid-column: 2 / 4; grid-row: 3; padding-right: 104px; font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--blue); }
+.fleet-card-actions { grid-column: 2 / 4; grid-row: 2 / 4; justify-self: end; align-self: end; }
 
 .fleets-empty { margin-top: 26px; font-family: var(--display); font-weight: 800; font-size: clamp(20px, 3vw, 26px); color: var(--ink); line-height: 1.25; }
 .fleets-empty-sub { font-family: var(--sans); font-size: 13.5px; font-weight: 500; color: var(--ink-2); }
@@ -2450,6 +2434,7 @@ button { font-family: inherit; }
 .game-ticks-label { font-family: var(--sans); font-size: 11px; font-weight: 700; color: var(--ink-3); margin-left: 4px; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
 .outfit-card-actions { display: flex; gap: 6px; align-items: center; padding: 0 12px 12px; margin-top: auto; }
 .outfit-card-actions .ghost-btn:first-child { margin-right: auto; }
+.outfit-card-actions .card-menu { margin-left: auto; }
 
 /* ---------------------------------------------------------------- solo shell
 
@@ -8082,3 +8067,11 @@ cds-text-input.limit-custom { width: 6.5rem; }
   .cmd-pip.cmd-pip { flex: 1 1 0; width: auto; min-width: 28px; max-width: 44px; }
   .cmd-pip .icon { width: 18px; height: 18px; }
 }
+
+/* Per-card "Actions" menus (fleet cards, Solo outfits): Carbon's ghost menu
+   button with the same keyline as the builder's, so it reads as a control. */
+cds-menu-button.card-menu { border: 1px solid var(--blue); position: relative; z-index: 1; }
+/* An open card menu sits above the next card's own Actions button, which
+   otherwise painted over the menu's last items (both are z-index 1). Carbon
+   reflects the open state as the _open attribute. */
+cds-menu-button.card-menu[_open] { z-index: 60; }

@@ -644,7 +644,9 @@ function fleetsView(state: AppState): string {
   // was cut: the list is already sorted newest first, and the example fleets
   // all claimed "Updated January 1, 2026", which was never true. The whole
   // card is the link to the fleet (the name's ::after covers it); the actions
-  // sit above that layer.
+  // sit above that layer, in one labelled Carbon menu (the same "Actions" as the
+  // builder header). They were three bare icons whose only words were hover
+  // text, which a phone never shows.
   const cards = lists
     .map((l) => {
       const faction = findFaction(l.fleet.factionId, state.customFactions);
@@ -656,11 +658,13 @@ function fleetsView(state: AppState): string {
         <span class="fleet-card-cost">${credits(total)}</span>
         <span class="fleet-card-faction">${escapeHtml(faction?.name ?? "Mixed forces")}</span>
         <span class="fleet-card-mode">${l.freePlay ? "Free Play" : MODE_LABEL[l.mode]}</span>
-        <span class="fleet-card-actions">
-          <button class="card-act" data-action="duplicate-list" data-id="${l.id}" title="Duplicate this fleet" aria-label="Duplicate this fleet">${icon("ix-duplicate", 18)}</button>
-          <button class="card-act" data-action="share-list" data-id="${l.id}" title="Copy a share link" aria-label="Copy a share link">${icon("ix-share", 18)}</button>
-          <button class="card-act is-danger" data-action="delete-list" data-id="${l.id}" title="Delete this fleet" aria-label="Delete this fleet">${icon("ix-trash", 18)}</button>
-        </span>
+        <cds-menu-button class="fleet-card-actions card-menu" label="Actions" kind="ghost" size="sm" menu-alignment="bottom-end">
+          <cds-menu>
+            <cds-menu-item label="Duplicate" data-action="duplicate-list" data-id="${l.id}"></cds-menu-item>
+            <cds-menu-item label="Share link" data-action="share-list" data-id="${l.id}"></cds-menu-item>
+            <cds-menu-item label="Delete" kind="danger" data-action="delete-list" data-id="${l.id}"></cds-menu-item>
+          </cds-menu>
+        </cds-menu-button>
       </article>`;
     })
     .join("");

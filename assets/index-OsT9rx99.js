@@ -688,8 +688,8 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         
         <h3 class="roster-section">Ships${r?` <span class="roster-warn">Outfit full</span>`:``}</h3>
         
-        <cds-progress-bar class="solo-budget" label="Budget" max="${Qu(e)}" value="${Math.min(t,Qu(e))}"
-          helper-text="${i?`¢${-n}k over ¢${Qu(e)}k`:`¢${t}k of ¢${Qu(e)}k`}" ${i?`status="error"`:``}></cds-progress-bar>
+        
+        <cds-progress-bar class="solo-budget" label="Budget ${i?`¢${-n}k over ¢${Qu(e)}k`:`¢${t}k of ¢${Qu(e)}k`}" max="${Qu(e)}" value="${Math.min(t,Qu(e))}" ${i?`status="error"`:``}></cds-progress-bar>
         
         <p class="panel-note">For each ¢1k you earned during this game, choose one of your surviving pilots to gain a Perk. Each pilot can only gain a maximum of one Perk after each game. When you gain a Perk, roll a D12. If you roll a Perk you already have, you can select and gain another Perk from your class list.</p>
         ${a||``}

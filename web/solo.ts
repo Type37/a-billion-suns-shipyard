@@ -346,7 +346,7 @@ function outfitTab(o: SavedOutfit): string {
           ${def ? "" : `<span class="roster-unit-glyph">${icon("warning", 20)}</span>`}
           <input class="unit-name-input" type="text" value="${escapeHtml(s.shipName ?? "")}" placeholder="${escapeHtml(def?.name ?? "Ship")}" aria-label="${escapeHtml(def?.name ?? "Ship")}" data-action="outfit-ship-name" data-ship="${s.id}" />
           <span class="roster-unit-cost">${ck(def?.cost ?? 0)}</span>
-          <cds-button has-main-content kind="danger-tertiary" size="lg" class="btn" data-action="outfit-remove-ship" data-ship="${s.id}">Remove${icon("trash", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+          <cds-button has-main-content kind="danger-ghost" size="lg" class="btn" data-action="outfit-remove-ship" data-ship="${s.id}">Remove${icon("trash", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>
         </div>
         ${
           // Same stat chips and weapons table the catalogue uses, so a ship
@@ -355,6 +355,11 @@ function outfitTab(o: SavedOutfit): string {
           // instead of stacking under a half-empty row.
           def ? `<div class="ru-spec">${statGuns(def)}</div>` : ""
         }
+        ${/* A Recon Ship in the outfit carries its scanner rule here too, so
+              the Long-Range Scan is in front of you while you play (Jet:
+              "remind players that the long range scanner is a thing"). p.202,
+              verbatim, same text as the catalogue row. */ ""}
+        ${def?.auxiliaryFitting === "Long-Range Scanners" ? `<p class="ship-rule">${ruleText(LONG_RANGE_SCANNERS_TEXT)}</p><p class="ship-rule">${ruleText(LONG_RANGE_SCAN_TEXT)}</p>` : ""}
         <!--
           The pilot's name sits with the pilot's class, on the same line, above
           the ability the class grants. It used to be a separate field UNDER the
@@ -379,7 +384,7 @@ function outfitTab(o: SavedOutfit): string {
   return `
   <main class="workspace solo-workspace">
     <section class="catalog">
-      <h3 class="catalog-title">Stock ship classes <span class="muted">costs in thousands of Juran credits</span></h3>
+      <h3 class="catalog-title">Stock ship classes</h3>
       <div class="catalog-list">${soloShipCatalog()}</div>
     </section>
     <aside class="roster">
@@ -688,10 +693,13 @@ export function soloOutfitView(state: AppState): string {
         <input class="fleet-name-input" type="text" value="${escapeHtml(o.name ?? "")}" data-action="outfit-name" /></label>
       ${/* An outfit is a roster and every other roster in this app prints, on
             the real print route (#/print-outfit), not window.print(). */ ""}
+      ${/* The tabs share the head row on a desktop (Jet: "put outfit/play/
+            campaign on that same line"); on a phone they take a row of their
+            own under the name. */ ""}
+      ${tabBar(o, tab)}
       <cds-button has-main-content kind="tertiary" size="lg" class="btn solo-print" href="#/print-outfit/${o.id}">Print${icon("print", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
     </div>
   </section>
-  ${tabBar(o, tab)}
   ${body}
   </div>`;
 }

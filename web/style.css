@@ -8693,7 +8693,12 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
    on every tab. Tabs: Carbon line tabs - sentence case, the selected one
    semibold over a 2px interactive line - instead of tracked caps over a pink
    bar. */
-.solo-head { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 16px; align-items: end; padding: 16px 0; }
+/* The name field is as wide as a name (Carbon: a field's width reflects the
+   expected length), not the whole row (Jet: "super long"); Print keeps right. */
+.solo-head { display: grid; grid-template-columns: 64px minmax(0, 28rem) minmax(0, 1fr) auto; gap: 16px; align-items: end; padding: 16px 0; border-bottom: 2px solid var(--hair-soft); }
+.solo-head .solo-print { grid-column: 4; }
+/* Tabs in the head row: their own 2px rule is the head's bottom rule. */
+.solo-head .solo-tabs { grid-column: 3; justify-self: start; align-self: end; border-bottom: none; padding: 0; margin-bottom: -16px; }
 .solo-head .solo-emblem { width: 64px; height: 64px; }
 .solo-head .solo-emblem .emblem, .solo-head .solo-emblem img { width: 48px; height: 48px; }
 .solo-name input {
@@ -8714,5 +8719,48 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
   .solo-head { grid-template-columns: 48px minmax(0, 1fr); }
   .solo-head .solo-emblem { width: 48px; height: 48px; }
   .solo-head .solo-emblem .emblem, .solo-head .solo-emblem img { width: 36px; height: 36px; }
-  .solo-head .solo-print { grid-column: 1 / -1; }
+  .solo-head .solo-print { grid-column: 1 / -1; grid-row: 2; justify-self: start; }
+  .solo-head .solo-tabs { grid-column: 1 / -1; grid-row: 3; margin-bottom: -16px; }
 }
+
+/* Solo Outfit tab body on Carbon (same pass as the head above).
+   - Budget, Spent, Left: three facts in Carbon's label-over-value form, no
+     boxed table of tracked caps.
+   - Section heads (Ships, Blips, Game log...) and the catalogue title:
+     heading-compact, sentence case, no coloured square.
+   - Ship cards, owned and stock: the Shipyard card's 1px keyline instead of a
+     3px black edge; "Add" in sentence case.
+   - Pilot class: Carbon-coloured segments (grey field, the chosen one ink).
+   - Name, call sign and perk fields: Carbon fields (grey ground, bottom line).
+   - Remove a ship: danger-ghost, not a red-bordered box on every card.
+   "costs in thousands of Juran credits" went from the catalogue title: the
+   ¢k beside every price says it. */
+.solo-outfit .band-readout { border: none; padding: 0; gap: 32px; background: none; }
+.solo-outfit .band-readout .readout { border: none; padding: 0; display: grid; gap: 4px; }
+.solo-outfit .readout-label { font-size: 13px; letter-spacing: 0; text-transform: none; font-weight: 400; color: var(--ink-2); }
+.solo-outfit .readout-value { font-size: 22px; }
+.solo-outfit .roster-section, .solo-outfit .catalog-title {
+  font: 600 16px/1.4 var(--sans); letter-spacing: 0; text-transform: none; color: var(--ink);
+  padding: 0 0 8px; margin: 24px 0 8px; border-bottom: 1px solid var(--hair-soft);
+}
+.solo-outfit .roster-section::before, .solo-outfit .catalog-title::before { content: none; display: none; }
+.solo-outfit .catalog-title { margin-top: 0; }
+.solo-outfit .ship-row, .solo-outfit .roster-unit { border: 1px solid var(--hair); border-left-width: 1px; padding: 16px; }
+.solo-outfit .add-cue { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: 14px; }
+.solo-outfit .pilot-picker { display: flex; flex-wrap: wrap; gap: 1px; background: var(--hair-soft); border: 1px solid var(--field-edge); }
+.solo-outfit .pilot-opt {
+  flex: 1 1 auto; border: none; background: var(--ground); color: var(--ink-2);
+  font-size: 14px; font-weight: 400; letter-spacing: 0; text-transform: none; min-height: 46px;
+}
+@media (hover: hover) { .solo-outfit .pilot-opt:hover { background: var(--cds-field-hover, #e8e8e8); color: var(--ink); } }
+.solo-outfit .pilot-opt.on { background: var(--ink); color: #fff; font-weight: 600; }
+.solo-outfit .unit-name-input, .solo-outfit .pilot-name-input, .solo-outfit .perk-select {
+  min-height: var(--tap); padding: 8px 12px; font-size: 16px; font-family: var(--sans);
+  border: none; border-bottom: 1px solid var(--field-edge); background: var(--ground); color: var(--ink);
+}
+.solo-outfit .unit-name-input:focus, .solo-outfit .pilot-name-input:focus, .solo-outfit .perk-select:focus { outline: 2px solid var(--focus); outline-offset: -2px; }
+.solo-outfit .pilot-name { text-transform: none; letter-spacing: 0; font-weight: inherit; color: inherit; font-size: 14px; }
+.solo-head .solo-tabs { overflow: visible; }
+/* The head's own rule is the divider; the old setup band's black line under
+   it doubled it. */
+#app > .solo-outfit > .solo-band { border-bottom: none; padding-top: 0; padding-bottom: 0; }

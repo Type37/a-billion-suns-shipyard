@@ -33,7 +33,7 @@ Read `CLAUDE.md` first. Its "Jet's rules for this app" section came out of a mob
 - **Fleet Sync (token)** works end to end: a write, read and delete against the live `dropfleet-builder` Firestore all returned 200 on 1 October.
 
 **Blocked, needs Jet:**
-- **Discord sign-in.** The app hides the button until the shared Worker accepts this app's return URL (`probeDiscord` in `web/fleet-sync.ts`). The Worker source in the Dropfleet repo already lists `/a-billion-suns-shipyard/` (`worker/discord-sync/src/index.js`, commit `13929d1`), but the deployed Worker predates it. Fix: `npx wrangler deploy` in `dropfleet-builder/worker/discord-sync`, logged in to Cloudflare. Nothing changes in this repo; the button appears by itself.
+- **Discord sign-in** is on. The shared Worker (`dfc-discord-sync`, Dropfleet repo `worker/discord-sync`) lists `/a-billion-suns-shipyard/` and was redeployed on 1 October 2026. The old startup probe that hid the button could never pass (`no-cors` + `redirect: "manual"` is rejected by the Fetch spec) and is gone; see the comment above `discordConfigured` in `web/fleet-sync.ts`.
 
 **In flight when this was written:**
 - Two audits were running against a frozen build: one played full games through fleet **Play mode** (rules against the Quick Reference, plus the CLAUDE.md screen rules), one went through every **Junkspace Solo** screen and proposes a structure for a redo. Jet: "i want a full redo of the solo play mode, but all of the solo mode screens need a shit ton of work." The redo starts from those two reports. If they are lost, rerun them: Playwright touch contexts, real taps, screenshot every finding.

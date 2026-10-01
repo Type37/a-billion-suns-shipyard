@@ -1381,11 +1381,6 @@ FleetSync.onChange = (lists) => store.setState((s) => ({ ...s, lists }));
 // Coming back from Discord's sign-in page replaces that: discordFinish() joins
 // the account's document, which is a sync in itself. The Sync dialog opens on
 // the result either way, so a failure is said where the button was pressed.
-// Show Discord sign-in the moment the Worker accepts this app (see
-// probeDiscord): a repaint once the answer is in, nothing if it is no.
-void FleetSync.probeDiscord().then((ok) => {
-  if (ok) store.setState((s) => ({ ...s }));
-});
 const discordDone = FleetSync.discordFinish();
 if (discordDone) {
   const openSync = () => store.setState((s) => ({ ...s, lists: loadLists(), ui: { ...s.ui, modal: { kind: "sync" } } }));

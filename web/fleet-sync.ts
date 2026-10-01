@@ -571,35 +571,21 @@ async function deleteRemote(): Promise<boolean> {
  * DISCORD_WORKER empty means no button renders and nothing here runs. */
 const DISCORD_WORKER = "https://dfc-discord-sync.discord-sync.workers.dev";
 
-/* The button shows only once the Worker accepts this app. Its allowedReturn()
- * has to list `/a-billion-suns-shipyard/` and be redeployed (`npx wrangler
- * deploy` in Dropfleet's worker/discord-sync); until then it answers this
- * app's sign-in with a bare "Bad request" page, which is worse than no button.
+/* The Worker's allowedReturn() lists `/a-billion-suns-shipyard/` (Dropfleet's
+ * worker/discord-sync, deployed 1 October 2026), so the button shows whenever
+ * DISCORD_WORKER is set.
  *
- * So rather than a flag someone has to remember to flip, the app asks at
- * startup. /login only builds a redirect, it changes nothing, and the two
- * answers are distinguishable even without CORS: an allowed return comes back
- * as a redirect ("opaqueredirect" under redirect: "manual"), a refused one as
- * a plain 400 ("opaque"). Unreachable counts as refused. */
-let discordAllowed = false;
-async function probeDiscord(): Promise<boolean> {
-  if (!DISCORD_WORKER || !supported()) return false;
-  try {
-    const ret = location.href.split("#")[0] ?? location.href;
-    const res = await fetch(`${DISCORD_WORKER}/login?state=probeprobeprobe01&return=${encodeURIComponent(ret)}`, {
-      mode: "no-cors",
-      redirect: "manual",
-      cache: "no-store",
-    });
-    discordAllowed = res.type === "opaqueredirect";
-  } catch {
-    discordAllowed = false;
-  }
-  return discordAllowed;
-}
-
+ * There used to be a startup probe that asked /login for a redirect and showed
+ * the button only if one came back. It could never succeed: it fetched with
+ * mode "no-cors" and redirect "manual", a pair the Fetch spec rejects outright,
+ * so every browser threw "Failed to fetch" and the button stayed hidden even
+ * after the Worker was fixed. Without CORS headers on the Worker there is no
+ * request that tells an allowed return from a refused one (with redirects
+ * followed both come back "opaque"), so the probe was removed rather than
+ * repaired. If the Worker ever drops this path, the sign-in lands on its
+ * "Bad request" page; the fix then is in the Worker, not here. */
 function discordConfigured(): boolean {
-  return discordAllowed && !!DISCORD_WORKER && supported();
+  return !!DISCORD_WORKER && supported();
 }
 
 function discordUser(): DiscordUser | null {
@@ -717,7 +703,6 @@ export const FleetSync = {
   recordDeleted,
   linkedToken: loadSyncLinked,
   discordConfigured,
-  probeDiscord,
   discordUser,
   discordSignIn,
   discordFinish,

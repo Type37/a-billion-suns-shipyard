@@ -3814,8 +3814,34 @@ function playView(state: AppState): string {
     }
 
   </main>
+  ${isOver ? "" : playDock(play, maxRound, atLastPhase, currentPhase?.name ?? "")}
   ${toast(state)}
   ${footer()}`;
+}
+
+/**
+ * Play mode's bar on a phone: fixed to the bottom of the screen, in thumb
+ * reach, one row. It replaces pinning the whole header block to the top, which
+ * held the round, print/reset/end, the four phase tabs, the token row and
+ * Next phase, and measured 282px of a 664px portrait screen (42%) and 239 of
+ * 342 in landscape (70%): the fleet you were playing was a strip at the
+ * bottom. The bar carries only what you touch between every action: where you
+ * are, spend or take back a CMD token, and Next phase. The full header still
+ * sits at the top of the page and scrolls away. Desktop never shows the bar.
+ * Buttons are Carbon's.
+ */
+function playDock(play: PlayState, maxRound: number, atLastPhase: boolean, phaseName: string): string {
+  const phase = phaseName.replace(" Phase", "");
+  return `
+  <div class="play-dock" role="region" aria-label="Game controls">
+    <p class="play-dock-where"><span class="play-dock-round">Round ${play.round} of ${maxRound}</span><span class="play-dock-phase">${escapeHtml(phase)}</span></p>
+    <div class="play-dock-cmd" role="group" aria-label="CMD tokens">
+      <cds-button kind="ghost" size="lg" data-action="play-cmd" data-delta="-1" aria-label="Spend a CMD token" ${play.cmd <= 0 ? "disabled" : ""}>${icon("minus", 18)}</cds-button>
+      <span class="play-dock-cmd-n"><b>${play.cmd}</b><span>CMD</span></span>
+      <cds-button kind="ghost" size="lg" data-action="play-cmd" data-delta="1" aria-label="Take a CMD token back">${icon("plus", 18)}</cds-button>
+    </div>
+    <cds-button kind="primary" size="lg" class="play-dock-next" data-action="play-next">${atLastPhase ? "End game" : "Next phase"}</cds-button>
+  </div>`;
 }
 
 // ---------------------------------------------------------------------------

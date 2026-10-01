@@ -16,6 +16,7 @@ import "./style.css";
 // library, so only what the app uses is bundled. Colours are mapped to ours in
 // style.css ("Carbon"), fonts are inherited.
 import "@carbon/web-components/es/components/modal/index.js";
+import "@carbon/web-components/es/components/button/index.js";
 
 // Keep every Markdown notes editor's preview in step with its textarea as the
 // user types. Uncontrolled on purpose (see richtext.ts): typing must not go

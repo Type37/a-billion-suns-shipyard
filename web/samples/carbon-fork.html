@@ -137,6 +137,97 @@ h1, h2, h3, p { margin: 0; }
 .mark-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
 
 .pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: var(--spacing-07); align-items: start; }
+
+/* Segmented control: Astryx's behaviour, Carbon's tokens. One always selected,
+   2 to 5 segments, equal widths, lg 48. */
+.seg { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; border: 1px solid var(--border-strong); background: var(--field); }
+.seg.fill { display: grid; }
+.seg button { height: 46px; border: none; border-left: 1px solid var(--border-subtle); background: none; padding: 0 var(--spacing-05); font: 400 14px/18px var(--sans); letter-spacing: 0.16px; color: var(--text-secondary); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: var(--spacing-03); }
+.seg button:first-child { border-left: none; }
+.seg button:hover { background: var(--field-hover); color: var(--text-primary); }
+.seg button[aria-checked="true"] { background: var(--text-primary); color: #fff; font-weight: 600; }
+.seg button[aria-checked="true"] + button { border-left-color: transparent; }
+.seg button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+
+/* Radio and checkbox */
+.choice-group { border: none; padding: 0; margin: 0; display: grid; gap: var(--spacing-03); }
+.choice-group legend { padding: 0; margin-bottom: var(--spacing-03); color: var(--text-secondary); }
+.choice { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: var(--spacing-03); align-items: start; cursor: pointer; }
+.choice input { appearance: none; margin: 0; width: 20px; height: 20px; border: 1px solid var(--icon-primary); border-radius: 50%; display: grid; place-items: center; cursor: pointer; }
+.choice input:checked::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--icon-primary); }
+.choice input:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.choice.box { grid-template-columns: 16px minmax(0, 1fr); }
+.choice.box input { width: 16px; height: 16px; border-radius: 2px; margin-top: 1px; }
+.choice.box input:checked { background: var(--icon-primary); }
+.choice.box input:checked::after { width: 9px; height: 5px; border-radius: 0; background: none; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: translateY(-1px) rotate(-45deg); }
+.choice-group.box { gap: var(--spacing-02); }
+
+/* Toggle, default size */
+.toggle { display: grid; gap: var(--spacing-05); justify-items: start; }
+.toggle-row { display: inline-flex; align-items: center; gap: var(--spacing-03); cursor: pointer; }
+.toggle-row input { appearance: none; margin: 0; width: 48px; height: 24px; border-radius: 12px; background: #8d8d8d; position: relative; cursor: pointer; }
+.toggle-row input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform 110ms cubic-bezier(0.2, 0, 0.38, 0.9); }
+.toggle-row input:checked { background: #24a148; }
+.toggle-row input:checked::after { transform: translateX(24px); }
+.toggle-row input:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+
+/* Selectable tiles */
+.sel-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 208px), 1fr)); gap: var(--spacing-05); }
+.sel-tile { position: relative; display: grid; gap: var(--spacing-02); align-content: start; background: var(--layer-01); padding: var(--spacing-05) var(--spacing-09) var(--spacing-05) var(--spacing-05); border: 1px solid transparent; cursor: pointer; min-height: 64px; }
+.sel-tile:hover { background: var(--layer-hover-01); }
+.sel-tile input { position: absolute; top: var(--spacing-05); right: var(--spacing-05); margin: 0; appearance: none; width: 16px; height: 16px; border: 1px solid var(--icon-primary); border-radius: 50%; display: grid; place-items: center; cursor: pointer; }
+.sel-tile input:checked { background: var(--icon-primary); }
+.sel-tile input:checked::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+.sel-tile input[type=checkbox] { border-radius: 2px; }
+.sel-tile input[type=checkbox]:checked::after { width: 8px; height: 4px; border-radius: 0; background: none; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: translateY(-1px) rotate(-45deg); }
+.sel-tile:has(input:checked) { border-color: #161616; }
+.sel-tile:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: -2px; }
+
+/* Line tabs, md 40 */
+.tabs { display: flex; flex-wrap: wrap; border-bottom: 2px solid var(--border-subtle); }
+.tabs button { height: 40px; margin-bottom: -2px; border: none; border-bottom: 2px solid transparent; background: none; padding: 0 var(--spacing-05); font: 400 14px/18px var(--sans); letter-spacing: 0.16px; color: var(--text-secondary); cursor: pointer; }
+.tabs button:hover { color: var(--text-primary); border-bottom-color: var(--border-strong); }
+.tabs button[aria-selected="true"] { color: var(--text-primary); font-weight: 600; border-bottom-color: var(--interactive); }
+.tabs button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+
+/* Content switcher, low contrast, md 40 */
+.switch { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; border: 1px solid var(--border-strong); border-radius: 4px; overflow: hidden; }
+.switch button { height: 38px; border: none; border-left: 1px solid var(--border-subtle); background: var(--layer-01); padding: 0 var(--spacing-05); font: 400 14px/18px var(--sans); letter-spacing: 0.16px; color: var(--text-secondary); cursor: pointer; }
+.switch button:first-child { border-left: none; }
+.switch button:hover { background: var(--layer-hover-01); color: var(--text-primary); }
+.switch button[aria-selected="true"] { background: var(--background); color: var(--text-primary); font-weight: 600; }
+.switch button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+
+/* Progress bar, big */
+.pbar { display: grid; gap: var(--spacing-03); max-width: 448px; }
+.pbar-track { height: 8px; background: var(--border-subtle); }
+.pbar-track > span { display: block; height: 100%; background: var(--interactive); }
+
+/* Progress indicator, horizontal */
+.steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); list-style: none; margin: 0; padding: 0; }
+.steps li { border-top: 2px solid var(--border-subtle); padding: var(--spacing-03) var(--spacing-03) 0 0; display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: var(--spacing-03); align-items: start; }
+.steps li.done, .steps li.current { border-top-color: var(--interactive); }
+.steps .dot { width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--interactive); margin-top: 1px; }
+.steps li.done .dot { background: var(--interactive); }
+.steps li.current .dot { border-width: 5px; }
+.steps li.todo .dot { border-color: var(--text-secondary); }
+.steps li.current .label { font-weight: 600; }
+
+/* Tags, md 24, read-only */
+.tags { display: flex; flex-wrap: wrap; gap: var(--spacing-03); }
+.tag { min-height: 24px; display: inline-flex; align-items: center; padding: 0 var(--spacing-03); border-radius: 16px; font: 400 12px/16px var(--sans); letter-spacing: 0.32px; }
+.tag.blue { background: #d0e2ff; color: #0043ce; }
+.tag.gray { background: #e0e0e0; color: #393939; }
+.tag.red { background: #ffd7d9; color: #a2191f; }
+.tag.green { background: #a7f0ba; color: #0e6027; }
+
+/* Inline notification, low contrast */
+.note { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: var(--spacing-05); align-items: start; padding: var(--spacing-05); border-left: 3px solid; min-height: 48px; max-width: 608px; }
+.note.error { background: #fff1f1; border-color: #da1e28; }
+
+.gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 448px), 1fr)); gap: var(--spacing-09) var(--spacing-07); align-items: start; }
+.gallery > div { display: grid; gap: var(--spacing-03); align-content: start; }
+.cap { color: var(--text-secondary); }
 </style>
 </head>
 <body>
@@ -240,6 +331,135 @@ h1, h2, h3, p { margin: 0; }
   </div>
 </section>
 
+<section class="gallery">
+  <div>
+    <span class="label-01 cap">Era</span>
+    <div class="seg" role="radiogroup" aria-label="Era">
+      <button type="button" role="radio" aria-checked="true">Armageddon</button>
+      <button type="button" role="radio" aria-checked="false">Age of Unity</button>
+      <button type="button" role="radio" aria-checked="false">Hypergrowth</button>
+    </div>
+  </div>
+  <div>
+    <span class="label-01 cap">Credits limit</span>
+    <div class="seg fill" role="radiogroup" aria-label="Credits limit">
+      <button type="button" role="radio" aria-checked="false">¢300</button>
+      <button type="button" role="radio" aria-checked="true">¢400</button>
+      <button type="button" role="radio" aria-checked="false">¢500</button>
+      <button type="button" role="radio" aria-checked="false">No limit</button>
+      <button type="button" role="radio" aria-checked="false">Custom</button>
+    </div>
+  </div>
+  <div>
+    <span class="label-01 cap">Position</span>
+    <div class="seg" role="radiogroup" aria-label="Position">
+      <button type="button" role="radio" aria-checked="true">Reserve</button>
+      <button type="button" role="radio" aria-checked="false">Jumped in</button>
+    </div>
+  </div>
+  <div>
+    <span class="label-01 cap">View</span>
+    <div class="switch" role="tablist" aria-label="View">
+      <button type="button" role="tab" aria-selected="true">Table</button>
+      <button type="button" role="tab" aria-selected="false">Compare</button>
+    </div>
+  </div>
+  <div>
+    <fieldset class="choice-group">
+      <legend class="label-01">Paper</legend>
+      <label class="choice body-compact-01"><input type="radio" name="paper" checked />Letter</label>
+      <label class="choice body-compact-01"><input type="radio" name="paper" />A4</label>
+    </fieldset>
+  </div>
+  <div>
+    <fieldset class="choice-group box">
+      <legend class="label-01">Print</legend>
+      <label class="choice box body-compact-01"><input type="checkbox" checked />Trackers</label>
+      <label class="choice box body-compact-01"><input type="checkbox" checked />Rules</label>
+      <label class="choice box body-compact-01"><input type="checkbox" />Ink saver</label>
+    </fieldset>
+  </div>
+  <div class="toggle">
+    <span class="label-01 cap">Sample custom factions</span>
+    <label class="toggle-row body-compact-01"><input type="checkbox" role="switch" checked /><span>On</span></label>
+  </div>
+  <div>
+    <span class="label-01 cap">Phase</span>
+    <ol class="steps body-compact-01">
+      <li class="done"><span class="dot"></span><span class="label">Command</span></li>
+      <li class="current"><span class="dot"></span><span class="label">Jump</span></li>
+      <li class="todo"><span class="dot"></span><span class="label">Tactical</span></li>
+      <li class="todo"><span class="dot"></span><span class="label">End</span></li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <div class="tabs" role="tablist" aria-label="Outfit">
+    <button type="button" role="tab" aria-selected="true">Outfit</button>
+    <button type="button" role="tab" aria-selected="false">Play</button>
+    <button type="button" role="tab" aria-selected="false">Campaign</button>
+  </div>
+</section>
+
+<section style="display: grid; gap: var(--spacing-07)">
+  <fieldset class="choice-group">
+    <legend class="label-01">Faction</legend>
+    <div class="sel-tiles">
+      <label class="sel-tile"><input type="radio" name="faction" checked /><span class="heading-02">The Vyke</span><span class="body-compact-01 cap">Armageddon</span></label>
+      <label class="sel-tile"><input type="radio" name="faction" /><span class="heading-02">The Ordinate</span><span class="body-compact-01 cap">Age of Unity</span></label>
+      <label class="sel-tile"><input type="radio" name="faction" /><span class="heading-02">Heavy Industries</span><span class="body-compact-01 cap">Hypergrowth</span></label>
+      <label class="sel-tile"><input type="radio" name="faction" /><span class="heading-02">Golem Mega-Systems</span><span class="body-compact-01 cap">Age of Unity</span></label>
+    </div>
+  </fieldset>
+  <fieldset class="choice-group">
+    <legend class="label-01">Personnel</legend>
+    <div class="sel-tiles">
+      <label class="sel-tile"><input type="checkbox" checked /><span class="heading-02">Chief Engineer</span><span class="body-compact-01 cap">Units in this unit's battlegroup can use the Power to Engines command for 0 CMD once per Round.</span></label>
+      <label class="sel-tile"><input type="checkbox" /><span class="heading-02">Seasoned Captain</span><span class="body-compact-01 cap">Units in this unit's battlegroup can use the Red Alert command for 0 CMD once per Round.</span></label>
+      <label class="sel-tile"><input type="checkbox" checked /><span class="heading-02">Executive Officer</span><span class="body-compact-01 cap">Units in this unit's battlegroup can use the Executive Oversight command for 0 CMD once per activation.</span></label>
+    </div>
+  </fieldset>
+</section>
+
+<section class="gallery">
+  <div class="pbar">
+    <div class="debt-line body-compact-01"><span>¢30k still owed</span><span>¢0k paid</span></div>
+    <div class="pbar-track"><span style="width: 25%"></span></div>
+    <span class="helper-text-01">2 of 8 games</span>
+  </div>
+  <div class="tags">
+    <span class="tag blue">Armageddon</span>
+    <span class="tag gray">Free play</span>
+    <span class="tag green">1 in fleet</span>
+    <span class="tag red">Over by ¢20</span>
+  </div>
+  <div class="note error" role="status">
+    <svg width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="#da1e28"/><path fill="#fff" d="M14.9 8h2.2v11h-2.2zM16 22a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3"/></svg>
+    <div><p class="heading-compact-01">Over the credits limit</p><p class="body-compact-01">¢420 of ¢400</p></div>
+  </div>
+</section>
+
 </main>
+<script>
+// Segmented controls and tabs: one selected at a time, arrow keys move it.
+document.querySelectorAll("[role=radiogroup], [role=tablist]").forEach((group) => {
+  const items = [...group.querySelectorAll("[role=radio], [role=tab]")];
+  const attr = items[0] && items[0].getAttribute("role") === "tab" ? "aria-selected" : "aria-checked";
+  const pick = (el) => {
+    items.forEach((b) => { b.setAttribute(attr, String(b === el)); b.tabIndex = b === el ? 0 : -1; });
+    el.focus();
+  };
+  items.forEach((b) => {
+    b.tabIndex = b.getAttribute(attr) === "true" ? 0 : -1;
+    b.addEventListener("click", () => pick(b));
+    b.addEventListener("keydown", (e) => {
+      const i = items.indexOf(b);
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); pick(items[(i + 1) % items.length]); }
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); pick(items[(i - 1 + items.length) % items.length]); }
+    });
+  });
+});
+</script>
 </body>
 </html>

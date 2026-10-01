@@ -591,7 +591,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         <div class="outfit-card-actions">
           <cds-button has-main-content kind="tertiary" size="lg" class="btn" href="#/solo/${e.id}">Continue${P(`chevronRight`,15).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
           
-          <cds-overflow-menu class="card-menu" label="Actions" size="lg" enable-v12-overflowmenu menu-alignment="bottom-end">
+          <cds-overflow-menu kind="ghost" class="card-menu" label="Actions" size="lg" enable-v12-overflowmenu menu-alignment="bottom-end">
             ${P(`ix-context-menu`,20).replace(`<svg `,`<svg slot="icon" `)}
             <cds-menu>
               <cds-menu-item label="Duplicate" data-action="duplicate-outfit" data-id="${e.id}"></cds-menu-item>
@@ -1346,7 +1346,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         <span class="fleet-card-cost">${Pi(r)}</span>
         <span class="fleet-card-faction">${F(n?.name??`Mixed forces`)}</span>
         <span class="fleet-card-mode">${t.freePlay?`Free Play`:Wd[t.mode]}</span>
-        <cds-overflow-menu class="fleet-card-actions card-menu" label="Actions" size="lg" enable-v12-overflowmenu menu-alignment="bottom-end">
+        <cds-overflow-menu kind="ghost" class="fleet-card-actions card-menu" label="Actions" size="lg" enable-v12-overflowmenu menu-alignment="bottom-end">
           ${P(`ix-context-menu`,20).replace(`<svg `,`<svg slot="icon" `)}
           <cds-menu>
             <cds-menu-item label="Duplicate" data-action="duplicate-list" data-id="${t.id}"></cds-menu-item>
@@ -1486,7 +1486,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     <ul class="hvp-req-list">${n}</ul>
     <p class="hvp-req-why">A Shipyard has no units until you requisition one, so there is nobody to assign them to yet. Each rides the unit you form when you requisition it &mdash; write it in the roster's <strong>HVP carried</strong> column as you go.</p>
     <cds-button has-main-content kind="tertiary" size="lg" class="btn" href="#/print/${e.id}">Print the roster${P(`print`,15).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
-  </section>`}var Af=[{era:`Hypergrowth`,mode:`hypergrowth`,builds:`Build a Shipyard`},{era:`Age of Unity`,mode:`age-of-unity`,builds:`Build a Fleet List`},{era:`Armageddon`,mode:`armageddon`,builds:`Build a Fleet List`}];function jf(e,t){if(e.freePlay)return`<span class="freeplay-badge">All ships unlocked</span>`;let n=wr(t),r=new Set(t.map(e=>e.id)),i=e=>`<cds-select-item value="${F(e.id)}" data-action="set-faction" data-faction="${F(e.id)}">${F(e.name)}</cds-select-item>`,a=(e,t)=>t.length?`<cds-select-item-group label="${F(e)}">${t.map(i).join(``)}</cds-select-item-group>`:``,o=gr.map(e=>a(e,(n.get(e)??[]).filter(e=>!r.has(e.id)))).join(``)+a(`Custom`,Sr(t).filter(e=>r.has(e.id)));return`<cds-select class="hdr-select hdr-faction" hide-label label-text="Faction" size="lg" value="${F(e.fleet.factionId)}" data-key="hdr-faction">${o}</cds-select>`}function Mf(e){return Af.find(t=>t.mode===e.mode)?`<cds-select class="hdr-select hdr-era" hide-label label-text="Era" size="lg" value="${e.mode}" data-key="hdr-era">${Af.map(e=>`<cds-select-item value="${e.mode}" data-action="set-era" data-mode="${e.mode}">${F(e.era)}</cds-select-item>`).join(``)}</cds-select>`:`<span class="mf-era-badge">${F(Wd[e.mode]??e.mode)}</span>`}function Nf(e,t,n=!1){return`<cds-overflow-menu class="hdr-menu" label="Actions" size="lg" enable-v12-overflowmenu menu-alignment="bottom-end" data-key="hdr-menu">
+  </section>`}var Af=[{era:`Hypergrowth`,mode:`hypergrowth`,builds:`Build a Shipyard`},{era:`Age of Unity`,mode:`age-of-unity`,builds:`Build a Fleet List`},{era:`Armageddon`,mode:`armageddon`,builds:`Build a Fleet List`}];function jf(e,t){if(e.freePlay)return`<span class="freeplay-badge">All ships unlocked</span>`;let n=wr(t),r=new Set(t.map(e=>e.id)),i=e=>`<cds-select-item value="${F(e.id)}" data-action="set-faction" data-faction="${F(e.id)}">${F(e.name)}</cds-select-item>`,a=(e,t)=>t.length?`<cds-select-item-group label="${F(e)}">${t.map(i).join(``)}</cds-select-item-group>`:``,o=gr.map(e=>a(e,(n.get(e)??[]).filter(e=>!r.has(e.id)))).join(``)+a(`Custom`,Sr(t).filter(e=>r.has(e.id)));return`<cds-select class="hdr-select hdr-faction" hide-label label-text="Faction" size="lg" value="${F(e.fleet.factionId)}" data-key="hdr-faction">${o}</cds-select>`}function Mf(e){return Af.find(t=>t.mode===e.mode)?`<cds-select class="hdr-select hdr-era" hide-label label-text="Era" size="lg" value="${e.mode}" data-key="hdr-era">${Af.map(e=>`<cds-select-item value="${e.mode}" data-action="set-era" data-mode="${e.mode}">${F(e.era)}</cds-select-item>`).join(``)}</cds-select>`:`<span class="mf-era-badge">${F(Wd[e.mode]??e.mode)}</span>`}function Nf(e,t,n=!1){return`<cds-overflow-menu kind="ghost" class="hdr-menu" label="Actions" size="lg" enable-v12-overflowmenu menu-alignment="bottom-end" data-key="hdr-menu">
       ${P(`ix-context-menu`,20).replace(`<svg `,`<svg slot="icon" `)}
       <cds-menu>
         <cds-menu-item label="Play mode" data-action="go" data-href="#/play/${e.id}"></cds-menu-item>

@@ -51,14 +51,14 @@
 
 :root {
   --paper: #ffffff;
-  --ground: #f2f4f8;      /* used sparingly, only to seat white cards */
-  --ink: #0a0e14;
-  --ink-2: #3a424f;
+  --ground: #f4f4f4;      /* used sparingly, only to seat white cards */
+  --ink: #161616;
+  --ink-2: #393939;
   /* Carries most of the app's small labels. #6b7480 passed on white (4.74:1)
      but not on --blue-wash (4.14:1), where plenty of those labels actually sit:
      the guide band, hovered ship rows, the phase checklist. One step darker
      clears 4.5:1 on both grounds. */
-  --ink-3: #5c6472;
+  --ink-3: #525252;
 
   /* Per-stat colours. Okabe-Ito hue angles (so this is deliberately NOT a
      red/green pair), pulled back in chroma and held inside one contrast band.
@@ -103,27 +103,27 @@
      value, they do not bounce past it and come back - that bounce is the thing
      that reads as a consumer app rather than a control panel. */
   --ease: cubic-bezier(0.2, 0, 0, 1);
-  --blue: #0b3d91;
-  --blue-deep: #062a6b;
-  --blue-wash: #eaf0fb;
-  --red: #fc3d21;
-  --red-deep: #d32c12;
+  --blue: #0f62fe;
+  --blue-deep: #0043ce;
+  --blue-wash: #edf5ff;
+  --red: #da1e28;
+  --red-deep: #a2191f;
   /* Damage is its own red, hotter than the NASA accent, so a damage figure is
      never mistaken for the "over budget" / error red. */
   --damage: #ff3131;
-  --red-wash: #ffece7;
+  --red-wash: #fff1f1;
   /* Placeholders were set per-field at #c7cdd6 / #b4bcc8 / #aab2be - 1.6:1 to
      2.1:1 on white, well under the 4.5:1 body text needs. One token at 5.96:1
      instead. The unit-name field in particular shows a real, load-bearing value
      here (the auto-generated unit name), not a hint. */
-  --placeholder: #5c6472;
+  --placeholder: #6f6f6f;
   --amber: #b4520a;
   --amber-wash: #fbeddc;
-  --go: #0b6b3a;
-  --go-wash: #e6f3ea;
+  --go: #198038;
+  --go-wash: #defbe6;
 
-  --hair: #0a0e14;                 /* full-strength Swiss rule */
-  --hair-soft: #d3d8e0;            /* quiet divider */
+  --hair: #161616;                 /* full-strength Swiss rule */
+  --hair-soft: #c6c6c6;            /* quiet divider */
   /* The inert foreground: an unavailable control's label, its glyph and its
      edge. All of these were painted in --hair-soft, which is a divider colour
      and nothing else - 1.43:1 on white, so a greyed-out "+", a "Jump in"
@@ -131,7 +131,7 @@
      value as --field-edge and for the same reason: 3.52:1 on --paper, 3.20:1
      on --ground and 3.08:1 on --blue-wash, so it clears WCAG 1.4.11's 3:1 on
      every ground one of these sits on. --hair-soft stays a rule, never ink. */
-  --ink-off: #818997;
+  --ink-off: #8d8d8d;
 
   --display: "Archivo", "Libre Franklin", Arial, sans-serif;
   --sans: "Libre Franklin", "Helvetica Neue", Arial, sans-serif;
@@ -153,17 +153,17 @@
      action = primary/interactive, accent = attention/keyline, and the three
      feedback tokens are states. Everything else maps to ink/line/ground. */
   --color-ground: #ffffff;
-  --color-ink: #0a0e14;
-  --color-action: #0b3d91;
-  --color-action-strong: #062a6b;
-  --color-accent: #fc3d21;
-  --color-feedback-error: #d32c12;
+  --color-ink: #161616;
+  --color-action: #0f62fe;
+  --color-action-strong: #0043ce;
+  --color-accent: #da1e28;
+  --color-feedback-error: #a2191f;
   --color-feedback-warning: #b4520a;
-  --color-feedback-ok: #0b6b3a;
-  --color-line: #0a0e14;
+  --color-feedback-ok: #198038;
+  --color-line: #161616;
   /* Brand chrome, from the official Second Edition identity. */
-  --color-brand: #0b3d91;
-  --color-brand-deep: #062a6b;
+  --color-brand: #0f62fe;
+  --color-brand-deep: #0043ce;
 
   --shell: 1340px;
   /* The builder alone (setup band, training guide, roster + catalog) uses
@@ -211,13 +211,53 @@
      --ground, so it clears WCAG 1.4.11's 3:1 on both grounds a field sits on.
      It has to: the field's boundary is the ONLY thing identifying the control,
      which is exactly the case the criterion is written for. */
-  --field-edge: #818997;
+  --field-edge: #8d8d8d;
   --shadow2: 0 0 2px var(--shadow-ambient), 0 1px 2px var(--shadow-key);
   --shadow4: 0 0 2px var(--shadow-ambient), 0 2px 4px var(--shadow-key);
   --shadow8: 0 0 2px var(--shadow-ambient), 0 4px 8px var(--shadow-key);
   --shadow16: 0 0 2px var(--shadow-ambient), 0 8px 16px var(--shadow-key);
   --shadow28: 0 0 8px var(--shadow-ambient), 0 14px 28px var(--shadow-key);
   --shadow64: 0 0 8px var(--shadow-ambient), 0 32px 64px var(--shadow-key);
+
+  /* Colours are Carbon's White theme, values read from carbondesignsystem.com
+     (color/tokens) and @carbon/themes, so Carbon's own controls and ours agree.
+     Rebrand: change --blue, --blue-deep, --blue-wash and --red here and the
+     --cds-* mapping below carries it into every Carbon component. */
+  --on-color: #ffffff;
+  --discord: #5865f2;
+  --discord-deep: #4752c4;
+  --cds-background: var(--paper);
+  --cds-background-brand: var(--blue);
+  --cds-layer-01: var(--ground);
+  --cds-layer-02: var(--paper);
+  --cds-field-01: var(--ground);
+  --cds-field-02: var(--paper);
+  --cds-border-strong-01: var(--field-edge);
+  --cds-border-subtle-01: var(--hair-soft);
+  --cds-border-interactive: var(--blue);
+  --cds-interactive: var(--blue);
+  --cds-focus: var(--blue);
+  --cds-link-primary: var(--blue);
+  --cds-link-primary-hover: var(--blue-deep);
+  --cds-icon-interactive: var(--blue);
+  --cds-highlight: var(--blue-wash);
+  --cds-text-primary: var(--ink);
+  --cds-text-secondary: var(--ink-2);
+  --cds-text-error: var(--red);
+  --cds-support-error: var(--red);
+  --cds-support-success: var(--go);
+  --cds-button-primary: var(--blue);
+  --cds-button-primary-hover: #0050e6;
+  --cds-button-primary-active: #002d9c;
+  --cds-button-secondary: #393939;
+  --cds-button-secondary-hover: #474747;
+  --cds-button-secondary-active: #6f6f6f;
+  --cds-button-tertiary: var(--blue);
+  --cds-button-tertiary-hover: #0050e6;
+  --cds-button-tertiary-active: #002d9c;
+  --cds-button-danger-primary: var(--red);
+  --cds-button-danger-hover: #b81921;
+  --cds-button-danger-active: #750e13;
 }
 
 /* Tabular figures, so numbers line up in columns. One typeface throughout: the
@@ -648,40 +688,19 @@ button { font-family: inherit; }
               type into, a 1px black keyline for any outlined button. */
 
 /* -------------------------------------------------------------------- Carbon */
-/* IBM's Carbon design system supplies the dialogs (web components, see main.ts).
-   Its colours are pointed at ours here so a Carbon dialog looks like the rest
-   of the app; everything else (layout, spacing, focus, the phone full-screen
-   behaviour) is Carbon's own. Fonts need nothing: Carbon inherits them. */
+/* IBM's Carbon design system supplies the dialogs, buttons, selects and menus
+   (web components, see main.ts). The app now wears Carbon's own White theme, so
+   the --cds-* mapping lives in :root with the tokens it points at; this block
+   only adds the names the :root list does not carry. */
 :root {
-  --cds-background: var(--paper);
   --cds-layer: var(--paper);
-  --cds-layer-01: var(--paper);
-  /* Fields (selects, text inputs) share the name box's grey ground and keyline,
-     so a Carbon picker and the fleet-name field read as the same kind of thing. */
   --cds-field: var(--ground);
-  --cds-field-01: var(--ground);
-  --cds-field-hover: var(--hair-soft);
+  --cds-field-hover: #e8e8e8;
   --cds-border-strong: var(--field-edge);
-  --cds-border-strong-01: var(--field-edge);
-  --cds-text-primary: var(--ink);
-  --cds-text-secondary: var(--ink-2);
-  --cds-icon-primary: var(--ink);
   --cds-border-subtle: var(--hair-soft);
-  --cds-border-subtle-01: var(--hair-soft);
-  --cds-focus: var(--red);
-  --cds-button-primary: var(--blue);
-  --cds-button-primary-hover: var(--blue-deep);
-  --cds-button-primary-active: var(--blue-deep);
-  --cds-button-secondary: var(--ink);
-  --cds-button-tertiary: var(--blue);
-  --cds-button-tertiary-hover: var(--blue-deep);
-  --cds-button-tertiary-active: var(--blue-deep);
-  --cds-link-primary: var(--blue);
-  --cds-interactive: var(--blue);
-  --cds-button-secondary-hover: var(--ink-2);
-  --cds-button-disabled: var(--hair-soft);
-  --cds-text-on-color-disabled: var(--ink-off);
-  --cds-button-danger-primary: var(--red-deep);
+  --cds-icon-primary: var(--ink);
+  --cds-button-disabled: #c6c6c6;
+  --cds-text-on-color-disabled: #8d8d8d;
 }
 
 /* --------------------------------------------------------------------- toast */
@@ -4301,9 +4320,9 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 .sync-error { font-size: 13px; color: var(--red-deep); font-weight: 600; }
 /* Discord's own blurple, on Discord's own button only: it is their mark, and a
    player scanning the dialog looks for that colour, not for our blue. */
-.sync-discord-btn { background: #5865f2; border-color: #5865f2; }
-.sync-discord-btn:active { background: #4752c4; border-color: #4752c4; }
-@media (hover: hover) { .sync-discord-btn:hover { background: #4752c4; border-color: #4752c4; } }
+.sync-discord-btn { background: var(--discord); border-color: var(--discord); }
+.sync-discord-btn:active { background: var(--discord-deep); border-color: var(--discord-deep); }
+@media (hover: hover) { .sync-discord-btn:hover { background: var(--discord-deep); border-color: var(--discord-deep); } }
 .sync-discord-who { display: flex; align-items: center; gap: 8px; font-size: 16px; }
 .sync-avatar { width: 32px; height: 32px; border-radius: 50%; }
 @media (max-width: 480px) {

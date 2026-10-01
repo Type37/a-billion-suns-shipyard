@@ -8764,3 +8764,28 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
 /* The head's own rule is the divider; the old setup band's black line under
    it doubled it. */
 #app > .solo-outfit > .solo-band { border-bottom: none; padding-top: 0; padding-bottom: 0; }
+
+/* Solo Play and Campaign on Carbon. The game bars lose the 3px coloured top
+   edge (a second, heavier rule right under the head's) and their bottom line
+   goes quiet; Alert's danger state is carried by the figure's colour, which
+   it already was. The Round stepper is the forked Carbon number input. */
+.solo-outfit .game-bar { border-top: none; border-bottom: 1px solid var(--hair-soft); padding-top: 24px; }
+.solo-outfit .solo-card { border-top: none; }
+.solo-outfit .control-label { font-size: 13px; letter-spacing: 0; text-transform: none; font-weight: 400; color: var(--ink-2); }
+.num-field {
+  display: grid; grid-template-columns: minmax(48px, auto) var(--tap) 1px var(--tap); align-items: center;
+  height: var(--tap); background: var(--ground); border-bottom: 1px solid var(--field-edge); margin-top: 8px;
+}
+.num-field .num-val { padding: 0 16px; font: 600 22px/1 var(--display); font-variant-numeric: tabular-nums; }
+.num-field .stepper-btn { width: var(--tap); height: var(--tap); border: none; background: none; color: var(--ink); }
+@media (hover: hover) { .num-field .stepper-btn:hover { background: var(--cds-field-hover, #e8e8e8); color: var(--ink); } }
+.num-field .num-rule { height: 24px; background: var(--hair-soft); }
+/* Rules prose on the solo tabs at a reading measure (it ran ~140 characters a
+   line at 1080), same cap as Learn and the rules pages. */
+.solo-outfit li, .solo-outfit .solo-card p, .solo-outfit .panel-note { max-width: 68ch; }
+/* Junkspace list: "Your outfits" as a Carbon heading, not tracked caps, and
+   the outfit card's insides on the 16px card padding the fleet cards use. */
+.solo-main .panel-title { font: 600 16px/1.4 var(--sans); letter-spacing: 0; text-transform: none; color: var(--ink); }
+.outfit-card-main { padding: 16px 16px 8px; }
+.outfit-card-debt { padding: 0 16px 16px; }
+.outfit-card-actions { padding: 0 16px 16px; }

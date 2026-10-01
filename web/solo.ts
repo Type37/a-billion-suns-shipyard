@@ -472,8 +472,9 @@ function blipsPanel(o: SavedOutfit): string {
     return `
     <section class="solo-card solo-blips">
       <h3 class="roster-section">Blips</h3>
-      <p class="blip-note">Eight markers, numbered 1 to 8, shuffled facedown into the Hostile half.</p>
-      <button class="primary-btn" data-action="solo-shuffle-blips" title="Shuffle the eight blips into a random order">${icon("random", 12)} Shuffle the bag</button>
+      ${/* A Carbon button. It was a class with no styles at all, under a line
+            of explainer that was not the book's. */ ""}
+      <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="solo-shuffle-blips">Shuffle the bag${icon("random", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
     </section>`;
   }
   // NOTHING MOVES WHEN A MARKER IS FLIPPED. Every tile carries both faces at
@@ -559,9 +560,12 @@ function playTab(state: AppState, o: SavedOutfit): string {
     </div>
     <div class="gb-round">
       <span class="control-label">Round</span>
-      <div class="round-control">
+      ${/* Carbon number input (forked): value left, subtract and add at the
+            right, the same control as the New outfit dialog's dials. */ ""}
+      <div class="num-field">
+        <span class="num-val round-value">${o.round}</span>
         <button class="stepper-btn" data-action="round-adjust" data-delta="-1" aria-label="Previous round">${icon("minus", 16)}</button>
-        <span class="round-value">${o.round}</span>
+        <span class="num-rule" aria-hidden="true"></span>
         <button class="stepper-btn" data-action="round-adjust" data-delta="1" aria-label="Next round">${icon("plus", 16)}</button>
       </div>
     </div>
@@ -631,7 +635,9 @@ function campaignTab(o: SavedOutfit): string {
   <div class="solo-split solo-split-solo">
     <div class="solo-ref">
       ${orphanPerks ? `<section class="solo-card solo-card-quiet"><h3 class="roster-section">Perks with no pilot</h3><ul class="perk-list">${orphanPerks}</ul></section>` : ""}
-      <section class="solo-card solo-card-quiet">
+      ${/* No games yet, no section: an empty list shows nothing rather than a
+            "No games logged yet." line (Jet's rules for this app). */ ""}
+      ${o.gameLog.length ? `<section class="solo-card solo-card-quiet">
         <h3 class="roster-section">Game log</h3>
         ${
           o.gameLog.length
@@ -647,9 +653,9 @@ function campaignTab(o: SavedOutfit): string {
                   </li>`,
                 )
                 .join("")}</ol>`
-            : '<p class="muted">No games logged yet.</p>'
+            : ""
         }
-      </section>
+      </section>` : ""}
       ${/* Somewhere to write down what the Junkspace did to you. A campaign is
             a story told over eight games and the app recorded three integers of
             it. Uncontrolled, and saved on blur: routing every keystroke through
@@ -657,7 +663,6 @@ function campaignTab(o: SavedOutfit): string {
       <section class="solo-card solo-card-quiet">
         <h3 class="roster-section">Campaign notes</h3>
         <textarea class="outfit-notes" data-action="outfit-notes" rows="6"
-                  placeholder="Who you lost, who owes you, what is waiting out there."
                   aria-label="Campaign notes">${escapeHtml(o.notes ?? "")}</textarea>
       </section>
     </div>

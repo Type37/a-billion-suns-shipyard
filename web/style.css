@@ -3707,6 +3707,8 @@ button { font-family: inherit; }
 .au-species .switcher-opt { min-height: 44px; }
 .au-quad-list { display: flex; flex-direction: column; gap: 0; }
 .au-body { padding-top: 8px; }
+.au-budget { font-variant-numeric: tabular-nums; }
+.au-budget.is-over { color: var(--red-deep); }
 @media (max-width: 720px) { .au-grid { grid-template-columns: 1fr; gap: 6px; } }
 
 /* Ship Reference: one line per ship, PDF-style, grouped by Mass. Built as a grid

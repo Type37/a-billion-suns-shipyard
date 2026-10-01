@@ -28,7 +28,7 @@ import { ACTIVATION_STEPS, CORE_ACTIONS, CORE_COMMANDS, ROUND_PHASES } from "../
 import { deriveCommandEffects, effectiveCost } from "../src/command-effects.ts";
 import type { CommandCostChange, CommandEffects, RuleSource } from "../src/command-effects.ts";
 import { allFactions, factionsByEra, findFaction, makeCatalog, ERA_ORDER } from "./catalog.ts";
-import { auxSlotText, costBreakdown, credits, escapeHtml, formatDate, formatWeapon, pluralise, primarySlotText, ruleText } from "./format.ts";
+import { auxSlotText, costBreakdown, credits, creditsText, escapeHtml, formatDate, formatWeapon, pluralise, primarySlotText, ruleText } from "./format.ts";
 import { markdownEditor, renderMarkdown } from "./richtext.ts";
 import {
   commandRow,
@@ -1830,20 +1830,32 @@ function addUnitModal(state: AppState): string {
   // chosen here, before the add, instead of being a separate chore on every
   // roster row afterwards. It holds for every add until changed.
   const species = faction?.requiresSpecies && !list.freePlay ? addUnitSpecies(m.species, list.fleet.units) : null;
+  // The dialog covers the roster, so the budget it would otherwise hide rides
+  // in Carbon's label slot above the title: what is left, or how far over.
+  const { remaining } = listTotals(list, state.customFactions);
+  const budget =
+    list.unlimitedShipyards === true
+      ? "No limit"
+      : remaining < 0
+        ? `${creditsText(-remaining)} over`
+        : `${creditsText(remaining)} left`;
+  // Carbon's modal, as New Fleet: full screen on a phone, its own focus trap,
+  // Escape and outside-tap close (cds-modal-closed, handled in main.ts).
   return `
-  <div class="modal-root">
-    <div class="modal-backdrop" data-action="close-modal"></div>
-    <div class="modal-panel modal-wide au-modal" role="dialog" aria-modal="true" aria-label="Add ${label}">
-      <header class="modal-header">
-        <h2 class="modal-title">Add ${label}</h2>
-        <button class="modal-close" data-action="close-modal" aria-label="Close">${icon("close", 18)}</button>
-      </header>
-      <div class="modal-body au-body">
+  <cds-modal open size="lg" class="au-modal" data-key="au-modal">
+      <cds-modal-header>
+        <cds-modal-close-button></cds-modal-close-button>
+        <cds-modal-label class="au-budget ${remaining < 0 ? "is-over" : ""}">${escapeHtml(budget)}</cds-modal-label>
+        <cds-modal-heading>Add ${label}</cds-modal-heading>
+      </cds-modal-header>
+      <cds-modal-body class="au-body">
         ${species ? `<div class="au-species"><span class="au-species-label">Species</span>${switcher("Species", "add-unit-species", "species", ALLIANCE_SPECIES.map((s) => [s, s] as [string, string]), species)}</div>` : ""}
         <div class="au-grid">${[0, 1, 2, 3].map(quad).join("")}</div>
-      </div>
-    </div>
-  </div>`;
+      </cds-modal-body>
+      <cds-modal-footer>
+        <cds-modal-footer-button kind="primary" data-action="close-modal">Done</cds-modal-footer-button>
+      </cds-modal-footer>
+  </cds-modal>`;
 }
 
 /**

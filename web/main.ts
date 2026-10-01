@@ -399,6 +399,7 @@ function holdAnchor(): void {
 }
 
 let lastSurface: string | null = null;
+let lastModalKind = "";
 function paint(): void {
   // Most text fields commit on `change` (blur), so typing does not re-render.
   // The compendium search is the exception: it filters live on `input`, so
@@ -511,6 +512,25 @@ function paint(): void {
     if (lastSurface !== null) armTapGuard();
     lastSurface = surface;
   }
+
+  // Back closes a dialog. Opening one adds a history entry; Back pops it and
+  // the popstate handler below closes the dialog instead of leaving the page,
+  // which is what a phone's Back gesture did before (Add unit open, Back, and
+  // you were on Fleets). Closing it any other way (X, Done, Escape) takes that
+  // entry back off, so it never piles up. A dialog that hands over to another
+  // dialog adds nothing; only the first open and the last close count.
+  const modalKind = store.getState().ui.modal?.kind ?? "";
+  if (modalKind && !lastModalKind) history.pushState({ absModal: true }, "");
+  else if (!modalKind && lastModalKind) {
+    // Checked after the current tap finishes, not now: Get building closes the
+    // dialog and THEN moves to the new fleet, and a Back fired here would land
+    // after that move and undo it. By the next task the move has happened, the
+    // entry under us is the fleet's, and there is nothing to take back.
+    setTimeout(() => {
+      if (!store.getState().ui.modal && (history.state as { absModal?: boolean } | null)?.absModal) history.back();
+    }, 0);
+  }
+  lastModalKind = modalKind;
   revealSelectedSigil();
   syncLearnAnchor();
   animateOpenEraTitles();
@@ -1386,6 +1406,16 @@ store.subscribe(paint);
 // A Carbon modal closes itself (its X, Escape, a tap outside) and then says so.
 // The app's state still thinks it is open until told, or the next render would
 // put it straight back.
+window.addEventListener("popstate", () => {
+  if (store.getState().ui.modal) {
+    lastModalKind = ""; // this Back already removed the dialog's entry
+    store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined } }));
+  } else if ((history.state as { absModal?: boolean } | null)?.absModal) {
+    // A dialog's entry left behind because the dialog navigated away (Get
+    // building opens the new fleet). Nothing to close: step past it.
+    history.back();
+  }
+});
 document.addEventListener("cds-modal-closed", () => {
   if (store.getState().ui.modal) store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined } }));
 });

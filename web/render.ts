@@ -4883,23 +4883,25 @@ function emblemModal(state: AppState): string {
          <input id="emblem-lib-search" class="em-search" type="search" placeholder="Search sigils: try skull, wings, money" value="${escapeHtml(m.libQuery ?? "")}" data-action="emblem-lib-search" aria-label="Search sigils" />
          <div class="em-scroll">${iconLibraryGrid(cfg.libA, cfg.currentLib, m.libQuery, m.libShown ?? LIB_PAGE)}</div>`;
 
+  // A Carbon modal since October 2026: pinned Done, full screen on a phone,
+  // Back and the X close it like every other dialog. Drag-and-drop still
+  // lands anywhere in the body (data-drop).
   return `
-  <div class="modal-root">
-    <div class="modal-backdrop" data-action="close-modal"></div>
-    <div class="modal-panel em-modal" role="dialog" aria-modal="true" aria-label="Choose an emblem" data-drop>
-      <header class="modal-header">
-        <div class="em-head"><span class="em-preview">${emblemView(cfg.fields, 40)}</span><h2 class="modal-title">Choose an emblem</h2></div>
-        <button class="modal-close" data-action="close-modal" aria-label="Close">${icon("close", 18)}</button>
-      </header>
+  <cds-modal open size="md" class="em-modal" data-key="em-modal">
+    <cds-modal-header>
+      <cds-modal-close-button></cds-modal-close-button>
+      <cds-modal-heading>Choose an emblem</cds-modal-heading>
+    </cds-modal-header>
+    <cds-modal-body data-modal-primary-focus tabindex="-1" data-drop>
       <div class="em-tabs" role="tablist">${tabBtns}</div>
       <div class="em-body">${body}</div>
-      <div class="em-foot">
-        <button class="bar-btn" data-action="${cfg.rndA}" title="Pick a random emblem from the library">${icon("random", 11)} Random</button>
-        ${cfg.hasImage ? `<button class="bar-btn danger" data-action="${cfg.clrA}">${icon("close", 15)} Remove</button>` : ""}
-        <button class="cta-btn em-done" data-action="close-modal">${icon("check", 16)} Done</button>
-      </div>
-    </div>
-  </div>`;
+    </cds-modal-body>
+    <cds-modal-footer>
+      <cds-modal-footer-button kind="ghost" data-action="${cfg.rndA}">Random</cds-modal-footer-button>
+      ${cfg.hasImage ? `<cds-modal-footer-button kind="danger--ghost" data-action="${cfg.clrA}">Remove</cds-modal-footer-button>` : ""}
+      <cds-modal-footer-button kind="primary" data-action="close-modal">Done</cds-modal-footer-button>
+    </cds-modal-footer>
+  </cds-modal>`;
 }
 
 /**

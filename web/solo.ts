@@ -113,14 +113,12 @@ export function newOutfitModal(state: AppState): string {
   const games = draft.gamesLimit ?? DEBT_CLEAR_GAMES;
 
   return `
-  <div class="modal-root">
-    <div class="modal-backdrop" data-action="close-modal"></div>
-    <div class="modal-panel no-modal" role="dialog" aria-modal="true" aria-label="Start a new outfit">
-      <header class="modal-header">
-        <h2 class="modal-title">Start a new outfit</h2>
-        <button class="modal-close" data-action="close-modal" aria-label="Close">${icon("close", 18)}</button>
-      </header>
-      <div class="modal-body no-modal-body">
+  <cds-modal open size="sm" class="no-modal" data-key="no-modal">
+    <cds-modal-header>
+      <cds-modal-close-button></cds-modal-close-button>
+      <cds-modal-heading>Start a new outfit</cds-modal-heading>
+    </cds-modal-header>
+    <cds-modal-body class="no-modal-body" data-modal-primary-focus tabindex="-1">
         <div class="no-identity">
           <button class="no-emblem-btn" data-action="open-emblem-modal" data-target="new-outfit" aria-label="Change emblem">
             <span class="no-emblem-mark">${emblemView(draft, 60)}</span>
@@ -160,13 +158,12 @@ export function newOutfitModal(state: AppState): string {
             </div>
           </div>
         </div>
-      </div>
-      <footer class="modal-footer">
-        <button class="bar-btn" data-action="close-modal">Cancel</button>
-        <button class="cta-btn" data-action="solo-new-outfit-create">${icon("plus", 15)} Start blank</button>
-      </footer>
-    </div>
-  </div>`;
+    </cds-modal-body>
+    <cds-modal-footer>
+      <cds-modal-footer-button kind="secondary" data-action="close-modal">Cancel</cds-modal-footer-button>
+      <cds-modal-footer-button kind="primary" data-action="solo-new-outfit-create">Start blank</cds-modal-footer-button>
+    </cds-modal-footer>
+  </cds-modal>`;
 }
 
 // ---------------------------------------------------------------------------

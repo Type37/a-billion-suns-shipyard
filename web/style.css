@@ -8205,3 +8205,13 @@ cds-overflow-menu.hdr-menu, cds-overflow-menu.card-menu {
   flex: none; width: var(--tap); height: 100%; min-height: 0; border: none; background: transparent; color: var(--ink-3);
 }
 .sy-hvp-check.sy-hvp-check { width: var(--tap); height: var(--tap); align-self: start; }
+
+/* The two dialogs moved onto Carbon: their text fields take the field look,
+   and New outfit's two steppers share one column so they line up. */
+.em-search, .new-outfit-name {
+  background: var(--ground); border: none; border-bottom: 1px solid var(--field-edge); border-radius: 0;
+  min-height: var(--tap); padding: 0 12px; font-size: 16px; width: 100%; box-sizing: border-box;
+}
+.no-dials { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: center; gap: 12px 16px; }
+.no-dial { display: contents; }
+.no-dial .dial { width: 100%; display: grid; grid-template-columns: var(--tap) minmax(0, 1fr) var(--tap); align-items: center; justify-items: center; }

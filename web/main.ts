@@ -1316,7 +1316,14 @@ document.addEventListener("cds-modal-closed", (e) => {
     if (store.getState().ui.crop) store.setState((s) => ({ ...s, ui: { ...s.ui, crop: undefined } }));
     return;
   }
-  if (store.getState().ui.modal) store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined } }));
+  // Everything else closes through the close-modal action, so a dialog with
+  // its own closing rule (the emblem picker hands back to New outfit when it
+  // was opened from there) keeps it when closed by Carbon's X or Escape.
+  if (store.getState().ui.modal) {
+    const el = document.createElement("button");
+    el.dataset["action"] = "close-modal";
+    dispatchAction(el);
+  }
 });
 
 if (!tryImportShare()) {

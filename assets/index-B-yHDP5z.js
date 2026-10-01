@@ -1912,7 +1912,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
           <input class="we-num" type="number" min="0" value="${n.rangeMin}" ${r(i,`rangeMin`,``)} /></label>
         <label class="we-f"><span class="we-l">Max range</span>
           <input class="we-num" type="number" min="0" value="${n.rangeMax}" ${r(i,`rangeMax`,``)} /></label>
-        <button class="ghost-btn danger we-remove" data-action="cf-weapon-remove" data-ship="${e}" data-slot="${t}" data-index="${i}" title="Remove weapon" aria-label="Remove weapon">${N(`trash`,16)}</button>
+        <button class="ghost-btn we-remove" data-action="cf-weapon-remove" data-ship="${e}" data-slot="${t}" data-index="${i}" title="Remove weapon" aria-label="Remove weapon">${N(`close`,16)}</button>
       </div>`).join(``)}${n.length?``:`<cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="cf-weapon-add" data-ship="${e}" data-slot="${t}">Add ${t===`auxiliary`?`an`:`a`} ${t} weapon${N(`plus`,14).replace(`<svg `,`<svg slot="icon" `)}</cds-button>`}`}function $f(e,t){let n=e.customFactions.find(e=>e.id===t);if(!n)return`${hf()}<main class="empty-state"><p>That faction was not found.</p><p><a href="#/foundry">Back to Custom Rules</a></p></main>`;let r=n.ships.map((e,t)=>`
     <article class="cf-ship">
       
@@ -1922,19 +1922,19 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         </button>
         <label class="cf-f cf-ship-name"><span class="cf-l">Ship class name</span>
           <input type="text" value="${P(e.name)}" data-action="cf-ship" data-ship="${t}" data-field="name" /></label>
-        <label class="cf-f cf-ship-cost"><span class="cf-l">Cost</span>
-          <input type="number" min="1" value="${e.cost}" data-action="cf-ship" data-ship="${t}" data-field="cost" /></label>
         <button class="ghost-btn danger cf-ship-x" data-action="cf-ship-remove" data-ship="${t}" title="Remove this ship class" aria-label="Remove ship class ${P(e.name)}">${N(`trash`,16)}</button>
       </div>
       <div class="cf-ship-body">
         <div class="cf-ship-stats">
+          <label class="cf-f cf-stat cf-ship-cost"><span class="cf-l">¢ Cost</span>
+            <input type="number" min="1" value="${e.cost}" data-action="cf-ship" data-ship="${t}" data-field="cost" /></label>
           <label class="cf-f cf-stat"><span class="cf-l">${N(`stat-mass`,16,`stat-ico stat-ico-mass`)}Mass</span>
             <select data-action="cf-ship" data-ship="${t}" data-field="mass">
               ${[0,1,2,3].map(t=>`<option value="${t}" ${e.mass===t?`selected`:``}>${t}</option>`).join(``)}
             </select></label>
           <label class="cf-f cf-stat"><span class="cf-l">${N(`stat-thrust`,16,`stat-ico stat-ico-thrust`)}Thrust</span>
             <input type="number" min="0" value="${e.thrust}" data-action="cf-ship" data-ship="${t}" data-field="thrust" /></label>
-          <label class="cf-f cf-stat"><span class="cf-l">${N(`stat-silhouette`,16,`stat-ico stat-ico-silhouette`)}Silhouette</span>
+          <label class="cf-f cf-stat"><span class="cf-l">${N(`stat-silhouette`,16,`stat-ico stat-ico-silhouette`)}Sil</span>
             <input type="number" min="1" max="12" value="${e.silhouette}" data-action="cf-ship" data-ship="${t}" data-field="silhouette" /></label>
           <label class="cf-f cf-stat"><span class="cf-l">${N(`stat-shields`,16,`stat-ico stat-ico-shields`)}Shields</span>
             <input type="number" min="0" value="${e.shields}" data-action="cf-ship" data-ship="${t}" data-field="shields" /></label>

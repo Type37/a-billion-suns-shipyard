@@ -599,6 +599,30 @@ button { font-family: inherit; }
   .gif-inner > a { padding-top: 13px; padding-bottom: 13px; }
 }
 
+/* -------------------------------------------------------------------- Carbon */
+/* IBM's Carbon design system supplies the dialogs (web components, see main.ts).
+   Its colours are pointed at ours here so a Carbon dialog looks like the rest
+   of the app; everything else (layout, spacing, focus, the phone full-screen
+   behaviour) is Carbon's own. Fonts need nothing: Carbon inherits them. */
+:root {
+  --cds-background: var(--paper);
+  --cds-layer: var(--paper);
+  --cds-layer-01: var(--paper);
+  --cds-text-primary: var(--ink);
+  --cds-text-secondary: var(--ink-2);
+  --cds-icon-primary: var(--ink);
+  --cds-border-subtle: var(--hair-soft);
+  --cds-border-subtle-01: var(--hair-soft);
+  --cds-focus: var(--red);
+  --cds-button-primary: var(--blue);
+  --cds-button-primary-hover: var(--blue-deep);
+  --cds-button-primary-active: var(--blue-deep);
+  --cds-button-secondary: var(--ink);
+  --cds-button-secondary-hover: var(--ink-2);
+  --cds-button-disabled: var(--hair-soft);
+  --cds-text-on-color-disabled: var(--ink-off);
+}
+
 /* --------------------------------------------------------------------- toast */
 
 .toast {

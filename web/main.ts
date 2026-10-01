@@ -12,6 +12,10 @@ import { FleetSync } from "./fleet-sync.ts";
 import { syncCropper } from "./cropper.ts";
 import { hydrateImages } from "./image-store.ts";
 import "./style.css";
+// IBM Carbon web components. Imported one component at a time, not the whole
+// library, so only what the app uses is bundled. Colours are mapped to ours in
+// style.css ("Carbon"), fonts are inherited.
+import "@carbon/web-components/es/components/modal/index.js";
 
 // Keep every Markdown notes editor's preview in step with its textarea as the
 // user types. Uncontrolled on purpose (see richtext.ts): typing must not go
@@ -1378,6 +1382,13 @@ window.addEventListener("hashchange", () => {
 wireActions(root);
 watchGlossPopovers();
 store.subscribe(paint);
+
+// A Carbon modal closes itself (its X, Escape, a tap outside) and then says so.
+// The app's state still thinks it is open until told, or the next render would
+// put it straight back.
+document.addEventListener("cds-modal-closed", () => {
+  if (store.getState().ui.modal) store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined } }));
+});
 
 if (!tryImportShare()) {
   store.setState((s) => ({ ...s, route: parseRoute(location.hash) }));

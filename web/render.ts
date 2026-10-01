@@ -710,15 +710,18 @@ function newFleetModal(state: AppState, customs: Faction[]): string {
 
   const selected = m.factionId ? findFaction(m.factionId, customs) : undefined;
 
+  // Carbon's modal (IBM's design system), not the homemade one: on a phone it
+  // goes full screen with the footer pinned, so Get building is always on
+  // screen instead of 250px below the fold; it traps focus and closes on
+  // Escape and outside taps itself. Closing fires cds-modal-closed, which
+  // main.ts turns into close-modal.
   return `
-  <div class="modal-root">
-    <div class="modal-backdrop" data-action="close-modal"></div>
-    <div class="modal-panel modal-wide nf-modal" role="dialog" aria-modal="true" aria-label="New fleet">
-      <header class="modal-header">
-        <h2 class="modal-title">New fleet</h2>
-        <button class="modal-close" data-action="close-modal" aria-label="Close">${icon("close", 18)}</button>
-      </header>
-      <div class="modal-body nf-body">
+  <cds-modal open size="lg" class="nf-modal" data-key="nf-modal">
+      <cds-modal-header>
+        <cds-modal-close-button></cds-modal-close-button>
+        <cds-modal-heading>New fleet</cds-modal-heading>
+      </cds-modal-header>
+      <cds-modal-body class="nf-body">
         <div class="nf-controls">
           <div class="modal-field">
             <span class="control-label">Era</span>
@@ -770,13 +773,12 @@ function newFleetModal(state: AppState, customs: Faction[]): string {
         <div class="nf-detail-col">
           ${selected ? factionDetailPane(selected) : '<div class="nf-detail nf-detail-empty"><p class="muted">Pick a faction to see its ships, rule, and personnel.</p></div>'}
         </div>
-      </div>
-      <footer class="modal-footer">
-        <button class="bar-btn" data-action="close-modal">Cancel</button>
-        <button class="cta-btn cta-go" data-action="nf-create" ${m.factionId ? "" : "disabled"}>${icon("flag", 16)} GET BUILDING</button>
-      </footer>
-    </div>
-  </div>`;
+      </cds-modal-body>
+      <cds-modal-footer>
+        <cds-modal-footer-button kind="secondary" data-action="close-modal">Cancel</cds-modal-footer-button>
+        <cds-modal-footer-button kind="primary" data-action="nf-create" ${m.factionId ? "" : "disabled"}>Get building</cds-modal-footer-button>
+      </cds-modal-footer>
+  </cds-modal>`;
 }
 
 // ---------------------------------------------------------------------------

@@ -589,7 +589,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
           ${Vu(e.gamesPlayed,zu(e))}
         </div>
         <div class="outfit-card-actions">
-          <a class="ghost-btn" href="#/solo/${e.id}">${P(`chevronRight`,15)} Continue</a>
+          <cds-button has-main-content kind="tertiary" size="lg" class="btn" href="#/solo/${e.id}">Continue${P(`chevronRight`,15).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
           
           <cds-overflow-menu class="card-menu" label="Actions" size="lg" enable-v12-overflowmenu menu-alignment="bottom-end">
             ${P(`ix-context-menu`,20).replace(`<svg `,`<svg slot="icon" `)}
@@ -607,7 +607,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     <section class="commission-panel">
       <div class="solo-panel-head">
         <h2 class="panel-title">Your outfits</h2>
-        <button class="cta-btn" data-action="solo-new-outfit-open">${P(`plus`,18)} Start a new outfit</button>
+        <cds-button has-main-content kind="primary" size="lg" class="btn" data-action="solo-new-outfit-open">Start a new outfit${P(`plus`,18).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
       </div>
       ${t.length===0?`<div class="solo-empty">
               <p class="solo-tagline">You are in hock to the wrong people for ${Fu(30)}, flying salvage runs through the Junkspace to pay it off.</p>
@@ -645,7 +645,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
           ${n?``:`<span class="roster-unit-glyph">${P(`warning`,20)}</span>`}
           <input class="unit-name-input" type="text" value="${F(t.shipName??``)}" placeholder="${F(n?.name??`Ship`)}" aria-label="${F(n?.name??`Ship`)}" data-action="outfit-ship-name" data-ship="${t.id}" />
           <span class="roster-unit-cost">${Fu(n?.cost??0)}</span>
-          <button class="ghost-btn danger" data-action="outfit-remove-ship" data-ship="${t.id}">${P(`trash`,14)} Remove</button>
+          <cds-button has-main-content kind="danger--tertiary" size="lg" class="btn" data-action="outfit-remove-ship" data-ship="${t.id}">Remove${P(`trash`,14).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
         </div>
         ${n?`<div class="ru-spec">${Tf(n)}</div>`:``}
         <!--
@@ -689,7 +689,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         ${a||``}
         ${i?`<div class="inspection fail"><p class="issue-error">Over budget by `+Fu(-n)+`.</p></div>`:``}
         <div class="roster-actions">
-          <button class="bar-btn danger" data-action="delete-outfit" data-id="${e.id}">${P(`trash`,16)} Delete outfit</button>
+          <cds-button has-main-content kind="danger--tertiary" size="lg" class="btn" data-action="delete-outfit" data-id="${e.id}">Delete outfit${P(`trash`,16).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
         </div>
       </div>
     </aside>
@@ -710,7 +710,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       </button>`}).join(``);return`
     <section class="solo-card solo-blips">
       <h3 class="roster-section">Blips
-        <button class="ghost-btn" data-action="solo-shuffle-blips" title="Shuffle the eight blips into a random order">${P(`random`,10)} Reshuffle</button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="solo-shuffle-blips" title="Shuffle the eight blips into a random order">Reshuffle${P(`random`,10).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
       </h3>
       <div class="blip-grid">${r}</div>
       <p class="blip-rule">${I(Wn)}</p>
@@ -729,10 +729,10 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         <!-- What just happened on the table, then what it does to the Level.
              The old labels led with the arithmetic ("+1 End Phase"), which is
              the wrong way round: you press these because a thing happened. -->
-        <button class="bar-btn" data-action="alert-adjust" data-delta="1">${P(`plus`,13)} End Phase <b class="alert-delta">+1</b></button>
-        <button class="bar-btn" data-action="alert-adjust" data-delta="1">${P(`plus`,13)} Reveal Mass 2-3 <b class="alert-delta">+1</b></button>
-        <button class="bar-btn" data-action="alert-adjust" data-delta="-2">${P(`minus`,13)} Destroy Mass 2-3 <b class="alert-delta">&minus;2</b></button>
-        <button class="ghost-btn" data-action="alert-adjust" data-delta="-1">${P(`minus`,13)} Take one back <b class="alert-delta">&minus;1</b></button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="alert-adjust" data-delta="1">End Phase <b class="alert-delta">+1</b>${P(`plus`,13).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="alert-adjust" data-delta="1">Reveal Mass 2-3 <b class="alert-delta">+1</b>${P(`plus`,13).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="alert-adjust" data-delta="-2">Destroy Mass 2-3 <b class="alert-delta">&minus;2</b>${P(`minus`,13).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="alert-adjust" data-delta="-1">Take one back <b class="alert-delta">&minus;1</b>${P(`minus`,13).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
       </div>
       ${i}
     </div>
@@ -770,7 +770,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       ${r?`<p class="issue-error">Eight games are up with debt remaining. Some very unpleasant people pay a visit: the campaign is lost.</p>`:``}
     </div>
     <div class="gb-act">
-      <button class="cta-btn" data-action="log-game">${P(`plus`,16)} Log a completed game</button>
+      <cds-button has-main-content kind="primary" size="lg" class="btn" data-action="log-game">Log a completed game${P(`plus`,16).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
     </div>
   </section>
   <div class="solo-split solo-split-solo">
@@ -811,7 +811,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       </div>
       
       <div class="setup-actions">
-        <a class="bar-btn" href="#/print-outfit/${t.id}">${P(`print`,15)} Print</a>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" href="#/print-outfit/${t.id}">Print${P(`print`,15).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
       </div>
     </div>
   </section>
@@ -1358,7 +1358,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
   <main class="fleets-main">
     <div class="fleets-head">
       <h1 class="page-title">Fleets</h1>
-      <button class="cta-btn create-cta" data-action="open-new-fleet">${P(`plus`,18)} New fleet</button>
+      <cds-button has-main-content kind="primary" size="lg" class="btn create-cta" data-action="open-new-fleet">New fleet${P(`plus`,18).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
     </div>
 
     ${t.length===0?`<p class="fleets-empty">No fleets yet.</p>`:`<div class="fleet-cards">${n}</div>`}
@@ -1482,7 +1482,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     </div>
     <ul class="hvp-req-list">${n}</ul>
     <p class="hvp-req-why">A Shipyard has no units until you requisition one, so there is nobody to assign them to yet. Each rides the unit you form when you requisition it &mdash; write it in the roster's <strong>HVP carried</strong> column as you go.</p>
-    <a class="bar-btn" href="#/print/${e.id}">${P(`print`,15)} Print the roster</a>
+    <cds-button has-main-content kind="tertiary" size="lg" class="btn" href="#/print/${e.id}">Print the roster${P(`print`,15).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
   </section>`}var Mf=[{era:`Hypergrowth`,mode:`hypergrowth`,builds:`Build a Shipyard`},{era:`Age of Unity`,mode:`age-of-unity`,builds:`Build a Fleet List`},{era:`Armageddon`,mode:`armageddon`,builds:`Build a Fleet List`}];function Nf(e,t){if(e.freePlay)return`<span class="freeplay-badge">All ships unlocked</span>`;let n=Tr(t),r=new Set(t.map(e=>e.id)),i=e=>`<cds-select-item value="${F(e.id)}" data-action="set-faction" data-faction="${F(e.id)}">${F(e.name)}</cds-select-item>`,a=(e,t)=>t.length?`<cds-select-item-group label="${F(e)}">${t.map(i).join(``)}</cds-select-item-group>`:``,o=_r.map(e=>a(e,(n.get(e)??[]).filter(e=>!r.has(e.id)))).join(``)+a(`Custom`,Cr(t).filter(e=>r.has(e.id)));return`<cds-select class="hdr-select hdr-faction" hide-label label-text="Faction" size="lg" value="${F(e.fleet.factionId)}" data-key="hdr-faction">${o}</cds-select>`}function Pf(e){return Mf.find(t=>t.mode===e.mode)?`<cds-select class="hdr-select hdr-era" hide-label label-text="Era" size="lg" value="${e.mode}" data-key="hdr-era">${Mf.map(e=>`<cds-select-item value="${e.mode}" data-action="set-era" data-mode="${e.mode}">${F(e.era)}</cds-select-item>`).join(``)}</cds-select>`:`<span class="mf-era-badge">${F(Kd[e.mode]??e.mode)}</span>`}function Ff(e,t,n=!1){return`<cds-overflow-menu class="hdr-menu" label="Actions" size="lg" enable-v12-overflowmenu menu-alignment="bottom-end" data-key="hdr-menu">
       ${P(`ix-context-menu`,20).replace(`<svg `,`<svg slot="icon" `)}
       <cds-menu>
@@ -1534,8 +1534,8 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     </div>`:``}
 
     <div class="sy-finish mf-finish">
-      <a class="mf-play-cta" href="#/play/${t.id}">${P(`flag`,18)} Enter Play Mode</a>
-      <a class="mf-print-cta" href="#/print/${t.id}">${P(`print`,18)} Print setup</a>
+      <cds-button has-main-content kind="tertiary" size="lg" class="mf-foot-btn" href="#/play/${t.id}">Enter Play Mode${P(`flag`,18).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
+      <cds-button has-main-content kind="tertiary" size="lg" class="mf-foot-btn" href="#/print/${t.id}">Print setup${P(`print`,18).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
     </div>
   </main>
   ${pf(e)}
@@ -1566,7 +1566,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         ${c.length||f?`<div class="sy-unit-sub">${m}${f?Cf(e):``}</div>`:``}
         ${i?`<div class="sy-ship-data">${Tf(i.ship)}</div>`:``}
       </article>`}).join(``),y=`<button class="emblem-current-btn" data-action="open-emblem-modal" data-target="list" title="Choose an emblem">${lf(t,46)}${P(`pencil`,12,`emblem-edit-cue`)}</button>`,b=`<span class="limit-ctl">/${Ni(t.fleet.creditsLimit)}</span>`,x=t.fleet.units.length,ee=t.freePlay?`<p class="yard-status is-muted">Free Play, no rules check</p>`:s.length>0&&x>0?`<details class="yard-status-pop">
-          <summary class="yard-status is-fail" aria-label="${s.length===1?`One thing`:`${s.length} things`} to resolve">${P(`warning`,16)} To resolve</summary>
+          <summary class="yard-status is-fail" aria-label="${s.length===1?`One thing`:`${s.length} things`} to resolve">${P(`warning`,20)}</summary>
           <ul class="yard-status-panel issue-list">${s.map(Sf).join(``)}</ul>
         </details>`:x>0?`<p class="yard-status is-ok">${P(`check`,12)} Legal</p>`:``;return`
   ${df()}
@@ -1599,13 +1599,11 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         <span class="sy-budget-now">${Ni(i)}</span>
         <span class="sy-budget-cap">${b}</span>
         <div class="sy-budget-status">${ee}</div>
-        <span class="sy-budget-free">${a<0?`${Ni(-a)} over`:`${Ni(a)} left`}</span>
+        ${a<0?`<span class="sy-budget-free">${Ni(-a)} over</span>`:``}
+        ${t.freePlay||r?`<cds-button has-main-content kind="primary" size="lg" class="sy-add-unit" data-action="open-add-unit">Add ${o?`ship`:`unit`}${P(`plus`,16).replace(`<svg `,`<svg slot="icon" `)}</cds-button>`:``}
       </div>
       
-      <div class="sy-meter-row">
-        <div class="sy-meter"><span class="sy-meter-fill" style="width:${t.fleet.creditsLimit>0?Math.min(100,i/t.fleet.creditsLimit*100):0}%"></span></div>
-        ${t.freePlay||r?`<button class="sy-add-unit ${x===0?`is-pulsing`:``}" data-action="open-add-unit">${P(`plus`,16)} Add ${o?`ship`:`unit`}</button>`:``}
-      </div>
+      <div class="sy-meter"><span class="sy-meter-fill" style="width:${t.fleet.creditsLimit>0?Math.min(100,i/t.fleet.creditsLimit*100):0}%"></span></div>
     </div>
 
     <div class="sy-cols">
@@ -1623,8 +1621,8 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     </div>
 
     <div class="sy-finish mf-finish">
-      <a class="mf-play-cta" href="#/play/${t.id}">${P(`flag`,18)} Enter Play Mode</a>
-      <a class="mf-print-cta" href="#/print/${t.id}">${P(`print`,18)} Print setup</a>
+      <cds-button has-main-content kind="tertiary" size="lg" class="mf-foot-btn" href="#/play/${t.id}">Enter Play Mode${P(`flag`,18).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
+      <cds-button has-main-content kind="tertiary" size="lg" class="mf-foot-btn" href="#/print/${t.id}">Print setup${P(`print`,18).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
     </div>
   </main>
   ${pf(e)}
@@ -1777,7 +1775,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
   ${df()}
   <main class="print-page">
     <div class="print-toolbar">
-      <a class="bar-btn" href="${t?`#/solo/${n.id}`:`#/list/${n.id}`}">${P(`chevronRight`,15,`flip-x`)} Back to the ${t?`outfit`:u?`Shipyard`:`Fleet List`}</a>
+      <cds-button has-main-content kind="tertiary" size="lg" class="btn" href="${t?`#/solo/${n.id}`:`#/list/${n.id}`}">Back to the ${t?`outfit`:u?`Shipyard`:`Fleet List`}${P(`chevronRight`,15,`flip-x`).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
       <div class="print-opts">
         <span class="segment" role="group" aria-label="Layout">
           <button class="${s.format===`roster`?`selected`:``}" data-action="print-format" data-format="roster">Roster</button>
@@ -1798,7 +1796,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       </div>
       <div class="print-go">
         <span class="print-pagecount" data-print-pagecount>&nbsp;</span>
-        <button class="cta-btn" data-action="do-print">${P(`print`,17)} Print</button>
+        <cds-button has-main-content kind="primary" size="lg" class="btn" data-action="do-print">Print${P(`print`,17).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
       </div>
     </div>
     ${l.size?`<p class="print-excluded-note">${l.size} ${l.size===1?`unit is`:`units are`} left out of this printout. <button class="linklike" data-action="print-include-all">Put them back</button></p>`:``}
@@ -1849,10 +1847,10 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         <td class="cell-num" data-label="Ships">${e.ships.length}</td>
         <td class="cell-num" data-label="Personnel">${e.hvp.length}</td>
         <td class="cell-actions">
-          <button class="ghost-btn" data-action="clone-faction" data-source="${e.id}" title="Duplicate this faction">${P(`ix-duplicate`,16)} Duplicate</button>
-          <button class="ghost-btn" data-action="copy-faction" data-id="${e.id}" title="Copy as JSON to share">${P(`scroll`,16)} Copy</button>
-          <button class="ghost-btn" data-action="export-faction" data-id="${e.id}" title="Download as a file">${P(`download`,16)} Download</button>
-          <button class="ghost-btn danger" data-action="delete-faction" data-id="${e.id}" title="Delete">${P(`ix-trash`,16)} Delete</button>
+          <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="clone-faction" data-source="${e.id}" title="Duplicate this faction">Duplicate${P(`ix-duplicate`,16).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
+          <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="copy-faction" data-id="${e.id}" title="Copy as JSON to share">Copy${P(`scroll`,16).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
+          <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="export-faction" data-id="${e.id}" title="Download as a file">Download${P(`download`,16).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
+          <cds-button has-main-content kind="danger--tertiary" size="lg" class="btn" data-action="delete-faction" data-id="${e.id}" title="Delete">Delete${P(`ix-trash`,16).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
         </td>
       </tr>`).join(``),n=Cr(e.customFactions).map(e=>`
       <button class="faction-plaque" data-action="clone-faction" data-source="${e.id}">
@@ -1885,7 +1883,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       <label class="bar-btn file-btn">${P(`upload`,16)} Import from a file
         <input class="file-cover" type="file" accept="application/json" data-action="import-faction" aria-label="Import a faction from a file" />
       </label>
-      <button class="bar-btn" data-action="paste-faction">${P(`duplicate`,16)} Paste from clipboard</button>
+      <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="paste-faction">Paste from clipboard${P(`duplicate`,16).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
     </div>
     ${e.customFactions.length===0?`<p class="muted">No custom factions yet.</p>`:`<div class="table-scroll"><table class="dock-table cf-table">
             <thead><tr><th>Faction</th><th>Era</th><th>Ships</th><th>Personnel</th><th></th></tr></thead>
@@ -1913,7 +1911,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         </span>
         <button class="ghost-btn danger" data-action="cf-weapon-remove" data-ship="${e}" data-slot="${t}" data-index="${i}" title="Remove weapon">${P(`close`,14)}</button>
       </div>`).join(``)}
-    <button class="ghost-btn" data-action="cf-weapon-add" data-ship="${e}" data-slot="${t}">${P(`plus`,14)} Add ${t===`auxiliary`?`an`:`a`} ${t} weapon</button>`}function Jf(e,t){let n=e.customFactions.find(e=>e.id===t);if(!n)return`${df()}<main class="empty-state"><p>That faction was not found.</p><p><a href="#/foundry">Back to Custom Rules</a></p></main>`;let r=n.ships.map((e,t)=>`
+    <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="cf-weapon-add" data-ship="${e}" data-slot="${t}">Add ${t===`auxiliary`?`an`:`a`} ${t} weapon${P(`plus`,14).replace(`<svg `,`<svg slot="icon" `)}</cds-button>`}function Jf(e,t){let n=e.customFactions.find(e=>e.id===t);if(!n)return`${df()}<main class="empty-state"><p>That faction was not found.</p><p><a href="#/foundry">Back to Custom Rules</a></p></main>`;let r=n.ships.map((e,t)=>`
     <article class="cf-ship">
       <!--
         Three rows that always mean the same thing: what it is called, what it
@@ -1980,7 +1978,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         and editable. One of the three had to go, and the heading was the one
         that did nothing the other two do not.
       -->
-      ${n.ships.length?`<button class="bar-btn" data-action="open-new-fleet-with-faction" data-faction="${n.id}">${P(`flag`,14)} Build a fleet with this faction</button>`:``}
+      ${n.ships.length?`<cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="open-new-fleet-with-faction" data-faction="${n.id}">Build a fleet with this faction${P(`flag`,14).replace(`<svg `,`<svg slot="icon" `)}</cds-button>`:``}
     </div>
 
     <section class="cf-section">
@@ -2016,13 +2014,13 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     <section class="cf-section">
       <h2 class="panel-title">Ship classes</h2>
       ${r||`<p class="muted">No ships yet.</p>`}
-      <button class="cta-btn" data-action="cf-ship-add">${P(`plus`,16)} Add a ship class</button>
+      <cds-button has-main-content kind="primary" size="lg" class="btn" data-action="cf-ship-add">Add a ship class${P(`plus`,16).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
     </section>
 
     <section class="cf-section">
       <h2 class="panel-title">High-Value Personnel</h2>
       ${i||`<p class="muted">None yet.</p>`}
-      <button class="cta-btn" data-action="cf-hvp-add">${P(`plus`,16)} Add a person</button>
+      <cds-button has-main-content kind="primary" size="lg" class="btn" data-action="cf-hvp-add">Add a person${P(`plus`,16).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
     </section>
   </main>
   ${pf(e)}
@@ -2183,9 +2181,9 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
           "Reset" alone does not say what it resets, and it is sitting next to a
           round counter and a phase track it would wipe.
         -->
-        <a class="ghost-btn play-bar-print" href="#/print/${t.id}">${P(`print`,14)} Print</a>
-        <button class="ghost-btn play-bar-reset" data-action="play-reset" title="Reset the round, phase, CMD and VP trackers">${P(`eraser`,14)} Reset game</button>
-        <a class="ghost-btn play-bar-end" href="#/list/${t.id}">${P(`check`,15)} End play</a>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn play-bar-print" href="#/print/${t.id}">Print${P(`print`,14).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn play-bar-reset" data-action="play-reset" title="Reset the round, phase, CMD and VP trackers">Reset game${P(`eraser`,14).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn play-bar-end" href="#/list/${t.id}">End play${P(`check`,15).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
       </header>
       <div class="phase-track">${g}</div>
       ${S}
@@ -2198,7 +2196,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         how to carry on if that was a mis-tap.
       -->
       ${u?``:`<div class="play-sticky-next">
-        <button class="cta-btn${d?` play-next-final`:``}" data-action="play-next">${P(d?`flag`:`chevronRight`,16)} ${d?`End the game`:`Next phase`}</button>
+        <cds-button has-main-content kind="primary" size="lg" class="btn ${d?` play-next-final`:``}" data-action="play-next">${d?`End the game`:`Next phase`}${P(d?`flag`:`chevronRight`,16).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
       </div>`}
     </div>
     ${T?`<div class="play-cols">
@@ -2283,7 +2281,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
               <span class="comp-groupcheck-box">${P(`check`,14)}</span>
               <span class="comp-groupcheck-label">Show custom ships</span>
             </label>`:``}
-      ${n.era||n.faction||n.mass||n.q?`<button class="ghost-btn comp-clear" data-action="ship-filter-clear">Clear filters</button>`:``}
+      ${n.era||n.faction||n.mass||n.q?`<cds-button has-main-content kind="tertiary" size="lg" class="btn comp-clear" data-action="ship-filter-clear">Clear filters</cds-button>`:``}
     </div>
 
     <div class="comp-viewbar">
@@ -2350,10 +2348,10 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
           -->
           ${Me()>25e4?`<p class="opt-note opt-usage">Fleets, factions and outfits are using about ${Math.round(Me()/1024)}&nbsp;KB. Uploaded images are stored separately and are not counted here.</p>`:``}
           <div class="opt-actions">
-            <button class="bar-btn" data-action="export-data">${P(`download`,15)} Export a backup</button>
+            <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="export-data">Export a backup${P(`download`,15).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
             <label class="bar-btn file-btn">${P(`upload`,15)} Import a backup
               <input class="file-cover" type="file" accept="application/json,.json" data-action="import-data" aria-label="Import a backup file" /></label>
-            <button class="bar-btn danger" data-action="clear-data">${P(`trash`,15)} Clear all data</button>
+            <cds-button has-main-content kind="danger--tertiary" size="lg" class="btn" data-action="clear-data">Clear all data${P(`trash`,15).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
           </div>
         </section>
         <section class="opt-section">
@@ -2374,7 +2372,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
           <h3 class="opt-h">Sync</h3>
           <p class="opt-note">${Mu.enabled()?`Syncing is on for this device.`:`Keep the same fleets on your phone and your computer.`}</p>
           <div class="opt-actions">
-            <button class="bar-btn" data-action="open-sync">${P(`sync`,15)} Sync Fleets Online</button>
+            <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="open-sync">Sync Fleets Online${P(`sync`,15).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
           </div>
         </section>
         <section class="opt-section">
@@ -2390,7 +2388,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     The token is the only key. Anyone you give it to can read and change your fleets.</p>`}function vp(){return Mu.discordConfigured()?`
     <section class="opt-section">
       <div class="opt-actions">
-        <button class="cta-btn sync-discord-btn" data-action="sync-discord">${P(`discord`,16)} Sign in with Discord</button>
+        <cds-button has-main-content kind="primary" size="lg" class="btn sync-discord-btn" data-action="sync-discord">Sign in with Discord${P(`discord`,16).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
       </div>
       <p class="sync-hint">Sign in on each device and your fleets follow you.</p>
     </section>`:``}function yp(){return`${vp()}
@@ -2400,7 +2398,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       <p>Put this phrase into any device and it will load and sync your current fleets.</p>
       ${_p()}
       <div class="opt-actions">
-        <button class="cta-btn" id="sync-generate" data-action="sync-generate">${P(`sync`,15)} Generate a Sync Token</button>
+        <cds-button has-main-content kind="primary" size="lg" class="btn" id="sync-generate" data-action="sync-generate">Generate a Sync Token${P(`sync`,15).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
       </div>
     </section>
     <section class="opt-section sync-existing">
@@ -2408,7 +2406,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       <div class="sync-join-row">
         <input type="text" id="sync-input" class="sync-input" placeholder="Enter your Sync Token…"
                autocapitalize="none" autocorrect="off" spellcheck="false" aria-label="Sync Token" />
-        <button class="bar-btn" id="sync-join" data-action="sync-join">${P(`check`,14)} Confirm</button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" id="sync-join" data-action="sync-join">Confirm${P(`check`,14).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
       </div>
       <p class="sync-status" id="sync-busy" hidden></p>
       <p class="sync-error" id="sync-error" hidden></p>
@@ -2419,9 +2417,9 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     </section>
     <section class="opt-section">
       <div class="opt-actions">
-        <button class="cta-btn" id="sync-now" data-action="sync-now">${P(`sync`,15)} Sync now</button>
-        <button class="bar-btn" id="sync-stop" data-action="sync-stop">Sign out</button>
-        <button class="bar-btn danger" id="sync-delete" data-action="sync-delete">${P(`trash`,14)} Delete online copy</button>
+        <cds-button has-main-content kind="primary" size="lg" class="btn" id="sync-now" data-action="sync-now">Sync now${P(`sync`,15).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" id="sync-stop" data-action="sync-stop">Sign out</cds-button>
+        <cds-button has-main-content kind="danger--tertiary" size="lg" class="btn" id="sync-delete" data-action="sync-delete">Delete online copy${P(`trash`,14).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
       </div>
       <p class="sync-status" id="sync-busy" hidden></p>
       <p class="sync-error" id="sync-error" hidden></p>
@@ -2432,7 +2430,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       <h3 class="opt-h">Your Sync Token</h3>
       <div class="sync-token-row">
         <code class="sync-token" id="sync-token-text">${F(Mu.token()??``)}</code>
-        <button class="bar-btn" id="sync-copy" data-action="sync-copy">${P(`duplicate`,14)} Copy</button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" id="sync-copy" data-action="sync-copy">Copy${P(`duplicate`,14).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
       </div>
       <p class="sync-hint">Put this phrase into any device and it will load and sync your current fleets.</p>
       ${_p()}
@@ -2440,11 +2438,11 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     ${vp()}
     <section class="opt-section">
       <div class="opt-actions">
-        <button class="cta-btn" id="sync-now" data-action="sync-now">${P(`sync`,15)} Sync now</button>
-        <button class="bar-btn" id="sync-stop" data-action="sync-stop"
-          title="Keeps your fleets on this device and leaves the online copy alone">Stop syncing here</button>
-        <button class="bar-btn danger" id="sync-delete" data-action="sync-delete"
-          title="Removes the online copy. Your fleets on this device are kept">${P(`trash`,14)} Delete online copy</button>
+        <cds-button has-main-content kind="primary" size="lg" class="btn" id="sync-now" data-action="sync-now">Sync now${P(`sync`,15).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" id="sync-stop" data-action="sync-stop"
+          title="Keeps your fleets on this device and leaves the online copy alone">Stop syncing here</cds-button>
+        <cds-button has-main-content kind="danger--tertiary" size="lg" class="btn" id="sync-delete" data-action="sync-delete"
+          title="Removes the online copy. Your fleets on this device are kept">Delete online copy${P(`trash`,14).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
       </div>
       <p class="sync-status" id="sync-busy" hidden></p>
       <p class="sync-error" id="sync-error" hidden></p>
@@ -3341,4 +3339,4 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             </div>
             <slot name="icon"></slot>
           </button>
-        `}static get itemClicked(){return`cds-overflow-menu-item-clicked`}static{this.shadowRootOptions={...q.shadowRootOptions,delegatesFocus:!0}}static{this.styles=gx}};W([J({type:Boolean,reflect:!0})],Mx.prototype,`danger`,void 0),W([J({type:String,attribute:`danger-description`})],Mx.prototype,`dangerDescription`,void 0),W([J({type:Boolean,reflect:!0})],Mx.prototype,`disabled`,void 0),W([J({type:Boolean,reflect:!0})],Mx.prototype,`divider`,void 0),W([J()],Mx.prototype,`href`,void 0),W([J({reflect:!0})],Mx.prototype,`size`,void 0),Mx=W([U(`cds-overflow-menu-item`)],Mx);function Nx(){for(let e of document.querySelectorAll(`.rt-editor`)){if(e.dataset.wired)continue;e.dataset.wired=`1`;let t=e.querySelector(`textarea.rt-input`),n=e.querySelector(`[data-rt-preview]`);!t||!n||t.addEventListener(`input`,()=>{n.innerHTML=Bi(t.value)})}}var Px=document.getElementById(`app`);if(!Px)throw Error(`Missing #app root element.`);var Fx=Px;function Ix(e){if(!(e instanceof HTMLElement))return null;if(e.id)return`id:${e.id}`;if(!e.dataset.action)return null;let t=[];for(let n of Object.keys(e.dataset).sort()){let r=e.dataset[n];r!==void 0&&t.push(`${n}=${r}`)}return`data:${t.join(`&`)}`}var Lx=`A Billion Suns 2e Shipyard`,Rx={home:`Home`,fleets:`Fleets`,builder:`Fleet List`,print:`Print setup`,"print-outfit":`Print setup`,foundry:`Custom Rules`,solo:`Solo`,"solo-outfit":`Outfit`,ships:`Ship Compendium`,play:`Play Mode`,learn:`Learn to Play`,rules:`The rules`,"learn-classic":`Learn to Play (archived)`},zx=null;function Bx(){let e=M.getState().route,t=e.view===`learn-classic`&&e.anchor?`${e.step}/${e.anchor}`:null;if(t===zx||(zx=t,!t||e.view!==`learn-classic`||!e.anchor))return;let n=document.getElementById(`phase-${e.anchor}`);n&&n.scrollIntoView({behavior:`smooth`,block:`start`})}var Vx=null;function Hx(){let e=M.getState().route,t=e.view===`learn`?e.tab??``:null;if(t===null){Vx=null;return}if(t===Vx)return;let n=Vx===null;Vx=t,n||window.scrollTo({top:0,behavior:`smooth`})}function Ux(){let e=document.querySelector(`[data-ltp-prog]`),t=e?.querySelector(`.ltp-prog-fill`);if(!e||!t)return;let n=Number(e.dataset.at??0),r=Math.max(1,Number(e.dataset.of??1)),i=document.documentElement.scrollHeight-window.innerHeight,a=i>8?Math.min(1,Math.max(0,window.scrollY/i)):1;t.style.transform=`scaleX(${((n+a)/r).toFixed(4)})`}var Wx=0;function Gx(){Wx||=requestAnimationFrame(()=>{Wx=0,Ux()})}var Kx=2.8;function qx(e){if(window.matchMedia(`(prefers-reduced-motion: reduce)`).matches)return;let t=e.dataset.era??`arma`,n=e.dataset.title??e.textContent??``;if(t===`hyper`){mS(e,n,Kx);return}if(t===`arma`){_S(e,n,Kx);return}hS(e,n,Kx),e.animate([{transform:`perspective(560px) rotateX(46deg) translateY(30px) scale(1.22)`,opacity:.15},{transform:`perspective(560px) rotateX(12deg) translateY(6px) scale(1.04)`,opacity:1,offset:.55},{transform:`perspective(560px) rotateX(0deg) translateY(0) scale(1)`,opacity:1}],{duration:Math.round(gS*Kx),easing:`cubic-bezier(.25,.8,.25,1)`})}var Jx=12;function Yx(e){let t=e.querySelector(`.ltp-gloss-pop`);if(!t)return;t.style.setProperty(`--gloss-x`,`0px`);let n=t.getBoundingClientRect();if(!n.width)return;let r=document.documentElement.clientWidth,i=n.right-(r-Jx),a=Jx-n.left,o=i>0?-i:a>0?a:0;o&&t.style.setProperty(`--gloss-x`,`${Math.round(o)}px`)}function Xx(){for(let e of[`pointerover`,`focusin`])document.addEventListener(e,e=>{let t=e.target;if(!(t instanceof Element))return;let n=t.closest(`.ltp-gloss`);n&&Yx(n)})}var Zx=null;function Qx(){let e=document.querySelectorAll(`.learn-dg`);if(!(!e.length||typeof IntersectionObserver>`u`)){Zx||=(document.documentElement.classList.add(`dg-gated`),new IntersectionObserver(e=>{for(let t of e)t.target.classList.toggle(`is-onscreen`,t.isIntersecting)},{threshold:.08})),Zx.disconnect();for(let t of e)Zx.observe(t)}}function $x(){for(let e of document.querySelectorAll(`.ltp-era[open]`)){let t=e.querySelector(`.ltp-era-title[data-anim-title]`);!t||t.dataset.animDone===`1`||(t.dataset.animDone=`1`,qx(t))}}function eS(){let e=M.getState(),t=e.route.view,n=Rx[t];if(t===`builder`){let t=e.lists.find(t=>t.id===e.route.listId);n=t&&Ut[t.mode]===`shipyard`?`Shipyard`:`Fleet List`}document.title=n?`${n} - ${Lx}`:Lx}var tS=null;document.addEventListener(`pointerdown`,e=>{tS=(e.target instanceof Element?e.target.closest(`[data-action]`):null)instanceof HTMLElement?{scrollY:window.scrollY,route:location.hash}:null},!0);function nS(){let e=tS;tS=null,!(!e||e.route!==location.hash)&&window.scrollY!==e.scrollY&&window.scrollTo(0,e.scrollY)}var rS=null,iS=``;function aS(){let e=document.activeElement,t=Ix(e),n=e instanceof HTMLInputElement?e.selectionStart:null,r=document.querySelector(`.mf-manifest`)?.scrollTop??0,i=document.querySelector(`.modal-panel`)?.scrollTop??0,a=new Set,o=new Set;for(let e of document.querySelectorAll(`details[data-persist]`)){let t=e.dataset.persist;t&&(e.open?a:o).add(t)}zp(Fx,jp(M.getState()));let s=Fx.querySelector(`main`);s&&(s.id=`main-content`),nS(),eS(),document.body.dataset.view=M.getState().route.view,MS(),uS();let c=document.querySelector(`.mf-manifest`);c&&(c.scrollTop=r);let l=document.querySelector(`.modal-panel`);l&&i&&(l.scrollTop=i),OS(),SS(),jm(),Nx(),AS(),jS(),bS(),requestAnimationFrame(()=>lS()),document.fonts?.ready.then(()=>lS());for(let e of document.querySelectorAll(`details[data-persist]`)){let t=e.dataset.persist;t&&(a.has(t)?e.open=!0:o.has(t)&&(e.open=!1))}if(t){let e=t.startsWith(`id:`)?document.getElementById(t.slice(3)):[...Fx.querySelectorAll(`[data-action]`)].find(e=>Ix(e)===t);if(e instanceof HTMLElement&&(e.focus({preventScroll:!0}),e instanceof HTMLInputElement&&n!==null))try{e.setSelectionRange(n,n)}catch{}}ES();let u=M.getState(),d=u.route.view===`play`?Mt(u)?.play:void 0,f=[location.hash,u.ui.modal?.kind??``,d?`${d.round}.${d.phase}`:``,document.querySelectorAll(`[data-roster-key]`).length].join(`|`);f!==rS&&(rS!==null&&fh(),rS=f);let p=M.getState().ui.modal?.kind??``;p&&!iS?history.pushState({absModal:!0},``):!p&&iS&&setTimeout(()=>{!M.getState().ui.modal&&history.state?.absModal&&history.back()},0),iS=p,DS(),Bx(),$x(),Qx(),Hx(),Ux()}function oS(e){history.replaceState(null,``,`#/fleets`),M.setState(t=>({...t,route:{view:`fleets`},ui:{...t.ui,modal:{kind:`share`,decoded:e}}}))}function sS(){let e=Cm(location.hash);if(!e)return!1;if(e.kind===`z`)return wm(e).then(e=>{e?oS(e):M.setState(e=>({...e,route:Et(location.hash)}))}),!0;let t=xm(e.data);return t?(oS(t),!0):!1}function cS(){let e=document.querySelector(`[data-print-sheet]`),t=e?.parentElement;if(!e||!t)return;let n=parseFloat(getComputedStyle(e).getPropertyValue(`--page-w`))||710;t.classList.remove(`is-fit`),t.style.height=``;let r=t.clientWidth;if(!r||!n||r>=n)return;let i=r/n;e.style.setProperty(`--sheet-scale`,String(i)),t.classList.add(`is-fit`),t.style.height=`${Math.ceil(e.offsetHeight*i)}px`}function lS(){let e=document.querySelector(`[data-print-sheet]`),t=document.querySelector(`[data-print-pagecount]`);if(!e)return;for(let t of e.querySelectorAll(`.page-guide`))t.remove();cS();let n=getComputedStyle(e),r=parseFloat(n.getPropertyValue(`--page-h`))||950,i=parseFloat(n.getPropertyValue(`--page-w`))||710,a=e.getBoundingClientRect(),o=a.top,s=a.width>0?a.width/i:1,c=[],l=e=>{for(let t of Array.from(e.children)){if(t.classList.contains(`page-guide`))continue;let e=t.getBoundingClientRect().height/s;if(e<=0)continue;let n=t.querySelectorAll(`tbody tr`);if(n.length>1){let e=t.querySelector(`thead`);e&&c.push(e),n.forEach(e=>c.push(e));continue}if(e>r*.9&&t.children.length>1){l(t);continue}c.push(t)}};l(e);let u=[],d=r;for(let e of c){let t=e.getBoundingClientRect(),n=(t.top-o)/s,i=(t.bottom-o)/s;i>d&&(n>0&&n<i&&u.push(n),d=n+r)}u.forEach((t,n)=>{let r=document.createElement(`div`);r.className=`page-guide`,r.style.top=`${t}px`,r.dataset.page=String(n+2),r.setAttribute(`aria-hidden`,`true`),e.appendChild(r)});let f=u.length+1;if(t){let n=e.dataset.paperLabel??``;t.textContent=`${f} ${f===1?`page`:`pages`}${n?`, ${n}`:``}`}}function uS(){let e=document.querySelector(`.topnav`),t=e?.querySelector(`.nav-pill`);if(!e||!t)return;let n=Array.from(e.querySelectorAll(`a, .topnav-btn`)),r=n.filter(e=>e.tagName===`A`),i=location.hash.replace(/^#/,``)||`/`,a=r.find(e=>{let t=e.getAttribute(`href`)?.replace(/^#/,``)??``;return t!==`/`&&(i===t||i.startsWith(t+`/`))});for(let e of r)e.removeAttribute(`aria-current`);a&&a.setAttribute(`aria-current`,`page`);let o=e=>{if(!e){t.style.opacity=`0`,t.style.width=`0`;return}t.style.opacity=`1`,t.style.width=`${e.offsetWidth}px`,t.style.transform=`translateX(${e.offsetLeft}px)`};t.style.transition=`none`,o(a),t.offsetWidth,t.style.transition=``,n.forEach(e=>e.addEventListener(`mouseenter`,()=>o(e))),e.addEventListener(`mouseleave`,()=>o(a))}var dS=null,fS=`ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/<>*-_`.split(``);function pS(){let e=document.createElement(`span`);return e.className=`nfd-underline`,e.setAttribute(`aria-hidden`,`true`),e}function mS(e,t,n=1){e.textContent=``;let r=[...t].map(t=>{let n=document.createElement(`span`);return n.className=`c`,n.setAttribute(`aria-hidden`,`true`),n.dataset.o=t,n.textContent=t,e.appendChild(n),n});e.appendChild(pS());let i=performance.now(),a=t=>{if(!e.isConnected)return;let o=t-i,s=!0;r.forEach((e,t)=>{let r=e.dataset.o??``;r!==` `&&(o<(70+t*26)*n?(e.textContent=fS[Math.floor(Math.random()*fS.length)]??r,s=!1):e.textContent=r)}),s||requestAnimationFrame(a)};requestAnimationFrame(a)}function hS(e,t,n=1){let r=Math.round(gS*n);e.textContent=t,e.appendChild(pS()),e.style.transformOrigin=``,e.style.setProperty(`--wipe-ms`,`${r}ms`),e.animate([{clipPath:`inset(-20% 100% -20% 0)`},{clipPath:`inset(-20% 0 -20% 0)`}],{duration:r,easing:`cubic-bezier(.3,0,.1,1)`}),e.classList.remove(`is-wiping`),e.offsetWidth,e.classList.add(`is-wiping`),window.setTimeout(()=>e.classList.remove(`is-wiping`),r+60)}var gS=460;function _S(e,t,n=1){let r=Math.round(340*n);e.textContent=t,e.appendChild(pS()),e.classList.add(`is-landing`),e.style.transformOrigin=`50% 100%`,e.animate([{opacity:0,transform:`scale(1.45)`},{opacity:1,transform:`scale(.97)`,offset:.6},{transform:`translateY(-2px) scale(1.01)`,offset:.78},{transform:`translateY(1px) scale(0.995)`,offset:.9},{transform:`translate(0,0) scale(1)`}],{duration:r,easing:`cubic-bezier(.2,.9,.2,1)`,fill:`forwards`}),window.setTimeout(()=>e.classList.remove(`is-landing`),r+20)}function vS(){document.querySelectorAll(`.nfd-stats .dice-ico`).forEach((e,t)=>{e.animate([{opacity:0,transform:`translateY(5px) scale(0.6)`},{opacity:1,transform:`translateY(0) scale(1)`}],{duration:300,delay:140+t*70,easing:`cubic-bezier(.2,.9,.3,1.4)`,fill:`backwards`})})}var yS=null;function bS(){let e=document.querySelector(`.mf-manifest, .roster-sheet`)!==null,t=Array.from(document.querySelectorAll(`[data-roster-key]`));if(!e){yS=null;return}if(t.length===0){yS=new Set;return}let n=new Set;for(let e of t){let t=e.dataset.rosterKey;t&&n.add(t)}let r=yS;if(yS=n,r!==null&&!window.matchMedia(`(prefers-reduced-motion: reduce)`).matches)for(let e of t){let t=e.dataset.rosterKey;!t||r.has(t)||e.animate([{opacity:0,transform:`translateY(-8px)`,boxShadow:`inset 3px 0 0 rgba(11,61,145,0.9)`},{opacity:1,transform:`translateY(0)`,boxShadow:`inset 0 0 0 rgba(11,61,145,0)`}],{duration:320,easing:`cubic-bezier(.2,.8,.2,1)`})}}var xS=null;function SS(){xS?.disconnect(),xS=null;let e=document.querySelector(`[data-lib-more]`);if(!e)return;let t=e.closest(`.em-body`)??null;xS=new IntersectionObserver(e=>{e.some(e=>e.isIntersecting)&&(xS?.disconnect(),xS=null,M.setState(e=>e.ui.modal?.kind===`emblem`?{...e,ui:{...e.ui,modal:{...e.ui.modal,libShown:(e.ui.modal.libShown??72)+72}}}:e))},{root:t,rootMargin:`300px`}),xS.observe(e)}var CS=null,wS=null;function TS(e){return[...e.querySelectorAll(`a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])`)].filter(e=>e.offsetParent!==null||e===document.activeElement)}function ES(){let e=document.querySelectorAll(`.modal-root .modal-panel`),t=e[e.length-1]??null;if(!t){wS&&=(document.removeEventListener(`keydown`,wS,!0),null),document.body.style.removeProperty(`overflow`),CS?.isConnected&&CS.focus(),CS=null;return}if(!wS){let e=document.activeElement;CS=e instanceof HTMLElement&&e!==document.body?e:null,document.body.style.overflow=`hidden`,(t.querySelector(`#emblem-lib-search`)??TS(t)[0])?.focus(),wS=e=>{if(e.key!==`Tab`)return;let t=document.querySelectorAll(`.modal-root .modal-panel`),n=t[t.length-1];if(!n)return;let r=TS(n);if(r.length===0)return;let i=r[0],a=r[r.length-1];n.contains(document.activeElement)?e.shiftKey&&document.activeElement===i?(e.preventDefault(),a.focus()):!e.shiftKey&&document.activeElement===a&&(e.preventDefault(),i.focus()):(e.preventDefault(),(e.shiftKey?a:i).focus())},document.addEventListener(`keydown`,wS,!0)}}function DS(){let e=document.querySelector(`.em-modal .lib-icon.selected`);if(!e)return;let t=e.closest(`.em-body`);if(!t)return;let n=t.getBoundingClientRect(),r=e.getBoundingClientRect();r.top>=n.top&&r.bottom<=n.bottom||(t.scrollTop+=r.top-n.top-t.clientHeight/2+r.height/2)}function OS(){let e=document.querySelector(`.mf-head`);if(!e)return;let t=Math.round(e.getBoundingClientRect().height);t>0&&document.documentElement.style.setProperty(`--mf-head-h`,`${t+12}px`)}var kS=new Map;function AS(){for(let e of document.querySelectorAll(`.faction-plaques`)){let t=e.closest(`.nf-modal, .faction-switch, .foundry-main, main`)?.className??`loose`,n=e.querySelector(`.faction-plaque.selected`),r=n?.dataset.faction??``,i=`${t}|${e.className}`,a=kS.get(i);kS.set(i,r),!(a===void 0||a===r||!n)&&n.classList.add(`just-picked`)}}function jS(){let e=document.querySelector(`.nfd-title[data-anim-title]:not(.ltp-era-title)`);if(!e){dS=null;return}let t=e.dataset.era??`unity`,n=e.dataset.title??e.textContent??``,r=`${t}|${n}`;if(r===dS||(dS=r,window.matchMedia(`(prefers-reduced-motion: reduce)`).matches))return;let i=new IntersectionObserver(r=>{r.some(e=>e.isIntersecting)&&(i.disconnect(),e.isConnected&&(t===`hyper`?mS(e,n):t===`arma`?_S(e,n):hS(e,n),vS()))},{threshold:.6});i.observe(e)}document.addEventListener(`pointerdown`,e=>{let t=e.target;for(let e of document.querySelectorAll(`details[open]`)){if(t&&e.contains(t))continue;let n=e.querySelector(`:scope > *:not(summary)`);if(!n)continue;let r=getComputedStyle(n).position;r!==`absolute`&&r!==`fixed`||(e.open=!1)}},!0),window.addEventListener(`resize`,()=>{uS(),OS(),lS()}),window.addEventListener(`scroll`,Gx,{passive:!0}),window.addEventListener(`resize`,Gx,{passive:!0}),document.addEventListener(`toggle`,e=>{let t=e.target;if(!(t instanceof HTMLDetailsElement)||!t.classList.contains(`ltp-era`))return;let n=t.querySelector(`.ltp-era-title[data-anim-title]`);n&&(t.open?(n.dataset.animDone=`1`,qx(n)):delete n.dataset.animDone)},!0);function MS(){for(let e of document.querySelectorAll(`details.mf-menu[open]`)){let t=e.querySelector(`.mf-menu-panel`);t&&(e.classList.remove(`is-flip`),t.getBoundingClientRect().left<8&&e.classList.add(`is-flip`))}}document.addEventListener(`toggle`,e=>{e.target instanceof HTMLDetailsElement&&e.target.classList.contains(`mf-menu`)&&MS()},!0),window.addEventListener(`hashchange`,()=>{let e=Et(location.hash);e.view===`learn-classic`&&e.anchor||e.view===`learn`&&M.getState().route.view===`learn`||window.scrollTo(0,0),M.setState(t=>({...t,route:e,ui:{...t.ui,modal:void 0}}))}),gh(Fx),Xx(),M.subscribe(aS),window.addEventListener(`popstate`,()=>{M.getState().ui.modal?(iS=``,M.setState(e=>({...e,ui:{...e.ui,modal:void 0}}))):history.state?.absModal&&history.back()}),document.addEventListener(`cds-notification-closed`,e=>{let t=e.target?.dataset?.coachmark;t&&M.setState(e=>{if(e.onboarding.toursSeen.includes(t))return e;let n={...e.onboarding,toursSeen:[...e.onboarding.toursSeen,t]};return mt(n),{...e,onboarding:n,ui:{...e.ui,coachmarkDone:!0}}})}),document.addEventListener(`cds-select-selected`,e=>{let t=e.target,n=e.detail?.value;if(n===void 0)return;let r=Array.from(t.querySelectorAll(`cds-select-item`)).find(e=>e.getAttribute(`value`)===n);r?.dataset.action&&sh(r),requestAnimationFrame(()=>{let e=t.getAttribute(`value`);e!==null&&t.value!==e&&(t.value=e)})}),document.addEventListener(`cds-modal-closed`,e=>{if(e.target.classList.contains(`crop-modal`)){M.getState().ui.crop&&M.setState(e=>({...e,ui:{...e.ui,crop:void 0}}));return}if(M.getState().ui.modal){let e=document.createElement(`button`);e.dataset.action=`close-modal`,sh(e)}}),sS()||M.setState(e=>({...e,route:Et(location.hash)})),aS(),le().then(aS),Mu.onChange=e=>M.setState(t=>({...t,lists:e})),Mu.probeDiscord().then(e=>{e&&M.setState(e=>({...e}))});var NS=Mu.discordFinish();if(NS){let e=()=>M.setState(e=>({...e,lists:Ne(),ui:{...e.ui,modal:{kind:`sync`}}}));NS.then(e,t=>{e(),requestAnimationFrame(()=>{let e=document.getElementById(`sync-error`);e&&(e.textContent=t instanceof Error?t.message:`Discord sign-in failed. Try again.`,e.hidden=!1)})})}else Mu.enabled()&&setTimeout(()=>void Mu.sync().catch(()=>{}),800);
+        `}static get itemClicked(){return`cds-overflow-menu-item-clicked`}static{this.shadowRootOptions={...q.shadowRootOptions,delegatesFocus:!0}}static{this.styles=gx}};W([J({type:Boolean,reflect:!0})],Mx.prototype,`danger`,void 0),W([J({type:String,attribute:`danger-description`})],Mx.prototype,`dangerDescription`,void 0),W([J({type:Boolean,reflect:!0})],Mx.prototype,`disabled`,void 0),W([J({type:Boolean,reflect:!0})],Mx.prototype,`divider`,void 0),W([J()],Mx.prototype,`href`,void 0),W([J({reflect:!0})],Mx.prototype,`size`,void 0),Mx=W([U(`cds-overflow-menu-item`)],Mx);function Nx(){for(let e of document.querySelectorAll(`.rt-editor`)){if(e.dataset.wired)continue;e.dataset.wired=`1`;let t=e.querySelector(`textarea.rt-input`),n=e.querySelector(`[data-rt-preview]`);!t||!n||t.addEventListener(`input`,()=>{n.innerHTML=Bi(t.value)})}}var Px=document.getElementById(`app`);if(!Px)throw Error(`Missing #app root element.`);var Fx=Px;function Ix(e){if(!(e instanceof HTMLElement))return null;if(e.id)return`id:${e.id}`;if(!e.dataset.action)return null;let t=[];for(let n of Object.keys(e.dataset).sort()){let r=e.dataset[n];r!==void 0&&t.push(`${n}=${r}`)}return`data:${t.join(`&`)}`}var Lx=`A Billion Suns 2e Shipyard`,Rx={home:`Home`,fleets:`Fleets`,builder:`Fleet List`,print:`Print setup`,"print-outfit":`Print setup`,foundry:`Custom Rules`,solo:`Solo`,"solo-outfit":`Outfit`,ships:`Ship Compendium`,play:`Play Mode`,learn:`Learn to Play`,rules:`The rules`,"learn-classic":`Learn to Play (archived)`},zx=null;function Bx(){let e=M.getState().route,t=e.view===`learn-classic`&&e.anchor?`${e.step}/${e.anchor}`:null;if(t===zx||(zx=t,!t||e.view!==`learn-classic`||!e.anchor))return;let n=document.getElementById(`phase-${e.anchor}`);n&&n.scrollIntoView({behavior:`smooth`,block:`start`})}var Vx=null;function Hx(){let e=M.getState().route,t=e.view===`learn`?e.tab??``:null;if(t===null){Vx=null;return}if(t===Vx)return;let n=Vx===null;Vx=t,n||window.scrollTo({top:0,behavior:`smooth`})}function Ux(){let e=document.querySelector(`[data-ltp-prog]`),t=e?.querySelector(`.ltp-prog-fill`);if(!e||!t)return;let n=Number(e.dataset.at??0),r=Math.max(1,Number(e.dataset.of??1)),i=document.documentElement.scrollHeight-window.innerHeight,a=i>8?Math.min(1,Math.max(0,window.scrollY/i)):1;t.style.transform=`scaleX(${((n+a)/r).toFixed(4)})`}var Wx=0;function Gx(){Wx||=requestAnimationFrame(()=>{Wx=0,Ux()})}var Kx=2.8;function qx(e){if(window.matchMedia(`(prefers-reduced-motion: reduce)`).matches)return;let t=e.dataset.era??`arma`,n=e.dataset.title??e.textContent??``;if(t===`hyper`){mS(e,n,Kx);return}if(t===`arma`){_S(e,n,Kx);return}hS(e,n,Kx),e.animate([{transform:`perspective(560px) rotateX(46deg) translateY(30px) scale(1.22)`,opacity:.15},{transform:`perspective(560px) rotateX(12deg) translateY(6px) scale(1.04)`,opacity:1,offset:.55},{transform:`perspective(560px) rotateX(0deg) translateY(0) scale(1)`,opacity:1}],{duration:Math.round(gS*Kx),easing:`cubic-bezier(.25,.8,.25,1)`})}var Jx=12;function Yx(e){let t=e.querySelector(`.ltp-gloss-pop`);if(!t)return;t.style.setProperty(`--gloss-x`,`0px`);let n=t.getBoundingClientRect();if(!n.width)return;let r=document.documentElement.clientWidth,i=n.right-(r-Jx),a=Jx-n.left,o=i>0?-i:a>0?a:0;o&&t.style.setProperty(`--gloss-x`,`${Math.round(o)}px`)}function Xx(){for(let e of[`pointerover`,`focusin`])document.addEventListener(e,e=>{let t=e.target;if(!(t instanceof Element))return;let n=t.closest(`.ltp-gloss`);n&&Yx(n)})}var Zx=null;function Qx(){let e=document.querySelectorAll(`.learn-dg`);if(!(!e.length||typeof IntersectionObserver>`u`)){Zx||=(document.documentElement.classList.add(`dg-gated`),new IntersectionObserver(e=>{for(let t of e)t.target.classList.toggle(`is-onscreen`,t.isIntersecting)},{threshold:.08})),Zx.disconnect();for(let t of e)Zx.observe(t)}}function $x(){for(let e of document.querySelectorAll(`.ltp-era[open]`)){let t=e.querySelector(`.ltp-era-title[data-anim-title]`);!t||t.dataset.animDone===`1`||(t.dataset.animDone=`1`,qx(t))}}function eS(){let e=M.getState(),t=e.route.view,n=Rx[t];if(t===`builder`){let t=e.lists.find(t=>t.id===e.route.listId);n=t&&Ut[t.mode]===`shipyard`?`Shipyard`:`Fleet List`}document.title=n?`${n} - ${Lx}`:Lx}var tS=null;document.addEventListener(`pointerdown`,e=>{tS=(e.target instanceof Element?e.target.closest(`[data-action]`):null)instanceof HTMLElement?{scrollY:window.scrollY,route:location.hash}:null},!0);function nS(){let e=tS;tS=null,!(!e||e.route!==location.hash)&&window.scrollY!==e.scrollY&&window.scrollTo(0,e.scrollY)}var rS=null,iS=``;function aS(){let e=document.activeElement,t=Ix(e),n=e instanceof HTMLInputElement?e.selectionStart:null,r=document.querySelector(`.mf-manifest`)?.scrollTop??0,i=document.querySelector(`.modal-panel`)?.scrollTop??0,a=new Set,o=new Set;for(let e of document.querySelectorAll(`details[data-persist]`)){let t=e.dataset.persist;t&&(e.open?a:o).add(t)}zp(Fx,jp(M.getState()));let s=Fx.querySelector(`main`);s&&(s.id=`main-content`),nS(),eS(),document.body.dataset.view=M.getState().route.view,NS(),uS();let c=document.querySelector(`.mf-manifest`);c&&(c.scrollTop=r);let l=document.querySelector(`.modal-panel`);l&&i&&(l.scrollTop=i),OS(),SS(),jm(),Nx(),AS(),jS(),bS(),requestAnimationFrame(()=>lS()),document.fonts?.ready.then(()=>lS());for(let e of document.querySelectorAll(`details[data-persist]`)){let t=e.dataset.persist;t&&(a.has(t)?e.open=!0:o.has(t)&&(e.open=!1))}if(t){let e=t.startsWith(`id:`)?document.getElementById(t.slice(3)):[...Fx.querySelectorAll(`[data-action]`)].find(e=>Ix(e)===t);if(e instanceof HTMLElement&&(e.focus({preventScroll:!0}),e instanceof HTMLInputElement&&n!==null))try{e.setSelectionRange(n,n)}catch{}}ES();let u=M.getState(),d=u.route.view===`play`?Mt(u)?.play:void 0,f=[location.hash,u.ui.modal?.kind??``,d?`${d.round}.${d.phase}`:``,document.querySelectorAll(`[data-roster-key]`).length].join(`|`);f!==rS&&(rS!==null&&fh(),rS=f);let p=M.getState().ui.modal?.kind??``;p&&!iS?history.pushState({absModal:!0},``):!p&&iS&&setTimeout(()=>{!M.getState().ui.modal&&history.state?.absModal&&history.back()},0),iS=p,DS(),Bx(),$x(),Qx(),Hx(),Ux()}function oS(e){history.replaceState(null,``,`#/fleets`),M.setState(t=>({...t,route:{view:`fleets`},ui:{...t.ui,modal:{kind:`share`,decoded:e}}}))}function sS(){let e=Cm(location.hash);if(!e)return!1;if(e.kind===`z`)return wm(e).then(e=>{e?oS(e):M.setState(e=>({...e,route:Et(location.hash)}))}),!0;let t=xm(e.data);return t?(oS(t),!0):!1}function cS(){let e=document.querySelector(`[data-print-sheet]`),t=e?.parentElement;if(!e||!t)return;let n=parseFloat(getComputedStyle(e).getPropertyValue(`--page-w`))||710;t.classList.remove(`is-fit`),t.style.height=``;let r=t.clientWidth;if(!r||!n||r>=n)return;let i=r/n;e.style.setProperty(`--sheet-scale`,String(i)),t.classList.add(`is-fit`),t.style.height=`${Math.ceil(e.offsetHeight*i)}px`}function lS(){let e=document.querySelector(`[data-print-sheet]`),t=document.querySelector(`[data-print-pagecount]`);if(!e)return;for(let t of e.querySelectorAll(`.page-guide`))t.remove();cS();let n=getComputedStyle(e),r=parseFloat(n.getPropertyValue(`--page-h`))||950,i=parseFloat(n.getPropertyValue(`--page-w`))||710,a=e.getBoundingClientRect(),o=a.top,s=a.width>0?a.width/i:1,c=[],l=e=>{for(let t of Array.from(e.children)){if(t.classList.contains(`page-guide`))continue;let e=t.getBoundingClientRect().height/s;if(e<=0)continue;let n=t.querySelectorAll(`tbody tr`);if(n.length>1){let e=t.querySelector(`thead`);e&&c.push(e),n.forEach(e=>c.push(e));continue}if(e>r*.9&&t.children.length>1){l(t);continue}c.push(t)}};l(e);let u=[],d=r;for(let e of c){let t=e.getBoundingClientRect(),n=(t.top-o)/s,i=(t.bottom-o)/s;i>d&&(n>0&&n<i&&u.push(n),d=n+r)}u.forEach((t,n)=>{let r=document.createElement(`div`);r.className=`page-guide`,r.style.top=`${t}px`,r.dataset.page=String(n+2),r.setAttribute(`aria-hidden`,`true`),e.appendChild(r)});let f=u.length+1;if(t){let n=e.dataset.paperLabel??``;t.textContent=`${f} ${f===1?`page`:`pages`}${n?`, ${n}`:``}`}}function uS(){let e=document.querySelector(`.topnav`),t=e?.querySelector(`.nav-pill`);if(!e||!t)return;let n=Array.from(e.querySelectorAll(`a, .topnav-btn`)),r=n.filter(e=>e.tagName===`A`),i=location.hash.replace(/^#/,``)||`/`,a=r.find(e=>{let t=e.getAttribute(`href`)?.replace(/^#/,``)??``;return t!==`/`&&(i===t||i.startsWith(t+`/`))});for(let e of r)e.removeAttribute(`aria-current`);a&&a.setAttribute(`aria-current`,`page`);let o=e=>{if(!e){t.style.opacity=`0`,t.style.width=`0`;return}t.style.opacity=`1`,t.style.width=`${e.offsetWidth}px`,t.style.transform=`translateX(${e.offsetLeft}px)`};t.style.transition=`none`,o(a),t.offsetWidth,t.style.transition=``,n.forEach(e=>e.addEventListener(`mouseenter`,()=>o(e))),e.addEventListener(`mouseleave`,()=>o(a))}var dS=null,fS=`ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/<>*-_`.split(``);function pS(){let e=document.createElement(`span`);return e.className=`nfd-underline`,e.setAttribute(`aria-hidden`,`true`),e}function mS(e,t,n=1){e.textContent=``;let r=[...t].map(t=>{let n=document.createElement(`span`);return n.className=`c`,n.setAttribute(`aria-hidden`,`true`),n.dataset.o=t,n.textContent=t,e.appendChild(n),n});e.appendChild(pS());let i=performance.now(),a=t=>{if(!e.isConnected)return;let o=t-i,s=!0;r.forEach((e,t)=>{let r=e.dataset.o??``;r!==` `&&(o<(70+t*26)*n?(e.textContent=fS[Math.floor(Math.random()*fS.length)]??r,s=!1):e.textContent=r)}),s||requestAnimationFrame(a)};requestAnimationFrame(a)}function hS(e,t,n=1){let r=Math.round(gS*n);e.textContent=t,e.appendChild(pS()),e.style.transformOrigin=``,e.style.setProperty(`--wipe-ms`,`${r}ms`),e.animate([{clipPath:`inset(-20% 100% -20% 0)`},{clipPath:`inset(-20% 0 -20% 0)`}],{duration:r,easing:`cubic-bezier(.3,0,.1,1)`}),e.classList.remove(`is-wiping`),e.offsetWidth,e.classList.add(`is-wiping`),window.setTimeout(()=>e.classList.remove(`is-wiping`),r+60)}var gS=460;function _S(e,t,n=1){let r=Math.round(340*n);e.textContent=t,e.appendChild(pS()),e.classList.add(`is-landing`),e.style.transformOrigin=`50% 100%`,e.animate([{opacity:0,transform:`scale(1.45)`},{opacity:1,transform:`scale(.97)`,offset:.6},{transform:`translateY(-2px) scale(1.01)`,offset:.78},{transform:`translateY(1px) scale(0.995)`,offset:.9},{transform:`translate(0,0) scale(1)`}],{duration:r,easing:`cubic-bezier(.2,.9,.2,1)`,fill:`forwards`}),window.setTimeout(()=>e.classList.remove(`is-landing`),r+20)}function vS(){document.querySelectorAll(`.nfd-stats .dice-ico`).forEach((e,t)=>{e.animate([{opacity:0,transform:`translateY(5px) scale(0.6)`},{opacity:1,transform:`translateY(0) scale(1)`}],{duration:300,delay:140+t*70,easing:`cubic-bezier(.2,.9,.3,1.4)`,fill:`backwards`})})}var yS=null;function bS(){let e=document.querySelector(`.mf-manifest, .roster-sheet`)!==null,t=Array.from(document.querySelectorAll(`[data-roster-key]`));if(!e){yS=null;return}if(t.length===0){yS=new Set;return}let n=new Set;for(let e of t){let t=e.dataset.rosterKey;t&&n.add(t)}let r=yS;if(yS=n,r!==null&&!window.matchMedia(`(prefers-reduced-motion: reduce)`).matches)for(let e of t){let t=e.dataset.rosterKey;!t||r.has(t)||e.animate([{opacity:0,transform:`translateY(-8px)`,boxShadow:`inset 3px 0 0 rgba(11,61,145,0.9)`},{opacity:1,transform:`translateY(0)`,boxShadow:`inset 0 0 0 rgba(11,61,145,0)`}],{duration:320,easing:`cubic-bezier(.2,.8,.2,1)`})}}var xS=null;function SS(){xS?.disconnect(),xS=null;let e=document.querySelector(`[data-lib-more]`);if(!e)return;let t=e.closest(`.em-body`)??null;xS=new IntersectionObserver(e=>{e.some(e=>e.isIntersecting)&&(xS?.disconnect(),xS=null,M.setState(e=>e.ui.modal?.kind===`emblem`?{...e,ui:{...e.ui,modal:{...e.ui.modal,libShown:(e.ui.modal.libShown??72)+72}}}:e))},{root:t,rootMargin:`300px`}),xS.observe(e)}var CS=null,wS=null;function TS(e){return[...e.querySelectorAll(`a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])`)].filter(e=>e.offsetParent!==null||e===document.activeElement)}function ES(){let e=document.querySelectorAll(`.modal-root .modal-panel`),t=e[e.length-1]??null;if(!t){wS&&=(document.removeEventListener(`keydown`,wS,!0),null),document.body.style.removeProperty(`overflow`),CS?.isConnected&&CS.focus(),CS=null;return}if(!wS){let e=document.activeElement;CS=e instanceof HTMLElement&&e!==document.body?e:null,document.body.style.overflow=`hidden`,(t.querySelector(`#emblem-lib-search`)??TS(t)[0])?.focus(),wS=e=>{if(e.key!==`Tab`)return;let t=document.querySelectorAll(`.modal-root .modal-panel`),n=t[t.length-1];if(!n)return;let r=TS(n);if(r.length===0)return;let i=r[0],a=r[r.length-1];n.contains(document.activeElement)?e.shiftKey&&document.activeElement===i?(e.preventDefault(),a.focus()):!e.shiftKey&&document.activeElement===a&&(e.preventDefault(),i.focus()):(e.preventDefault(),(e.shiftKey?a:i).focus())},document.addEventListener(`keydown`,wS,!0)}}function DS(){let e=document.querySelector(`.em-modal .lib-icon.selected`);if(!e)return;let t=e.closest(`.em-body`);if(!t)return;let n=t.getBoundingClientRect(),r=e.getBoundingClientRect();r.top>=n.top&&r.bottom<=n.bottom||(t.scrollTop+=r.top-n.top-t.clientHeight/2+r.height/2)}function OS(){let e=document.querySelector(`.mf-head`);if(!e)return;let t=Math.round(e.getBoundingClientRect().height);t>0&&document.documentElement.style.setProperty(`--mf-head-h`,`${t+12}px`)}var kS=new Map;function AS(){for(let e of document.querySelectorAll(`.faction-plaques`)){let t=e.closest(`.nf-modal, .faction-switch, .foundry-main, main`)?.className??`loose`,n=e.querySelector(`.faction-plaque.selected`),r=n?.dataset.faction??``,i=`${t}|${e.className}`,a=kS.get(i);kS.set(i,r),!(a===void 0||a===r||!n)&&n.classList.add(`just-picked`)}}function jS(){let e=document.querySelector(`.nfd-title[data-anim-title]:not(.ltp-era-title)`);if(!e){dS=null;return}let t=e.dataset.era??`unity`,n=e.dataset.title??e.textContent??``,r=`${t}|${n}`;if(r===dS||(dS=r,window.matchMedia(`(prefers-reduced-motion: reduce)`).matches))return;let i=new IntersectionObserver(r=>{r.some(e=>e.isIntersecting)&&(i.disconnect(),e.isConnected&&(t===`hyper`?mS(e,n):t===`arma`?_S(e,n):hS(e,n),vS()))},{threshold:.6});i.observe(e)}document.addEventListener(`pointerdown`,e=>{let t=e.target;for(let e of document.querySelectorAll(`details[open]`)){if(t&&e.contains(t))continue;let n=e.querySelector(`:scope > *:not(summary)`);if(!n)continue;let r=getComputedStyle(n).position;r!==`absolute`&&r!==`fixed`||(e.open=!1)}},!0);var MS=window.innerWidth;window.addEventListener(`resize`,()=>{window.innerWidth!==MS&&(MS=window.innerWidth,uS(),OS(),lS())}),window.addEventListener(`scroll`,Gx,{passive:!0}),window.addEventListener(`resize`,Gx,{passive:!0}),document.addEventListener(`toggle`,e=>{let t=e.target;if(!(t instanceof HTMLDetailsElement)||!t.classList.contains(`ltp-era`))return;let n=t.querySelector(`.ltp-era-title[data-anim-title]`);n&&(t.open?(n.dataset.animDone=`1`,qx(n)):delete n.dataset.animDone)},!0);function NS(){for(let e of document.querySelectorAll(`details.mf-menu[open]`)){let t=e.querySelector(`.mf-menu-panel`);t&&(e.classList.remove(`is-flip`),t.getBoundingClientRect().left<8&&e.classList.add(`is-flip`))}}document.addEventListener(`toggle`,e=>{e.target instanceof HTMLDetailsElement&&e.target.classList.contains(`mf-menu`)&&NS()},!0),window.addEventListener(`hashchange`,()=>{let e=Et(location.hash);e.view===`learn-classic`&&e.anchor||e.view===`learn`&&M.getState().route.view===`learn`||window.scrollTo(0,0),M.setState(t=>({...t,route:e,ui:{...t.ui,modal:void 0}}))}),gh(Fx),Xx(),M.subscribe(aS),window.addEventListener(`popstate`,()=>{M.getState().ui.modal?(iS=``,M.setState(e=>({...e,ui:{...e.ui,modal:void 0}}))):history.state?.absModal&&history.back()}),document.addEventListener(`cds-notification-closed`,e=>{let t=e.target?.dataset?.coachmark;t&&M.setState(e=>{if(e.onboarding.toursSeen.includes(t))return e;let n={...e.onboarding,toursSeen:[...e.onboarding.toursSeen,t]};return mt(n),{...e,onboarding:n,ui:{...e.ui,coachmarkDone:!0}}})}),document.addEventListener(`cds-select-selected`,e=>{let t=e.target,n=e.detail?.value;if(n===void 0)return;let r=Array.from(t.querySelectorAll(`cds-select-item`)).find(e=>e.getAttribute(`value`)===n);r?.dataset.action&&sh(r),requestAnimationFrame(()=>{let e=t.getAttribute(`value`);e!==null&&t.value!==e&&(t.value=e)})}),document.addEventListener(`cds-modal-closed`,e=>{if(e.target.classList.contains(`crop-modal`)){M.getState().ui.crop&&M.setState(e=>({...e,ui:{...e.ui,crop:void 0}}));return}if(M.getState().ui.modal){let e=document.createElement(`button`);e.dataset.action=`close-modal`,sh(e)}}),sS()||M.setState(e=>({...e,route:Et(location.hash)})),aS(),le().then(aS),Mu.onChange=e=>M.setState(t=>({...t,lists:e})),Mu.probeDiscord().then(e=>{e&&M.setState(e=>({...e}))});var PS=Mu.discordFinish();if(PS){let e=()=>M.setState(e=>({...e,lists:Ne(),ui:{...e.ui,modal:{kind:`sync`}}}));PS.then(e,t=>{e(),requestAnimationFrame(()=>{let e=document.getElementById(`sync-error`);e&&(e.textContent=t instanceof Error?t.message:`Discord sign-in failed. Try again.`,e.hidden=!1)})})}else Mu.enabled()&&setTimeout(()=>void Mu.sync().catch(()=>{}),800);

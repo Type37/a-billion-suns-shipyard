@@ -2855,7 +2855,7 @@ button { font-family: inherit; }
 .perk-block .ghost-btn.danger { padding: 1px 4px; flex: none; }
 /* Not full width: a select that runs the whole card reads as the card's
    subject rather than one more thing you may do to the pilot. */
-.perk-select { max-width: 230px; font-size: 13px; padding: 4px 8px; }
+.perk-select { max-width: 230px; }
 /* The log is a story, so an entry is a line of it: which game, what it paid,
    when, and what happened. */
 .game-log { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
@@ -8754,11 +8754,11 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
 }
 @media (hover: hover) { .solo-outfit .pilot-opt:hover { background: var(--cds-field-hover, #e8e8e8); color: var(--ink); } }
 .solo-outfit .pilot-opt.on { background: var(--ink); color: #fff; font-weight: 600; }
-.solo-outfit .unit-name-input, .solo-outfit .pilot-name-input, .solo-outfit .perk-select {
+.solo-outfit .unit-name-input, .solo-outfit .pilot-name-input {
   min-height: var(--tap); padding: 8px 12px; font-size: 16px; font-family: var(--sans);
   border: none; border-bottom: 1px solid var(--field-edge); background: var(--ground); color: var(--ink);
 }
-.solo-outfit .unit-name-input:focus, .solo-outfit .pilot-name-input:focus, .solo-outfit .perk-select:focus { outline: 2px solid var(--focus); outline-offset: -2px; }
+.solo-outfit .unit-name-input:focus, .solo-outfit .pilot-name-input:focus { outline: 2px solid var(--focus); outline-offset: -2px; }
 .solo-outfit .pilot-name { text-transform: none; letter-spacing: 0; font-weight: inherit; color: inherit; font-size: 14px; }
 .solo-head .solo-tabs { overflow: visible; }
 /* The head's own rule is the divider; the old setup band's black line under
@@ -8789,3 +8789,21 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
 .outfit-card-main { padding: 16px 16px 8px; }
 .outfit-card-debt { padding: 0 16px 16px; }
 .outfit-card-actions { padding: 0 16px 16px; }
+
+/* Fewer lines, more space (Jet: "too many dividers once again", "spacing
+   especially"). Carbon separates sections with the spacing scale, not with a
+   rule under every heading: the solo headings lose their underline and the
+   game bars their bottom rule, and sections are 32px apart instead. The only
+   rule left on the outfit page is the head's, which the tabs sit on. */
+.solo-outfit .roster-section, .solo-outfit .catalog-title { border-bottom: none; padding-bottom: 0; margin: 32px 0 16px; }
+.solo-outfit .catalog-title, .solo-outfit .roster-sheet > .roster-section:first-of-type { margin-top: 32px; }
+.solo-outfit .game-bar { border-bottom: none; padding-bottom: 0; }
+.solo-outfit .solo-card { margin-top: 32px; padding: 0; border: none; }
+.solo-outfit .solo-budget { display: block; margin: 0 0 24px; max-width: 32rem; }
+.solo-outfit .perk-select { margin-top: 16px; max-width: 20rem; }
+.solo-outfit .roster-unit + .roster-unit, .solo-outfit .ship-row + .ship-row { margin-top: 16px; }
+/* A granted perk reads like the rest of the card (it was set in the serif
+   with a red boxed close mark); removing it is a ghost close mark. */
+.solo-outfit .perk-taken-text { font-family: var(--sans); font-size: 14px; line-height: 1.45; color: var(--ink-2); }
+.solo-outfit .perk-list .ghost-btn.danger { border: none; color: var(--ink-2); background: none; width: var(--tap); height: var(--tap); }
+@media (hover: hover) { .solo-outfit .perk-list .ghost-btn.danger:hover { background: var(--cds-field-hover, #e8e8e8); color: var(--error); } }

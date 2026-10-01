@@ -284,7 +284,7 @@ function perkBlock(o: SavedOutfit, sh: SavedOutfit["ships"][number]): string {
   const opts = list
     .map(
       (p) =>
-        `<option value="${escapeHtml(p.name)}"${has.has(p.name) ? " disabled" : ""}>${p.n}. ${escapeHtml(p.name)}${has.has(p.name) ? " (taken)" : ""}</option>`,
+        `<cds-select-item value="${escapeHtml(p.name)}" data-action="assign-perk-item" data-ship="${sh.id}" data-perk="${escapeHtml(p.name)}"${has.has(p.name) ? " disabled" : ""}>${p.n}. ${escapeHtml(p.name)}${has.has(p.name) ? " (taken)" : ""}</cds-select-item>`,
     )
     .join("");
   const taken = o.perks
@@ -302,7 +302,10 @@ function perkBlock(o: SavedOutfit, sh: SavedOutfit["ships"][number]): string {
   const who = sh.pilotName || sh.shipName || `${sh.pilotClass} pilot`;
   return `<div class="perk-block">
       ${taken ? `<ul class="perk-list">${taken}</ul>` : ""}
-      <select class="perk-select" data-action="assign-perk" data-ship="${sh.id}" aria-label="Grant a perk to ${escapeHtml(who)}"><option value="">Grant a perk&hellip;</option>${opts}</select>
+      ${/* Carbon select (a native one before). The items carry the action, so
+            main.ts's cds-select bridge runs it; value stays empty, so the
+            field reads "Grant a perk" again after each grant. */ ""}
+      <cds-select class="perk-select" label-text="Grant a perk to ${escapeHtml(who)}" hide-label placeholder="Grant a perk" value="" size="lg">${opts}</cds-select>
     </div>`;
 }
 
@@ -394,16 +397,17 @@ function outfitTab(o: SavedOutfit): string {
           panel already shows both, and shows them editable; repeating them
           200px lower was the same outfit introduced to you twice.
         -->
-        <div class="band-readout solo-readout ${over ? "over" : ""}">
-          <div class="readout"><span class="readout-label">Budget</span><span class="readout-value">${ck(budgetK(o))}</span></div>
-          <div class="readout"><span class="readout-label">Spent</span><span class="readout-value">${ck(cost)}</span></div>
-          <div class="readout"><span class="readout-label">Left</span><span class="readout-value ${over ? "negative" : ""}">${over ? "−" : ""}${ck(Math.abs(remaining))}</span></div>
-        </div>
         ${/* No running count. "3/5" beside a list of three ships you can see is
               the app counting to three for you, every time you look at it. The
               cap only matters at the moment it stops you, so it only speaks
               then. */ ""}
         <h3 class="roster-section">Ships${full ? ` <span class="roster-warn">Outfit full</span>` : ""}</h3>
+        ${/* Budget as Carbon's progress bar (Jet, 1 October 2026: remove the
+              Budget / Spent / Left readout, "have a simple meter"). One label,
+              one bar, one line of helper text; over budget it goes to
+              Carbon's error state and says by how much. */ ""}
+        <cds-progress-bar class="solo-budget" label="Budget" max="${budgetK(o)}" value="${Math.min(cost, budgetK(o))}"
+          helper-text="${over ? `¢${-remaining}k over ¢${budgetK(o)}k` : `¢${cost}k of ¢${budgetK(o)}k`}" ${over ? 'status="error"' : ""}></cds-progress-bar>
         ${/* p.212, verbatim. The old one-line paraphrase dropped the
               one-Perk-per-pilot-per-game limit and the D12 roll. */ ""}
         <p class="panel-note">For each ¢1k you earned during this game, choose one of your surviving pilots to gain a Perk. Each pilot can only gain a maximum of one Perk after each game. When you gain a Perk, roll a D12. If you roll a Perk you already have, you can select and gain another Perk from your class list.</p>

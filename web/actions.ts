@@ -2464,6 +2464,16 @@ export function dispatchAction(target: HTMLElement): void {
       }
       break;
     }
+    // A perk picked from the Carbon select under a pilot (solo.ts perkBlock).
+    case "assign-perk-item": {
+      const shipId = target.dataset["ship"];
+      const perk = target.dataset["perk"];
+      if (!shipId || !perk) return;
+      editOutfit((o) =>
+        o.perks.some((p) => p.shipId === shipId && p.perk === perk) ? o : { ...o, perks: [...o.perks, { shipId, perk }] },
+      );
+      break;
+    }
     case "cf-ship-open": {
       const si = Number(target.dataset["ship"]);
       if (!Number.isInteger(si)) return;

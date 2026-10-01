@@ -22,6 +22,7 @@ import "@carbon/web-components/es/components/overflow-menu/index.js";
 import "@carbon/web-components/es/components/menu/index.js";
 import "@carbon/web-components/es/components/checkbox/index.js";
 import "@carbon/web-components/es/components/toggle/index.js";
+import "@carbon/web-components/es/components/progress-bar/index.js";
 
 // Keep every Markdown notes editor's preview in step with its textarea as the
 // user types. Uncontrolled on purpose (see richtext.ts): typing must not go

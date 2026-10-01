@@ -3443,8 +3443,10 @@ button { font-family: inherit; }
   font-family: var(--display); font-weight: 800; font-size: 18px; text-transform: uppercase; letter-spacing: 0.04em;
   border: 2px solid var(--blue); transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
 }
-.mf-play-cta { background: var(--blue); color: #fff; }
-@media (hover: hover) { .mf-play-cta:hover { background: var(--blue-deep); border-color: var(--blue-deep); } }
+/* Outlined, not filled: Add unit is the builder's one filled button (Jet's
+   rule), and Play mode is also first in the Fleet menu at the top. */
+.mf-play-cta { background: transparent; color: var(--blue); }
+@media (hover: hover) { .mf-play-cta:hover { background: var(--blue); color: #fff; } }
 /* Print is demoted, not removed. It sat at the same 18px/800 weight and the same
    2px blue border as Enter Play Mode, so two full-width blue slabs argued for
    the same click and nothing said which one "finishing" meant. Play Mode is what
@@ -7997,3 +7999,24 @@ cds-select.hdr-select { flex: 1 1 0; min-width: 10rem; }
   cds-select.hdr-select { min-width: 0; }
 }
 cds-menu-button.hdr-menu { border: 1px solid var(--blue); }
+
+/* Stacked rules, removed (Jet, October 2026: "dividers next to dividers").
+   Measured on an iPhone 13 by listing every full-width border on each screen
+   and flagging any two within 24px of each other. In each case the rule that
+   went is the one that repeated an edge something else already drew. */
+/* Home and Custom Rules: a 2px ink rule 2px above the first row's own border. */
+.index { border-top: none; }
+/* Builder: the personnel block's ink rule sat 14px under the last unit card. */
+.sy-personnel { border-top: none; padding-top: 0; }
+/* Play: the commands box framed a list of framed command cards, so its top
+   and bottom edges doubled the first and last card's. */
+.pc-cmds { border: none; background: none; padding: 0; }
+/* Play: the phase panel's box began 18px under the pinned bar's 2px edge. */
+.phase-fold { border-color: transparent; }
+/* Hypergrowth Play: a rule under the shipyard heading, 4px above a card. */
+.sy-shipyard-head { border-bottom: none; }
+/* Compendium: rules above and below the filters, then the view toggle, then
+   the table's own frame, three rules in 60px. The table frame stays. */
+.comp-filters { border-top: none; border-bottom: none; padding: 8px 0; }
+/* Rules: a section heading's top rule 20px under the commands box above it. */
+.ltp-cmds + .ltp-h3 { border-top: none; padding-top: 0; }

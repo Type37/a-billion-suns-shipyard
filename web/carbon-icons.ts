@@ -52,7 +52,7 @@ import c_renew from "@carbon/icons/es/renew/16.js";
 import c_image from "@carbon/icons/es/image/16.js";
 import c_logo_discord from "@carbon/icons/es/logo--discord/16.js";
 import c_user_military from "@carbon/icons/es/user--military/16.js";
-import c_double_chevron_right from "@carbon/icons/es/double-chevron--right/16.js";
+import c_deployment_policy from "@carbon/icons/es/deployment-policy/16.js";
 import c_target from "@carbon/icons/es/target/16.js";
 import c_security from "@carbon/icons/es/security/16.js";
 import c_cube from "@carbon/icons/es/cube/16.js";
@@ -109,8 +109,9 @@ export const CARBON_ICONS: Record<string, Node> = {
   "image": c_image,
   "discord": c_logo_discord,
   "commander": c_user_military,
-  // Thrust: carbon:double-chevron-right, Jet's pick (it was "rocket").
-  "stat-thrust": c_double_chevron_right,
+  // Thrust: carbon:deployment-policy, Jet's pick (tried "rocket", then
+  // "double-chevron-right").
+  "stat-thrust": c_deployment_policy,
   "stat-silhouette": c_target,
   "stat-shields": c_security,
   "die": c_cube,

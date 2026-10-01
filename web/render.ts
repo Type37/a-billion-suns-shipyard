@@ -1330,8 +1330,10 @@ function shipyardView(state: AppState): string {
     <header class="sy-head">
       <div class="sy-id">
         <span class="mf-emblem">${emblemPicker}</span>
-        <input class="mf-name sy-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled company" aria-label="Company name" data-action="fleet-name" />
-        <button class="mf-name-gen" data-action="reroll-corp-name" title="Roll a random company name" aria-label="Roll a random company name">${icon("random", 14)}</button>
+        <span class="name-box">
+          <input class="mf-name sy-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled company" aria-label="Company name" data-action="fleet-name" />
+          <button class="mf-name-gen" data-action="reroll-corp-name" title="Roll a random company name" aria-label="Roll a random company name">${icon("random", 18)}</button>
+        </span>
       </div>
       <div class="sy-fac">
         <span class="mf-fac">${factionControl}</span>
@@ -1671,6 +1673,24 @@ function builderView(state: AppState): string {
     </details>`;
 
   const nUnits = list.fleet.units.length;
+  // The fleet's legality sits in the credits row beside what is left to
+  // spend (Jet: "the 1 to resolve should live next to the cash remaining"):
+  // both answer "is this fleet done?", and the row is pinned while you scroll.
+  const fleetStatus =
+    // A legal fleet says nothing worth a standing line; the line is only spent
+    // when there is something to resolve. Free Play always announces itself.
+    list.freePlay
+      ? '<p class="yard-status is-muted">Free Play, no rules check</p>'
+      : // An empty fleet is not a broken one. "2 to resolve" in red before the
+        // first ship was added greeted every new fleet with an error.
+        issues.length > 0 && nUnits > 0
+        ? `<details class="yard-status-pop">
+          <summary class="yard-status is-fail">${icon("warning", 12)} ${issues.length} to resolve</summary>
+          <ul class="yard-status-panel issue-list">${issues.map(issueLine).join("")}</ul>
+        </details>`
+        : nUnits > 0
+          ? `<p class="yard-status is-ok">${icon("check", 12)} Legal</p>`
+          : "";
 
   return `
   ${topbar()}
@@ -1680,8 +1700,10 @@ function builderView(state: AppState): string {
     <header class="sy-head">
       <div class="sy-id">
         <span class="mf-emblem">${emblemPicker}</span>
-        <input class="mf-name sy-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled fleet" aria-label="Fleet name" data-action="fleet-name" />
-        <button class="mf-name-gen" data-action="gen-fleet-name" title="Roll a random fleet name" aria-label="Roll a random fleet name">${icon("random", 14)}</button>
+        <span class="name-box">
+          <input class="mf-name sy-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled fleet" aria-label="Fleet name" data-action="fleet-name" />
+          <button class="mf-name-gen" data-action="gen-fleet-name" title="Roll a random fleet name" aria-label="Roll a random fleet name">${icon("random", 18)}</button>
+        </span>
         <!-- No eraser button. It sat flush against the field, a thumb a few px
              off the name blanked it with no undo, and clearing a text field is
              something every phone keyboard already does. -->
@@ -1702,38 +1724,28 @@ function builderView(state: AppState): string {
       <div class="sy-budget-row">
         <span class="sy-budget-now">${credits(total)}</span>
         <span class="sy-budget-cap">${limitControl}</span>
-        <span class="sy-budget-free">${remaining < 0 ? `${credits(-remaining)} over` : `${credits(remaining)} remaining`}</span>
+        <div class="sy-budget-status">${fleetStatus}</div>
+        <span class="sy-budget-free">${remaining < 0 ? `${credits(-remaining)} over` : `${credits(remaining)} left`}</span>
       </div>
       <div class="sy-meter"><span class="sy-meter-fill" style="width:${list.fleet.creditsLimit > 0 ? Math.min(100, (total / list.fleet.creditsLimit) * 100) : 0}%"></span></div>
     </div>
 
     <div class="sy-cols">
     <div class="sy-col-fleet">
+    ${/* One row: the fleet's status on the left, Add unit on the right. There
+          used to be a "YOUR FLEET" heading row with Add unit beside it and then
+          a row of its own for "Legal" or "1 to resolve" under that: two rows
+          and 70px before the first ship, for a heading that names the page
+          you are on. The heading stays for screen readers only, and the
+          status moved up into the credits row (fleetStatus). */ ""}
     <div class="sy-list-head">
-      ${/* No "10 units" beside the heading: the list under it already says
-            how many, one row each. */ ""}<h3 class="sy-h">${isStocking ? "Your shipyard" : "Your fleet"}</h3>
+      <h3 class="visually-hidden">${isStocking ? "Your shipyard" : "Your fleet"}</h3>
       ${
         list.freePlay || faction
           ? `<button class="sy-add-unit ${nUnits === 0 ? "is-pulsing" : ""}" data-action="open-add-unit">${icon("plus", 16)} Add ${isStocking ? "ship" : "unit"}</button>`
           : ""
       }
     </div>
-    ${
-      // A legal fleet says nothing worth a standing line; the line is only spent
-      // when there is something to resolve. Free Play always announces itself.
-      list.freePlay
-        ? '<p class="yard-status is-muted">Free Play, no rules check</p>'
-        : // An empty fleet is not a broken one. "2 to resolve" in red before the
-          // first ship was added greeted every new fleet with an error.
-          issues.length > 0 && nUnits > 0
-          ? `<details class="yard-status-pop">
-              <summary class="yard-status is-fail">${icon("warning", 12)} ${issues.length} to resolve</summary>
-              <ul class="yard-status-panel issue-list">${issues.map(issueLine).join("")}</ul>
-            </details>`
-          : nUnits > 0
-            ? `<p class="yard-status is-ok">${icon("check", 12)} Legal</p>`
-            : ""
-    }
 
     <div class="sy-list">${
       // Nothing when empty. The dashed "No units yet / Tap Add unit to begin"

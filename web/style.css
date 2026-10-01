@@ -3573,15 +3573,22 @@ button { font-family: inherit; }
    in red, never blocked. */
 .sy-budget {
   position: sticky; top: 0; z-index: 30; background: var(--paper);
-  padding: 9px 0 10px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink);
+  /* No rules above or below. The meter is the band's bottom edge, and the
+     header already ends in a rule of its own, so the band sat between two
+     black lines with a third (the meter) inside it. */
+  padding: 8px 0 0;
 }
 .sy-budget-row { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; font-family: var(--display); font-variant-numeric: tabular-nums; }
 .sy-budget-now { font-size: clamp(24px, 5vw, 32px); font-weight: 900; color: var(--ink); }
 .sy-budget-cap { font-weight: 800; }
 .sy-budget-cap .limit-switch > summary { font-size: 15px; font-weight: 700; color: var(--ink-2); border-bottom-width: 1px; }
-.sy-budget-free { margin-left: auto; font-size: 15px; font-weight: 900; color: var(--go); }
+.sy-budget-status { margin-left: auto; align-self: center; font-family: var(--sans); }
+.sy-budget-status .yard-status, .sy-budget-status .yard-status-pop { margin: 0; }
+/* The issues panel opens from the right edge now that its summary sits there. */
+.sy-budget-status .yard-status-panel { left: auto; right: 0; }
+.sy-budget-free { font-size: 15px; font-weight: 900; color: var(--go); }
 .shipyard.is-over .sy-budget-now, .shipyard.is-over .sy-budget-free { color: var(--red-deep); }
-.sy-meter { margin-top: 9px; height: 8px; background: var(--ground); border: 1px solid var(--hair-soft); }
+.sy-meter { margin-top: 6px; height: 8px; background: var(--ground); border: 1px solid var(--hair-soft); }
 .sy-meter-fill { display: block; height: 100%; background: var(--blue); transition: width 0.18s var(--ease); }
 .shipyard.is-over .sy-meter-fill { background: var(--red); }
 
@@ -3712,7 +3719,11 @@ button { font-family: inherit; }
 .sy-ref-btn { display: inline-flex; align-items: center; gap: 6px; font-family: var(--display); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.02em; padding: 5px 10px; border: 1px solid var(--hair-soft); background: var(--paper); color: var(--ink); cursor: pointer; }
 @media (hover: hover) { .sy-ref-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-wash); } }
 
-.sy-list-head { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+.sy-list-head { display: flex; align-items: center; gap: 12px; margin: 10px 0; min-height: var(--tap); }
+/* Status left, Add unit pushed right; the status line's own bottom margin goes
+   now that it shares the row. */
+.sy-list-head .sy-add-unit { margin-left: auto; }
+.sy-list-head .yard-status, .sy-list-head .yard-status-pop { margin: 0; }
 .sy-h { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; font-size: 15px; margin: 0; display: flex; align-items: baseline; gap: 8px; }
 .sy-h-count { font-weight: 600; font-size: 12px; color: var(--ink-3); }
 .sy-add-unit { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; font-size: 13px; padding: 9px 15px; border: none; background: var(--blue); color: #fff; cursor: pointer; }
@@ -7944,3 +7955,20 @@ cds-inline-notification.app-hint { max-width: none; width: 100%; margin: 6px 0; 
 .pf-unit.is-reserve { border-left-color: var(--hair); }
 .au-card { border: none; padding: 0; }
 .mf-yard .mf-list { border: none; }
+
+/* The fleet (or company) name and its dice are one field: the roll button sits
+   inside the box at its right end, the way a search field carries its clear
+   button. They were two controls side by side, the dice a 24px glyph floating
+   outside the box where it read as a separate, unexplained tool. The box draws
+   the border and the focus ring; the input inside is bare. */
+.name-box {
+  display: flex; align-items: stretch; flex: 1 1 auto; min-width: 0;
+  border: 1px solid var(--field-edge); background: var(--ground); border-radius: 2px;
+}
+.name-box:focus-within { outline: 2px solid var(--red); outline-offset: -2px; border-color: var(--blue); background: var(--paper); }
+.name-box > .mf-name.mf-name { flex: 1 1 auto; min-width: 0; max-width: none; border: none; background: transparent; outline: none; }
+.name-box > .mf-name-gen.mf-name-gen {
+  flex: 0 0 auto; width: var(--tap); height: auto; min-height: 0; border: none; border-radius: 0;
+  background: transparent; color: var(--ink-3); display: inline-flex; align-items: center; justify-content: center;
+}
+.name-box > .mf-name-gen.mf-name-gen:focus-visible { outline: 2px solid var(--red); outline-offset: -4px; }

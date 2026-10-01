@@ -606,7 +606,11 @@ function dispatchAction(target: HTMLElement): void {
       if (!source) return;
       const copy = structuredClone(source);
       copy.id = newId("fl");
-      copy.fleet.name = source.fleet.name ? `${source.fleet.name} (copy)` : "";
+      // Always "(copy)", named or not. An unnamed fleet used to copy to another
+      // blank name, so jumping to the copy from inside the builder changed
+      // nothing you could see and the button looked dead. The name in the
+      // header is the confirmation; no toast.
+      copy.fleet.name = `${source.fleet.name || "Untitled fleet"} (copy)`;
       copy.createdAt = new Date().toISOString();
       copy.updatedAt = copy.createdAt;
       store.setState((s) => {
@@ -630,7 +634,7 @@ function dispatchAction(target: HTMLElement): void {
       if (
         needsConfirm(target, {
           title: "Delete this fleet?",
-          body: `"${doomed.fleet.name || "Unnamed fleet"}" and everything in it goes for good. This cannot be undone.`,
+          body: `"${doomed.fleet.name || "Untitled fleet"}" and everything in it goes for good. This cannot be undone.`,
           confirmLabel: "Delete fleet",
           danger: true,
         })

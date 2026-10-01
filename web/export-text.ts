@@ -27,7 +27,7 @@ export function fleetToMarkdown(list: SavedList, customs: Faction[]): string {
   const era = MODE_ERA[list.mode] ?? "";
   const lines: string[] = [];
 
-  lines.push(`# ${list.fleet.name || "Unnamed fleet"}`);
+  lines.push(`# ${list.fleet.name || "Untitled fleet"}`);
   const sub = [faction?.name ?? "Mixed forces", era].filter(Boolean).join(" — ");
   lines.push(`${sub}, ${creditsText(total)} of ${creditsText(list.fleet.creditsLimit)}`);
   if (faction) lines.push(`**${faction.rule.name}:** ${faction.rule.text}`);

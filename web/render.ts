@@ -651,7 +651,7 @@ function fleetsView(state: AppState): string {
       return `
       <article class="fleet-card">
         <span class="fleet-card-emblem">${listEmblem(l, 40)}</span>
-        <a class="fleet-card-name" href="#/list/${l.id}">${escapeHtml(l.fleet.name || "Unnamed fleet")}</a>
+        <a class="fleet-card-name" href="#/list/${l.id}">${escapeHtml(l.fleet.name || "Untitled fleet")}</a>
         <span class="fleet-card-cost">${credits(total)}</span>
         <span class="fleet-card-faction">${escapeHtml(faction?.name ?? "Mixed forces")}</span>
         <span class="fleet-card-mode">${l.freePlay ? "Free Play" : MODE_LABEL[l.mode]}</span>
@@ -2613,7 +2613,7 @@ function printView(
       <header class="sheet-head">
         <div class="sheet-emblem">${listEmblem(list, 52)}</div>
         <div class="sheet-title-block">
-          <h1 class="sheet-title">${escapeHtml(list.fleet.name || "Unnamed fleet")}</h1>
+          <h1 class="sheet-title">${escapeHtml(list.fleet.name || "Untitled fleet")}</h1>
           <p class="sheet-subtitle">${subtitle}</p>
         </div>
         <div class="sheet-totals">
@@ -3716,7 +3716,7 @@ function playView(state: AppState): string {
     -->
     <div class="play-sticky">
       <header class="play-bar">
-        <p class="play-bar-id"><a href="#/list/${list.id}" aria-label="Back to ${escapeHtml(list.fleet.name || "Unnamed fleet")}">${icon("chevronRight", 16, "flip-x play-bar-back")}<span class="play-bar-name">${escapeHtml(list.fleet.name || "Unnamed fleet")}</span></a><span class="play-bar-id-tail"> <span aria-hidden="true">/</span> Play mode</span></p>
+        <p class="play-bar-id"><a href="#/list/${list.id}" aria-label="Back to ${escapeHtml(list.fleet.name || "Untitled fleet")}">${icon("chevronRight", 16, "flip-x play-bar-back")}<span class="play-bar-name">${escapeHtml(list.fleet.name || "Untitled fleet")}</span></a><span class="play-bar-id-tail"> <span aria-hidden="true">/</span> Play mode</span></p>
         <!--
           A readout, not a control. The round only ever moves one way and it moves
           by itself: Next phase past the End Phase rolls it over. A pair of steppers
@@ -4167,7 +4167,7 @@ function shareModal(state: AppState): string {
       <cds-modal-header>
         <cds-modal-close-button></cds-modal-close-button>
         <cds-modal-label>Shared with you</cds-modal-label>
-        <cds-modal-heading>${escapeHtml(list.fleet.name || "Unnamed fleet")}</cds-modal-heading>
+        <cds-modal-heading>${escapeHtml(list.fleet.name || "Untitled fleet")}</cds-modal-heading>
       </cds-modal-header>
       <cds-modal-body class="share-body" data-modal-primary-focus tabindex="-1">
         <p class="share-meta"><span>${escapeHtml(faction?.name ?? "Unknown faction")}</span><span>${escapeHtml(list.freePlay ? "Free Play" : MODE_LABEL[list.mode])}</span><span>${credits(total)} of ${credits(list.fleet.creditsLimit)}</span></p>

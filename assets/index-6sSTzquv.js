@@ -1401,7 +1401,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         <cds-modal-close-button></cds-modal-close-button>
         <cds-modal-heading>New fleet</cds-modal-heading>
       </cds-modal-header>
-      <cds-modal-body class="nf-body">
+      <cds-modal-body class="nf-body" data-modal-primary-focus tabindex="-1">
         <div class="nf-controls">
           <div class="modal-field">
             <span class="control-label">Era</span>
@@ -1732,7 +1732,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         <cds-modal-label class="au-budget ${p<0?`is-over`:``}">${B(m)}</cds-modal-label>
         <cds-modal-heading>Add ${d}</cds-modal-heading>
       </cds-modal-header>
-      <cds-modal-body class="au-body">
+      <cds-modal-body class="au-body" data-modal-primary-focus tabindex="-1">
         ${f?`<div class="au-species"><span class="au-species-label">Species</span>${Nd(`Species`,`add-unit-species`,`species`,Bt.map(e=>[e,e]),f)}</div>`:``}
         <div class="au-grid">${[0,1,2,3].map(u).join(``)}</div>
       </cds-modal-body>
@@ -1742,26 +1742,25 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
   </cds-modal>`}function Jd(e,t){return e.length?e.map(e=>`${B(e.name)} ${e.count}${e.die} ${e.rangeMin}&ndash;${e.rangeMax}"`).join(` · `):t?`Utility Bays`:``}function Yd(e){let t=e.ui.modal;if(!t||t.kind!==`ship-reference`)return``;let n=kt(e);if(!n)return``;let r=L(n.fleet.factionId,e.customFactions);if(!r)return``;let i=``;for(let e of[0,1,2,3]){let t=r.ships.filter(t=>t.mass===e).sort((e,t)=>e.cost-t.cost);if(t.length){i+=`<div class="sr-mass">Mass ${e}</div>`;for(let e of t){let t=Jd(e.primary,e.utilityBays&&e.primary.length===0),n=Jd(e.auxiliary,e.utilityBays&&e.auxiliary.length===0);i+=`<div class="sr-row">
         <span class="sr-name">${B(e.name)}</span>
         <span class="sr-stats">
-          <span class="sr-num" data-l="&#9410;">${e.mass}</span>
-          <span class="sr-num" data-l="T">${e.thrust}"</span>
-          <span class="sr-num" data-l="S">${e.silhouette}</span>
-          <span class="sr-num" data-l="Sh">${e.shields}</span>
+          <span class="sr-num" data-l="Mass">${e.mass}</span>
+          <span class="sr-num" data-l="Thrust">${e.thrust}"</span>
+          <span class="sr-num" data-l="SIL">${e.silhouette}</span>
+          <span class="sr-num" data-l="Shields">${e.shields}</span>
         </span>
         <span class="sr-weps">
-          <span class="sr-w ${t?``:`is-empty`}" data-l="P">${t||`&mdash;`}</span>
-          <span class="sr-w ${n?``:`is-empty`}" data-l="A">${n||`&mdash;`}</span>
+          <span class="sr-w ${t?``:`is-empty`}" data-l="Primary">${t||`&mdash;`}</span>
+          <span class="sr-w ${n?``:`is-empty`}" data-l="Auxiliary">${n||`&mdash;`}</span>
         </span>
         <span class="sr-cost">${z(e.cost)}</span>
       </div>`}}}return`
-  <div class="modal-root">
-    <div class="modal-backdrop" data-action="close-modal"></div>
-    <div class="modal-panel shipref-modal" role="dialog" aria-modal="true" aria-label="${B(r.name)} ship reference">
-      <header class="modal-header">
-        <h2 class="modal-title">${B(r.name)} &mdash; Ship Reference</h2>
-        <button class="modal-close" data-action="close-modal" aria-label="Close">${R(`close`,18)}</button>
-      </header>
-      <div class="modal-body shipref-body">
-        <p class="shipref-cap">${B(r.rule.name)} · Initiative ${B(r.initiative)} · ${B(r.cmdTokens)} CMD/round</p>
+  <cds-modal open size="lg" class="shipref-modal" data-key="shipref-modal">
+      <cds-modal-header>
+        <cds-modal-close-button></cds-modal-close-button>
+        <cds-modal-label>${B(r.name)}</cds-modal-label>
+        <cds-modal-heading>Ship reference</cds-modal-heading>
+      </cds-modal-header>
+      <cds-modal-body class="shipref-body" data-modal-primary-focus tabindex="-1">
+        <p class="shipref-cap"><span>${B(r.rule.name)}</span><span>Initiative ${B(r.initiative)}</span><span>${B(r.cmdTokens)} CMD a round</span></p>
         <div class="shipref">
           <div class="sr-row sr-head" aria-hidden="true">
             <span class="sr-name">Ship</span><span class="sr-num">Mass</span><span class="sr-num">Thr</span>
@@ -1770,9 +1769,8 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
           </div>
           ${i}
         </div>
-      </div>
-    </div>
-  </div>`}var Xd=(e,t)=>{let n=R(t===`primary`?`arc-primary`:`arc-aux`,10,`prw-mark slot-arc`),r=t===`primary`?e.primary:e.auxiliary;return(r.length?r.map(e=>B(Ur(e))):[B(t===`primary`?Wr(e):Gr(e))]).map(e=>`<span class="prw"><span class="prw-ico">${e===`None`?``:n}</span><span class="prw-t">${e}</span></span>`).join(``)};function Zd(e){let t=e.outfits.find(t=>t.id===e.route.outfitId);if(!t)return`${Cd()}<main class="empty-state"><p>That outfit was not found.</p></main>`;let n={id:`junkspace`,name:`Junkspace`,era:`Hypergrowth`,tagline:``,rule:{name:`The Rule of Hard Knocks`,text:`In Junkspace, if you can't figure out precisely what the rules are telling you to do: choose the interpretation or outcome that disadvantages you the most.`},initiative:`2D6`,cmdTokens:`5`,ships:d,hvp:[],commands:[]};return Qd(e,{list:{id:t.id,mode:`junkspace`,freePlay:!1,emblem:t.emblem,emblemImage:t.emblemImage,emblemLib:t.emblemLib,emblemColor:t.emblemColor,fleet:{name:t.name||`Unnamed outfit`,factionId:`junkspace`,creditsLimit:t.debtStartK??30,units:t.ships.map(e=>({id:e.id,shipClassId:e.shipClassId,count:1,...e.shipName?.trim()?{name:e.shipName.trim()}:{}})),hvp:[]},createdAt:t.createdAt,updatedAt:t.updatedAt},factions:[n],unitExtra:e=>{let n=t.ships.find(t=>t.id===e);if(!n)return``;let r=f.find(e=>e.class===n.pilotClass),i=t.perks.filter(e=>e.shipId===n.id).map(e=>{let t=Object.values(Vn).flat().find(t=>t.name===e.perk);return`<span class="pp-perk"><b>${B(e.perk)}</b> ${t?V(t.text):``}</span>`}).join(``);return ad[n.pilotClass],`
+      </cds-modal-body>
+  </cds-modal>`}var Xd=(e,t)=>{let n=R(t===`primary`?`arc-primary`:`arc-aux`,10,`prw-mark slot-arc`),r=t===`primary`?e.primary:e.auxiliary;return(r.length?r.map(e=>B(Ur(e))):[B(t===`primary`?Wr(e):Gr(e))]).map(e=>`<span class="prw"><span class="prw-ico">${e===`None`?``:n}</span><span class="prw-t">${e}</span></span>`).join(``)};function Zd(e){let t=e.outfits.find(t=>t.id===e.route.outfitId);if(!t)return`${Cd()}<main class="empty-state"><p>That outfit was not found.</p></main>`;let n={id:`junkspace`,name:`Junkspace`,era:`Hypergrowth`,tagline:``,rule:{name:`The Rule of Hard Knocks`,text:`In Junkspace, if you can't figure out precisely what the rules are telling you to do: choose the interpretation or outcome that disadvantages you the most.`},initiative:`2D6`,cmdTokens:`5`,ships:d,hvp:[],commands:[]};return Qd(e,{list:{id:t.id,mode:`junkspace`,freePlay:!1,emblem:t.emblem,emblemImage:t.emblemImage,emblemLib:t.emblemLib,emblemColor:t.emblemColor,fleet:{name:t.name||`Unnamed outfit`,factionId:`junkspace`,creditsLimit:t.debtStartK??30,units:t.ships.map(e=>({id:e.id,shipClassId:e.shipClassId,count:1,...e.shipName?.trim()?{name:e.shipName.trim()}:{}})),hvp:[]},createdAt:t.createdAt,updatedAt:t.updatedAt},factions:[n],unitExtra:e=>{let n=t.ships.find(t=>t.id===e);if(!n)return``;let r=f.find(e=>e.class===n.pilotClass),i=t.perks.filter(e=>e.shipId===n.id).map(e=>{let t=Object.values(Vn).flat().find(t=>t.name===e.perk);return`<span class="pp-perk"><b>${B(e.perk)}</b> ${t?V(t.text):``}</span>`}).join(``);return ad[n.pilotClass],`
       <span class="pp">
         ${r?`<span class="pp-perk pp-perk-base"><b>${B(r.perkName)}</b> ${V(r.text)}</span>`:``}
         ${i}
@@ -2394,30 +2392,23 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       </span>
     </div>
   </div>`}function Sf(e){let t=e.ui.modal;return!t||t.kind!==`confirm`?``:`
-  <div class="modal-root">
-    <div class="modal-backdrop" data-action="confirm-cancel"></div>
-    <div class="modal-panel no-modal cf-modal" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title">
-      <header class="modal-header ${t.danger?`is-danger`:``}">
-        <h2 class="modal-title" id="confirm-title">${B(t.title)}</h2>
-        <button class="modal-close" data-action="confirm-cancel" aria-label="Cancel">${R(`close`,18)}</button>
-      </header>
-      <div class="modal-body">
-        <p class="cf-body">${B(t.body)}</p>
-      </div>
-      <footer class="modal-footer">
-        <button class="bar-btn" data-action="confirm-cancel">Cancel</button>
-        <button class="cta-btn ${t.danger?`cf-danger`:``}" data-action="confirm-go" autofocus>${R(t.danger?`ix-trash`:`check`,16)} ${B(t.confirmLabel)}</button>
-      </footer>
-    </div>
-  </div>`}function Cf(e){let t=e.ui.modal;if(!t||t.kind!==`options`)return``;let n=Mc.version;return`
-  <div class="modal-root">
-    <div class="modal-backdrop" data-action="close-modal"></div>
-    <div class="modal-panel opt-modal" role="dialog" aria-modal="true" aria-label="Options">
-      <header class="modal-header">
-        <h2 class="modal-title">Options</h2>
-        <button class="modal-close" data-action="close-modal" aria-label="Close">${R(`close`,18)}</button>
-      </header>
-      <div class="modal-body opt-body">
+  <cds-modal open size="xs" alert class="cf-modal" data-key="cf-modal">
+      <cds-modal-header>
+        <cds-modal-close-button></cds-modal-close-button>
+        <cds-modal-heading>${B(t.title)}</cds-modal-heading>
+      </cds-modal-header>
+      <cds-modal-body data-modal-primary-focus tabindex="-1"><p class="cf-body">${B(t.body)}</p></cds-modal-body>
+      <cds-modal-footer>
+        <cds-modal-footer-button kind="secondary" data-action="confirm-cancel">Cancel</cds-modal-footer-button>
+        <cds-modal-footer-button kind="${t.danger?`danger`:`primary`}" data-action="confirm-go">${B(t.confirmLabel)}</cds-modal-footer-button>
+      </cds-modal-footer>
+  </cds-modal>`}function Cf(e){let t=e.ui.modal;if(!t||t.kind!==`options`)return``;let n=Mc.version;return`
+  <cds-modal open size="sm" class="opt-modal" data-key="opt-modal">
+      <cds-modal-header>
+        <cds-modal-close-button></cds-modal-close-button>
+        <cds-modal-heading>Options</cds-modal-heading>
+      </cds-modal-header>
+      <cds-modal-body class="opt-body" data-modal-primary-focus tabindex="-1">
         <section class="opt-section">
           <h3 class="opt-h">Your data</h3>
           <p class="opt-note">Everything you build is saved in this browser only.</p>
@@ -2469,9 +2460,8 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
                the version, which is a fact rather than a link. -->
           <p class="opt-version">Version ${B(n)}</p>
         </section>
-      </div>
-    </div>
-  </div>`}function wf(){return`<p class="sync-note"><strong>Note:</strong> this is not an account, there is no password.
+      </cds-modal-body>
+  </cds-modal>`}function wf(){return`<p class="sync-note"><strong>Note:</strong> this is not an account, there is no password.
     The token is the only key. Anyone you give it to can read and change your fleets.</p>`}function Tf(){return Ul.discordConfigured()?`
     <section class="opt-section">
       <div class="opt-actions">
@@ -2543,22 +2533,18 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       <p class="sync-status" id="sync-busy" hidden></p>
       <p class="sync-error" id="sync-error" hidden></p>
     </section>`}function kf(e){return`
-  <footer class="modal-footer">
-    <button class="bar-btn" data-action="sync-join-cancel">Cancel</button>
-    <button class="cta-btn" data-action="sync-join-confirmed" data-token="${B(e.token)}" autofocus>
-      ${R(`check`,16)} ${e.exists?`Combine fleets`:`Start syncing`}</button>
-  </footer>`}function Af(e){let t=e.ui.modal;if(!t||t.kind!==`sync`)return``;let n=Ul.supported()?t.pendingJoin?Of(t.pendingJoin):Ul.enabled()?Df(e):Ef():`<p class="opt-note">This browser cannot sync fleets online.</p>`,r=t.pendingJoin&&Ul.supported()?kf(t.pendingJoin):``;return`
-  <div class="modal-root">
-    <div class="modal-backdrop" data-action="close-modal"></div>
-    <div class="modal-panel opt-modal" role="dialog" aria-modal="true" aria-label="Sync Your Fleets Online">
-      <header class="modal-header">
-        <h2 class="modal-title">Sync Your Fleets Online</h2>
-        <button class="modal-close" data-action="close-modal" aria-label="Close">${R(`close`,18)}</button>
-      </header>
-      <div class="modal-body opt-body">${n}</div>
-      ${r}
-    </div>
-  </div>`}var jf=[{label:`Mission`},{label:`Your fleet`},{label:`The round`,phases:!0}],Mf=e=>e.replace(/ Phase$/,``).toLowerCase();function Nf(){return new Map([[`heavy-cruiser`,1],[`frigate`,1],[`corvette`,3],[`gunship`,3],[`light-utility-ship`,3],[`fighter-wing`,3],[`bomber-wing`,3]])}function Pf(){let e=Nf(),t=[`heavy-cruiser`,`frigate`,`corvette`,`gunship`,`light-utility-ship`,`fighter-wing`,`bomber-wing`],n=new Map(Gn.ships.map(e=>[e.id,e])),r=t.map(t=>{let r=n.get(t);if(!r)return``;let i=(e,t)=>t.map(t=>`<span class="lf-arc lf-arc-${e.toLowerCase()}">${e}</span> ${B(t.name)} ${t.count}${t.die}`).join(`<br>`),a=[[...r.primary.length?[i(`PRI`,r.primary)]:[]],[...r.auxiliary.length?[i(`AUX`,r.auxiliary)]:[]]].flat().join(`<br>`);return`<tr>
+  <cds-modal-footer>
+    <cds-modal-footer-button kind="secondary" data-action="sync-join-cancel">Cancel</cds-modal-footer-button>
+    <cds-modal-footer-button kind="primary" data-action="sync-join-confirmed" data-token="${B(e.token)}">${e.exists?`Combine fleets`:`Start syncing`}</cds-modal-footer-button>
+  </cds-modal-footer>`}function Af(e){let t=e.ui.modal;return!t||t.kind!==`sync`?``:`
+  <cds-modal open size="sm" class="opt-modal" data-key="sync-modal">
+      <cds-modal-header>
+        <cds-modal-close-button></cds-modal-close-button>
+        <cds-modal-heading>Sync your fleets</cds-modal-heading>
+      </cds-modal-header>
+      <cds-modal-body class="opt-body" data-modal-primary-focus tabindex="-1">${Ul.supported()?t.pendingJoin?Of(t.pendingJoin):Ul.enabled()?Df(e):Ef():`<p class="opt-note">This browser cannot sync fleets online.</p>`}</cds-modal-body>
+      ${t.pendingJoin&&Ul.supported()?kf(t.pendingJoin):``}
+  </cds-modal>`}var jf=[{label:`Mission`},{label:`Your fleet`},{label:`The round`,phases:!0}],Mf=e=>e.replace(/ Phase$/,``).toLowerCase();function Nf(){return new Map([[`heavy-cruiser`,1],[`frigate`,1],[`corvette`,3],[`gunship`,3],[`light-utility-ship`,3],[`fighter-wing`,3],[`bomber-wing`,3]])}function Pf(){let e=Nf(),t=[`heavy-cruiser`,`frigate`,`corvette`,`gunship`,`light-utility-ship`,`fighter-wing`,`bomber-wing`],n=new Map(Gn.ships.map(e=>[e.id,e])),r=t.map(t=>{let r=n.get(t);if(!r)return``;let i=(e,t)=>t.map(t=>`<span class="lf-arc lf-arc-${e.toLowerCase()}">${e}</span> ${B(t.name)} ${t.count}${t.die}`).join(`<br>`),a=[[...r.primary.length?[i(`PRI`,r.primary)]:[]],[...r.auxiliary.length?[i(`AUX`,r.auxiliary)]:[]]].flat().join(`<br>`);return`<tr>
         <td class="lf-qty" data-label="Qty">${e.get(t)??1}</td>
         <td class="lf-ship">${B(r.name)}</td>
         <td data-label="Mass">${r.mass}</td><td data-label="Thrust">${r.thrust}"</td><td data-label="Sil">${r.silhouette}</td><td data-label="Shields">${r.shields}</td>

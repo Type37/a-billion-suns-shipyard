@@ -102,9 +102,8 @@ function gameTicks(played: number, total: number): string {
 // Copying an outfit is still one press of Duplicate on the dock, which is where
 // you are looking when you want it.
 //
-// The ready-made crews used to sit here too, as an "Or start with a ready-made
-// crew" list. They are pre-built outfits now (see seed-outfits.ts): already on
-// the Solo page, not a pitch inside the dialog you opened to skip the pitch.
+// The ready-made crews used to sit here too, then became pre-built outfits on
+// the Solo page; both are gone (Jet: "they suck"). See dropUntouchedSeedOutfits.
 export function newOutfitModal(state: AppState): string {
   const m = state.ui.modal;
   if (!m || m.kind !== "new-outfit") return "";

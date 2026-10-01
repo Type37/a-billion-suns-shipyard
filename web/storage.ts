@@ -1,6 +1,5 @@
 import type { Faction, Fleet, GameMode, OutfitShip } from "../src/types.ts";
 import { SEED_LISTS } from "./seed-lists.ts";
-import { SEED_OUTFITS } from "./seed-outfits.ts";
 import { clearImages, imageDataUrl, internDataUrl, isImageRef, sweepImages } from "./image-store.ts";
 
 // localStorage persistence. One key per concern, JSON payloads, versioned so a
@@ -10,7 +9,6 @@ const LISTS_KEY = "abs2.lists.v1";
 const FACTIONS_KEY = "abs2.customFactions.v1";
 const OUTFITS_KEY = "abs2.outfits.v1";
 const LIST_SEEDS_APPLIED_KEY = "abs2.listSeedsApplied.v1";
-const OUTFIT_SEEDS_APPLIED_KEY = "abs2.outfitSeedsApplied.v1";
 const SYNC_TOKEN_KEY = "abs2.sync.token.v1";
 const SYNC_LASTSYNC_KEY = "abs2.sync.lastSync.v1";
 const SYNC_DELETED_KEY = "abs2.sync.deleted.v1";
@@ -391,23 +389,21 @@ export interface SavedOutfit {
   updatedAt: string;
 }
 
-// Pre-built outfits ship as ready-made crews (see seed-outfits.ts), same rule
-// as the fleet seeds above: added at most once per browser, tracked by id so a
-// deleted one never reappears on the next visit.
-function applyOutfitSeeds(stored: SavedOutfit[]): SavedOutfit[] {
-  const applied = new Set(read<string[]>(OUTFIT_SEEDS_APPLIED_KEY, []));
-  const additions = SEED_OUTFITS.filter((seed) => !applied.has(seed.id) && !stored.some((o) => o.id === seed.id));
-  if (additions.length === 0) return stored;
-
-  const merged = [...stored, ...additions];
-  write(OUTFITS_KEY, merged);
-  for (const seed of SEED_OUTFITS) applied.add(seed.id);
-  write(OUTFIT_SEEDS_APPLIED_KEY, [...applied]);
-  return merged;
+// There used to be two pre-built outfits, Greylancer and Valcua, seeded onto
+// the Solo page in every browser (seed-outfits.ts, starter-outfits.ts). Jet,
+// 1 October 2026: "remove the default solo outfits, they suck". The seeding is
+// gone, and a seeded outfit still sitting untouched in a browser (never edited
+// since its fixed seed date) is removed on load. One that has been played or
+// changed is the player's now and stays.
+const SEED_OUTFIT_CREATED = "2026-01-01T00:00:00.000Z";
+function dropUntouchedSeedOutfits(stored: SavedOutfit[]): SavedOutfit[] {
+  const kept = stored.filter((o) => !(o.id.startsWith("seed-outfit-") && o.updatedAt === SEED_OUTFIT_CREATED));
+  if (kept.length !== stored.length) write(OUTFITS_KEY, kept);
+  return kept;
 }
 
 export function loadOutfits(): SavedOutfit[] {
-  return applyOutfitSeeds(read<SavedOutfit[]>(OUTFITS_KEY, []));
+  return dropUntouchedSeedOutfits(read<SavedOutfit[]>(OUTFITS_KEY, []));
 }
 
 export function persistOutfits(outfits: SavedOutfit[]): void {

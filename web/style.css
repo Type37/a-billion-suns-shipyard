@@ -8561,7 +8561,12 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
      masthead) and the prose is capped at 68ch, about 66 characters, which is
      what the 840px column was there to give. */
 @media (min-width: 672px) {
-  #app > .solo-outfit > .solo-band, #app > .solo-outfit > .solo-tabs, #app > .solo-outfit > .solo-workspace { padding-left: 0; padding-right: 0; }
+  /* Every part of the outfit page on the same edges, whichever tab is open.
+     The Play and Campaign body (main.solo-body) kept its own 40px sides when
+     the Outfit tab's lost theirs, so switching tabs moved the page sideways:
+     content started at 84px on Outfit, 37 on Play and 124 on Campaign at a
+     1080 window (Jet: "i clicked play/campaign and shit got fucked"). */
+  #app > .solo-outfit > .solo-band, #app > .solo-outfit > .solo-tabs, #app > .solo-outfit > main { padding-left: 0; padding-right: 0; margin-left: 0; margin-right: 0; max-width: none; width: auto; }
 }
 .ltp p, .ltp li, .ltp blockquote { max-width: 68ch; }
 /* Phones: one side margin. Carbon's sm grid is 0 margin + 16px column
@@ -8673,3 +8678,8 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
 .cf-card-art { width: 32px; height: 32px; object-fit: contain; flex: none; }
 /* The form inside the dialog: the card frame goes, the dialog is the frame. */
 .se-modal .cf-ship { border: none; padding: 0; margin: 0; background: none; }
+/* The outfit page's wrapper shrank to its content (#app centres its
+   children): 960px wide on Outfit and Campaign, 1056 on Play, so the whole
+   page, name and tabs included, jumped 47px sideways between tabs. Full grid
+   width on every tab. */
+#app > .solo-outfit { width: 100%; }

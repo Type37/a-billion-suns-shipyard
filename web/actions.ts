@@ -1746,9 +1746,8 @@ export function dispatchAction(target: HTMLElement): void {
       location.hash = routeHash({ view: "solo-outfit", outfitId: outfit.id });
       break;
     }
-    // No "solo-new-outfit-preset". The ready-made crews are pre-built outfits
-    // sitting on the Solo page now (see seed-outfits.ts), so starting one is
-    // opening it, not asking the dialog to build it.
+    // No "solo-new-outfit-preset" and no ready-made crews: the two pre-built
+    // outfits were removed on 1 October 2026 (see dropUntouchedSeedOutfits).
     case "duplicate-outfit": {
       const id = target.dataset["id"];
       const src = state.outfits.find((o) => o.id === id);

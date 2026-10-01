@@ -1,4 +1,4 @@
-import type { Era, Faction, Fleet, GameMode } from "../src/types.ts";
+import type { AllianceSpecies, Era, Faction, Fleet, GameMode } from "../src/types.ts";
 import { STARTING_DEBT_K, ALERT_START } from "../src/data/junkspace.ts";
 import {
   loadCustomFactions,
@@ -324,7 +324,7 @@ export interface AppState {
     /** An open modal dialog. */
     modal?:
       | { kind: "new-fleet"; era: Era; limit: number; factionId?: string; showAll: boolean; customOpen?: boolean; noLimit?: boolean }
-      | { kind: "add-unit" }
+      | { kind: "add-unit"; species?: AllianceSpecies }
       | { kind: "ship-reference" }
       | {
           kind: "emblem";

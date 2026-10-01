@@ -1,4 +1,4 @@
-import type { Faction, Fleet, FleetHvp, GameMode, Mass, PilotClass, Weapon } from "../src/types.ts";
+import type { AllianceSpecies, Faction, Fleet, FleetHvp, GameMode, Mass, PilotClass, Weapon } from "../src/types.ts";
 import { maxUnitSize } from "../src/validation.ts";
 import { MODE_BUILDER_SHAPE } from "../src/types.ts";
 import {
@@ -15,7 +15,7 @@ import { capitalShipName } from "../src/ship-names.ts";
 import { rollHvpName } from "../src/hvp-names.ts";
 import { announce } from "./announce.ts";
 import { findFaction, isCustom } from "./catalog.ts";
-import { ERA_MODES, hvpById, resolveShip } from "./render.ts";
+import { ERA_MODES, addUnitSpecies, hvpById, resolveShip } from "./render.ts";
 import {
   clearAllData,
   exportAllData,
@@ -617,15 +617,6 @@ function dispatchAction(target: HTMLElement): void {
       }
       break;
     }
-    case "blank-fleet-name": {
-      // Eraser button beside the roll die: clear the name back to empty.
-      const id = currentListId();
-      if (!id) return;
-      const input = document.querySelector<HTMLInputElement>(".sy-name, .mf-name");
-      if (input) input.value = "";
-      store.setState((s) => updateFleet(s, id, (f) => ({ ...f, name: "" })));
-      break;
-    }
     case "duplicate-list": {
       const id = target.dataset["id"];
       const source = state.lists.find((l) => l.id === id);
@@ -640,13 +631,12 @@ function dispatchAction(target: HTMLElement): void {
         persistLists(lists);
         return { ...s, lists };
       });
-      // From the Fleets table, stay put - the toast is enough, the row shows up
-      // below. From inside the builder, a silent copy sitting off-screen in the
-      // list looks like the button did nothing, so jump straight to the copy.
+      // From the Fleets table, stay put: the copy's row appears in the list,
+      // which is confirmation enough (a toast here sat over the next card's
+      // Delete). From inside the builder, a silent copy sitting off-screen in
+      // the list looks like the button did nothing, so jump straight to it.
       if (currentListId() === id) {
         location.hash = routeHash({ view: "builder", listId: copy.id });
-      } else {
-        showToast("Fleet duplicated.");
       }
       break;
     }
@@ -953,6 +943,28 @@ function dispatchAction(target: HTMLElement): void {
       store.setState((s) => updateFleet(s, id, (f) => ({ ...f, factionId, units: [], hvp: [] })));
       break;
     }
+    case "add-unit-species": {
+      const picked = target.dataset["species"] as AllianceSpecies | undefined;
+      if (!picked) return;
+      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "add-unit", species: picked } } }));
+      break;
+    }
+    // Species: buttons now (see speciesSwitch in render.ts), so a click.
+    case "unit-species": {
+      const listId = currentListId();
+      if (!listId) return;
+      const unitId = target.dataset["unit"];
+      const species = (target.dataset["species"] ?? "") as AllianceSpecies | "";
+      store.setState((s) =>
+        updateFleet(s, listId, (f) => ({
+          ...f,
+          units: f.units.map((u) =>
+            u.id === unitId ? { ...u, species: species === "" ? undefined : species } : u,
+          ),
+        })),
+      );
+      break;
+    }
     case "add-unit": {
       const id = currentListId();
       const shipId = target.dataset["ship"];
@@ -964,22 +976,12 @@ function dispatchAction(target: HTMLElement): void {
       // Nothing here ever forms a unit - that happens at requisition, in play.
       const stocking = MODE_BUILDER_SHAPE[list.mode] === "shipyard";
       const faction = findFaction(list.fleet.factionId, state.customFactions);
-      const addedName = resolveShip(shipId, faction, state.customFactions)?.ship.name ?? "Unit";
-      const held = stocking ? (list.fleet.units.find((u) => u.shipClassId === shipId)?.count ?? 0) + 1 : 1;
-      // This used to say nothing, on the reasoning that the roster row animates
-      // in where you are already looking. That reasoning does not survive
-      // contact with the Add Unit dialog: the dialog STAYS OPEN so you can add
-      // several ships in a row, and it is covering the roster the whole time.
-      // So the row you were supposed to watch land is behind the dialog, and
-      // the add had no feedback at all. Loud, because it is the confirmation
-      // for the single most repeated action in the app.
-      const cost = resolveShip(shipId, faction, state.customFactions)?.ship.cost;
-      showToast(
-        stocking
-          ? `${addedName} stocked${held > 1 ? ` (${held} held)` : ""}${cost === undefined ? "" : ` · ${creditsText(cost)}`}`
-          : `${addedName} added to the fleet${cost === undefined ? "" : ` · ${creditsText(cost)}`}`,
-        { icon: "check", loud: true },
-      );
+      // No toast. One used to confirm every add ("Needlefin added to the fleet
+      // · ¢3") because the dialog covers the roster, but the card you tapped
+      // already shows "N in fleet" the moment it lands, right under your thumb.
+      // The toast then sat over the next cards for three seconds, swallowed the
+      // tap meant for them, and followed you to the next screen. The badge is
+      // the confirmation.
       store.setState((s) =>
         updateFleet(s, id, (f) => {
           if (stocking) {
@@ -1005,7 +1007,12 @@ function dispatchAction(target: HTMLElement): void {
               ? capitalShipName(f.factionId, `${f.factionId}:${unitId}`, f.units.map((u) => u.name ?? ""))
               : undefined;
           const named = christened ? { name: christened } : {};
-          return { ...f, units: [...f.units, { id: unitId, shipClassId: shipId, count: 1, ...named }] };
+          const modal = s.ui.modal;
+          const tagged =
+            faction?.requiresSpecies && !list.freePlay
+              ? { species: addUnitSpecies(modal?.kind === "add-unit" ? modal.species : undefined, f.units) }
+              : {};
+          return { ...f, units: [...f.units, { id: unitId, shipClassId: shipId, count: 1, ...named, ...tagged }] };
         }),
       );
       break;
@@ -1057,11 +1064,8 @@ function dispatchAction(target: HTMLElement): void {
           unlimitedShipyards: mode === "hypergrowth" ? l.unlimitedShipyards : undefined,
         })),
       );
-      const kept = list.fleet.units.reduce((n, u) => n + u.count, 0);
-      showToast(
-        `Now building for ${toEra?.era ?? mode}. ${kept} ship${kept === 1 ? "" : "s"} kept${losing.length ? `, ${losing.join(" and ")} cleared` : ""}.`,
-        { icon: "check", loud: true },
-      );
+      // No toast. The era control in the header shows the new era, and when
+      // anything is lost the confirm above has already said what.
       break;
     }
     case "close-modal": {
@@ -1717,7 +1721,6 @@ function dispatchAction(target: HTMLElement): void {
         persistOutfits(outfits);
         return { ...s, outfits };
       });
-      showToast("Outfit duplicated.");
       break;
     }
     case "delete-outfit": {
@@ -2153,7 +2156,13 @@ function dispatchAction(target: HTMLElement): void {
               const i = Number(target.dataset["i"] ?? -1);
               const max = p.cmdMax ?? p.cmd;
               if (!Number.isFinite(i) || i < 0 || i >= max) return l;
-              return { ...l, play: { ...p, cmd: i < p.cmd ? i : i + 1 } };
+              // One token per tap, whichever pip is hit: an unspent one spends
+              // one, a spent one takes one back. This used to work like a star
+              // rating, setting the count to the pip's index, so a thumb landing
+              // on the first pip of nine spent all nine at once. Nobody spends
+              // CMD by pointing at where the count should end up.
+              const spent = i >= p.cmd;
+              return { ...l, play: { ...p, cmd: spent ? Math.min(max, p.cmd + 1) : Math.max(0, p.cmd - 1) } };
             }
             // Reserve <-> jumped in, per unit. Units start in Reserve and jump
             // in via a Jump Point; the Jump Out action puts one straight back.
@@ -2557,20 +2566,6 @@ function handleChange(e: Event): void {
       );
       break;
     }
-    case "unit-species": {
-      if (!listId) return;
-      const unitId = target.dataset["unit"];
-      const species = inputValue as "Rannari" | "Yynnx" | "Gorgronti" | "";
-      store.setState((s) =>
-        updateFleet(s, listId, (f) => ({
-          ...f,
-          units: f.units.map((u) =>
-            u.id === unitId ? { ...u, species: species === "" ? undefined : species } : u,
-          ),
-        })),
-      );
-      break;
-    }
     case "hvp-assign": {
       if (!listId) return;
       const index = Number(target.dataset["index"]);
@@ -2956,6 +2951,38 @@ function wireImageDrops(): void {
     e.preventDefault();
     startImageCrop(action, input!.dataset, file);
   });
+}
+
+/*
+ * Double-tap guard. A double tap is two taps about 140ms apart, and the first
+ * one often changes what is under the finger: Add unit opens a dialog whose
+ * ship cards land exactly where the button was, Delete opens a confirm whose
+ * "Delete fleet" lands on the trigger, Play opens on the phase controls. The
+ * audits measured all of these, on real touch taps: a ship nobody chose
+ * added, a fleet deleted, Play skipped to the End phase.
+ *
+ * So for a moment after a dialog opens or the page changes, taps are dropped.
+ * 350ms clears a double tap (iOS and Android both count two taps within
+ * ~300ms as one gesture) and is under the half second it takes anyone to read
+ * a new screen and aim at it deliberately. Capture phase on the document, so
+ * it also stops <a> navigation and <details> toggles, which never reach
+ * handleClick.
+ */
+let tapGuardUntil = 0;
+export function armTapGuard(): void {
+  tapGuardUntil = performance.now() + 350;
+}
+if (typeof document !== "undefined") {
+  document.addEventListener(
+    "click",
+    (e) => {
+      if (performance.now() < tapGuardUntil) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+    },
+    true,
+  );
 }
 
 export function wireActions(root: HTMLElement): void {

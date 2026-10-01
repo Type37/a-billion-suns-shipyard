@@ -481,10 +481,14 @@ button { font-family: inherit; }
 .topnav a:hover, .topnav-btn:hover { color: #fff; text-decoration: none; }
 /* Nav fold: on a phone the whole nav collapses behind a hamburger (see the
    max-width block below). On desktop the hamburger is hidden and the nav is the
-   normal flat row, shown whether or not the <details> is open. */
+   normal flat row, shown whether or not the <details> is open.
+   761, matching the phone block's max-width: 760. This said 721, and between
+   721 and 760px (a 360px Android turned sideways) both blocks applied: the
+   phone block drew the hamburger dropdown and this one forced its contents
+   visible, so the menu sat open over Add unit and Play and would not close. */
 .nav-fold { position: relative; }
 .nav-fold-btn { display: none; }
-@media (min-width: 721px) {
+@media (min-width: 761px) {
   .nav-fold > .nav-fold-btn { display: none; }
   .nav-fold > .topnav { display: flex; }
   .nav-fold::details-content { content-visibility: visible; }
@@ -604,6 +608,10 @@ button { font-family: inherit; }
   border-left: 4px solid var(--red);
   display: flex; align-items: center; gap: 10px;
   animation: toast-in 200ms var(--ease) both;
+  /* Taps go straight through. A toast holds no controls, and when it took
+     taps it swallowed the ones aimed at whatever it was sitting on, for three
+     seconds, at the bottom of the screen where the thumb lives. */
+  pointer-events: none;
   /* Above .modal-root (60). The toast was on 40, which meant the one moment it
      most needed to be seen - confirming an add while the Add Unit dialog is
      still open over the roster - was the one moment the dialog's backdrop was
@@ -612,10 +620,10 @@ button { font-family: inherit; }
   z-index: 90;
 }
 .toast-ico { flex: none; color: var(--red); }
-/* The loud variant. Confirming an add has to carry across a dialog that is
-   sitting over the roster, so it is bigger, holds longer (see showToast) and
-   arrives with a movement rather than appearing. Still bottom-centre and still
-   position:fixed, so it never displaces anything. */
+/* The loud variant, for the one notice that means work is not being saved
+   (storage full). Bigger, holds longer (see showToast). It used to confirm
+   every ship added too; that toast is gone, see "add-unit" in actions.ts.
+   Still bottom-centre and position:fixed, so it never displaces anything. */
 .toast.is-loud {
   bottom: 34px; padding: 16px 26px 16px 22px; gap: 12px;
   font-family: var(--display); font-weight: 800; font-size: 16px; letter-spacing: 0.01em;
@@ -631,9 +639,9 @@ button { font-family: inherit; }
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 @keyframes toast-in-loud {
-  0% { opacity: 0; transform: translateX(-50%) translateY(16px) scale(0.96); }
-  70% { opacity: 1; transform: translateX(-50%) translateY(-2px) scale(1.01); }
-  100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+  /* No overshoot step: the stylesheet's own rule is that nothing bounces. */
+  from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 @media (prefers-reduced-motion: reduce) {
   .toast, .toast.is-loud { animation: none; }
@@ -2210,15 +2218,22 @@ button { font-family: inherit; }
 .comp-weap { font-family: var(--serif); font-size: 12.5px; min-width: 170px; }
 
 /* Faction group bar: turns the dense list into a scannable, foldered index. */
+/* Flex, not floats. The count and the build button used to float right, and
+   on a phone the button's 44px touch floor made it taller than the bar: the
+   overhang hung into the first ship's row, which (a flex box, so a new
+   formatting context) shrank to the space beside it. Junkspace's first ship
+   rendered at half width next to an empty white box that was the bottom of
+   the button. A flex row (.cg-bar, inside the cell so the cell keeps its colspan) grows to its tallest child, so nothing can hang out. */
 .comp-group td {
   background: var(--ink); color: #fff; padding: 8px 12px;
   position: sticky; top: 34px; z-index: 1;
 }
+.comp-group .cg-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
 .comp-group .cg-name { font-family: var(--display); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 0.01em; }
-.comp-group .cg-era { margin-left: 12px; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #9fb2d6; }
-.comp-group .cg-count { float: right; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #9fb2d6; }
+.comp-group .cg-era { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #9fb2d6; }
+.comp-group .cg-count { margin-left: auto; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #9fb2d6; }
 .comp-group .cg-build {
-  float: right; display: inline-flex; align-items: center; gap: 5px; margin-right: 14px;
+  display: inline-flex; align-items: center; gap: 5px;
   font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
   color: #fff; background: none; border: 1px solid rgba(255,255,255,0.5); padding: 3px 8px; cursor: pointer;
   /* WCAG 2.5.8 (AA) asks 24x24 of ANY pointer, not just a thumb - the app's own
@@ -3456,6 +3471,18 @@ button { font-family: inherit; }
 .sy-head .mf-era-badge { padding: 3px 7px; font-size: 11px; letter-spacing: 0.04em; }
 .sy-head .mf-menu > summary { height: 28px; padding: 0 8px; gap: 4px; }
 .sy-head .emblem-current-btn svg { width: 34px; height: 34px; }
+
+/* One filled button in this header, and it is Play. The era used to be a
+   second solid blue slab beside it, the reference and "..." buttons each had
+   their own box, and on a phone the row read as five unrelated buttons
+   fighting for the eye. The era is a choice like the faction and the credit
+   limit, so it now looks like them: plain text with a caret. Reference and
+   "..." are bare icons. The hit areas are unchanged; only the paint went. */
+.sy-head .mf-era-badge.is-control { background: none; color: var(--ink); box-shadow: inset 0 -2px 0 var(--hair); }
+.sy-head .mf-era-badge.is-control:hover,
+.sy-head .era-switch[open] > summary { background: var(--blue-wash); color: var(--blue); }
+.sy-head .sy-ref-btn,
+.sy-head .mf-menu > summary { border-color: transparent; background: none; }
 .sy-head .emblem-edit-cue { display: none; }
 
 /* Play, in the header. Filled blue because it is the only thing up here that
@@ -3645,15 +3672,15 @@ button { font-family: inherit; }
 .sy-unit-remove:hover { border-color: var(--red); color: var(--red); }
 .sy-unit-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 6px 0 2px; }
 
-.sy-empty { border: 2px dashed var(--hair-soft); padding: 34px 18px; text-align: center; display: flex; flex-direction: column; gap: 5px; color: var(--ink-3); }
-.sy-empty-big { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; font-size: 16px; color: var(--ink-2); }
 .sy-hvp-note { font-size: 12.5px; color: var(--ink-3); margin: 0 0 10px; }
 
 /* Add-unit picker: the faction's classes in a 2x2 grid by Mass. */
 .au-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 18px; }
-.au-quad-head { display: flex; align-items: center; gap: 7px; margin: 0 0 2px; font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; font-size: 11px; color: var(--ink-2); border-bottom: 2px solid var(--ink); padding-bottom: 3px; }
-.au-mass { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 11px; }
-.au-quad-count { font-weight: 600; font-size: 10px; color: var(--ink-3); text-transform: none; letter-spacing: 0; }
+.au-quad-head { margin: 0 0 2px; font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; font-size: 12px; color: var(--ink-2); border-bottom: 2px solid var(--ink); padding-bottom: 3px; }
+.au-species { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; }
+.au-species-label { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; font-size: 12px; color: var(--ink-2); }
+.au-species .switcher { flex: 1 1 auto; max-width: 420px; }
+.au-species .switcher-opt { min-height: 44px; }
 .au-quad-list { display: flex; flex-direction: column; gap: 0; }
 .au-body { padding-top: 8px; }
 @media (max-width: 720px) { .au-grid { grid-template-columns: 1fr; gap: 6px; } }
@@ -3744,9 +3771,15 @@ button { font-family: inherit; }
 .au-card-stats { display: flex; flex-wrap: wrap; gap: 0 10px; margin: 0; flex: 0 0 auto; }
 .au-card .stat-chip, .au-card .stat-chip-mini { border: none; background: none; padding: 0; }
 .au-card .stat-chips { gap: 0 10px; }
-.au-card-wep { font-size: 11.5px; line-height: 1.35; color: var(--ink-2); flex: 1 1 200px; min-width: 0; }
-.au-wl { font-family: var(--display); font-weight: 800; font-size: 9px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3); margin-right: 4px; }
-.au-wsep { margin: 0 5px; color: var(--ink-off); }
+.au-card-wep { display: grid; gap: 1px; font-size: 11.5px; line-height: 1.35; color: var(--ink-2); flex: 1 1 200px; min-width: 0; }
+.au-wrow { display: grid; grid-template-columns: 5.6em 1fr; align-items: baseline; }
+.au-wl { font-family: var(--display); font-weight: 800; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-3); }
+/* Species on a roster row: three plain buttons, the unit's own one filled. */
+.species-pick { display: inline-grid; grid-template-columns: repeat(3, auto); border: 1px solid var(--hair); }
+.species-opt { min-height: 36px; padding: 0 12px; font: inherit; font-size: 13px; font-weight: 600; background: var(--paper); color: var(--ink-2); border: 0; border-left: 1px solid var(--hair); cursor: pointer; }
+.species-opt:first-child { border-left: 0; }
+.species-opt.selected { background: var(--blue); color: #fff; }
+@media (pointer: coarse) { .species-opt { min-height: 44px; } }
 
 /* Armageddon carrier-assignment block, below the HVP choose list. */
 /* Carrier assignment. Mobile-first: the HVP's name on its own line and a
@@ -6660,6 +6693,9 @@ main.play-body .roster-section::before { content: none; }
   .foundry-main .ghost-btn, .ru-remove, .modal-close, .rt-btn, .cf-ship-x {
     min-width: var(--tap);
   }
+  /* ...and the HVP row's grid column has to grow with its check box, or the
+     44px box hangs 12px out of a 32px track and past the page gutter. */
+  .sy-hvp { grid-template-columns: minmax(0, 1fr) var(--tap); }
   /* The clear-art badge is the exception the other way: it is pinned to the
      corner of a 108x65 thumbnail, and a 44px button there would cover the art
      it is a badge on. It gets a 44px HIT area instead - an invisible

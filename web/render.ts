@@ -1,4 +1,4 @@
-import type { Era, Faction, FleetHvp, FleetUnit, GameMode, Hvp, ShipClass, Weapon } from "../src/types.ts";
+import type { AllianceSpecies, Era, Faction, FleetHvp, FleetUnit, GameMode, Hvp, ShipClass, Weapon } from "../src/types.ts";
 import { ALLIANCE_SPECIES, MODE_BUILDER_SHAPE } from "../src/types.ts";
 import { validateFleet, type ValidationIssue } from "../src/validation.ts";
 import { GENERIC_HVP } from "../src/data/index.ts";
@@ -795,16 +795,16 @@ function issueLine(issue: ValidationIssue): string {
   }:</b> ${escapeHtml(issue.message)}</span></li>`;
 }
 
-function speciesSelect(unit: FleetUnit): string {
-  const opts = ALLIANCE_SPECIES.map(
-    (s) => `<option value="${s}" ${unit.species === s ? "selected" : ""}>${s}</option>`,
-  ).join("");
-  return `
-    <label class="inline-field">Species
-      <select data-action="unit-species" data-unit="${unit.id}">
-        <option value="">Choose</option>${opts}
-      </select>
-    </label>`;
+/* The Alliance's species, as three buttons rather than a <select>. A select
+ * hid the three choices behind a "Choose" that read as optional, and on a
+ * phone opened a full-screen picker for a choice between three words. The
+ * buttons show all three at once and which one this unit is. A unit with no
+ * species yet (one saved before the Add Unit dialog asked) shows none lit. */
+function speciesSwitch(unit: FleetUnit): string {
+  return `<div class="species-pick" role="group" aria-label="Species">${ALLIANCE_SPECIES.map(
+    (s) =>
+      `<button class="species-opt ${unit.species === s ? "selected" : ""}" data-action="unit-species" data-unit="${unit.id}" data-species="${s}" aria-pressed="${unit.species === s}">${s}</button>`,
+  ).join("")}</div>`;
 }
 
 // A segmented switcher with a sliding highlight, for any number of mutually
@@ -1324,7 +1324,6 @@ function shipyardView(state: AppState): string {
         <span class="mf-emblem">${emblemPicker}</span>
         <input class="mf-name sy-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled company" aria-label="Company name" data-action="fleet-name" />
         <button class="mf-name-gen" data-action="reroll-corp-name" title="Roll a random company name" aria-label="Roll a random company name">${icon("random", 14)}</button>
-        <button class="mf-name-gen" data-action="blank-fleet-name" title="Clear the name" aria-label="Clear the name">${icon("eraser", 18)}</button>
       </div>
       <div class="sy-fac">
         <span class="mf-fac">${factionControl}</span>
@@ -1581,7 +1580,7 @@ function builderView(state: AppState): string {
           <span class="sy-ship-cost">${r ? costBreakdown(u.count, r.ship.cost) : credits(cost)}</span>
           ${control}
         </div>
-        ${carried.length || showSpecies ? `<div class="sy-unit-sub">${carryMarkup}${showSpecies ? speciesSelect(u) : ""}</div>` : ""}
+        ${carried.length || showSpecies ? `<div class="sy-unit-sub">${carryMarkup}${showSpecies ? speciesSwitch(u) : ""}</div>` : ""}
         ${r ? `<div class="sy-ship-data">${statChips(r.ship, true)}${weaponsTable(r.ship)}</div>` : ""}
       </article>`;
     })
@@ -1676,7 +1675,9 @@ function builderView(state: AppState): string {
         <span class="mf-emblem">${emblemPicker}</span>
         <input class="mf-name sy-name" type="text" value="${escapeHtml(list.fleet.name ?? "")}" placeholder="Untitled fleet" aria-label="Fleet name" data-action="fleet-name" />
         <button class="mf-name-gen" data-action="gen-fleet-name" title="Roll a random fleet name" aria-label="Roll a random fleet name">${icon("random", 14)}</button>
-        <button class="mf-name-gen" data-action="blank-fleet-name" title="Clear the name" aria-label="Clear the name">${icon("eraser", 18)}</button>
+        <!-- No eraser button. It sat flush against the field, a thumb a few px
+             off the name blanked it with no undo, and clearing a text field is
+             something every phone keyboard already does. -->
       </div>
       <div class="sy-fac">
         <span class="mf-fac">${factionControl}</span>
@@ -1713,7 +1714,9 @@ function builderView(state: AppState): string {
       // when there is something to resolve. Free Play always announces itself.
       list.freePlay
         ? '<p class="yard-status is-muted">Free Play, no rules check</p>'
-        : issues.length > 0
+        : // An empty fleet is not a broken one. "2 to resolve" in red before the
+          // first ship was added greeted every new fleet with an error.
+          issues.length > 0 && nUnits > 0
           ? `<details class="yard-status-pop">
               <summary class="yard-status is-fail">${icon("warning", 12)} ${issues.length} to resolve</summary>
               <ul class="yard-status-panel issue-list">${issues.map(issueLine).join("")}</ul>
@@ -1724,9 +1727,9 @@ function builderView(state: AppState): string {
     }
 
     <div class="sy-list">${
-      nUnits
-        ? unitRows
-        : `<div class="sy-empty"><span class="sy-empty-big">No ${isStocking ? "ships" : "units"} yet</span><span>Tap &ldquo;Add ${isStocking ? "ship" : "unit"}&rdquo; to begin.</span></div>`
+      // Nothing when empty. The dashed "No units yet / Tap Add unit to begin"
+      // box restated the button sitting directly above it.
+      nUnits ? unitRows : ""
     }</div>
     </div>
 
@@ -1758,6 +1761,12 @@ function builderView(state: AppState): string {
   ${shipReferenceModal(state)}`;
 }
 
+/** Which species the Add Unit dialog adds as: the one picked in the dialog,
+ *  else the most recently added unit's, else the first. */
+export function addUnitSpecies(picked: AllianceSpecies | undefined, units: readonly FleetUnit[]): AllianceSpecies {
+  return picked ?? [...units].reverse().find((u) => u.species)?.species ?? ALLIANCE_SPECIES[0]!;
+}
+
 // The Add-unit picker: the faction's ship classes in a 2x2 grid by Mass (0-3),
 // each a full catalogue row you tap to add as a new unit. Free Play offers every
 // faction's ships in the same grid. The roster's own size control grows a unit
@@ -1780,10 +1789,13 @@ function addUnitModal(state: AppState): string {
     const p = shortWeaponText(s.primary, s.utilityBays && s.primary.length === 0);
     const a = shortWeaponText(s.auxiliary, s.utilityBays && s.auxiliary.length === 0);
     const parts: string[] = [];
-    const util = (t: string) => (t === "Utility Bays" ? `${icon("utility", 11, "util-ico")}${t}` : t);
-    if (p) parts.push(`<span class="au-wl">P</span>${util(p)}`);
-    if (a) parts.push(`<span class="au-wl">A</span>${util(a)}`);
-    return parts.join('<span class="au-wsep">·</span>');
+    const util = (t: string) => `<span>${t === "Utility Bays" ? `${icon("utility", 11, "util-ico")}${t}` : t}</span>`;
+    // One labelled line per arc. These were once "P ... · A ..." on a single
+    // line, which saved a row and cost every reader a decode: single letters
+    // nobody recognised and a dot that looked like it meant something.
+    if (p) parts.push(`<span class="au-wrow"><span class="au-wl">Primary</span>${util(p)}</span>`);
+    if (a) parts.push(`<span class="au-wrow"><span class="au-wl">Auxiliary</span>${util(a)}</span>`);
+    return parts.join("");
   };
   const auCard = (ship: ShipClass, addId: string, owned: number) => `
       <button class="au-card" data-action="add-unit" data-ship="${addId}" title="Add ${escapeHtml(ship.name)}">
@@ -1807,20 +1819,25 @@ function addUnitModal(state: AppState): string {
       })
       .join("");
     return `<div class="au-quad">
-        <h4 class="au-quad-head"><span class="au-mass">${mass}</span> Mass ${mass} <span class="au-quad-count">${rows.length} class${rows.length === 1 ? "" : "es"}${mass === 3 ? " · single-ship units" : ""}</span></h4>
+        <h4 class="au-quad-head">Mass ${mass}</h4>
         <div class="au-quad-list">${cards || '<p class="mf-empty">None</p>'}</div>
       </div>`;
   };
   const label = isStocking ? "ship" : "unit";
+  // The Alliance declares a species per unit (Fractious Coalition), so it is
+  // chosen here, before the add, instead of being a separate chore on every
+  // roster row afterwards. It holds for every add until changed.
+  const species = faction?.requiresSpecies && !list.freePlay ? addUnitSpecies(m.species, list.fleet.units) : null;
   return `
   <div class="modal-root">
     <div class="modal-backdrop" data-action="close-modal"></div>
     <div class="modal-panel modal-wide au-modal" role="dialog" aria-modal="true" aria-label="Add ${label}">
       <header class="modal-header">
-        <h2 class="modal-title">Add ${label}${faction && !list.freePlay ? ` · ${escapeHtml(faction.name)}` : ""}</h2>
+        <h2 class="modal-title">Add ${label}</h2>
         <button class="modal-close" data-action="close-modal" aria-label="Close">${icon("close", 18)}</button>
       </header>
       <div class="modal-body au-body">
+        ${species ? `<div class="au-species"><span class="au-species-label">Species</span>${switcher("Species", "add-unit-species", "species", ALLIANCE_SPECIES.map((s) => [s, s] as [string, string]), species)}</div>` : ""}
         <div class="au-grid">${[0, 1, 2, 3].map(quad).join("")}</div>
       </div>
     </div>
@@ -3582,7 +3599,7 @@ function playView(state: AppState): string {
     cmdMax > 0
       ? Array.from({ length: cmdMax }, (_, i) => {
           const spent = i >= play.cmd;
-          return `<button class="cmd-pip ${spent ? "is-spent" : ""}" data-action="play-cmd-set" data-i="${i}" aria-pressed="${spent}" title="${spent ? `Take token ${i + 1} back` : `Spend down to ${i} token${i === 1 ? "" : "s"}`}" aria-label="${spent ? `Token ${i + 1} of ${cmdMax}, spent` : `Token ${i + 1} of ${cmdMax}, unspent`}">${icon("cmd-delta", 20)}</button>`;
+          return `<button class="cmd-pip ${spent ? "is-spent" : ""}" data-action="play-cmd-set" data-i="${i}" aria-pressed="${spent}" title="${spent ? "Take a token back" : "Spend a token"}" aria-label="${spent ? `Token ${i + 1} of ${cmdMax}, spent` : `Token ${i + 1} of ${cmdMax}, unspent`}">${icon("cmd-delta", 20)}</button>`;
         }).join("")
       : `<span class="cmd-pips-none">No CMD tokens this round</span>`;
   const cmdStrip = `
@@ -3980,7 +3997,7 @@ function shipsView(state: AppState): string {
     bodyHtml = groups
       .map(
         (g) => `
-        <tr class="comp-group"><td colspan="8"><span class="cg-name">${escapeHtml(g.name)}</span><span class="cg-era">${escapeHtml(g.era)}</span><span class="cg-count">${g.rows.length} ${g.rows.length === 1 ? "ship" : "ships"}</span>${buildLink(g)}</td></tr>
+        <tr class="comp-group"><td colspan="8"><div class="cg-bar"><span class="cg-name">${escapeHtml(g.name)}</span><span class="cg-era">${escapeHtml(g.era)}</span><span class="cg-count">${g.rows.length} ${g.rows.length === 1 ? "ship" : "ships"}</span>${buildLink(g)}</div></td></tr>
         ${g.rows.map((r) => `<tr><td class="comp-name">${escapeHtml(r.name)}</td>${shipCells(r)}</tr>`).join("")}`,
       )
       .join("");

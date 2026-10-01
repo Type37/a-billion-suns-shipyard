@@ -2,7 +2,7 @@ import { parseRoute, store } from "./state.ts";
 import { MODE_BUILDER_SHAPE } from "../src/types.ts";
 import { render } from "./render.ts";
 import { morphInto } from "./morph.ts";
-import { wireActions } from "./actions.ts";
+import { armTapGuard, wireActions } from "./actions.ts";
 import { decodeShare, decodeSharePayload, sharePayloadFromHash, type DecodedShare } from "./share.ts";
 import { loadLists, persistCustomFactions, persistLists } from "./storage.ts";
 import { runDecode, DIGIT_POOL } from "./write-on.ts";
@@ -394,6 +394,7 @@ function holdAnchor(): void {
   if (window.scrollY !== a.scrollY) window.scrollTo(0, a.scrollY);
 }
 
+let lastSurface: string | null = null;
 function paint(): void {
   // Most text fields commit on `change` (blur), so typing does not re-render.
   // The compendium search is the exception: it filters live on `input`, so
@@ -498,6 +499,14 @@ function paint(): void {
   // to the button that opened it, which immediately undid the dialog's own
   // focus. A newly opened modal owns the focus.
   syncModalFocus();
+
+  // A new dialog or a new page puts different controls under the thumb that
+  // just tapped. See armTapGuard in actions.ts.
+  const surface = `${location.hash}|${store.getState().ui.modal?.kind ?? ""}`;
+  if (surface !== lastSurface) {
+    if (lastSurface !== null) armTapGuard();
+    lastSurface = surface;
+  }
   revealSelectedSigil();
   syncLearnAnchor();
   animateOpenEraTitles();

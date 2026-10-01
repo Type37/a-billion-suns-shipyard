@@ -556,16 +556,18 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
           <div class="no-dial">
             <span class="control-label">Debt</span>
             <div class="dial">
-              <button class="stepper-btn" data-action="new-outfit-debt" data-delta="-5" aria-label="Less debt">${N(`minus`,15)}</button>
               <span class="dial-val ${r>=45?`is-hard`:``}">${zu(r)}</span>
+              <button class="stepper-btn" data-action="new-outfit-debt" data-delta="-5" aria-label="Less debt">${N(`minus`,15)}</button>
+              <span class="dial-rule" aria-hidden="true"></span>
               <button class="stepper-btn" data-action="new-outfit-debt" data-delta="5" aria-label="More debt">${N(`plus`,15)}</button>
             </div>
           </div>
           <div class="no-dial">
             <span class="control-label">Games to clear it</span>
             <div class="dial">
-              <button class="stepper-btn" data-action="new-outfit-games" data-delta="-1" aria-label="Fewer games">${N(`minus`,15)}</button>
               <span class="dial-val ${i<=6?`is-hard`:``}">${i}</span>
+              <button class="stepper-btn" data-action="new-outfit-games" data-delta="-1" aria-label="Fewer games">${N(`minus`,15)}</button>
+              <span class="dial-rule" aria-hidden="true"></span>
               <button class="stepper-btn" data-action="new-outfit-games" data-delta="1" aria-label="More games">${N(`plus`,15)}</button>
             </div>
           </div>

@@ -406,8 +406,9 @@ function outfitTab(o: SavedOutfit): string {
               Budget / Spent / Left readout, "have a simple meter"). One label,
               one bar, one line of helper text; over budget it goes to
               Carbon's error state and says by how much. */ ""}
-        <cds-progress-bar class="solo-budget" label="Budget" max="${budgetK(o)}" value="${Math.min(cost, budgetK(o))}"
-          helper-text="${over ? `¢${-remaining}k over ¢${budgetK(o)}k` : `¢${cost}k of ¢${budgetK(o)}k`}" ${over ? 'status="error"' : ""}></cds-progress-bar>
+        ${/* The figure rides on the label line, not a helper line under the bar
+              (Jet: "put the budget to the right of the word budget"). */ ""}
+        <cds-progress-bar class="solo-budget" label="Budget ${over ? `¢${-remaining}k over ¢${budgetK(o)}k` : `¢${cost}k of ¢${budgetK(o)}k`}" max="${budgetK(o)}" value="${Math.min(cost, budgetK(o))}" ${over ? 'status="error"' : ""}></cds-progress-bar>
         ${/* p.212, verbatim. The old one-line paraphrase dropped the
               one-Perk-per-pilot-per-game limit and the D12 roll. */ ""}
         <p class="panel-note">For each ¢1k you earned during this game, choose one of your surviving pilots to gain a Perk. Each pilot can only gain a maximum of one Perk after each game. When you gain a Perk, roll a D12. If you roll a Perk you already have, you can select and gain another Perk from your class list.</p>

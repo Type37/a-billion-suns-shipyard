@@ -8698,7 +8698,7 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
 .solo-head { display: grid; grid-template-columns: 64px minmax(0, 28rem) minmax(0, 1fr) auto; gap: 16px; align-items: end; padding: 16px 0; border-bottom: 2px solid var(--hair-soft); }
 .solo-head .solo-print { grid-column: 4; }
 /* Tabs in the head row: their own 2px rule is the head's bottom rule. */
-.solo-head .solo-tabs { grid-column: 3; justify-self: start; align-self: end; border-bottom: none; padding: 0; margin-bottom: -16px; }
+.solo-head .solo-tabs { grid-column: 3; justify-self: start; align-self: end; border-bottom: none; padding: 0; margin-bottom: -12px; }
 .solo-head .solo-emblem { width: 64px; height: 64px; }
 .solo-head .solo-emblem .emblem, .solo-head .solo-emblem img { width: 48px; height: 48px; }
 .solo-name input {
@@ -8720,7 +8720,7 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
   .solo-head .solo-emblem { width: 48px; height: 48px; }
   .solo-head .solo-emblem .emblem, .solo-head .solo-emblem img { width: 36px; height: 36px; }
   .solo-head .solo-print { grid-column: 1 / -1; grid-row: 2; justify-self: start; }
-  .solo-head .solo-tabs { grid-column: 1 / -1; grid-row: 3; margin-bottom: -16px; }
+  .solo-head .solo-tabs { grid-column: 1 / -1; grid-row: 3; margin-bottom: -12px; }
 }
 
 /* Solo Outfit tab body on Carbon (same pass as the head above).
@@ -8807,3 +8807,15 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
 .solo-outfit .perk-taken-text { font-family: var(--sans); font-size: 14px; line-height: 1.45; color: var(--ink-2); }
 .solo-outfit .perk-list .ghost-btn.danger { border: none; color: var(--ink-2); background: none; width: var(--tap); height: var(--tap); }
 @media (hover: hover) { .solo-outfit .perk-list .ghost-btn.danger:hover { background: var(--cds-field-hover, #e8e8e8); color: var(--error); } }
+/* Tighter (Jet: "tighten white space"). Section heads 16px from what is above
+   and 8px from what they head; the first heads 16px under the tab rule; the
+   meter, the perk rule and the cards 8-16px apart. Still Carbon steps. */
+.solo-outfit .roster-section, .solo-outfit .catalog-title { margin: 16px 0 8px; }
+.solo-outfit .catalog-title, .solo-outfit .roster-sheet > .roster-section:first-of-type { margin-top: 16px; }
+.solo-outfit .solo-budget { margin: 0 0 12px; }
+.solo-outfit .panel-note { margin: 0 0 12px; }
+.solo-outfit .solo-card { margin-top: 16px; }
+.solo-outfit .game-bar { padding-top: 16px; }
+.solo-outfit .roster-unit + .roster-unit, .solo-outfit .ship-row + .ship-row { margin-top: 8px; }
+.solo-outfit .solo-workspace { padding-top: 0; }
+.solo-head { padding: 12px 0; }

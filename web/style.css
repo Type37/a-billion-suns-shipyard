@@ -8896,3 +8896,6 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
   .sip-row { grid-template-columns: minmax(0, 1fr); }
   .hp-cell { justify-content: flex-start; }
 }
+/* Face-down Blip: just its number, big and centred. */
+.blip-back { display: grid; place-items: center; }
+.blip-back .blip-slot { position: static; font: 800 56px/1 var(--display); color: var(--ink); }

@@ -548,10 +548,10 @@ function blipsPanel(o: SavedOutfit): string {
       return `
       <button class="blip ${b.revealed ? "is-revealed" : ""}" data-action="solo-blip-reveal" data-index="${i}"
               aria-label="${b.revealed ? `Blip ${b.n}, ${escapeHtml(name)}. Turn it back over.` : "Face-down Blip marker. Turn it over."}">
-        ${/* Each face-down marker carries its place in the row (Jet: "add
-              numbers to the blips"), so the tile can be matched to the marker
-              on the table. */ ""}
-        <span class="blip-face blip-back"><span class="blip-slot">${i + 1}</span>${BLIP_PING}</span>
+        ${/* A face-down marker is its place in the row, as one big number
+              (Jet: "replace blips with just big numbers"), so the tile matches
+              the marker on the table. The radar mark that was here is gone. */ ""}
+        <span class="blip-face blip-back"><span class="blip-slot">${i + 1}</span></span>
         <span class="blip-face blip-front">
           <span class="blip-head"><span class="blip-n">${b.n}</span><span class="blip-what">${escapeHtml(name)}</span></span>
           ${p ? statChips(p, true) : ""}
@@ -638,11 +638,6 @@ function shipsInPlay(o: SavedOutfit): string {
     </section>`;
 }
 
-/*
- * The face-down Blip mark: Stash's radar-duotone ("stash:radar-duotone", Jet's
- * pick, 1 October 2026), drawn large. Copied from the set, not drawn here.
- */
-const BLIP_PING = `<svg class="blip-ping" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 7.75A4.25 4.25 0 1 0 16.25 12a.75.75 0 0 1 1.5 0a5.75 5.75 0 1 1-3.45-5.271a.75.75 0 0 1-.6 1.374A4.2 4.2 0 0 0 12 7.75" opacity=".5"/><path fill="currentColor" d="M12 4.75a7.25 7.25 0 0 0-1.233 14.396a1.498 1.498 0 0 1 2.466 0A7.25 7.25 0 0 0 19.25 12a.75.75 0 0 1 1.5 0a8.75 8.75 0 0 1-7.396 8.646a1.5 1.5 0 0 1-2.708 0a8.75 8.75 0 1 1 4.636-16.76a.75.75 0 1 1-.563 1.39A7.2 7.2 0 0 0 12 4.75"/><path fill="currentColor" d="M14 12a2 2 0 1 1-1.219-1.842L17.97 4.97a.75.75 0 1 1 1.06 1.06l-5.188 5.189c.102.24.158.504.158.781m-7 1.5a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3"/></svg>`;
 
 function playTab(state: AppState, o: SavedOutfit): string {
   const alert = o.alertLevel;

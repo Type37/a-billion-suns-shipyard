@@ -52,3 +52,42 @@ The code carries long explanatory comments about *why* a thing is the way it is
 abandoned. Match that when you change something with a reason behind it; a
 change that alters a documented decision should update the documentation of it
 rather than leaving the old rationale sitting above new code.
+
+## Jet's rules for this app (from review, October 2026)
+
+These came out of a mobile review session. They override any default taste.
+
+### How to work
+- Things AI makes are inherently bad and usually slop. A first draft is never
+  worth showing. Fix it before anyone sees it.
+- Do not invent a design system. The app uses IBM Carbon
+  (`@carbon/web-components`). Move homemade components onto Carbon instead of
+  restyling them. A Carbon component beats anything written here by hand.
+- Colour is fine. Do not retint, add dark mode or chase contrast unless asked.
+- Work from real phone screenshots (Playwright touch contexts: iPhone 13, Pixel
+  7, a 360px Android, portrait AND landscape) and real taps. A finding without
+  a screenshot is a guess. Show the screenshot when the change ships.
+- Do what was asked, the way it was asked. Do not substitute a bigger project.
+
+### What the screens must not do
+- No middots (`·`) as separators. Two facts get two labelled lines.
+- No counts that restate the list ("2 classes", "0 units") and no numbered
+  markers unless the order is real.
+- No single letter labels (P, A, T, S). Write Primary, Auxiliary, Thrust.
+- No over-explaining copy, no cheer ("Check it out now!", "Get building!").
+- No toast for something the screen already shows. Toasts never take taps.
+- An empty list shows nothing, not a dashed box telling you to press the button
+  above it. An empty fleet is not an error.
+- One filled button per screen.
+
+### Layout rules
+- Guns go to the right of the ship stats. Stats left column, weapons right,
+  at every width.
+- On the Alliance, species is picked in Add unit before adding, and shown as
+  buttons, not a select.
+- Nothing pinned may eat the screen: Play mode's pinned block was 42% of a
+  portrait screen and 70% of landscape. That is a bug.
+- Dialogs keep their confirm button on screen (Carbon does this) and Back
+  closes a dialog instead of leaving the page.
+- Layout must not jump under the thumb. A double tap must never hit what just
+  appeared (see armTapGuard in web/actions.ts).

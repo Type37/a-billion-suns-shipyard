@@ -48,6 +48,9 @@ function morphAttributes(from: Element, to: Element): void {
     if (from.getAttribute(attr.name) !== attr.value) from.setAttribute(attr.name, attr.value);
   }
   for (const attr of Array.from(from.attributes)) {
+    // Carbon components reflect their own state into attributes (cds-button
+    // writes has-main-content). Those must also be in the rendered markup, or
+    // this line strips them and the component falls back to a default.
     if (!to.hasAttribute(attr.name)) from.removeAttribute(attr.name);
   }
 }

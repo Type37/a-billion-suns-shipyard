@@ -675,7 +675,7 @@ function fleetsView(state: AppState): string {
   <main class="fleets-main">
     <div class="fleets-head">
       <h1 class="page-title">Fleets</h1>
-      <button class="cta-btn create-cta" data-action="open-new-fleet">${icon("plus", 18)} New fleet</button>
+      <cds-button has-main-content kind="primary" size="lg" class="btn create-cta" data-action="open-new-fleet">New fleet${icon("plus", 18).replace("<svg ", '<svg slot="icon" ')}</cds-button>
     </div>
 
     ${
@@ -1194,7 +1194,7 @@ function hvpRequisitionNote(list: SavedList, faction: Faction | undefined): stri
     </div>
     <ul class="hvp-req-list">${rows}</ul>
     <p class="hvp-req-why">A Shipyard has no units until you requisition one, so there is nobody to assign them to yet. Each rides the unit you form when you requisition it &mdash; write it in the roster's <strong>HVP carried</strong> column as you go.</p>
-    <a class="bar-btn" href="#/print/${list.id}">${icon("print", 15)} Print the roster</a>
+    <cds-button has-main-content kind="tertiary" size="lg" class="btn" href="#/print/${list.id}">Print the roster${icon("print", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
   </section>`;
 }
 
@@ -1377,8 +1377,8 @@ function shipyardView(state: AppState): string {
     }
 
     <div class="sy-finish mf-finish">
-      <a class="mf-play-cta" href="#/play/${list.id}">${icon("flag", 18)} Enter Play Mode</a>
-      <a class="mf-print-cta" href="#/print/${list.id}">${icon("print", 18)} Print setup</a>
+      <cds-button has-main-content kind="tertiary" size="lg" class="mf-foot-btn" href="#/play/${list.id}">Enter Play Mode${icon("flag", 18).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+      <cds-button has-main-content kind="tertiary" size="lg" class="mf-foot-btn" href="#/print/${list.id}">Print setup${icon("print", 18).replace("<svg ", '<svg slot="icon" ')}</cds-button>
     </div>
   </main>
   ${toast(state)}
@@ -1600,6 +1600,9 @@ function builderView(state: AppState): string {
   // The fleet's legality sits in the credits row beside what is left to
   // spend (Jet: "the 1 to resolve should live next to the cash remaining"):
   // both answer "is this fleet done?", and the row is pinned while you scroll.
+  // Something to fix is the warning mark alone (Jet: no "1", "just the
+  // warning icon"); tapping it opens the list. The count is in its name for
+  // screen readers.
   const fleetStatus =
     // A legal fleet says nothing worth a standing line; the line is only spent
     // when there is something to resolve. Free Play always announces itself.
@@ -1609,7 +1612,7 @@ function builderView(state: AppState): string {
         // first ship was added greeted every new fleet with an error.
         issues.length > 0 && nUnits > 0
         ? `<details class="yard-status-pop">
-          <summary class="yard-status is-fail" aria-label="${issues.length === 1 ? "One thing" : `${issues.length} things`} to resolve">${icon("warning", 16)} To resolve</summary>
+          <summary class="yard-status is-fail" aria-label="${issues.length === 1 ? "One thing" : `${issues.length} things`} to resolve">${icon("warning", 20)}</summary>
           <ul class="yard-status-panel issue-list">${issues.map(issueLine).join("")}</ul>
         </details>`
         : nUnits > 0
@@ -1647,19 +1650,20 @@ function builderView(state: AppState): string {
         <span class="sy-budget-now">${credits(total)}</span>
         <span class="sy-budget-cap">${limitControl}</span>
         <div class="sy-budget-status">${fleetStatus}</div>
-        <span class="sy-budget-free">${remaining < 0 ? `${credits(-remaining)} over` : `${credits(remaining)} left`}</span>
-      </div>
-      ${/* Add unit rides in the pinned band beside the meter: it had a row of
-            its own under the band, and pinned it can be reached from anywhere
-            down a long roster without scrolling back up. */ ""}
-      <div class="sy-meter-row">
-        <div class="sy-meter"><span class="sy-meter-fill" style="width:${list.fleet.creditsLimit > 0 ? Math.min(100, (total / list.fleet.creditsLimit) * 100) : 0}%"></span></div>
+        ${remaining < 0 ? `<span class="sy-budget-free">${credits(-remaining)} over</span>` : ""}
         ${
           list.freePlay || faction
-            ? `<button class="sy-add-unit ${nUnits === 0 ? "is-pulsing" : ""}" data-action="open-add-unit">${icon("plus", 16)} Add ${isStocking ? "ship" : "unit"}</button>`
+            ? `<cds-button has-main-content kind="primary" size="lg" class="sy-add-unit" data-action="open-add-unit">Add ${isStocking ? "ship" : "unit"}${icon("plus", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>`
             : ""
         }
       </div>
+      ${/* One row and a line. The band used to be three readings of one sum,
+            "¢0 / ¢400", "¢400 left" and a meter, over two rows, with Add unit
+            on the second (Jet: "still feels wasteful"). What is spent and the
+            limit stay; the meter is the band's bottom edge; "left" shows only
+            when it turns into "over". Add unit is pinned at the row's end, so
+            it is in reach anywhere down a long roster. */ ""}
+      <div class="sy-meter"><span class="sy-meter-fill" style="width:${list.fleet.creditsLimit > 0 ? Math.min(100, (total / list.fleet.creditsLimit) * 100) : 0}%"></span></div>
     </div>
 
     <div class="sy-cols">
@@ -1695,8 +1699,8 @@ function builderView(state: AppState): string {
     </div>
 
     <div class="sy-finish mf-finish">
-      <a class="mf-play-cta" href="#/play/${list.id}">${icon("flag", 18)} Enter Play Mode</a>
-      <a class="mf-print-cta" href="#/print/${list.id}">${icon("print", 18)} Print setup</a>
+      <cds-button has-main-content kind="tertiary" size="lg" class="mf-foot-btn" href="#/play/${list.id}">Enter Play Mode${icon("flag", 18).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+      <cds-button has-main-content kind="tertiary" size="lg" class="mf-foot-btn" href="#/print/${list.id}">Print setup${icon("print", 18).replace("<svg ", '<svg slot="icon" ')}</cds-button>
     </div>
   </main>
   ${toast(state)}
@@ -2536,7 +2540,7 @@ function printView(
   ${topbar()}
   <main class="print-page">
     <div class="print-toolbar">
-      <a class="bar-btn" href="${override ? `#/solo/${list.id}` : `#/list/${list.id}`}">${icon("chevronRight", 15, "flip-x")} Back to the ${override ? "outfit" : isShipyard ? "Shipyard" : "Fleet List"}</a>
+      <cds-button has-main-content kind="tertiary" size="lg" class="btn" href="${override ? `#/solo/${list.id}` : `#/list/${list.id}`}">Back to the ${override ? "outfit" : isShipyard ? "Shipyard" : "Fleet List"}${icon("chevronRight", 15, "flip-x").replace("<svg ", '<svg slot="icon" ')}</cds-button>
       <div class="print-opts">
         <span class="segment" role="group" aria-label="Layout">
           <button class="${opts.format === "roster" ? "selected" : ""}" data-action="print-format" data-format="roster">Roster</button>
@@ -2565,7 +2569,7 @@ function printView(
       </div>
       <div class="print-go">
         <span class="print-pagecount" data-print-pagecount>&nbsp;</span>
-        <button class="cta-btn" data-action="do-print">${icon("print", 17)} Print</button>
+        <cds-button has-main-content kind="primary" size="lg" class="btn" data-action="do-print">Print${icon("print", 17).replace("<svg ", '<svg slot="icon" ')}</cds-button>
       </div>
     </div>
     ${
@@ -2729,10 +2733,10 @@ function foundryListView(state: AppState): string {
         <td class="cell-num" data-label="Ships">${f.ships.length}</td>
         <td class="cell-num" data-label="Personnel">${f.hvp.length}</td>
         <td class="cell-actions">
-          <button class="ghost-btn" data-action="clone-faction" data-source="${f.id}" title="Duplicate this faction">${icon("ix-duplicate", 16)} Duplicate</button>
-          <button class="ghost-btn" data-action="copy-faction" data-id="${f.id}" title="Copy as JSON to share">${icon("scroll", 16)} Copy</button>
-          <button class="ghost-btn" data-action="export-faction" data-id="${f.id}" title="Download as a file">${icon("download", 16)} Download</button>
-          <button class="ghost-btn danger" data-action="delete-faction" data-id="${f.id}" title="Delete">${icon("ix-trash", 16)} Delete</button>
+          <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="clone-faction" data-source="${f.id}" title="Duplicate this faction">Duplicate${icon("ix-duplicate", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+          <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="copy-faction" data-id="${f.id}" title="Copy as JSON to share">Copy${icon("scroll", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+          <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="export-faction" data-id="${f.id}" title="Download as a file">Download${icon("download", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+          <cds-button has-main-content kind="danger--tertiary" size="lg" class="btn" data-action="delete-faction" data-id="${f.id}" title="Delete">Delete${icon("ix-trash", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
         </td>
       </tr>`,
     )
@@ -2778,7 +2782,7 @@ function foundryListView(state: AppState): string {
       <label class="bar-btn file-btn">${icon("upload", 16)} Import from a file
         <input class="file-cover" type="file" accept="application/json" data-action="import-faction" aria-label="Import a faction from a file" />
       </label>
-      <button class="bar-btn" data-action="paste-faction">${icon("duplicate", 16)} Paste from clipboard</button>
+      <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="paste-faction">Paste from clipboard${icon("duplicate", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
     </div>
     ${
       state.customFactions.length === 0
@@ -2825,7 +2829,7 @@ function weaponEditor(shipIndex: number, slot: "primary" | "auxiliary", weapons:
   // single line, and this row has not been one since the name moved onto a line
   // of its own to stop "Pulse Laser Turrets" being clipped to "Pulse Las".
   return `${rows}
-    <button class="ghost-btn" data-action="cf-weapon-add" data-ship="${shipIndex}" data-slot="${slot}">${icon("plus", 14)} Add ${slot === "auxiliary" ? "an" : "a"} ${slot} weapon</button>`;
+    <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="cf-weapon-add" data-ship="${shipIndex}" data-slot="${slot}">Add ${slot === "auxiliary" ? "an" : "a"} ${slot} weapon${icon("plus", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>`;
 }
 
 function foundryEditView(state: AppState, factionId: string): string {
@@ -2914,7 +2918,7 @@ function foundryEditView(state: AppState, factionId: string): string {
       -->
       ${
         f.ships.length
-          ? `<button class="bar-btn" data-action="open-new-fleet-with-faction" data-faction="${f.id}">${icon("flag", 14)} Build a fleet with this faction</button>`
+          ? `<cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="open-new-fleet-with-faction" data-faction="${f.id}">Build a fleet with this faction${icon("flag", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>`
           : ""
       }
     </div>
@@ -2952,13 +2956,13 @@ function foundryEditView(state: AppState, factionId: string): string {
     <section class="cf-section">
       <h2 class="panel-title">Ship classes</h2>
       ${shipBlocks || '<p class="muted">No ships yet.</p>'}
-      <button class="cta-btn" data-action="cf-ship-add">${icon("plus", 16)} Add a ship class</button>
+      <cds-button has-main-content kind="primary" size="lg" class="btn" data-action="cf-ship-add">Add a ship class${icon("plus", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
     </section>
 
     <section class="cf-section">
       <h2 class="panel-title">High-Value Personnel</h2>
       ${hvpBlocks || '<p class="muted">None yet.</p>'}
-      <button class="cta-btn" data-action="cf-hvp-add">${icon("plus", 16)} Add a person</button>
+      <cds-button has-main-content kind="primary" size="lg" class="btn" data-action="cf-hvp-add">Add a person${icon("plus", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
     </section>
   </main>
   ${toast(state)}
@@ -3708,9 +3712,9 @@ function playView(state: AppState): string {
           "Reset" alone does not say what it resets, and it is sitting next to a
           round counter and a phase track it would wipe.
         -->
-        <a class="ghost-btn play-bar-print" href="#/print/${list.id}">${icon("print", 14)} Print</a>
-        <button class="ghost-btn play-bar-reset" data-action="play-reset" title="Reset the round, phase, CMD and VP trackers">${icon("eraser", 14)} Reset game</button>
-        <a class="ghost-btn play-bar-end" href="#/list/${list.id}">${icon("check", 15)} End play</a>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn play-bar-print" href="#/print/${list.id}">Print${icon("print", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn play-bar-reset" data-action="play-reset" title="Reset the round, phase, CMD and VP trackers">Reset game${icon("eraser", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn play-bar-end" href="#/list/${list.id}">End play${icon("check", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
       </header>
       <div class="phase-track">${phaseBtns}</div>
       ${cmdStrip}
@@ -3726,7 +3730,7 @@ function playView(state: AppState): string {
         isOver
           ? ""
           : `<div class="play-sticky-next">
-        <button class="cta-btn${atLastPhase ? " play-next-final" : ""}" data-action="play-next">${icon(atLastPhase ? "flag" : "chevronRight", 16)} ${atLastPhase ? "End the game" : "Next phase"}</button>
+        <cds-button has-main-content kind="primary" size="lg" class="btn ${atLastPhase ?" play-next-final" : ""}" data-action="play-next">${atLastPhase ? "End the game" : "Next phase"}${icon(atLastPhase ? "flag" : "chevronRight", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
       </div>`
       }
     </div>
@@ -4058,7 +4062,7 @@ function shipsView(state: AppState): string {
             </label>`
           : ""
       }
-      ${f.era || f.faction || f.mass || f.q ? '<button class="ghost-btn comp-clear" data-action="ship-filter-clear">Clear filters</button>' : ""}
+      ${f.era || f.faction || f.mass || f.q ? '<cds-button has-main-content kind="tertiary" size="lg" class="btn comp-clear" data-action="ship-filter-clear">Clear filters</cds-button>' : ""}
     </div>
 
     <div class="comp-viewbar">
@@ -4194,10 +4198,10 @@ function optionsModal(state: AppState): string {
               : ""
           }
           <div class="opt-actions">
-            <button class="bar-btn" data-action="export-data">${icon("download", 15)} Export a backup</button>
+            <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="export-data">Export a backup${icon("download", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
             <label class="bar-btn file-btn">${icon("upload", 15)} Import a backup
               <input class="file-cover" type="file" accept="application/json,.json" data-action="import-data" aria-label="Import a backup file" /></label>
-            <button class="bar-btn danger" data-action="clear-data">${icon("trash", 15)} Clear all data</button>
+            <cds-button has-main-content kind="danger--tertiary" size="lg" class="btn" data-action="clear-data">Clear all data${icon("trash", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
           </div>
         </section>
         <section class="opt-section">
@@ -4220,7 +4224,7 @@ function optionsModal(state: AppState): string {
             FleetSync.enabled() ? "Syncing is on for this device." : "Keep the same fleets on your phone and your computer."
           }</p>
           <div class="opt-actions">
-            <button class="bar-btn" data-action="open-sync">${icon("sync", 15)} Sync Fleets Online</button>
+            <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="open-sync">Sync Fleets Online${icon("sync", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
           </div>
         </section>
         <section class="opt-section">
@@ -4259,7 +4263,7 @@ function syncDiscordHTML(): string {
   return `
     <section class="opt-section">
       <div class="opt-actions">
-        <button class="cta-btn sync-discord-btn" data-action="sync-discord">${icon("discord", 16)} Sign in with Discord</button>
+        <cds-button has-main-content kind="primary" size="lg" class="btn sync-discord-btn" data-action="sync-discord">Sign in with Discord${icon("discord", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
       </div>
       <p class="sync-hint">Sign in on each device and your fleets follow you.</p>
     </section>`;
@@ -4273,7 +4277,7 @@ function syncOffHTML(): string {
       <p>Put this phrase into any device and it will load and sync your current fleets.</p>
       ${syncNoteHTML()}
       <div class="opt-actions">
-        <button class="cta-btn" id="sync-generate" data-action="sync-generate">${icon("sync", 15)} Generate a Sync Token</button>
+        <cds-button has-main-content kind="primary" size="lg" class="btn" id="sync-generate" data-action="sync-generate">Generate a Sync Token${icon("sync", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
       </div>
     </section>
     <section class="opt-section sync-existing">
@@ -4281,7 +4285,7 @@ function syncOffHTML(): string {
       <div class="sync-join-row">
         <input type="text" id="sync-input" class="sync-input" placeholder="Enter your Sync Token…"
                autocapitalize="none" autocorrect="off" spellcheck="false" aria-label="Sync Token" />
-        <button class="bar-btn" id="sync-join" data-action="sync-join">${icon("check", 14)} Confirm</button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" id="sync-join" data-action="sync-join">Confirm${icon("check", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>
       </div>
       <p class="sync-status" id="sync-busy" hidden></p>
       <p class="sync-error" id="sync-error" hidden></p>
@@ -4302,9 +4306,9 @@ function syncOnHTML(state: AppState): string {
     </section>
     <section class="opt-section">
       <div class="opt-actions">
-        <button class="cta-btn" id="sync-now" data-action="sync-now">${icon("sync", 15)} Sync now</button>
-        <button class="bar-btn" id="sync-stop" data-action="sync-stop">Sign out</button>
-        <button class="bar-btn danger" id="sync-delete" data-action="sync-delete">${icon("trash", 14)} Delete online copy</button>
+        <cds-button has-main-content kind="primary" size="lg" class="btn" id="sync-now" data-action="sync-now">Sync now${icon("sync", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" id="sync-stop" data-action="sync-stop">Sign out</cds-button>
+        <cds-button has-main-content kind="danger--tertiary" size="lg" class="btn" id="sync-delete" data-action="sync-delete">Delete online copy${icon("trash", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>
       </div>
       <p class="sync-status" id="sync-busy" hidden></p>
       <p class="sync-error" id="sync-error" hidden></p>
@@ -4317,7 +4321,7 @@ function syncOnHTML(state: AppState): string {
       <h3 class="opt-h">Your Sync Token</h3>
       <div class="sync-token-row">
         <code class="sync-token" id="sync-token-text">${escapeHtml(FleetSync.token() ?? "")}</code>
-        <button class="bar-btn" id="sync-copy" data-action="sync-copy">${icon("duplicate", 14)} Copy</button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" id="sync-copy" data-action="sync-copy">Copy${icon("duplicate", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>
       </div>
       <p class="sync-hint">Put this phrase into any device and it will load and sync your current fleets.</p>
       ${syncNoteHTML()}
@@ -4325,11 +4329,11 @@ function syncOnHTML(state: AppState): string {
     ${syncDiscordHTML()}
     <section class="opt-section">
       <div class="opt-actions">
-        <button class="cta-btn" id="sync-now" data-action="sync-now">${icon("sync", 15)} Sync now</button>
-        <button class="bar-btn" id="sync-stop" data-action="sync-stop"
-          title="Keeps your fleets on this device and leaves the online copy alone">Stop syncing here</button>
-        <button class="bar-btn danger" id="sync-delete" data-action="sync-delete"
-          title="Removes the online copy. Your fleets on this device are kept">${icon("trash", 14)} Delete online copy</button>
+        <cds-button has-main-content kind="primary" size="lg" class="btn" id="sync-now" data-action="sync-now">Sync now${icon("sync", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" id="sync-stop" data-action="sync-stop"
+          title="Keeps your fleets on this device and leaves the online copy alone">Stop syncing here</cds-button>
+        <cds-button has-main-content kind="danger--tertiary" size="lg" class="btn" id="sync-delete" data-action="sync-delete"
+          title="Removes the online copy. Your fleets on this device are kept">Delete online copy${icon("trash", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>
       </div>
       <p class="sync-status" id="sync-busy" hidden></p>
       <p class="sync-error" id="sync-error" hidden></p>

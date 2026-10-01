@@ -1181,7 +1181,15 @@ document.addEventListener(
   true,
 );
 
+// Width changes only. On a phone the address bar collapses and returns as you
+// scroll, and each time the browser fires "resize" with a new height and the
+// same width. Re-measuring the pinned header and the nav on those moved things
+// under the thumb mid-scroll, which near the bottom of a page felt like being
+// bounced (Jet). None of this depends on the height.
+let lastResizeWidth = window.innerWidth;
 window.addEventListener("resize", () => {
+  if (window.innerWidth === lastResizeWidth) return;
+  lastResizeWidth = window.innerWidth;
   enhanceNav();
   // The pinned header wraps to a second line as the viewport narrows, and the
   // roster panel sticks below it, so its height has to be re-read on resize.

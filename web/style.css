@@ -5933,7 +5933,8 @@ body[data-view="play"] .wlf { display: none; }
 /* On home the credits line rides the bottom of the screen while you scroll, then
    settles above the WarLore footer once you reach it (sticky is bounded by #app,
    and .wlf follows #app). Home has no fixed bottom bar, so bottom: 0 is clear. */
-body[data-view="home"] .game-info-footer { position: sticky; bottom: 0; z-index: 40; background: var(--paper); }
+/* The home footer is not pinned: pinned, it covered 104px of a 664px phone
+   screen and moved as the page reached its end. */
 /* On a phone that band sits over the page the whole time, so it packs tight:
    smaller type, small gaps, and the coarse-pointer 13px link padding (the 44px
    tap floor, set above) dropped here, where it made every wrapped row 45px tall. */
@@ -8215,3 +8216,55 @@ cds-overflow-menu.hdr-menu, cds-overflow-menu.card-menu {
 .no-dials { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: center; gap: 12px 16px; }
 .no-dial { display: contents; }
 .no-dial .dial { width: 100%; display: grid; grid-template-columns: var(--tap) minmax(0, 1fr) var(--tap); align-items: center; justify-items: center; }
+
+/* Carbon buttons (cds-button) everywhere a homemade .cta-btn / .ghost-btn /
+   .bar-btn was. Carbon reserves 64px on the right for a trailing icon and
+   caps a button at 20rem; in rows the app lays out itself (Play's top row,
+   the foot of the builder, Add unit in the credits band) the button takes the
+   width it is given and pads evenly instead. */
+cds-button.btn::part(button), cds-button.sy-add-unit::part(button), cds-button.mf-foot-btn::part(button) {
+  max-inline-size: none; padding-inline: 16px; gap: 8px;
+}
+.play-sticky .play-bar > cds-button { width: 100%; }
+.play-sticky .play-bar > cds-button::part(button) { width: 100%; justify-content: center; padding-inline: 8px; }
+.mf-finish cds-button, .mf-finish cds-button::part(button) { width: 100%; max-inline-size: none; }
+/* With even padding the icon goes back into the flow after the label (Carbon
+   pins it absolutely inside a 64px right gutter), and a label never wraps. */
+cds-button.btn > svg[slot="icon"], cds-button.sy-add-unit > svg[slot="icon"], cds-button.mf-foot-btn > svg[slot="icon"] {
+  position: static; inset: auto; margin: 0; flex: none;
+}
+cds-button.btn::part(button), cds-button.sy-add-unit::part(button), cds-button.mf-foot-btn::part(button) {
+  white-space: nowrap; align-items: center;
+}
+cds-button.btn, cds-button.sy-add-unit { flex: none; }
+/* The homemade button classes these Carbon buttons replaced still carry their
+   old padding, borders and backgrounds in older rules (.sy-add-unit,
+   .create-cta, .play-bar-*); on the Carbon host that padding sat outside the
+   real button and pushed its label out of the box. The host is bare; Carbon
+   draws the button. */
+cds-button.btn, cds-button.sy-add-unit, cds-button.mf-foot-btn {
+  padding: 0; border: none; background: none; min-height: 0; box-shadow: none; animation: none;
+}
+
+/* The credits band: one row (spent / limit, the warning mark, "over" when it
+   is, Add unit at the end) and the meter as a 4px line along its bottom. */
+.sy-budget-row.sy-budget-row { flex-wrap: nowrap; align-items: center; gap: 8px; }
+.sy-budget-row .sy-budget-status { margin-left: 0; }
+.sy-budget-row > .sy-add-unit { margin-left: auto; }
+.sy-budget > .sy-meter { margin-top: 8px; height: 4px; border: none; }
+.sy-budget { padding-bottom: 0; }
+/* A Carbon button in a flex row collapsed to 48px (its own min size), with
+   its label spilling out to the left. It takes its content's width. */
+cds-button.btn, cds-button.sy-add-unit { width: max-content; min-width: max-content; }
+/* Play's three cells: the older .play-bar-* rule (higher specificity than the
+   host reset above) still padded the host 8px a side, which left "Reset game"
+   96px inside a 112px cell and pushed its label past the edge at 360px. */
+.play-sticky .play-bar > cds-button.btn.btn { width: 100%; min-width: 0; padding: 0; border: none; }
+/* Carbon draws the tertiary border on the inner button, so the old "drop the
+   left line" rule no longer reaches it; neighbours overlap by 1px instead. */
+.play-sticky .play-bar > cds-button.btn + cds-button.btn { margin-left: -1px; width: calc(100% + 1px); }
+
+/* Add unit's mass groups: the rule between groups is a 3px blue line, so it
+   reads as a break between groups rather than one more card edge (Jet: "color
+   the dividers one of our accent colors, make it a lil thicker"). */
+.au-groups > .au-list + .au-list { border-top: 3px solid var(--blue); }

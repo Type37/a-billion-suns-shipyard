@@ -190,7 +190,7 @@ export function soloListView(state: AppState): string {
           ${gameTicks(o.gamesPlayed, gamesLimit(o))}
         </div>
         <div class="outfit-card-actions">
-          <a class="ghost-btn" href="#/solo/${o.id}">${icon("chevronRight", 15)} Continue</a>
+          <cds-button has-main-content kind="tertiary" size="lg" class="btn" href="#/solo/${o.id}">Continue${icon("chevronRight", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
           ${/* Labelled, in a Carbon menu like the fleet cards: the two bare icons
                 explained themselves only in hover text, which a phone never shows. */ ""}
           <cds-overflow-menu class="card-menu" label="Actions" size="lg" enable-v12-overflowmenu menu-alignment="bottom-end">
@@ -213,7 +213,7 @@ export function soloListView(state: AppState): string {
     <section class="commission-panel">
       <div class="solo-panel-head">
         <h2 class="panel-title">Your outfits</h2>
-        <button class="cta-btn" data-action="solo-new-outfit-open">${icon("plus", 18)} Start a new outfit</button>
+        <cds-button has-main-content kind="primary" size="lg" class="btn" data-action="solo-new-outfit-open">Start a new outfit${icon("plus", 18).replace("<svg ", '<svg slot="icon" ')}</cds-button>
       </div>
       ${
         outfits.length === 0
@@ -347,7 +347,7 @@ function outfitTab(o: SavedOutfit): string {
           ${def ? "" : `<span class="roster-unit-glyph">${icon("warning", 20)}</span>`}
           <input class="unit-name-input" type="text" value="${escapeHtml(s.shipName ?? "")}" placeholder="${escapeHtml(def?.name ?? "Ship")}" aria-label="${escapeHtml(def?.name ?? "Ship")}" data-action="outfit-ship-name" data-ship="${s.id}" />
           <span class="roster-unit-cost">${ck(def?.cost ?? 0)}</span>
-          <button class="ghost-btn danger" data-action="outfit-remove-ship" data-ship="${s.id}">${icon("trash", 14)} Remove</button>
+          <cds-button has-main-content kind="danger--tertiary" size="lg" class="btn" data-action="outfit-remove-ship" data-ship="${s.id}">Remove${icon("trash", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>
         </div>
         ${
           // Same stat chips and weapons table the catalogue uses, so a ship
@@ -404,7 +404,7 @@ function outfitTab(o: SavedOutfit): string {
         ${shipRows || ""}
         ${over ? '<div class="inspection fail"><p class="issue-error">Over budget by ' + ck(-remaining) + ".</p></div>" : ""}
         <div class="roster-actions">
-          <button class="bar-btn danger" data-action="delete-outfit" data-id="${o.id}">${icon("trash", 16)} Delete outfit</button>
+          <cds-button has-main-content kind="danger--tertiary" size="lg" class="btn" data-action="delete-outfit" data-id="${o.id}">Delete outfit${icon("trash", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
         </div>
       </div>
     </aside>
@@ -507,7 +507,7 @@ function blipsPanel(o: SavedOutfit): string {
   return `
     <section class="solo-card solo-blips">
       <h3 class="roster-section">Blips
-        <button class="ghost-btn" data-action="solo-shuffle-blips" title="Shuffle the eight blips into a random order">${icon("random", 10)} Reshuffle</button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="solo-shuffle-blips" title="Shuffle the eight blips into a random order">Reshuffle${icon("random", 10).replace("<svg ", '<svg slot="icon" ')}</cds-button>
       </h3>
       <div class="blip-grid">${markers}</div>
       <p class="blip-rule">${ruleText(PIRATE_RULE)}</p>
@@ -544,10 +544,10 @@ function playTab(state: AppState, o: SavedOutfit): string {
         <!-- What just happened on the table, then what it does to the Level.
              The old labels led with the arithmetic ("+1 End Phase"), which is
              the wrong way round: you press these because a thing happened. -->
-        <button class="bar-btn" data-action="alert-adjust" data-delta="1">${icon("plus", 13)} End Phase <b class="alert-delta">+1</b></button>
-        <button class="bar-btn" data-action="alert-adjust" data-delta="1">${icon("plus", 13)} Reveal Mass 2-3 <b class="alert-delta">+1</b></button>
-        <button class="bar-btn" data-action="alert-adjust" data-delta="-2">${icon("minus", 13)} Destroy Mass 2-3 <b class="alert-delta">&minus;2</b></button>
-        <button class="ghost-btn" data-action="alert-adjust" data-delta="-1">${icon("minus", 13)} Take one back <b class="alert-delta">&minus;1</b></button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="alert-adjust" data-delta="1">End Phase <b class="alert-delta">+1</b>${icon("plus", 13).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="alert-adjust" data-delta="1">Reveal Mass 2-3 <b class="alert-delta">+1</b>${icon("plus", 13).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="alert-adjust" data-delta="-2">Destroy Mass 2-3 <b class="alert-delta">&minus;2</b>${icon("minus", 13).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="alert-adjust" data-delta="-1">Take one back <b class="alert-delta">&minus;1</b>${icon("minus", 13).replace("<svg ", '<svg slot="icon" ')}</cds-button>
       </div>
       ${startNote}
     </div>
@@ -617,7 +617,7 @@ function campaignTab(o: SavedOutfit): string {
       ${outOfGames ? '<p class="issue-error">Eight games are up with debt remaining. Some very unpleasant people pay a visit: the campaign is lost.</p>' : ""}
     </div>
     <div class="gb-act">
-      <button class="cta-btn" data-action="log-game">${icon("plus", 16)} Log a completed game</button>
+      <cds-button has-main-content kind="primary" size="lg" class="btn" data-action="log-game">Log a completed game${icon("plus", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
     </div>
   </section>
   <div class="solo-split solo-split-solo">
@@ -695,7 +695,7 @@ export function soloOutfitView(state: AppState): string {
             it goes to the real print route now, same shell and same preview as
             a Fleet List. */ ""}
       <div class="setup-actions">
-        <a class="bar-btn" href="#/print-outfit/${o.id}">${icon("print", 15)} Print</a>
+        <cds-button has-main-content kind="tertiary" size="lg" class="btn" href="#/print-outfit/${o.id}">Print${icon("print", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
       </div>
     </div>
   </section>

@@ -2842,7 +2842,7 @@ function weaponEditor(shipIndex: number, slot: "primary" | "auxiliary", weapons:
           <input class="we-num" type="number" min="0" value="${w.rangeMin}" ${cell(wi, "rangeMin", "")} /></label>
         <label class="we-f"><span class="we-l">Max range</span>
           <input class="we-num" type="number" min="0" value="${w.rangeMax}" ${cell(wi, "rangeMax", "")} /></label>
-        <button class="ghost-btn danger we-remove" data-action="cf-weapon-remove" data-ship="${shipIndex}" data-slot="${slot}" data-index="${wi}" title="Remove weapon" aria-label="Remove weapon">${icon("trash", 16)}</button>
+        <button class="ghost-btn we-remove" data-action="cf-weapon-remove" data-ship="${shipIndex}" data-slot="${slot}" data-index="${wi}" title="Remove weapon" aria-label="Remove weapon">${icon("close", 16)}</button>
       </div>`,
     )
     .join("");
@@ -2875,19 +2875,19 @@ function foundryEditView(state: AppState, factionId: string): string {
         </button>
         <label class="cf-f cf-ship-name"><span class="cf-l">Ship class name</span>
           <input type="text" value="${escapeHtml(s.name)}" data-action="cf-ship" data-ship="${si}" data-field="name" /></label>
-        <label class="cf-f cf-ship-cost"><span class="cf-l">Cost</span>
-          <input type="number" min="1" value="${s.cost}" data-action="cf-ship" data-ship="${si}" data-field="cost" /></label>
         <button class="ghost-btn danger cf-ship-x" data-action="cf-ship-remove" data-ship="${si}" title="Remove this ship class" aria-label="Remove ship class ${escapeHtml(s.name)}">${icon("trash", 16)}</button>
       </div>
       <div class="cf-ship-body">
         <div class="cf-ship-stats">
+          <label class="cf-f cf-stat cf-ship-cost"><span class="cf-l">¢ Cost</span>
+            <input type="number" min="1" value="${s.cost}" data-action="cf-ship" data-ship="${si}" data-field="cost" /></label>
           <label class="cf-f cf-stat"><span class="cf-l">${icon("stat-mass", 16, "stat-ico stat-ico-mass")}Mass</span>
             <select data-action="cf-ship" data-ship="${si}" data-field="mass">
               ${[0, 1, 2, 3].map((m) => `<option value="${m}" ${s.mass === m ? "selected" : ""}>${m}</option>`).join("")}
             </select></label>
           <label class="cf-f cf-stat"><span class="cf-l">${icon("stat-thrust", 16, "stat-ico stat-ico-thrust")}Thrust</span>
             <input type="number" min="0" value="${s.thrust}" data-action="cf-ship" data-ship="${si}" data-field="thrust" /></label>
-          <label class="cf-f cf-stat"><span class="cf-l">${icon("stat-silhouette", 16, "stat-ico stat-ico-silhouette")}Silhouette</span>
+          <label class="cf-f cf-stat"><span class="cf-l">${icon("stat-silhouette", 16, "stat-ico stat-ico-silhouette")}Sil</span>
             <input type="number" min="1" max="12" value="${s.silhouette}" data-action="cf-ship" data-ship="${si}" data-field="silhouette" /></label>
           <label class="cf-f cf-stat"><span class="cf-l">${icon("stat-shields", 16, "stat-ico stat-ico-shields")}Shields</span>
             <input type="number" min="0" value="${s.shields}" data-action="cf-ship" data-ship="${si}" data-field="shields" /></label>

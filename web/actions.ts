@@ -2985,6 +2985,10 @@ if (typeof document !== "undefined") {
   );
 }
 
+const NAME_ACTIONS = new Set(["fleet-name", "unit-name", "hvp-name", "outfit-name", "outfit-ship-name", "outfit-pilot-name"]);
+let nameTimer: ReturnType<typeof setTimeout> | undefined;
+let pendingName: (() => void) | undefined;
+
 export function wireActions(root: HTMLElement): void {
   root.addEventListener("click", handleClick);
   root.addEventListener("change", handleChange);
@@ -3054,6 +3058,30 @@ export function wireActions(root: HTMLElement): void {
     const t = e.target as HTMLElement | null;
     const liveAction = t?.dataset?.["action"];
     if (liveAction === "ship-search" || liveAction === "emblem-lib-search") handleChange(e);
+    // Names save as you type, 400ms after the last key. They used to save only
+    // on `change`, which fires when the field loses focus, so typing a name and
+    // then pressing Back, reloading or switching apps lost it every time.
+    // Committing at leave time does not work: by the time Back fires, the
+    // address already points at the previous page, and the handlers find the
+    // fleet by the address. The debounce keeps a re-render off every keystroke.
+    else if (liveAction && NAME_ACTIONS.has(liveAction)) {
+      clearTimeout(nameTimer);
+      pendingName = () => {
+        pendingName = undefined;
+        if (t?.isConnected) handleChange(e);
+      };
+      nameTimer = setTimeout(() => pendingName?.(), 400);
+    }
+  });
+  // Reload and switching apps keep the address, so a name still inside its
+  // 400ms wait is saved on the spot rather than dropped.
+  const flushName = () => {
+    clearTimeout(nameTimer);
+    pendingName?.();
+  };
+  window.addEventListener("pagehide", flushName);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") flushName();
   });
   // Escape closes whatever is on top. Bound to the document, not root, because
   // focus can legitimately sit outside #app (the skip link, the address bar

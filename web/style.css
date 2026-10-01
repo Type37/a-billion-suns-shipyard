@@ -7872,3 +7872,10 @@ main.play-body .roster-section::before { content: none; }
    151px off the left edge. Which side it is on depends on how the row wrapped,
    so main.ts measures on open and sets .is-flip to hang it from the left edge. */
 .mf-menu.is-flip .mf-menu-panel { right: auto; left: 0; }
+
+/* iOS Safari zooms the whole page when a field under 16px is focused, and
+   leaves it zoomed. Measured on a phone: the personnel name field (15px), the
+   Compendium search (14px) and its filters (13.3px) all did it. */
+@media (max-width: 760px), (pointer: coarse) {
+  .hvp-name-input, .comp-search, .comp-filters select, #emblem-lib-search { font-size: 16px; }
+}

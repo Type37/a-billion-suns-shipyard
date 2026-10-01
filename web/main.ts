@@ -4,7 +4,7 @@ import { render } from "./render.ts";
 import { morphInto } from "./morph.ts";
 import { armTapGuard, wireActions } from "./actions.ts";
 import { decodeShare, decodeSharePayload, sharePayloadFromHash, type DecodedShare } from "./share.ts";
-import { loadLists, persistCustomFactions, persistLists } from "./storage.ts";
+import { loadLists, persistCustomFactions, persistLists, persistOnboarding } from "./storage.ts";
 import { runDecode, DIGIT_POOL } from "./write-on.ts";
 import { renderMarkdown } from "./richtext.ts";
 import { FleetSync } from "./fleet-sync.ts";
@@ -16,6 +16,7 @@ import "./style.css";
 // style.css ("Carbon"), fonts are inherited.
 import "@carbon/web-components/es/components/modal/index.js";
 import "@carbon/web-components/es/components/button/index.js";
+import "@carbon/web-components/es/components/notification/index.js";
 
 // Keep every Markdown notes editor's preview in step with its textarea as the
 // user types. Uncontrolled on purpose (see richtext.ts): typing must not go
@@ -1314,6 +1315,17 @@ window.addEventListener("popstate", () => {
     // building opens the new fleet). Nothing to close: step past it.
     history.back();
   }
+});
+// A hint closed (its X): never show it again.
+document.addEventListener("cds-notification-closed", (e) => {
+  const id = (e.target as HTMLElement | null)?.dataset?.["coachmark"];
+  if (!id) return;
+  store.setState((s) => {
+    if (s.onboarding.toursSeen.includes(id)) return s;
+    const onboarding = { ...s.onboarding, toursSeen: [...s.onboarding.toursSeen, id] };
+    persistOnboarding(onboarding);
+    return { ...s, onboarding, ui: { ...s.ui, coachmarkDone: true } };
+  });
 });
 document.addEventListener("cds-modal-closed", () => {
   if (store.getState().ui.modal) store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined } }));

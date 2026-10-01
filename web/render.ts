@@ -533,6 +533,52 @@ function tutorialCallout(state: AppState): string {
 // Home hub: decide what you want to do (Dropfleet-builder mental model)
 // ---------------------------------------------------------------------------
 
+
+/*
+ * Coachmarks: four one-time hints, as Carbon inline notifications placed right
+ * under the thing they describe. Carbon's own coachmark was tried first and
+ * dropped: it wraps its target in a shrink-to-fit popover, which narrowed the
+ * home rows, ran off the right edge beside the name field and drew behind the
+ * rows below. The first eligible hint on the screen shows, one per visit;
+ * closing it records it in onboarding.toursSeen ("cds-notification-closed" in
+ * main.ts) and it never shows again. Kept from the original set after review: renaming the fleet, naming
+ * personnel, Sync, and the sample factions. Cut: the Compendium search hint.
+ * One plain sentence each, no buttons beyond the close X.
+ */
+const COACHMARKS: { id: string; view: string; when: (s: AppState) => boolean; body: string }[] = [
+  { id: "rename-fleet", view: "builder", when: (s) => s.onboarding.visits >= 2, body: "The shuffle button beside the name rolls a new fleet name." },
+  {
+    id: "rename-personnel",
+    view: "builder",
+    when: (s) => s.onboarding.visits >= 3 && (activeList(s)?.fleet.hvp.length ?? 0) > 0,
+    body: "Chosen personnel can have names. Type over a title to rename them.",
+  },
+  {
+    id: "fleet-sync",
+    view: "home",
+    when: (s) => s.onboarding.visits >= 3 && !FleetSync.enabled(),
+    body: "Want these fleets on your phone and your computer? Menu, Options, Sync.",
+  },
+  { id: "example-factions", view: "home", when: (s) => s.onboarding.visits >= 5, body: "Want your own faction? Custom Rules has sample factions to start from." },
+];
+
+function activeCoachmark(state: AppState): string | undefined {
+  // One per visit: closing one does not put the next straight up.
+  if (state.ui.coachmarkDone) return undefined;
+  return COACHMARKS.find((c) => c.view === state.route.view && !state.onboarding.toursSeen.includes(c.id) && c.when(state))?.id;
+}
+
+/** `trigger` followed by hint `id` when it is the one to show now. */
+function coachmark(state: AppState, id: string, trigger: string): string {
+  return `${trigger}${hint(state, id)}`;
+}
+
+function hint(state: AppState, id: string): string {
+  const c = COACHMARKS.find((x) => x.id === id);
+  if (!c || activeCoachmark(state) !== id) return "";
+  return `<cds-inline-notification kind="info" low-contrast open data-coachmark="${id}" class="app-hint" title="" subtitle="${escapeHtml(c.body)}" close-button-label="Dismiss"></cds-inline-notification>`;
+}
+
 function homeView(state: AppState): string {
   // Rows are links, except when an action is given (Learn to Play launches a
   // guided tutorial battle rather than routing to a dead page).
@@ -562,7 +608,7 @@ function homeView(state: AppState): string {
     <div class="index-col">
       ${tutorialCallout(state)}
       <nav class="index">
-        ${row("#/fleets", "Fleets", "Build, save, print, and share fleets.")}
+        ${coachmark(state, "fleet-sync", row("#/fleets", "Fleets", "Build, save, print, and share fleets."))}
         ${row("#/solo", "Solo Play", "Play the Junkspace in solo/campaign mode.")}
         ${row("#/ships", "Ship Compendium", "Compare all ships and stats.")}
         ${row("#/learn", "Learn to Play", "If you&rsquo;re new, come here to learn how the game works.")}
@@ -571,7 +617,8 @@ function homeView(state: AppState): string {
               door to the walkthrough, not two: this row was added unprompted
               alongside the route split and read as a second, separate feature
               when it is the back half of the one above it. */ ""}
-        ${row("#/foundry", "Custom Rules", "Customize your own factions. Make &rsquo;em Your Guys!")}
+        ${/* Above its row, not below: the home footer is pinned and covered
+              anything under the last row on a phone. */ ""}${hint(state, "example-factions")}${row("#/foundry", "Custom Rules", "Customize your own factions. Make &rsquo;em Your Guys!")}
       </nav>
     </div>
     <aside class="index-book">
@@ -1684,6 +1731,7 @@ function builderView(state: AppState): string {
       ${playBtn}
       ${moreMenu}
     </header>
+    ${hint(state, "rename-fleet")}
 
     ${faction && !list.freePlay ? `<section class="sy-faction">${factionRuleBlock(faction, "full")}</section>` : ""}
 
@@ -1736,11 +1784,15 @@ function builderView(state: AppState): string {
       list.mode === "management-training"
         ? ""
         : `<div class="sy-personnel">
-      <p class="sy-hvp-count">${isFixedCrew ? "Personnel" : "High-Value Personnel"} <span>${
-        isFixedCrew
-          ? "issued by the scenario"
-          : `${list.fleet.hvp.length} of ${list.freePlay ? "any" : hvpMin === hvpMax ? hvpMax : `${hvpMin}–${hvpMax}`} chosen`
-      }</span></p>
+      ${coachmark(
+        state,
+        "rename-personnel",
+        `<p class="sy-hvp-count">${isFixedCrew ? "Personnel" : "High-Value Personnel"} <span>${
+          isFixedCrew
+            ? "issued by the scenario"
+            : `${list.fleet.hvp.length} of ${list.freePlay ? "any" : hvpMin === hvpMax ? hvpMax : `${hvpMin}–${hvpMax}`} chosen`
+        }</span></p>`,
+      )}
       ${list.mode === "age-of-unity" ? '<p class="sy-hvp-note">Choose your personnel here &mdash; in Age of Unity you put them aboard ships at the table, once the missions are rolled.</p>' : ""}
       ${isFixedCrew ? `<div class="mf-list personnel-grid">${personnelCatalog}</div>` : `<div class="sy-hvp-list">${personnelCatalog}</div>${hvpAssignBlock}`}
     </div>`

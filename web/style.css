@@ -8819,3 +8819,11 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
 .solo-outfit .roster-unit + .roster-unit, .solo-outfit .ship-row + .ship-row { margin-top: 8px; }
 .solo-outfit .solo-workspace { padding-top: 0; }
 .solo-head { padding: 12px 0; }
+/* Lines removed in an audit of every bordered element on the outfit page
+   (feedback: spacing, not dividers). Kept: card and Blip edges (they are the
+   objects), field bottom lines (Carbon's field), the tab line. Gone: the rule
+   between Alert and Round, the rule over Delete outfit, and the box round
+   each stat on a revealed Blip (the builder's bare stat style instead). */
+.solo-outfit .gb-round { border-left: none; padding-left: 0; }
+.solo-outfit .roster-actions { border-top: none; padding-top: 8px; }
+.solo-outfit .blip .stat-chip { border: none; background: none; padding: 0; }

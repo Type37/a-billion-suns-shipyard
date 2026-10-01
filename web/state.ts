@@ -328,6 +328,8 @@ export interface AppState {
       | { kind: "add-unit"; pickFor?: string }
       | { kind: "ship-reference" }
       | { kind: "credit-limit" }
+      /** Custom Rules: editing one ship class of the faction on screen. */
+      | { kind: "ship-edit"; ship: number }
       | {
           kind: "emblem";
           /** "new-outfit" is the outfit being started in the dialog, which does

@@ -1142,11 +1142,21 @@ export function dispatchAction(target: HTMLElement): void {
         // back to the dialog rather than dropping you on the dock with a
         // half-typed name gone. Closing the dialog itself is what discards.
         const backToDialog = s.ui.modal?.kind === "emblem" && s.ui.modal.target === "new-outfit";
+        // Ship art is chosen from inside a ship's editor, so closing the
+        // picker returns to that editor, not to the list.
+        const backToShip =
+          s.ui.modal?.kind === "emblem" && s.ui.modal.target === "ship" && s.ui.modal.ship !== undefined
+            ? s.ui.modal.ship
+            : undefined;
         return {
           ...s,
           ui: {
             ...s.ui,
-            modal: backToDialog ? { kind: "new-outfit" } : undefined,
+            modal: backToDialog
+              ? { kind: "new-outfit" }
+              : backToShip !== undefined
+                ? { kind: "ship-edit", ship: backToShip }
+                : undefined,
             ...(backToDialog ? {} : { newOutfit: undefined }),
           },
         };
@@ -2446,13 +2456,34 @@ export function dispatchAction(target: HTMLElement): void {
           },
         ],
       }));
+      {
+        const n = store.getState().customFactions.find((x) => x.id === fid)?.ships.length ?? 0;
+        if (n) store.setState((st) => ({ ...st, ui: { ...st.ui, modal: { kind: "ship-edit", ship: n - 1 } } }));
+      }
+      break;
+    }
+    case "cf-ship-open": {
+      const si = Number(target.dataset["ship"]);
+      if (!Number.isInteger(si)) return;
+      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: { kind: "ship-edit", ship: si } } }));
       break;
     }
     case "cf-ship-remove": {
       const fid = currentFoundryId();
       const si = Number(target.dataset["ship"]);
       if (!fid || !Number.isInteger(si)) return;
+      const name = store.getState().customFactions.find((x) => x.id === fid)?.ships[si]?.name ?? "this ship class";
+      if (
+        needsConfirm(target, {
+          title: `Delete ${name}?`,
+          body: "Its stats, weapons and art are removed from this faction.",
+          confirmLabel: "Delete ship class",
+          danger: true,
+        })
+      )
+        return;
       editFaction(fid, (f) => ({ ...f, ships: f.ships.filter((_, i) => i !== si) }));
+      store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined } }));
       break;
     }
     case "cf-ship-image-clear": {
@@ -3138,11 +3169,19 @@ export function wireActions(root: HTMLElement): void {
       // Leaving the draft behind here as well, so Escape out of the dialog
       // discards it exactly like Cancel does.
       const backToDialog = s.ui.modal.kind === "emblem" && s.ui.modal.target === "new-outfit";
+      const backToShip =
+        s.ui.modal.kind === "emblem" && s.ui.modal.target === "ship" && s.ui.modal.ship !== undefined
+          ? s.ui.modal.ship
+          : undefined;
       store.setState((st) => ({
         ...st,
         ui: {
           ...st.ui,
-          modal: backToDialog ? { kind: "new-outfit" } : undefined,
+          modal: backToDialog
+            ? { kind: "new-outfit" }
+            : backToShip !== undefined
+              ? { kind: "ship-edit", ship: backToShip }
+              : undefined,
           ...(backToDialog ? {} : { newOutfit: undefined }),
         },
       }));

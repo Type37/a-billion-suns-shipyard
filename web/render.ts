@@ -2852,14 +2852,9 @@ function weaponEditor(shipIndex: number, slot: "primary" | "auxiliary", weapons:
   return `${rows}${add}`;
 }
 
-function foundryEditView(state: AppState, factionId: string): string {
-  const f = state.customFactions.find((x) => x.id === factionId);
-  if (!f)
-    return `${topbar()}<main class="empty-state"><p>That faction was not found.</p><p><a href="#/foundry">Back to Custom Rules</a></p></main>`;
-
-  const shipBlocks = f.ships
-    .map(
-      (s, si) => `
+/** One ship class's editor: the form the Custom Rules list used to show inline. */
+function shipEditForm(s: ShipClass, si: number): string {
+  return `
     <article class="cf-ship">
       ${/* Laid out like a ship in the fleet builder (Jet, 1 October 2026: "where
             are the icons? shouldn't the layout mimic the one when you're
@@ -2875,7 +2870,6 @@ function foundryEditView(state: AppState, factionId: string): string {
         </button>
         <label class="cf-f cf-ship-name"><span class="cf-l">Ship class name</span>
           <input type="text" value="${escapeHtml(s.name)}" data-action="cf-ship" data-ship="${si}" data-field="name" /></label>
-        <button class="ghost-btn danger cf-ship-x" data-action="cf-ship-remove" data-ship="${si}" title="Remove this ship class" aria-label="Remove ship class ${escapeHtml(s.name)}">${icon("trash", 16)}</button>
       </div>
       <div class="cf-ship-body">
         <div class="cf-ship-stats">
@@ -2903,6 +2897,56 @@ function foundryEditView(state: AppState, factionId: string): string {
           </div>
         </div>
       </div>
+    </article>`;
+}
+
+function shipEditModal(state: AppState): string {
+  const m = state.ui.modal;
+  if (!m || m.kind !== "ship-edit") return "";
+  const fid = state.route.view === "foundry" ? state.route.factionId : undefined;
+  const f = fid ? state.customFactions.find((x) => x.id === fid) : undefined;
+  const s = f?.ships[m.ship];
+  if (!s) return "";
+  // Carbon transactional modal: secondary left, primary right, each half the
+  // footer. Delete is the danger option among two, so danger-ghost, and it
+  // asks first (cf-ship-remove goes through the confirm dialog).
+  return `
+  <cds-modal open size="md" class="se-modal" data-key="se-modal">
+    <cds-modal-header>
+      <cds-modal-close-button></cds-modal-close-button>
+      <cds-modal-heading>Edit ship class</cds-modal-heading>
+    </cds-modal-header>
+    <cds-modal-body data-modal-primary-focus tabindex="-1">${shipEditForm(s, m.ship)}</cds-modal-body>
+    <cds-modal-footer>
+      <cds-modal-footer-button kind="danger-ghost" data-action="cf-ship-remove" data-ship="${m.ship}">Delete ship class</cds-modal-footer-button>
+      <cds-modal-footer-button kind="primary" data-action="close-modal">Done</cds-modal-footer-button>
+    </cds-modal-footer>
+  </cds-modal>`;
+}
+
+function foundryEditView(state: AppState, factionId: string): string {
+  const f = state.customFactions.find((x) => x.id === factionId);
+  if (!f)
+    return `${topbar()}<main class="empty-state"><p>That faction was not found.</p><p><a href="#/foundry">Back to Custom Rules</a></p></main>`;
+
+  /*
+   * The list is read-only cards laid out like a ship in the fleet builder
+   * (name and cost, stats left, guns right), and a card opens its editor in a
+   * dialog (Jet, 1 October 2026). Every ship used to be a full form, all open
+   * at once: about 1300px per ship on a phone before the compact pass and
+   * ~600px after, so nine ships were still several thousand pixels of fields.
+   * Nine cards fit on about two phone screens.
+   */
+  const shipBlocks = f.ships
+    .map(
+      (s, si) => `
+    <article class="cf-ship-card sy-ship" role="button" tabindex="0" data-action="cf-ship-open" data-ship="${si}" aria-label="Edit ${escapeHtml(s.name)}">
+      <div class="sy-ship-head">
+        ${s.image ? `<img class="cf-card-art" src="${shipArtSrc(s.image)}" alt="" />` : ""}
+        <h4 class="sy-ship-name">${escapeHtml(s.name)}</h4>
+        <span class="sy-ship-cost">${credits(s.cost)}</span>
+      </div>
+      <div class="sy-ship-data">${statGuns(s)}</div>
     </article>`,
     )
     .join("");
@@ -2969,7 +3013,7 @@ function foundryEditView(state: AppState, factionId: string): string {
 
     <section class="cf-section">
       <h2 class="panel-title">Ship classes</h2>
-      ${shipBlocks || '<p class="muted">No ships yet.</p>'}
+      <div class="cf-ship-cards">${shipBlocks}</div>
       <cds-button has-main-content kind="primary" size="lg" class="btn" data-action="cf-ship-add">Add a ship class${icon("plus", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>
     </section>
 
@@ -5009,5 +5053,5 @@ export function render(state: AppState): string {
   })();
   // The cropper renders last: it opens OVER the emblem picker that launched it,
   // and hands back to it on cancel.
-  return `${body}${optionsModal(state)}${syncModal(state)}${emblemModal(state)}${newOutfitModal(state)}${confirmModal(state)}${shareModal(state)}${cropModal(state)}`;
+  return `${body}${optionsModal(state)}${syncModal(state)}${shipEditModal(state)}${emblemModal(state)}${newOutfitModal(state)}${confirmModal(state)}${shareModal(state)}${cropModal(state)}`;
 }

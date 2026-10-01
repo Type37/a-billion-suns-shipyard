@@ -18,6 +18,8 @@
 -->
 <style>
 @font-face { font-family: "Archivo"; src: url("../fonts/archivo-600.woff2") format("woff2"); font-weight: 600; }
+@font-face { font-family: "Archivo"; src: url("../fonts/archivo-800.woff2") format("woff2"); font-weight: 800; }
+@font-face { font-family: "Archivo"; src: url("../fonts/archivo-900.woff2") format("woff2"); font-weight: 900; }
 @font-face { font-family: "Libre Franklin"; src: url("../fonts/libre-franklin-regular.woff2") format("woff2"); font-weight: 400; }
 @font-face { font-family: "Libre Franklin"; src: url("../fonts/libre-franklin-600.woff2") format("woff2"); font-weight: 600; }
 
@@ -235,6 +237,33 @@ h1, h2, h3, p { margin: 0; }
 .note { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: var(--spacing-05); align-items: start; padding: var(--spacing-05); border-left: 3px solid; min-height: 48px; max-width: 608px; }
 .note.error { background: #fff1f1; border-color: #da1e28; }
 
+/* Ours, on top of Carbon. Carbon governs the controls; it says nothing about
+   page titles, emblems, ship stats or game pieces, so those stay the app's. */
+.page-title { font: 900 clamp(40px, 8vw, 72px)/0.95 var(--display); letter-spacing: -0.02em; text-transform: uppercase; margin: 0 0 var(--spacing-03); }
+.title-rule { height: 3px; background: #da1e28; width: 96px; margin-bottom: var(--spacing-07); }
+.ours { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: var(--spacing-05); }
+.ours .tile { border-top: 3px solid var(--text-primary); }
+.ours .tile-name { font: 800 22px/26px var(--display); letter-spacing: -0.01em; }
+.ours .tile-mark img { width: 48px; height: 48px; }
+.ticks { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.ticks i { width: 12px; height: 12px; border: 1px solid var(--border-strong); }
+.ticks i.on { background: var(--interactive); border-color: var(--interactive); }
+.ship-name { font: 800 18px/22px var(--display); display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--spacing-03); }
+.ship-cost { font: 800 16px/22px var(--display); }
+.stats { display: flex; flex-wrap: wrap; gap: var(--spacing-02) var(--spacing-05); font: 400 14px/18px var(--sans); }
+.stat { display: inline-flex; align-items: center; gap: var(--spacing-02); }
+.stat b { font: 800 16px/18px var(--display); }
+.stat.mass { color: #2d5da8; } .stat.thrust { color: #975f2a; } .stat.sil { color: #008f63; } .stat.shields { color: #6d3d6b; }
+.stat .k { color: var(--text-secondary); font-size: 12px; letter-spacing: 0.32px; }
+.guns { display: grid; gap: var(--spacing-02); font: 400 14px/18px var(--sans); }
+.gun { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto auto; gap: var(--spacing-03); align-items: center; }
+.gun .n { color: var(--text-secondary); }
+.gun b { font: 800 15px/18px var(--display); }
+.slogan { font: 400 14px/20px "SFMono-Regular", Consolas, monospace; color: var(--text-primary); }
+.slogan::after { content: "_"; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .slogan::after { animation: none; } }
+
 .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 448px), 1fr)); gap: var(--spacing-09) var(--spacing-07); align-items: start; }
 .gallery > div { display: grid; gap: var(--spacing-03); align-content: start; }
 .cap { color: var(--text-secondary); }
@@ -242,6 +271,44 @@ h1, h2, h3, p { margin: 0; }
 </head>
 <body>
 <main>
+
+<section>
+  <h1 class="page-title">Junkspace</h1>
+  <div class="title-rule"></div>
+  <div class="ours">
+    <article class="tile">
+      <div class="tile-head">
+        <span class="tile-mark"><img src="../emblems/ordinate.svg" alt="" /></span>
+        <div>
+          <h3 class="tile-name">Task Force Nemea</h3>
+          <p class="body-compact-01 tile-meta">3 ships, updated August 13, 2026</p>
+        </div>
+      </div>
+      <div class="debt">
+        <div class="debt-line body-compact-01"><span>¢30k still owed</span><span>¢0k paid</span></div>
+        <div class="ticks" role="img" aria-label="2 of 8 games"><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="tile-actions">
+        <button class="btn btn-ghost" type="button">Continue<svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M22 16 12 26l-1.4-1.4 8.6-8.6-8.6-8.6L12 6z"/></svg></button>
+        <button class="btn btn-icon" type="button" aria-label="Actions" title="Actions"><svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="8" r="2" fill="currentColor"/><circle cx="16" cy="16" r="2" fill="currentColor"/><circle cx="16" cy="24" r="2" fill="currentColor"/></svg></button>
+      </div>
+    </article>
+    <article class="tile">
+      <div class="ship-name">Macroforge Supercruiser <span class="ship-cost">¢80</span></div>
+      <div class="stats">
+        <span class="stat mass"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="0.45" d="M20.13 3.87Q23.5 7.23 23.5 12Q23.5 16.77 20.13 20.13Q16.77 23.5 12 23.5Q7.23 23.5 3.87 20.13Q0.5 16.77 0.5 12Q0.5 7.23 3.87 3.87Q7.23 0.5 12 0.5Q16.77 0.5 20.13 3.87ZM4.52 4.52Q1.43 7.61 1.43 12Q1.43 16.39 4.52 19.48Q7.61 22.57 12 22.57Q16.39 22.57 19.48 19.48Q22.57 16.39 22.57 12Q22.57 7.61 19.48 4.52Q16.39 1.43 12 1.43Q7.61 1.43 4.52 4.52ZM5.83 11.07V17.42H3.96V6.76H5.83V8.07Q7.23 6.39 9.01 6.39Q10.78 6.39 11.72 7.33Q12.37 7.98 12.56 8.54Q14.24 6.39 16.58 6.39Q18.17 6.39 19.2 7.42Q20.04 8.26 20.04 10.13V17.42H18.17V10.5Q18.17 9.29 17.52 8.63Q16.96 8.07 16.02 8.07Q14.9 8.07 14.06 8.91Q12.84 10.13 12.84 11.35V17.42H10.97V10.04Q10.97 9.1 10.41 8.54Q9.94 8.07 8.91 8.07Q7.61 8.07 6.67 9.01Q5.83 9.85 5.83 11.07Z"/></svg><span class="k">Mass</span> <b>3</b></span>
+        <span class="stat thrust"><span class="k">Thrust</span> <b>3"</b></span>
+        <span class="stat sil"><span class="k">Sil</span> <b>11</b></span>
+        <span class="stat shields"><span class="k">Shields</span> <b>6</b></span>
+      </div>
+      <div class="guns">
+        <div class="gun"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14 3 3a12 12 0 0 1 10 0z" fill="#0f62fe"/></svg><span class="n">Heavy Railguns</span><b>2D12</b><b>9–18"</b></div>
+        <div class="gun"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M1 13a7 7 0 0 1 14 0z" fill="#0f62fe"/></svg><span class="n">Plasma Batteries</span><b>4D6</b><b>0–9"</b></div>
+      </div>
+      <p class="slogan">&gt; Construction fleet delta 8 approaching target. Initialising drone swarms.</p>
+    </article>
+  </div>
+</section>
 
 <section>
   <h1 class="heading-05" style="margin-bottom: var(--spacing-07)">Carbon fork</h1>

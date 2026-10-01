@@ -14,6 +14,9 @@ const OUTFIT_SEEDS_APPLIED_KEY = "abs2.outfitSeedsApplied.v1";
 const SYNC_TOKEN_KEY = "abs2.sync.token.v1";
 const SYNC_LASTSYNC_KEY = "abs2.sync.lastSync.v1";
 const SYNC_DELETED_KEY = "abs2.sync.deleted.v1";
+const SYNC_LINKED_KEY = "abs2.sync.linked.v1";
+const SYNC_DISCORD_KEY = "abs2.sync.discord.v1";
+const SYNC_DISCORD_STATE_KEY = "abs2.sync.discordState.v1";
 
 /** Live table-companion state for a fleet list, persisted with it. */
 export interface PlayState {
@@ -446,6 +449,43 @@ export function loadSyncDeleted(): Record<string, number> {
 
 export function persistSyncDeleted(map: Record<string, number>): void {
   write(SYNC_DELETED_KEY, map);
+}
+
+/** A Sync Token this device was on before it signed in with Discord. It keeps
+ *  being synced alongside the Discord copy; see fleet-sync.ts. */
+export function loadSyncLinked(): string | null {
+  return read<string | null>(SYNC_LINKED_KEY, null);
+}
+
+export function persistSyncLinked(token: string | null): void {
+  if (token) write(SYNC_LINKED_KEY, token);
+  else localStorage.removeItem(SYNC_LINKED_KEY);
+}
+
+/** Who the Discord sync key belongs to, for "Signed in as ..." only. */
+export interface DiscordUser {
+  name: string;
+  avatar: string;
+}
+
+export function loadSyncDiscord(): DiscordUser | null {
+  return read<DiscordUser | null>(SYNC_DISCORD_KEY, null);
+}
+
+export function persistSyncDiscord(who: DiscordUser | null): void {
+  if (who) write(SYNC_DISCORD_KEY, who);
+  else localStorage.removeItem(SYNC_DISCORD_KEY);
+}
+
+/** Nonce for a Discord login in flight. localStorage, not sessionStorage:
+ *  Discord's own app can hand the login back to a fresh tab. */
+export function loadSyncDiscordState(): string | null {
+  return read<string | null>(SYNC_DISCORD_STATE_KEY, null);
+}
+
+export function persistSyncDiscordState(nonce: string | null): void {
+  if (nonce) write(SYNC_DISCORD_STATE_KEY, nonce);
+  else localStorage.removeItem(SYNC_DISCORD_STATE_KEY);
 }
 
 // --- First-run onboarding ---------------------------------------------------

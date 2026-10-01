@@ -4,7 +4,7 @@ import { render } from "./render.ts";
 import { morphInto } from "./morph.ts";
 import { wireActions } from "./actions.ts";
 import { decodeShare, decodeSharePayload, sharePayloadFromHash, type DecodedShare } from "./share.ts";
-import { persistCustomFactions, persistLists } from "./storage.ts";
+import { loadLists, persistCustomFactions, persistLists } from "./storage.ts";
 import { runDecode, DIGIT_POOL } from "./write-on.ts";
 import { visibleAnchor } from "./tours.ts";
 import { renderMarkdown } from "./richtext.ts";
@@ -1397,4 +1397,21 @@ FleetSync.onChange = (lists) => store.setState((s) => ({ ...s, lists }));
 // Deferred, same as the share-link import above settling before its own
 // paint: let the very first paint happen before spending a network round
 // trip on a sync nobody is looking at yet.
-if (FleetSync.enabled()) setTimeout(() => void FleetSync.sync().catch(() => {}), 800);
+//
+// Coming back from Discord's sign-in page replaces that: discordFinish() joins
+// the account's document, which is a sync in itself. The Sync dialog opens on
+// the result either way, so a failure is said where the button was pressed.
+const discordDone = FleetSync.discordFinish();
+if (discordDone) {
+  const openSync = () => store.setState((s) => ({ ...s, lists: loadLists(), ui: { ...s.ui, modal: { kind: "sync" } } }));
+  discordDone.then(openSync, (e: unknown) => {
+    openSync();
+    requestAnimationFrame(() => {
+      const el = document.getElementById("sync-error");
+      if (el) {
+        el.textContent = e instanceof Error ? e.message : "Discord sign-in failed. Try again.";
+        el.hidden = false;
+      }
+    });
+  });
+} else if (FleetSync.enabled()) setTimeout(() => void FleetSync.sync().catch(() => {}), 800);

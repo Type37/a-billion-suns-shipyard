@@ -4137,6 +4137,12 @@ button { font-family: inherit; }
 .sync-input:focus { outline: none; border-color: var(--blue); }
 .sync-status { font-size: 12.5px; color: var(--ink-3); }
 .sync-error { font-size: 12.5px; color: var(--red-deep); font-weight: 600; }
+/* Discord's own blurple, on Discord's own button only: it is their mark, and a
+   player scanning the dialog looks for that colour, not for our blue. */
+.sync-discord-btn { background: #5865f2; border-color: #5865f2; }
+.sync-discord-btn:hover, .sync-discord-btn:active { background: #4752c4; border-color: #4752c4; }
+.sync-discord-who { display: flex; align-items: center; gap: 10px; font-size: 15px; }
+.sync-avatar { width: 32px; height: 32px; border-radius: 50%; }
 @media (max-width: 480px) {
   .sync-join-row { flex-direction: column; }
 }

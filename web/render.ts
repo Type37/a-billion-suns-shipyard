@@ -4248,8 +4248,22 @@ function syncNoteHTML(): string {
     The token is the only key. Anyone you give it to can read and change your fleets.</p>`;
 }
 
-function syncOffHTML(): string {
+/* Discord sign-in sits above the token flow because it is the easier of the
+ * two: nothing to copy, nothing to type on the second device. The token flow
+ * stays for anyone without Discord. */
+function syncDiscordHTML(): string {
+  if (!FleetSync.discordConfigured()) return "";
   return `
+    <section class="opt-section">
+      <div class="opt-actions">
+        <button class="cta-btn sync-discord-btn" data-action="sync-discord">${icon("discord", 16)} Sign in with Discord</button>
+      </div>
+      <p class="sync-hint">Sign in on each device and your fleets follow you.</p>
+    </section>`;
+}
+
+function syncOffHTML(): string {
+  return `${syncDiscordHTML()}
     <section class="opt-section">
       <p>You can sync your fleets across devices. (Your fleets stay on this device as well.)
         Opting in gives you a <strong>Sync Token</strong>.</p>
@@ -4275,6 +4289,24 @@ function syncOnHTML(state: AppState): string {
   const last = FleetSync.lastSync();
   const when = last ? new Date(last).toLocaleString() : "not yet";
   const n = state.lists.length;
+  const who = FleetSync.discordUser();
+  if (who) {
+    const avatar = who.avatar ? `<img class="sync-avatar" src="${escapeHtml(who.avatar)}" alt="" width="32" height="32" />` : icon("discord", 20);
+    return `
+    <section class="opt-section">
+      <p class="sync-discord-who">${avatar} <span>Signed in as <strong>${escapeHtml(who.name)}</strong></span></p>
+      <p class="sync-on-state">${n} fleet${n === 1 ? "" : "s"}, last synced ${escapeHtml(when)}.</p>
+    </section>
+    <section class="opt-section">
+      <div class="opt-actions">
+        <button class="cta-btn" id="sync-now" data-action="sync-now">${icon("sync", 15)} Sync now</button>
+        <button class="bar-btn" id="sync-stop" data-action="sync-stop">Sign out</button>
+        <button class="bar-btn danger" id="sync-delete" data-action="sync-delete">${icon("trash", 14)} Delete online copy</button>
+      </div>
+      <p class="sync-status" id="sync-busy" hidden></p>
+      <p class="sync-error" id="sync-error" hidden></p>
+    </section>`;
+  }
   return `
     <section class="opt-section">
       <p class="sync-on-state"><strong>Syncing is on for this device.</strong>
@@ -4287,6 +4319,7 @@ function syncOnHTML(state: AppState): string {
       <p class="sync-hint">Put this phrase into any device and it will load and sync your current fleets.</p>
       ${syncNoteHTML()}
     </section>
+    ${syncDiscordHTML()}
     <section class="opt-section">
       <div class="opt-actions">
         <button class="cta-btn" id="sync-now" data-action="sync-now">${icon("sync", 15)} Sync now</button>

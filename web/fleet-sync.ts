@@ -10,7 +10,14 @@ import {
   persistSyncLastSync,
   loadSyncDeleted,
   persistSyncDeleted,
+  loadSyncLinked,
+  persistSyncLinked,
+  loadSyncDiscord,
+  persistSyncDiscord,
+  loadSyncDiscordState,
+  persistSyncDiscordState,
 } from "./storage.ts";
+import type { DiscordUser } from "./storage.ts";
 
 /**
  * Fleet Sync — opt-in cross-device sync of `abs2.lists.v1`.
@@ -68,6 +75,17 @@ import {
  *   is no need for Dropfleet's change-detection signature hack
  *   (`stampChanged`) - every SavedList that ever reaches `persistLists()`
  *   already carries a trustworthy `updatedAt`. Sync just has to READ it.
+ *
+ * - Discord sign-in is a second way to GET a token, not a second sync engine.
+ *   Discord issues no OpenID id_token, so neither Firestore rules nor Firebase
+ *   Auth can check a Discord login directly. Dropfleet Commander's Cloudflare
+ *   Worker (worker/discord-sync in that repo, live at DISCORD_WORKER below)
+ *   does the OAuth exchange and hands back HMAC(secret, discord id) written as
+ *   letters: a `discord-...` key that passes looksLikeToken and names a /sync
+ *   document exactly like a six-word phrase does. Same key on every device the
+ *   user signs in on, so the fleets follow the Discord account. The Worker is
+ *   shared by all of Jet's builders; DOC_PREFIX keeps this app's copy
+ *   (`abs2-discord-...`) apart from Dropfleet's (`discord-...`).
  *
  * Merge rules: union by list id, newest `updatedAt` wins on a collision, and
  * deletions travel as tombstones so a fleet deleted on one device does not
@@ -409,19 +427,40 @@ export interface JoinResult {
   fromDevice: number;
 }
 
+/* Merge one remote copy into local storage and return the result. join() and
+ * sync() call it once per document, so a linked token's copy folds in on top
+ * of the main one's rather than racing it. */
+function mergeIn(remote: SyncPayload): SyncPayload {
+  const merged = mergeLists(loadLists(), loadSyncDeleted(), remote);
+  writeLocal(merged.lists);
+  persistSyncDeleted(merged.deleted);
+  return merged;
+}
+
 /** Adopt a token: pull, merge into local, then push the merged result back
- *  so every device converges on the same registry. */
-async function join(raw: string): Promise<JoinResult> {
+ *  so every device converges on the same registry.
+ *
+ *  `linked` is the six-word token a device was on when it signed in with
+ *  Discord. Its copy is pulled in too, so fleets saved from other token
+ *  devices since this one last synced are not left behind, and it stays
+ *  linked: every later sync reads and writes both documents, so devices still
+ *  on the phrase and devices on Discord share one list instead of drifting. */
+async function join(raw: string, linked?: string | null): Promise<JoinResult> {
   const tok = normaliseToken(raw);
   if (!looksLikeToken(tok)) throw new Error("That does not look like a Sync Token.");
   const remote = (await remoteGet(tok)) ?? EMPTY;
-  const localLists = loadLists();
-  const before = localLists.length;
-  const merged = mergeLists(localLists, loadSyncDeleted(), remote);
-  writeLocal(merged.lists);
-  persistSyncDeleted(merged.deleted);
+  const before = loadLists().length;
+  let merged = mergeIn(remote);
+  const link = linked && linked !== tok ? linked : null;
+  const linkedRemote = link ? await remoteGet(link) : null;
+  if (linkedRemote) merged = mergeIn(linkedRemote);
   persistSyncToken(tok);
+  // A phrase joined by hand is not a Discord login; discordFinish() sets it
+  // back after this returns when it is one.
+  persistSyncDiscord(null);
+  persistSyncLinked(link && linkedRemote ? link : null);
   await remotePut(tok, merged);
+  if (link && linkedRemote) await remotePut(link, merged);
   persistSyncLastSync(Date.now());
   return { token: tok, total: merged.lists.length, fromToken: remote.lists.length, fromDevice: before };
 }
@@ -446,12 +485,22 @@ async function sync(): Promise<SyncResult | null> {
   inFlight = (async () => {
     try {
       const remote = (await remoteGet(tok)) ?? EMPTY;
-      const localLists = loadLists();
-      const beforeIds = localLists.map((l) => l.id).join(",");
-      const merged = mergeLists(localLists, loadSyncDeleted(), remote);
-      writeLocal(merged.lists);
-      persistSyncDeleted(merged.deleted);
+      const beforeIds = loadLists().map((l) => l.id).join(",");
+      let merged = mergeIn(remote);
+      // The linked token's copy is read and written with the main one. If it
+      // has been deleted, the link goes: recreating it would undo somebody's
+      // "Delete online copy" on a device still holding the phrase.
+      let link = loadSyncLinked();
+      if (link) {
+        const lr = await remoteGet(link);
+        if (lr) merged = mergeIn(lr);
+        else {
+          persistSyncLinked(null);
+          link = null;
+        }
+      }
       await remotePut(tok, merged);
+      if (link) await remotePut(link, merged);
       persistSyncLastSync(Date.now());
       const changed = merged.lists.map((l) => l.id).join(",") !== beforeIds;
       if (changed) FleetSync.onChange?.(merged.lists);
@@ -490,6 +539,8 @@ function notifyChanged(delay?: number): void {
  * the user can rejoin later or keep using it elsewhere. Local fleets are kept. */
 function stop(): void {
   persistSyncToken(null);
+  persistSyncDiscord(null);
+  persistSyncLinked(null);
   clearTimeout(debounceTimer);
 }
 
@@ -502,8 +553,91 @@ async function deleteRemote(): Promise<boolean> {
   const tok = token();
   if (!tok) return false;
   await remoteDelete(tok);
+  // Both copies: leaving the linked one would hand every fleet straight back.
+  const link = loadSyncLinked();
+  if (link) await remoteDelete(link);
   stop();
   return true;
+}
+
+/* ── Discord sign-in ─────────────────────────────────────────────────
+ * The Worker sends the browser to Discord, swaps Discord's code for the user's
+ * id, and sends the browser back here with the sync key in the URL fragment
+ * (never the query string, so it never reaches GitHub Pages' logs). It asks
+ * Discord for `identify` only and revokes the access token straight after
+ * reading it. Its allow-list of return URLs is what stops it bouncing a key
+ * to a stranger's page; this app's path has to be on it.
+ *
+ * DISCORD_WORKER empty means no button renders and nothing here runs. */
+const DISCORD_WORKER = "https://dfc-discord-sync.discord-sync.workers.dev";
+
+/* Off until the Worker's allowedReturn() lists `/a-billion-suns-shipyard/`
+ * and has been redeployed (`npx wrangler deploy` in Dropfleet's
+ * worker/discord-sync). Until then the Worker answers this app's sign-in with
+ * a bare "Bad request" page, which is worse than no button at all. */
+const DISCORD_LIVE = false;
+
+function discordConfigured(): boolean {
+  return DISCORD_LIVE && !!DISCORD_WORKER && supported();
+}
+
+function discordUser(): DiscordUser | null {
+  return token() ? loadSyncDiscord() : null;
+}
+
+function discordSignIn(): void {
+  const buf = new Uint8Array(18);
+  crypto.getRandomValues(buf);
+  const nonce = Array.from(buf, (b) => b.toString(16).padStart(2, "0")).join("");
+  persistSyncDiscordState(nonce);
+  const ret = location.href.split("#")[0] ?? location.href;
+  location.href = `${DISCORD_WORKER}/login?state=${nonce}&return=${encodeURIComponent(ret)}`;
+}
+
+/* Captured when this module loads, which is before main.ts reads the hash to
+ * pick a route: the router would otherwise try to open the sync key as a page.
+ * The fragment is wiped at once so a reload, the back button or a copied URL
+ * never carries the key. */
+let discordReturn: URLSearchParams | null = null;
+try {
+  if (typeof location !== "undefined" && location.hash.includes("dsync")) {
+    discordReturn = new URLSearchParams(location.hash.slice(1));
+    history.replaceState(null, "", location.pathname + location.search);
+  }
+} catch {
+  // Non-browser host (the node --test sandbox).
+}
+
+/** Called once at startup. Null when this load is not a return from Discord;
+ *  otherwise join()'s result, or a rejection whose message is fit to show.
+ *  The nonce check means only a login this browser started is accepted, so a
+ *  crafted link cannot sign somebody into an account that is not theirs. */
+function discordFinish(): Promise<JoinResult & { name: string }> | null {
+  const p = discordReturn;
+  if (!p) return null;
+  discordReturn = null;
+  const expected = loadSyncDiscordState();
+  persistSyncDiscordState(null);
+  if (!expected || p.get("ds") !== expected) {
+    return Promise.reject(new Error("Discord sign-in expired. Try again."));
+  }
+  const why = p.get("dsync_error");
+  if (why) {
+    return Promise.reject(
+      new Error(why === "access_denied" || why === "cancelled" ? "Discord sign-in was cancelled." : "Discord sign-in failed. Try again."),
+    );
+  }
+  const key = p.get("dsync") ?? "";
+  if (!looksLikeToken(key)) return Promise.reject(new Error("Discord sign-in failed. Try again."));
+  const who: DiscordUser = { name: p.get("dn") || "Discord", avatar: p.get("da") || "" };
+  // A device that was on a six-word phrase keeps it linked. A previous key
+  // that is itself a Discord key (a different account) is not carried over.
+  const prev = token();
+  const keep = prev && !prev.startsWith("discord-") ? prev : loadSyncLinked();
+  return join(key, keep).then((r) => {
+    persistSyncDiscord(who);
+    return { ...r, name: who.name };
+  });
 }
 
 /* ── Staying in step ─────────────────────────────────────────────────
@@ -560,6 +694,11 @@ export const FleetSync = {
   stop,
   deleteRemote,
   recordDeleted,
+  linkedToken: loadSyncLinked,
+  discordConfigured,
+  discordUser,
+  discordSignIn,
+  discordFinish,
   wordCount: WORDS.length,
   WORDS_PER_TOKEN,
   onChange: null as ((lists: SavedList[]) => void) | null,

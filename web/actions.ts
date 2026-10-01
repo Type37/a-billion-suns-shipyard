@@ -1169,6 +1169,12 @@ function dispatchAction(target: HTMLElement): void {
         });
       break;
     }
+    case "sync-discord": {
+      syncError();
+      syncBusy(true, "Opening Discord…");
+      FleetSync.discordSignIn();
+      break;
+    }
     case "sync-copy": {
       const tok = FleetSync.token() ?? "";
       void navigator.clipboard.writeText(tok).then(

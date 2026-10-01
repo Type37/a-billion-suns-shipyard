@@ -4280,7 +4280,9 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
   .au-modal::part(dialog) { max-inline-size: 960px; }
 }
 .opt-section { display: flex; flex-direction: column; gap: 8px; }
-.opt-h { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); border-bottom: 1px solid var(--hair-soft); padding-bottom: 8px; }
+/* Carbon heading-compact: sentence case, semibold, no tracking. The house
+   label style (11px tracked caps) is not Carbon's. */
+.opt-h { font-family: var(--sans); font-size: 16px; font-weight: 600; color: var(--ink); border-bottom: 1px solid var(--hair-soft); padding-bottom: 8px; }
 .opt-note { font-size: 13px; color: var(--ink-2); line-height: 1.45; }
 /* A settings switch: the whole row is the label, so the checkbox and the words
    are one target. The description is not a tooltip - what a switch does to your
@@ -8420,7 +8422,7 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
   --gutter-wide: 32px;
 }
 @media (min-width: 672px) {
-  #app > main:not(.print-page), #app > .shipyard {
+  #app > main:not(.print-page), #app > .shipyard, #app > .shipyard.builder-fleet {
     max-width: var(--grid-max); margin-left: auto; margin-right: auto;
     padding-left: var(--key); padding-right: var(--key); box-sizing: border-box;
   }
@@ -8430,6 +8432,16 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
      16px padding, so a card's text sits on the key line. */
   .fleet-cards, .outfit-cards { gap: var(--gutter-narrow); margin-left: calc(-1 * var(--gutter-narrow)); margin-right: calc(-1 * var(--gutter-narrow)); }
   .fleet-card { padding: 16px; }
+  /* The same hang for the ship and unit cards in the builder, the Shipyard
+     and Play: measured 1 October 2026, their text sat 16px inside the key line
+     (card edge on it, 8px padding plus the border inside). */
+  .sy-list, .pf-list { margin-left: calc(-1 * var(--gutter-narrow)); margin-right: calc(-1 * var(--gutter-narrow)); }
+  /* In the Fleet List builder the units' right edge meets the personnel
+     column, not the page margin: hanging into that gutter overlapped it. */
+  .builder-fleet .sy-list { margin-right: 0; }
+  .sy-list > .sy-ship, .pf-list > .pf-unit { padding-left: calc(var(--gutter-narrow) - 1px); padding-right: calc(var(--gutter-narrow) - 1px); }
+  /* Play's unit card carries the 3px status edge on its left instead of 1px. */
+  .pf-list > .pf-unit { padding-left: calc(var(--gutter-narrow) - 3px); }
 }
 
 /* The ship list at desktop width (Jet, 1 October 2026: "this screen feels too
@@ -8439,8 +8451,11 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
    halves the scroll. The card's own + margin-top stacking is replaced by the
    grid's gap so the two columns stay level. */
 @media (min-width: 1000px) {
-  .sy-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gutter-narrow, 16px); align-items: start; }
-  .sy-list > .sy-ship + .sy-ship { margin-top: 0; }
+  /* Hypergrowth's Shipyard only. The Fleet List builder (.builder-fleet) already
+     puts its units beside the personnel column; two columns inside that cut
+     unit names to "Vipe" and "Ori". */
+  .shipyard:not(.builder-fleet) .sy-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gutter-narrow, 16px); align-items: start; }
+  .shipyard:not(.builder-fleet) .sy-list > .sy-ship + .sy-ship { margin-top: 0; }
 }
 
 /* The hamburger from 761 to 959px too, not only on phones. The flat nav row

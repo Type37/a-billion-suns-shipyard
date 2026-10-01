@@ -1,7 +1,7 @@
 import type { Faction, Fleet, GameMode, OutfitShip } from "../src/types.ts";
 import { SEED_LISTS } from "./seed-lists.ts";
 import { SEED_OUTFITS } from "./seed-outfits.ts";
-import { sweepImages } from "./image-store.ts";
+import { clearImages, imageDataUrl, internDataUrl, isImageRef, sweepImages } from "./image-store.ts";
 
 // localStorage persistence. One key per concern, JSON payloads, versioned so a
 // future format change can migrate instead of clobber.
@@ -579,19 +579,65 @@ function absKeys(): string[] {
   return keys;
 }
 
-/** A JSON snapshot of every saved fleet, outfit, custom faction, and setting. */
-export function exportAllData(): string {
+/*
+ * Two things a backup must NOT be a copy of, both found in an audit of the
+ * Options dialog (1 October 2026):
+ *
+ *  - The sync keys (abs2.sync.*). The token is a capability: whoever holds it
+ *    can read and change the synced fleets. A backup file gets emailed and left
+ *    in Downloads, so it was quietly a password file; and restoring it on
+ *    another device silently joined that device to the sync. A restore now
+ *    leaves the device's own sync state alone.
+ *  - Bare picture references. Uploaded pictures live in IndexedDB and the
+ *    saved state holds only "img:..." keys to them (image-store.ts), so a
+ *    "backup" restored anywhere else came back with every uploaded emblem and
+ *    ship picture missing. The export now inlines each one as a data URL, and
+ *    the restore stores them again (internBackupImages).
+ */
+const isSyncKey = (k: string): boolean => k.startsWith("abs2.sync.");
+
+async function mapStrings(v: unknown, f: (s: string) => Promise<string>): Promise<unknown> {
+  if (typeof v === "string") return f(v);
+  if (Array.isArray(v)) return Promise.all(v.map((x) => mapStrings(x, f)));
+  if (v && typeof v === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, x] of Object.entries(v as Record<string, unknown>)) out[k] = await mapStrings(x, f);
+    return out;
+  }
+  return v;
+}
+
+/** A JSON snapshot of every saved fleet, outfit, custom faction, setting and uploaded picture. */
+export async function exportAllData(): Promise<string> {
   const data: Record<string, unknown> = {};
   for (const k of absKeys()) {
+    if (isSyncKey(k)) continue;
     const raw = localStorage.getItem(k);
     if (raw == null) continue;
+    let v: unknown;
     try {
-      data[k] = JSON.parse(raw);
+      v = JSON.parse(raw);
     } catch {
-      data[k] = raw;
+      v = raw;
     }
+    data[k] = await mapStrings(v, async (s) => (isImageRef(s) ? ((await imageDataUrl(s)) ?? s) : s));
   }
   return JSON.stringify({ app: "abs-v2-builder", version: 1, exportedAt: new Date().toISOString(), data }, null, 2);
+}
+
+/** Store a backup's inlined pictures in this browser's image store and point the data at them. */
+export async function internBackupImages(json: string): Promise<string> {
+  let parsed: { data?: unknown } | null;
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    return json;
+  }
+  if (!parsed || typeof parsed !== "object" || !parsed.data) return json;
+  parsed.data = await mapStrings(parsed.data, async (s) =>
+    s.startsWith("data:image/") ? ((await internDataUrl(s)) ?? s) : s,
+  );
+  return JSON.stringify(parsed);
 }
 
 /** Restore a snapshot produced by exportAllData. Returns false if unrecognised. */
@@ -605,12 +651,13 @@ export function importAllData(json: string): boolean {
   const data = (parsed as { data?: unknown } | null)?.data;
   if (!data || typeof data !== "object") return false;
   for (const [k, v] of Object.entries(data as Record<string, unknown>)) {
-    if (k.startsWith("abs2.")) write(k, v);
+    if (k.startsWith("abs2.") && !isSyncKey(k)) write(k, v);
   }
   return true;
 }
 
-/** Remove every saved fleet, outfit, custom faction, and setting. */
-export function clearAllData(): void {
+/** Remove every saved fleet, outfit, custom faction, setting and uploaded picture from this browser. */
+export async function clearAllData(): Promise<void> {
   for (const k of absKeys()) localStorage.removeItem(k);
+  await clearImages();
 }

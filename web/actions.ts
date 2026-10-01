@@ -20,6 +20,7 @@ import {
   clearAllData,
   exportAllData,
   importAllData,
+  internBackupImages,
   isTrainingMode,
   loadLists,
   newId,
@@ -1272,31 +1273,40 @@ export function dispatchAction(target: HTMLElement): void {
     }
     case "export-data": {
       // A self-initiated backup of the user's own browser-stored data.
-      const blob = new Blob([exportAllData()], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "a-billion-suns-backup.json";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      showToast("Backup downloaded.");
+      // Async now: uploaded pictures are read out of IndexedDB and inlined.
+      void exportAllData().then((json) => {
+        const blob = new Blob([json], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "a-billion-suns-backup.json";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      });
       break;
     }
     case "clear-data": {
       if (
         needsConfirm(target, {
           title: "Clear all data?",
-          body: "Every saved fleet, outfit and custom faction is deleted from this browser. Export a backup first if you want to keep any of it. This cannot be undone.",
+          // Said the way it actually works. Uploaded pictures go too (they
+          // used to stay behind in IndexedDB). With sync on, the wipe is local:
+          // the online copy is untouched and this browser stops syncing, so
+          // "cannot be undone" was only true for a browser that never synced.
+          body: FleetSync.enabled()
+            ? "Every saved fleet, outfit, custom faction and uploaded picture is deleted from this browser, and it stops syncing. The fleets already synced stay online."
+            : "Every saved fleet, outfit, custom faction and uploaded picture is deleted from this browser. This cannot be undone.",
           confirmLabel: "Clear all data",
           danger: true,
         })
       )
         return;
-      clearAllData();
-      location.hash = "#/";
-      location.reload();
+      void clearAllData().then(() => {
+        location.hash = "#/";
+        location.reload();
+      });
       break;
     }
     case "toggle-carry": {
@@ -2659,12 +2669,14 @@ function handleChange(e: Event): void {
       if (!file) return;
       const reader = new FileReader();
       reader.onload = () => {
-        if (importAllData(String(reader.result ?? ""))) {
-          location.hash = "#/";
-          location.reload();
-        } else {
-          showToast("That file was not a recognised backup.");
-        }
+        void internBackupImages(String(reader.result ?? "")).then((json) => {
+          if (importAllData(json)) {
+            location.hash = "#/";
+            location.reload();
+          } else {
+            showToast("That file was not a recognised backup.");
+          }
+        });
       };
       reader.onerror = () => showToast("Could not read that file.");
       reader.readAsText(file);

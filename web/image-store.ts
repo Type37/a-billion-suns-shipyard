@@ -1,4 +1,4 @@
-import { get, set, del, keys, getMany } from "idb-keyval";
+import { get, set, del, keys, getMany, clear } from "idb-keyval";
 
 /*
  * Where uploaded pictures actually live.
@@ -160,4 +160,15 @@ export async function sweepImages(inUse: Set<string>): Promise<void> {
   } catch {
     // Leaving orphans is survivable; failing a save over it is not.
   }
+}
+
+/** Delete every stored picture. Options > Clear all data. */
+export async function clearImages(): Promise<void> {
+  try {
+    await clear();
+  } catch {
+    // A browser that refused IndexedDB has nothing stored in it to clear.
+  }
+  for (const url of urls.values()) URL.revokeObjectURL(url);
+  urls.clear();
 }

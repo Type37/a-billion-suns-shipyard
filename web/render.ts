@@ -4172,20 +4172,36 @@ function optionsModal(state: AppState): string {
         <cds-modal-heading>Options</cds-modal-heading>
       </cds-modal-header>
       <cds-modal-body class="opt-body" data-modal-primary-focus tabindex="-1">
+        ${/* Audited 1 October 2026 for order, Carbon and truth.
+              Order: Sync first, because it decides where everything below it
+              lives; then the data actions with the destructive one last; then
+              the one display setting; then the version.
+              Truth: "Everything you build is saved in this browser only" was
+              false for anyone syncing, and "Keep the same fleets on your phone
+              and your computer" was a pitch, not a fact - both gone (no
+              explainer copy). The status line that stays is a fact about this
+              device: how it syncs and, for Discord, as whom. The button says
+              "Manage sync" once sync is on; "Sync fleets online" on a device
+              already syncing read as an instruction to do it again.
+              Carbon: section heads in heading-compact type, sentence case, not
+              tracked caps; the sample-factions switch applies the moment it is
+              pressed, which Carbon gives to a toggle, not a checkbox. */ ""}
+        <section class="opt-section">
+          <h3 class="opt-h">Sync</h3>
+          ${(() => {
+            if (!FleetSync.enabled()) return "";
+            const who = FleetSync.discordUser();
+            return `<p class="opt-note">${who ? `Signed in with Discord as <strong>${escapeHtml(who.name)}</strong>` : "Syncing with a sync token"}</p>`;
+          })()}
+          <div class="opt-actions">
+            <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="open-sync">${FleetSync.enabled() ? "Manage sync" : "Sync fleets online"}${icon("sync", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+            ${FleetSync.discordConfigured() && !FleetSync.discordUser()
+              ? `<cds-button has-main-content kind="primary" size="lg" class="btn sync-discord-btn" data-action="sync-discord">Sign in with Discord${icon("discord", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>`
+              : ""}
+          </div>
+        </section>
         <section class="opt-section">
           <h3 class="opt-h">Your data</h3>
-          <p class="opt-note">Everything you build is saved in this browser only.</p>
-          <!--
-            The figure, once there is enough saved to be worth knowing.
-
-            This used to warn that uploaded art was almost all of it and to
-            export a backup before the ~5MB localStorage ceiling arrived. That
-            was true when pictures were base64 strings in that same store; they
-            are Blobs in IndexedDB now (image-store.ts), whose budget is a share
-            of free disk rather than five megabytes. What is left here is text,
-            and text has never come close - so this is a readout, not a warning,
-            and it no longer tells anyone to go and delete their art.
-          -->
           ${
             storageBytes() > 250_000
               ? `<p class="opt-note opt-usage">Fleets, factions and outfits are using about ${Math.round(storageBytes() / 1024)}&nbsp;KB. Uploaded images are stored separately and are not counted here.</p>`
@@ -4200,33 +4216,10 @@ function optionsModal(state: AppState): string {
         </section>
         <section class="opt-section">
           <h3 class="opt-h">Display</h3>
-          <!-- One switch: sample factions are content you may or may not want
-               in your list. "Round emblems" used to sit beside it, on the
-               reasoning that the disc is right for circular badge art and wrong
-               for the marks drawn as squares. In practice it was never turned
-               off, so the crop is simply always on now and the choice is gone. -->
-          <cds-checkbox id="cb-example-factions" class="opt-check" data-action="toggle-example-factions" ${state.settings.exampleFactions ? "checked" : ""}>Show sample custom factions</cds-checkbox>
-        </section>
-        <section class="opt-section">
-          <h3 class="opt-h">Sync</h3>
-          <p class="opt-note">${
-            FleetSync.enabled() ? "Syncing is on for this device." : "Keep the same fleets on your phone and your computer."
-          }</p>
-          <div class="opt-actions">
-            <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="open-sync">Sync fleets online${icon("sync", 15).replace("<svg ", '<svg slot="icon" ')}</cds-button>
-            ${/* Discord beside the token flow, not only inside the Sync dialog:
-                  one press from Options instead of two (Jet circled the space). */ ""}
-            ${FleetSync.discordConfigured() && !FleetSync.discordUser()
-              ? `<cds-button has-main-content kind="primary" size="lg" class="btn sync-discord-btn" data-action="sync-discord">Sign in with Discord${icon("discord", 16).replace("<svg ", '<svg slot="icon" ')}</cds-button>`
-              : ""}
-          </div>
+          <cds-toggle id="tg-example-factions" class="opt-switch" data-action="toggle-example-factions" label-text="Sample custom factions" ${state.settings.exampleFactions ? "toggled" : ""}></cds-toggle>
         </section>
         <section class="opt-section">
           <h3 class="opt-h">About</h3>
-          <!-- The rulebook, the Quick Reference and the feedback address are
-               all in the footer, which is on every page including this one, so
-               listing them here put each of them on screen twice. That leaves
-               the version, which is a fact rather than a link. -->
           <p class="opt-version">Version ${escapeHtml(v)}</p>
         </section>
       </cds-modal-body>

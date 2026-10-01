@@ -21,6 +21,7 @@ import "@carbon/web-components/es/components/text-input/index.js";
 import "@carbon/web-components/es/components/overflow-menu/index.js";
 import "@carbon/web-components/es/components/menu/index.js";
 import "@carbon/web-components/es/components/checkbox/index.js";
+import "@carbon/web-components/es/components/toggle/index.js";
 
 // Keep every Markdown notes editor's preview in step with its textarea as the
 // user types. Uncontrolled on purpose (see richtext.ts): typing must not go
@@ -1331,6 +1332,16 @@ document.addEventListener("cds-checkbox-changed", (e) => {
   if (!host.dataset["action"]) return;
   host.dispatchEvent(new Event("change", { bubbles: true }));
   dispatchAction(host);
+});
+
+// Carbon toggles: same bridge as the checkboxes above. The host reports its
+// state as .toggled, so it is copied onto .checked, which is what the change
+// handlers read for every switch.
+document.addEventListener("cds-toggle-changed", (e) => {
+  const host = e.target as HTMLElement & { toggled?: boolean; checked?: boolean };
+  if (!host.dataset["action"]) return;
+  host.checked = !!host.toggled;
+  host.dispatchEvent(new Event("change", { bubbles: true }));
 });
 
 document.addEventListener("cds-modal-closed", (e) => {

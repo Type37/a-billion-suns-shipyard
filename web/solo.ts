@@ -21,8 +21,6 @@ import {
 } from "../src/data/junkspace.ts";
 import {
   type RuleEntry,
-  PIRATES_INTRO,
-  PIRATES_NOTE,
   REVEALING_BLIPS,
   AMBUSH,
   BLIP_REACTIONS,
@@ -130,7 +128,7 @@ export function logGameModal(state: AppState): string {
     <cds-modal-body data-modal-primary-focus tabindex="-1">
       ${/* Carbon's own number input (Jet: "carbon my friend, carbon"), read
             when Log game is pressed, so typing and stepping both count. */ ""}
-      <cds-number-input id="log-game-earned" class="lg-earned" label="Credits earned (¢k)" min="0" step="1" value="${m.earnedK}" size="lg"></cds-number-input>
+      <cds-number-input type="number" pattern="[0-9]*" locale="en-US" input-mode="decimal" placeholder="" max="" id="log-game-earned" class="lg-earned" label="Credits earned (¢k)" min="0" step="1" value="${m.earnedK}" size="lg"></cds-number-input>
       <label class="cf-f lg-note"><span class="cf-l">Note</span>
         <textarea id="log-game-note" rows="3"></textarea></label>
     </cds-modal-body>
@@ -179,8 +177,8 @@ export function newOutfitModal(state: AppState): string {
         ${/* Carbon number inputs, uncontrolled like the name above and read
               when the outfit is created. Typed or stepped, both count. */ ""}
         <div class="no-dials">
-          <cds-number-input id="no-debt" label="Debt (¢k)" min="5" max="200" step="5" value="${debt}" size="lg"></cds-number-input>
-          <cds-number-input id="no-games" label="Games to clear it" min="1" max="30" step="1" value="${games}" size="lg"></cds-number-input>
+          <cds-number-input type="number" pattern="[0-9]*" locale="en-US" input-mode="decimal" placeholder="" id="no-debt" label="Debt (¢k)" min="5" max="200" step="5" value="${debt}" size="lg"></cds-number-input>
+          <cds-number-input type="number" pattern="[0-9]*" locale="en-US" input-mode="decimal" placeholder="" id="no-games" label="Games to clear it" min="1" max="30" step="1" value="${games}" size="lg"></cds-number-input>
         </div>
     </cds-modal-body>
     <cds-modal-footer>
@@ -309,6 +307,16 @@ function soloShipCatalog(): string {
  */
 function perkBlock(o: SavedOutfit, sh: SavedOutfit["ships"][number]): string {
   const list = PERKS_BY_CLASS[sh.pilotClass] ?? [];
+  // p.212: one Perk per surviving pilot per game, one per ¢1k earned. Shown
+  // as tags; nothing is blocked (house rules happen).
+  const pb = o.perkBudget;
+  const status = !pb
+    ? ""
+    : pb.given.includes(sh.id)
+      ? `<cds-tag type="gray" size="md">Perk taken after game ${pb.game}</cds-tag>`
+      : !pb.surviving.includes(sh.id)
+        ? `<cds-tag type="gray" size="md">Destroyed in game ${pb.game}</cds-tag>`
+        : "";
   const has = new Set(o.perks.filter((p) => p.shipId === sh.id).map((p) => p.perk));
   const opts = list
     .map(
@@ -329,7 +337,7 @@ function perkBlock(o: SavedOutfit, sh: SavedOutfit["ships"][number]): string {
     })
     .join("");
   const who = sh.pilotName || sh.shipName || `${sh.pilotClass} pilot`;
-  return `<div class="perk-block">
+  return `<div class="perk-block">${status}
       ${taken ? `<ul class="perk-list">${taken}</ul>` : ""}
       ${/* Carbon select (a native one before). The items carry the action, so
             main.ts's cds-select bridge runs it; value stays empty, so the
@@ -430,7 +438,11 @@ function outfitTab(o: SavedOutfit): string {
               the app counting to three for you, every time you look at it. The
               cap only matters at the moment it stops you, so it only speaks
               then. */ ""}
-        <h3 class="roster-section">Ships${full ? ` <span class="roster-warn">Outfit full</span>` : ""}</h3>
+        <h3 class="roster-section">Ships${full ? ` <span class="roster-warn">Outfit full</span>` : ""}${
+          o.perkBudget && o.perkBudget.left > 0
+            ? ` <cds-tag type="blue" size="md">${o.perkBudget.left} ${o.perkBudget.left === 1 ? "perk" : "perks"} to grant</cds-tag>`
+            : ""
+        }</h3>
         ${/* Budget as Carbon's progress bar (Jet, 1 October 2026: remove the
               Budget / Spent / Left readout, "have a simple meter"). One label,
               one bar, one line of helper text; over budget it goes to
@@ -529,14 +541,17 @@ function blipsPanel(o: SavedOutfit): string {
       const p = byName.get(name);
       const weapons = p
         ? [
-            p.primary ? `<span class="blip-w"><b>Pri</b> ${escapeHtml(p.primary)}</span>` : "",
-            p.auxiliary ? `<span class="blip-w"><b>Aux</b> ${escapeHtml(p.auxiliary)}</span>` : "",
+            p.primary ? `<span class="blip-w"><b>Primary</b> ${escapeHtml(p.primary)}</span>` : "",
+            p.auxiliary ? `<span class="blip-w"><b>Auxiliary</b> ${escapeHtml(p.auxiliary)}</span>` : "",
           ].join("")
         : "";
       return `
       <button class="blip ${b.revealed ? "is-revealed" : ""}" data-action="solo-blip-reveal" data-index="${i}"
               aria-label="${b.revealed ? `Blip ${b.n}, ${escapeHtml(name)}. Turn it back over.` : "Face-down Blip marker. Turn it over."}">
-        <span class="blip-face blip-back">${icon("logo", 26)}</span>
+        ${/* Each face-down marker carries its place in the row (Jet: "add
+              numbers to the blips"), so the tile can be matched to the marker
+              on the table. */ ""}
+        <span class="blip-face blip-back"><span class="blip-slot">${i + 1}</span>${BLIP_PING}</span>
         <span class="blip-face blip-front">
           <span class="blip-head"><span class="blip-n">${b.n}</span><span class="blip-what">${escapeHtml(name)}</span></span>
           ${p ? statChips(p, true) : ""}
@@ -551,8 +566,83 @@ function blipsPanel(o: SavedOutfit): string {
         <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="solo-shuffle-blips" title="Shuffle the eight blips into a random order">Reshuffle${icon("random", 10).replace("<svg ", '<svg slot="icon" ')}</cds-button>
       </h3>
       <div class="blip-grid">${markers}</div>
+      ${(() => {
+        const up = blips
+          .map((b, i) => ({ b, i, p: byName.get(BLIP_TO_PIRATE[b.n] ?? "") }))
+          .filter((x) => x.b.revealed && x.p);
+        if (!up.length) return "";
+        return `<ul class="sip-list blip-hp">${up
+          .map(
+            ({ i, b, p }) => `<li class="sip-row">
+              <span class="sip-name"><b>${escapeHtml(p!.name)}</b><span class="sip-who">Blip ${i + 1}, marker ${b.n}</span></span>
+              ${hpField(o, `blip:${i}`, p!.silhouette, `${p!.name}, Blip ${i + 1}`)}
+            </li>`,
+          )
+          .join("")}</ul>`;
+      })()}
     </section>`;
 }
+
+/** CMD tokens gained each Command Phase: 5 (p.205), +1 per Quarterback (p.213). */
+export function cmdGain(o: SavedOutfit): number {
+  return 5 + o.perks.filter((p) => p.perk === "Quarterback").length;
+}
+
+/** A pilot's Initiative Value in D6: 2 to start (p.202), +1 Slick, +2 Rogue (pp.212-213). */
+function initiativeDice(o: SavedOutfit, shipId: string): number {
+  const mine = o.perks.filter((p) => p.shipId === shipId).map((p) => p.perk);
+  return 2 + (mine.includes("Slick") ? 1 : 0) + (mine.includes("Rogue") ? 2 : 0);
+}
+
+/** One HP field: Carbon number input, 0 to the ship's Silhouette (HP = Silhouette, p.47). */
+/*
+ * Every <cds-number-input> here spells out the attributes Carbon reflects onto
+ * itself (type, pattern, locale, input-mode, placeholder, max, step). morph
+ * removes host attributes the new markup lacks, so on the first repaint after
+ * any change those went and the field drew in Carbon's red invalid state with
+ * an error icon ("Please match the requested format"). Same trap as the
+ * modal footer's has-three-buttons.
+ */
+function hpField(o: SavedOutfit, key: string, max: number, label: string): string {
+  const hp = Math.max(0, max - (o.damage?.[key] ?? 0));
+  return `<span class="hp-cell">
+      <cds-number-input type="number" pattern="[0-9]*" locale="en-US" input-mode="decimal" placeholder="" class="hp-input" label="${escapeHtml(label)} HP" hide-label min="0" max="${max}" step="1" value="${hp}" size="md" data-action="ship-hp" data-key="${escapeHtml(key)}" data-max="${max}"></cds-number-input>
+      <span class="hp-of">of ${max} HP</span>
+      ${hp === 0 ? `<cds-tag type="red" size="md">Destroyed</cds-tag>` : ""}
+    </span>`;
+}
+
+/*
+ * The outfit's ships during a game: who is flying, their Initiative, and HP.
+ * Found playing a campaign through the app (1 October 2026): nothing on Play
+ * tracked damage, so the tracker could not tell you which ship was down. A
+ * Carbon structured-list look: one row per ship, quiet row lines.
+ */
+function shipsInPlay(o: SavedOutfit): string {
+  if (!o.ships.length) return "";
+  const rows = o.ships
+    .map((sh) => {
+      const def = shipById.get(sh.shipClassId);
+      if (!def) return "";
+      const who = sh.pilotName ? `${escapeHtml(sh.pilotName)}, ${sh.pilotClass}` : sh.pilotClass;
+      return `<li class="sip-row">
+        <span class="sip-name"><b>${escapeHtml(sh.shipName || def.name)}</b><span class="sip-who">${who}</span></span>
+        <span class="sip-init">Initiative ${initiativeDice(o, sh.id)}D6</span>
+        ${hpField(o, sh.id, def.silhouette, sh.shipName || def.name)}
+      </li>`;
+    })
+    .join("");
+  return `<section class="solo-card sip">
+      <h3 class="roster-section">Your ships</h3>
+      <ul class="sip-list">${rows}</ul>
+    </section>`;
+}
+
+/*
+ * The face-down Blip mark: Stash's radar-duotone ("stash:radar-duotone", Jet's
+ * pick, 1 October 2026), drawn large. Copied from the set, not drawn here.
+ */
+const BLIP_PING = `<svg class="blip-ping" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 7.75A4.25 4.25 0 1 0 16.25 12a.75.75 0 0 1 1.5 0a5.75 5.75 0 1 1-3.45-5.271a.75.75 0 0 1-.6 1.374A4.2 4.2 0 0 0 12 7.75" opacity=".5"/><path fill="currentColor" d="M12 4.75a7.25 7.25 0 0 0-1.233 14.396a1.498 1.498 0 0 1 2.466 0A7.25 7.25 0 0 0 19.25 12a.75.75 0 0 1 1.5 0a8.75 8.75 0 0 1-7.396 8.646a1.5 1.5 0 0 1-2.708 0a8.75 8.75 0 1 1 4.636-16.76a.75.75 0 1 1-.563 1.39A7.2 7.2 0 0 0 12 4.75"/><path fill="currentColor" d="M14 12a2 2 0 1 1-1.219-1.842L17.97 4.97a.75.75 0 1 1 1.06 1.06l-5.188 5.189c.102.24.158.504.158.781m-7 1.5a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3"/></svg>`;
 
 function playTab(state: AppState, o: SavedOutfit): string {
   const alert = o.alertLevel;
@@ -593,9 +683,12 @@ function playTab(state: AppState, o: SavedOutfit): string {
     </div>
     <div class="gb-round">
       <span class="control-label">Round</span>
-      <cds-number-input class="round-input" label="Round" hide-label min="1" step="1" value="${o.round}" size="lg" data-action="round-set"></cds-number-input>
+      <cds-number-input type="number" pattern="[0-9]*" locale="en-US" input-mode="decimal" placeholder="" max="" class="round-input" label="Round" hide-label min="1" step="1" value="${o.round}" size="lg" data-action="round-set"></cds-number-input>
+      <span class="control-label">CMD tokens</span>
+      <cds-number-input type="number" pattern="[0-9]*" locale="en-US" input-mode="decimal" placeholder="" max="" class="round-input" label="CMD tokens" hide-label min="0" step="1" value="${o.cmd ?? cmdGain(o)}" size="lg" data-action="cmd-set"></cds-number-input>
     </div>
   </section>
+  ${shipsInPlay(o)}
   ${blipsPanel(o)}
   ${soloRefTabs(state)}`;
 }
@@ -679,10 +772,8 @@ function soloRefTabs(state: AppState): string {
       ${GLITCH_RULES.map(ruleEntry).join("")}`;
   } else {
     body = `
-      <p class="rule-entry">${ruleText(PIRATES_INTRO)}</p>
       ${piratesTable()}
-      <p class="rule-entry">${ruleText(PIRATE_RULE)}</p>
-      <p class="rule-entry ref-note">${ruleText(PIRATES_NOTE)}</p>`;
+      <p class="rule-entry">${ruleText(PIRATE_RULE)}</p>`;
   }
   return `
   <section class="solo-ref-block">

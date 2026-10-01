@@ -35,6 +35,7 @@ import {
 } from "./storage.ts";
 import type { SavedOutfit } from "./storage.ts";
 import { FleetSync } from "./fleet-sync.ts";
+import { cmdGain } from "./solo.ts";
 import {
   createList,
   createOutfit,
@@ -1867,7 +1868,14 @@ export function dispatchAction(target: HTMLElement): void {
       // round moves on. A playtest needed two taps per round for that, one
       // here and one on the Round field.
       const nextRound = target.dataset["endPhase"] ? 1 : 0;
-      editOutfit((o) => ({ ...o, alertLevel: Math.max(1, Math.min(10, o.alertLevel + delta)), round: o.round + nextRound }));
+      // ...and the CMD tokens: unspent ones are discarded in the End Phase
+      // (p.49) and the next Command Phase gains 5, +1 per Quarterback (p.205).
+      editOutfit((o) => ({
+        ...o,
+        alertLevel: Math.max(1, Math.min(10, o.alertLevel + delta)),
+        round: o.round + nextRound,
+        ...(nextRound ? { cmd: cmdGain(o) } : {}),
+      }));
       break;
     }
     case "round-adjust": {
@@ -1962,6 +1970,18 @@ export function dispatchAction(target: HTMLElement): void {
           // this was hardcoded to 1, so it never did.
           alertLevel: startingAlertLevel(debtK),
           round: 1,
+          // Who can take a Perk after this game (p.212): one per ¢1k earned,
+          // surviving pilots only. Then the ships are repaired for the next.
+          perkBudget: {
+            game: o.gamesPlayed + 1,
+            left: earnedK,
+            given: [],
+            surviving: o.ships
+              .filter((sh) => (o.damage?.[sh.id] ?? 0) < (JUNKSPACE_SHIPS.find((c) => c.id === sh.shipClassId)?.silhouette ?? 1))
+              .map((sh) => sh.id),
+          },
+          damage: undefined,
+          cmd: undefined,
           // The markers belong to the game just finished; the next one gets a
           // fresh shuffle of the bag.
           blips: undefined,
@@ -2526,9 +2546,17 @@ export function dispatchAction(target: HTMLElement): void {
       const shipId = target.dataset["ship"];
       const perk = target.dataset["perk"];
       if (!shipId || !perk) return;
-      editOutfit((o) =>
-        o.perks.some((p) => p.shipId === shipId && p.perk === perk) ? o : { ...o, perks: [...o.perks, { shipId, perk }] },
-      );
+      editOutfit((o) => {
+        if (o.perks.some((p) => p.shipId === shipId && p.perk === perk)) return o;
+        const pb = o.perkBudget;
+        return {
+          ...o,
+          perks: [...o.perks, { shipId, perk }],
+          ...(pb && !pb.given.includes(shipId)
+            ? { perkBudget: { ...pb, left: Math.max(0, pb.left - 1), given: [...pb.given, shipId] } }
+            : {}),
+        };
+      });
       break;
     }
     case "cf-ship-open": {
@@ -2737,6 +2765,21 @@ function handleChange(e: Event): void {
         ...o,
         ships: o.ships.map((s) => (s.id === shipId ? { ...s, pilotName: inputValue } : s)),
       }));
+      break;
+    }
+    case "cmd-set": {
+      const v = readNumber(inputValue);
+      if (v === null) return;
+      editOutfit((o) => ({ ...o, cmd: Math.max(0, v) }));
+      break;
+    }
+    case "ship-hp": {
+      const key = target.dataset["key"];
+      const max = Number(target.dataset["max"]);
+      const v = readNumber(inputValue);
+      if (!key || !Number.isFinite(max) || v === null) return;
+      const lost = Math.max(0, Math.min(max, max - v));
+      editOutfit((o) => ({ ...o, damage: { ...(o.damage ?? {}), [key]: lost } }));
       break;
     }
     case "round-set": {

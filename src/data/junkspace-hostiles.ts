@@ -17,6 +17,8 @@ export interface RuleEntry {
   steps?: string[];
 }
 
+// PIRATES_INTRO and PIRATES_NOTE are kept for reference but not shown (Jet,
+// 1 October 2026: remove both from the Pirates tab).
 export const PIRATES_INTRO =
   "The Jura system is filled with violent and desperate people, as well as some crooked and criminal ones too. Wherever you go to try and make a spacebuck, you can be certain that your jetstreams will be dogged by pirates of one stripe or another. The “Blip” numbers in the tables indicate which Blip marker reveals a single ship of this class.";
 

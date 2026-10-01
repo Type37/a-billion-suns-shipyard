@@ -385,6 +385,20 @@ export interface SavedOutfit {
    * number is decided before you get near it.
    */
   blips?: { n: number; revealed: boolean }[];
+  /** Live game: CMD tokens in hand this round (p.205: you gain 5; Quarterback adds 1). */
+  cmd?: number;
+  /**
+   * Live game: HP lost, by ship id, and by "blip:<index>" for a revealed
+   * pirate. A ship starts with HP equal to its Silhouette (p.47). Cleared when
+   * the game is logged: "Destroyed ships are not lost" (p.212).
+   */
+  damage?: Record<string, number>;
+  /**
+   * After the last logged game: perks still to grant (one per ¢1k earned),
+   * the pilots who have already taken one, and the ships that survived
+   * (p.212). Shown, not enforced.
+   */
+  perkBudget?: { game: number; left: number; given: string[]; surviving: string[] };
   createdAt: string;
   updatedAt: string;
 }

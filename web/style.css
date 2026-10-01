@@ -4838,19 +4838,18 @@ cds-modal-body[data-modal-primary-focus]:focus { outline: none; }
 
 /* The crop step. Stacks above the emblem picker that opened it (which is itself
    above the page), so it needs to outrank a .modal-root. */
-.crop-root { z-index: 120; }
-.crop-modal { width: min(680px, 100%); display: flex; flex-direction: column; max-height: 92vh; }
-.crop-hint { font-family: var(--sans); font-size: 13px; line-height: 1.5; color: var(--ink-3); padding: 12px 18px 0; }
+.crop-hint { font-family: var(--sans); font-size: 13px; line-height: 1.5; color: var(--ink-3); margin: 0; }
+.crop-tools { display: flex; gap: 8px; }
 /* The stage is Cropper.js's; only its box is ours. A min-height stops the
    dialog collapsing to nothing in the frame before the image has decoded. */
-.crop-stage { margin: 14px 18px; min-height: 240px; max-height: 56vh; background: var(--blue-wash); }
+/* Sized from the screen height so Carbon's header and pinned footer always fit
+   around it: 342px tall in landscape leaves about 150px of picture. */
+.crop-stage { margin: 10px 0; height: clamp(140px, calc(100dvh - 300px), 56vh); background: var(--blue-wash); }
 .crop-stage > img { display: block; max-width: 100%; }
 /* Emblems are shown in a circle everywhere they land, so the crop box is drawn
    as one - cropping a square while the result will be a disc is how you end up
    trimming a mark that looked fine in the dialog. */
 .crop-stage.is-round .cropper-view-box, .crop-stage.is-round .cropper-face { border-radius: 50%; }
-.crop-foot { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 14px 18px; border-top: 1px solid var(--hair); }
-.crop-foot .crop-use { margin-left: auto; }
 
 .em-upload { display: flex; flex-direction: column; gap: 14px; }
 .em-drop {

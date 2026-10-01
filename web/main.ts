@@ -1295,7 +1295,13 @@ document.addEventListener("cds-select-selected", (e) => {
   });
 });
 
-document.addEventListener("cds-modal-closed", () => {
+document.addEventListener("cds-modal-closed", (e) => {
+  // The cropper is its own layer (ui.crop) and opens over the emblem picker,
+  // so closing it must not close the picker underneath.
+  if ((e.target as HTMLElement).classList.contains("crop-modal")) {
+    if (store.getState().ui.crop) store.setState((s) => ({ ...s, ui: { ...s.ui, crop: undefined } }));
+    return;
+  }
   if (store.getState().ui.modal) store.setState((s) => ({ ...s, ui: { ...s.ui, modal: undefined } }));
 });
 

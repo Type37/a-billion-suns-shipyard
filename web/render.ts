@@ -4896,7 +4896,6 @@ function emblemModal(state: AppState): string {
                <span class="em-drop-sub">or click to browse &mdash; ${/Mac|iPhone|iPad/.test(navigator.platform ?? "") ? "&#8984;V" : "Ctrl&#8239;+&#8239;V"} pastes one straight from the clipboard</span>
              </span>
            </label>
-           <p class="em-drop-note">PNG, JPEG, WebP or GIF. Whatever you give it is cropped to a centred square and stored at 480&nbsp;px, so a full-size photo will not bloat your saved fleets.</p>
          </div>`
       : `${fileInput(true)}
          <input id="emblem-lib-search" class="em-search" type="search" placeholder="Search sigils: try skull, wings, money" value="${escapeHtml(m.libQuery ?? "")}" data-action="emblem-lib-search" aria-label="Search sigils" />
@@ -4915,9 +4914,19 @@ function emblemModal(state: AppState): string {
       <div class="em-tabs" role="tablist">${tabBtns}</div>
       <div class="em-body">${body}</div>
     </cds-modal-body>
-    <cds-modal-footer>
+    ${/* has-three-buttons is the attribute Carbon sets on itself for a
+          three-button footer (25% each, right-aligned). It has to be in the
+          markup: morph removes attributes the new markup lacks, so the first
+          repaint after opening (pressing Remove, for one) stripped it and the
+          footer jumped to a different layout. */ ""}
+    <cds-modal-footer has-three-buttons>
       <cds-modal-footer-button kind="ghost" data-action="${cfg.rndA}">Random</cds-modal-footer-button>
-      ${cfg.hasImage ? `<cds-modal-footer-button kind="danger-ghost" data-action="${cfg.clrA}">Remove</cds-modal-footer-button>` : ""}
+      ${/* Always present, disabled when there is nothing to remove. It used to
+            appear only with a mark chosen, so pressing it took it away: the
+            footer went from three buttons to two and Random and Done slid and
+            widened under the thumb (283px to 424px), Done landing where Remove
+            had been. Jet: "clicking remove does some fucky shit". */ ""}
+      <cds-modal-footer-button kind="danger-ghost" data-action="${cfg.clrA}" ${cfg.hasImage ? "" : "disabled"}>Remove</cds-modal-footer-button>
       <cds-modal-footer-button kind="primary" data-action="close-modal">Done</cds-modal-footer-button>
     </cds-modal-footer>
   </cds-modal>`;

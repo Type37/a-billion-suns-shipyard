@@ -415,7 +415,9 @@ function startImageCrop(action: string, data: DOMStringMap, file: File): void {
  * to hold five of.
  */
 function applyImageUpload(action: string, data: DOMStringMap, ref: string): void {
-  const done = (): void => showToast("Image added.", { icon: "check" });
+  // No "Image added." toast: the picker closes on upload (see crop-apply) and
+  // the image is on screen, which is the confirmation.
+  const done = (): void => {};
   switch (action) {
     case "emblem-upload": {
       const id = currentListId();
@@ -800,6 +802,17 @@ export function dispatchAction(target: HTMLElement): void {
           void putImage(blob).then((ref) => {
             store.setState((s) => ({ ...s, ui: { ...s.ui, crop: undefined } }));
             applyImageUpload(c.action, data, ref);
+            // An upload is a finished choice, so the picker closes behind it
+            // and you land on whatever the image went onto. It used to stay
+            // open over the page, which hid the result and read as a failed
+            // upload (Jet: "i think the uploader is busted"). Closing goes
+            // through close-modal, so a picker opened over New outfit still
+            // hands back to that dialog.
+            if (store.getState().ui.modal?.kind === "emblem") {
+              const el = document.createElement("button");
+              el.dataset["action"] = "close-modal";
+              dispatchAction(el);
+            }
           });
         },
         "image/jpeg",

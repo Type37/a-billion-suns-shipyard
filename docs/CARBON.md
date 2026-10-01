@@ -261,6 +261,16 @@ only, not built).
   xlg 1312 (16), max 1584 (16). Column padding 16px. Wide gutter 32px
   (required for labelled components), narrow 16px (most common), condensed
   1px. Type never hangs into gutters. Max width 1584px.
+- **How the app uses the grid** (2x grid Overview, Guidelines and Code tabs,
+  read in the browser 1 October 2026): editorial style model, the grid held at
+  the lg width (1056px) and centred. Type sits on one key line 32px in (16
+  margin + 16 column padding), the masthead wordmark included. Card grids use
+  narrow gutter mode: containers hang 16px into the gutter, 16px apart, 16px
+  padding, so a card's text meets the page title's key line. Form fields keep
+  wide gutters (Carbon: labelled components must). "Type never hangs into the
+  gutter." Vertical spacing uses the fixed scale 8, 16, 24, 32, 48, 64, 80.
+  Implementation: `--grid-max`, `--key`, `--gutter-narrow`, `--gutter-wide`
+  in `web/style.css`, under "One page width on a desktop".
 - **Colour (White theme):** see the `--cds-*` mapping in `web/style.css`
   `:root`, values from the color/tokens page.
 

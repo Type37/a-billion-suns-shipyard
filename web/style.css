@@ -559,7 +559,7 @@ button { font-family: inherit; }
    visible, so the menu sat open over Add unit and Play and would not close. */
 .nav-fold { position: relative; }
 .nav-fold-btn { display: none; }
-@media (min-width: 761px) {
+@media (min-width: 960px) {
   .nav-fold > .nav-fold-btn { display: none; }
   .nav-fold > .topnav { display: flex; }
   .nav-fold::details-content { content-visibility: visible; }
@@ -8394,19 +8394,42 @@ cds-checkbox::part(label)::after { inset-block-start: 18.5px; }
 cds-checkbox.phase-check { font-family: var(--serif); line-height: 1.45; }
 cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--hair); }
 
-/* One page width on a desktop: the Fleets page's, 1100px with 40px sides
-   (Jet, October 2026, of the Fleets grid: "this is a good width for desktop
-   mode"). Before this every screen had its own ceiling, chosen per screen by
-   content: the builder 902px, Play 1160px, the Junkspace dock 760px, the
-   Compendium 1320px, Learn and the rules 840px. So the page jumped sideways
-   and the masthead's edges matched nothing as you moved between screens. The
-   print preview is the exception: it is a sheet of paper and keeps the
-   paper's width. */
-@media (min-width: 761px) {
-  #app > main:not(.print-page), #app > .shipyard.builder-fleet {
-    max-width: 1100px; margin-left: auto; margin-right: auto;
-    padding-left: 40px; padding-right: 40px; box-sizing: border-box;
+/* One page width on a desktop, now Carbon's 2x grid (carbondesignsystem.com
+   building-blocks/foundations/2x-grid, read 1 October 2026; see docs/CARBON.md).
+
+   History: every screen used to have its own ceiling (builder 902, Play 1160,
+   Junkspace 760, Compendium 1320, Learn 840), so the page jumped sideways
+   between screens. That became one 1100px width with 40px sides (Jet, October
+   2026: "this is a good width for desktop mode"), and that is what this
+   replaces: 1100 was not a grid width, the masthead's wordmark sat at 40px
+   while the page's type started at ~138px, and nothing lined up with anything
+   across the header/body seam.
+
+   Now: the page is the grid at Carbon's lg breakpoint, 1056px, centred (the
+   grid docs' "editorial model": max width held, grid centred). Inside it, a
+   16px grid margin plus 16px column padding puts every line of type 32px in
+   from the grid's edge - `--key` - and the masthead's wordmark sits on the
+   same key line. Containers (cards, tiles) use Carbon's narrow gutter mode:
+   they hang 16px out into the gutter, so the type INSIDE a card lands on the
+   same key line as a page title above it. Type itself never hangs into the
+   gutter. The print preview keeps the paper's width. */
+:root {
+  --grid-max: 1056px;
+  --key: 32px;           /* grid margin 16 + column padding 16 */
+  --gutter-narrow: 16px;
+  --gutter-wide: 32px;
+}
+@media (min-width: 672px) {
+  #app > main:not(.print-page), #app > .shipyard {
+    max-width: var(--grid-max); margin-left: auto; margin-right: auto;
+    padding-left: var(--key); padding-right: var(--key); box-sizing: border-box;
   }
+  /* The masthead is full-bleed colour but its contents ride the same grid. */
+  .topbar { padding-left: max(var(--key), calc((100% - var(--grid-max)) / 2 + var(--key))); padding-right: max(var(--key), calc((100% - var(--grid-max)) / 2 + var(--key))); }
+  /* Card grids in narrow gutter mode: hang 16px into the gutter, 16px apart,
+     16px padding, so a card's text sits on the key line. */
+  .fleet-cards, .outfit-cards { gap: var(--gutter-narrow); margin-left: calc(-1 * var(--gutter-narrow)); margin-right: calc(-1 * var(--gutter-narrow)); }
+  .fleet-card { padding: 16px; }
 }
 
 /* The ship list at desktop width (Jet, 1 October 2026: "this screen feels too
@@ -8416,6 +8439,43 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
    halves the scroll. The card's own + margin-top stacking is replaced by the
    grid's gap so the two columns stay level. */
 @media (min-width: 1000px) {
-  .sy-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: start; }
+  .sy-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gutter-narrow, 16px); align-items: start; }
   .sy-list > .sy-ship + .sy-ship { margin-top: 0; }
+}
+
+/* The hamburger from 761 to 959px too, not only on phones. The flat nav row
+   needs ~885px (wordmark 236 + five items 561 + gaps and the grid's 32px
+   sides), so between 761 and ~900 the whole page scrolled sideways - every
+   route, measured at 768 on 1 October 2026. Only the nav rules from the phone
+   block are repeated here; the rest of that block stays phone-only. */
+@media (min-width: 761px) and (max-width: 959px) {
+  .nav-pill { display: none; }
+  .nav-fold { position: relative; margin-left: auto; }
+  .nav-fold > .nav-fold-btn {
+    display: inline-flex; align-items: center; gap: 8px; list-style: none; cursor: pointer;
+    padding: 8px 12px; color: #fff; font-family: var(--sans); font-weight: 700; font-size: 13px;
+    /* 0.55, not 0.32. Over the blue bar, white at 32%% is 2.36:1 - under the
+       3:1 that 1.4.11 asks of the only line identifying a control. 0.55 is
+       3.3:1 and still reads as a keyline rather than a filled button. */
+    text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid rgba(255, 255, 255, 0.55);
+  }
+  .nav-fold > .nav-fold-btn::-webkit-details-marker { display: none; }
+  .nav-fold[open] > .nav-fold-btn { background: rgba(255, 255, 255, 0.16); }
+  .nav-fold > .nav-fold-btn svg { width: 18px; height: 18px; }
+
+  /* The dropdown: absolute, so opening it never shoves the page. Items are a
+     vertical stack, each icon + label on its own row, full-width thumb targets. */
+  .nav-fold > .topnav {
+    position: absolute; top: calc(100% + 9px); right: 0; z-index: 60;
+    flex-direction: column; align-items: stretch; gap: 2px; width: min(244px, 78vw);
+    margin: 0; padding: 8px; background: var(--blue-deep);
+    border: 1px solid rgba(255, 255, 255, 0.22); box-shadow: 0 16px 36px rgba(0, 0, 0, 0.34);
+  }
+  .nav-fold > .topnav a, .nav-fold > .topnav .topnav-btn {
+    flex: 0 0 auto; width: 100%; flex-direction: row; align-items: center; justify-content: flex-start;
+    text-align: left; gap: 12px; white-space: normal; line-height: 1.2;
+    padding: 12px 12px; font-size: 13px; letter-spacing: 0.03em; border: none;
+  }
+  @media (hover: hover) {   .nav-fold > .topnav a:hover, .nav-fold > .topnav .topnav-btn:hover { background: rgba(255, 255, 255, 0.12); } }
+  .nav-fold > .topnav a svg, .nav-fold > .topnav .topnav-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
 }

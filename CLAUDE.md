@@ -63,6 +63,11 @@ These came out of a mobile review session. They override any default taste.
 - Do not invent a design system. The app uses IBM Carbon
   (`@carbon/web-components`). Move homemade components onto Carbon instead of
   restyling them. A Carbon component beats anything written here by hand.
+- No hand-drawn icons. Interface icons come from Carbon's set
+  (`@carbon/icons`). Game marks with no Carbon equivalent (the Mass ⓜ, firing
+  arcs, faction emblems) come from the rulebook or the publisher, never drawn
+  here. `web/icons.ts` still holds older hand-drawn glyphs; replace them, do
+  not add to them.
 - Colour is fine. Do not retint, add dark mode or chase contrast unless asked.
 - Work from real phone screenshots (Playwright touch contexts: iPhone 13, Pixel
   7, a 360px Android, portrait AND landscape) and real taps. A finding without

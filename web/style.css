@@ -8894,3 +8894,21 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
   .solo-head .solo-print { grid-column: 3; grid-row: 1; }
   .solo-head .solo-tabs { grid-column: 1 / -1; grid-row: 2; }
 }
+/* Audit, 2 October 2026. Outfit ship card: class as title, then Ship name and
+   Call sign side by side as labelled fields, then the pilot class, ability
+   and Initiative together. Stock cards: Add sits at the top right of every
+   card at the same place, not centred on cards of different heights.
+   Campaign: no rule between Still owed and the clock (spacing does it); the
+   loss is a Carbon error notification; each game row has an overflow menu. */
+.ru-class { font: 600 18px/1.3 var(--display); margin: 0; min-width: 0; }
+.ru-names { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 8px 0; }
+.ru-names input { width: 100%; }
+.solo-outfit .ru-init { margin: 4px 0 8px; }
+.solo-outfit .ship-row { align-items: start; }
+.solo-outfit .ship-row .add-cue { align-self: start; }
+.solo-outfit .gb-clock { border-left: none; padding-left: 0; }
+.gb-loss { margin-top: 8px; max-width: 40rem; }
+.glr-menu { margin-left: auto; }
+@media (max-width: 671px) { .ru-names { grid-template-columns: minmax(0, 1fr); } }
+.roster-unit-head .ru-class { flex: 1 1 auto; }
+cds-overflow-menu.glr-menu { border: none; }

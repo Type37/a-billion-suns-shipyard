@@ -380,7 +380,10 @@ function outfitTab(o: SavedOutfit): string {
       <article class="roster-unit" data-roster-key="${s.id}">
         <div class="roster-unit-head">
           ${def ? "" : `<span class="roster-unit-glyph">${icon("warning", 20)}</span>`}
-          <input class="unit-name-input" type="text" value="${escapeHtml(s.shipName ?? "")}" placeholder="${escapeHtml(def?.name ?? "Ship")}" aria-label="${escapeHtml(def?.name ?? "Ship")}" data-action="outfit-ship-name" data-ship="${s.id}" />
+          ${/* The class is the card's title; the ship's own name is a labelled
+                field below. The name field used to BE the title, with the class
+                in grey as its placeholder, so an unnamed ship read as named. */ ""}
+          <h4 class="ru-class">${escapeHtml(def?.name ?? "Ship")}</h4>
           <span class="roster-unit-cost">${ck(def?.cost ?? 0)}</span>
           <cds-button has-main-content kind="danger-ghost" size="lg" class="btn" data-action="outfit-remove-ship" data-ship="${s.id}">Remove${icon("trash", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>
         </div>
@@ -403,14 +406,23 @@ function outfitTab(o: SavedOutfit): string {
           flying this" and "what are they called" and read as a different
           subject entirely. Same person, same row.
         -->
-        <p class="ru-init">Initiative ${initiativeDice(o, s.id)}D6</p>
         <div class="roster-unit-tools">
           <div class="pilot-field">
+            ${/* Ship name and call sign as Carbon fields, labels above (a
+                  placeholder never stands in for a label). */ ""}
+            <div class="ru-names">
+              <label class="cf-f"><span class="cf-l">Ship name</span>
+                <input class="unit-name-input" type="text" value="${escapeHtml(s.shipName ?? "")}" data-action="outfit-ship-name" data-ship="${s.id}" /></label>
+              <label class="cf-f"><span class="cf-l">Call sign</span>
+                <input class="pilot-name-input" type="text" value="${escapeHtml(s.pilotName ?? "")}" data-action="outfit-pilot-name" data-ship="${s.id}" /></label>
+            </div>
             <div class="pilot-row">
               <div class="pilot-picker" role="group" aria-label="Pilot class">${pilotPicker}</div>
-              <input class="pilot-name-input" type="text" value="${escapeHtml(s.pilotName ?? "")}" placeholder="Call sign" aria-label="Pilot name" data-action="outfit-pilot-name" data-ship="${s.id}" />
             </div>
             <div class="pilot-abilities">${abilities}</div>
+            ${/* Initiative belongs to the pilot, so it sits with the pilot's
+                  class ability, not under the perk select. */ ""}
+            <p class="ru-init">Initiative ${initiativeDice(o, s.id)}D6</p>
             ${perkBlock(o, s)}
           </div>
         </div>
@@ -721,7 +733,7 @@ function campaignTab(o: SavedOutfit): string {
       ${gameTicks(o.gamesPlayed, gamesLimit(o))}
       ${/* p.201, verbatim, with this campaign's game count in place of the
             standard 8 (it said "Eight" whatever the dial was set to). */ ""}
-      ${outOfGames ? `<p class="issue-error">If, after ${gamesLimit(o)} games, you still have outstanding debt, some very unpleasant people pay a visit to your space dock and you lose the campaign (and your ships).</p>` : ""}
+      ${outOfGames ? `<cds-inline-notification kind="error" low-contrast hide-close-button class="gb-loss" title="Campaign lost" subtitle="If, after ${gamesLimit(o)} games, you still have outstanding debt, some very unpleasant people pay a visit to your space dock and you lose the campaign (and your ships)."></cds-inline-notification>` : ""}
     </div>
     ${/* Logging stays available after the campaign is won or lost. A
           playtest logged a ninth game of an eight-game campaign and hiding
@@ -753,7 +765,16 @@ function campaignTab(o: SavedOutfit): string {
                     ${/* A mis-logged game can be taken out again (Jet: "can you
                           even remove anything"). Removing it gives the Debt back
                           and recounts games and the next starting Alert. */ ""}
-                    <cds-button has-main-content kind="danger-ghost" size="sm" class="btn glr-remove" data-action="remove-game" data-game="${g.game}">Remove${icon("trash", 14).replace("<svg ", '<svg slot="icon" ')}</cds-button>
+                    ${/* A quiet overflow menu per row (Carbon: extra actions in
+                          rows go in an overflow menu, danger item last). Ten
+                          red Removes down the log were the loudest thing on
+                          the page for the rarest action on it. */ ""}
+                    <cds-overflow-menu kind="ghost" class="card-menu glr-menu" label="Game ${g.game} actions" size="md" enable-v12-overflowmenu menu-alignment="bottom-end">
+                      ${icon("ix-context-menu", 16).replace("<svg ", '<svg slot="icon" ')}
+                      <cds-menu>
+                        <cds-menu-item label="Remove" kind="danger" data-action="remove-game" data-game="${g.game}"></cds-menu-item>
+                      </cds-menu>
+                    </cds-overflow-menu>
                   </li>`,
                 )
                 .join("")}</ol>`

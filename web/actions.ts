@@ -1862,22 +1862,6 @@ export function dispatchAction(target: HTMLElement): void {
       }));
       break;
     }
-    case "alert-adjust": {
-      const delta = Number(target.dataset["delta"]);
-      // End Phase is the end of the round (p.206): the Alert goes up AND the
-      // round moves on. A playtest needed two taps per round for that, one
-      // here and one on the Round field.
-      const nextRound = target.dataset["endPhase"] ? 1 : 0;
-      // ...and the CMD tokens: unspent ones are discarded in the End Phase
-      // (p.49) and the next Command Phase gains 5, +1 per Quarterback (p.205).
-      editOutfit((o) => ({
-        ...o,
-        alertLevel: Math.max(1, Math.min(10, o.alertLevel + delta)),
-        round: o.round + nextRound,
-        ...(nextRound ? { cmd: cmdGain(o) } : {}),
-      }));
-      break;
-    }
     case "round-adjust": {
       const delta = Number(target.dataset["delta"]);
       editOutfit((o) => ({ ...o, round: Math.max(1, o.round + delta) }));
@@ -2756,6 +2740,12 @@ function handleChange(e: Event): void {
         ...o,
         ships: o.ships.map((s) => (s.id === shipId ? { ...s, pilotName: inputValue } : s)),
       }));
+      break;
+    }
+    case "alert-set": {
+      const v = readNumber(inputValue);
+      if (v === null) return;
+      editOutfit((o) => ({ ...o, alertLevel: Math.max(1, Math.min(10, v)) }));
       break;
     }
     case "cmd-set": {

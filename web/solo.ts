@@ -13,8 +13,6 @@ import {
   HARD_DEBT_K,
   HARD_CLEAR_GAMES,
   PILOT_PERKS,
-  ALERT_START,
-  LOW_DEBT_THRESHOLD_K,
   startingAlertLevel,
   LONG_RANGE_SCANNERS_TEXT,
   LONG_RANGE_SCAN_TEXT,
@@ -340,7 +338,7 @@ function perkBlock(o: SavedOutfit, sh: SavedOutfit["ships"][number]): string {
       ${/* Carbon select (a native one before). The items carry the action, so
             main.ts's cds-select bridge runs it; value stays empty, so the
             field reads "Grant a perk" again after each grant. */ ""}
-      <cds-select class="perk-select" label-text="Grant a perk to ${escapeHtml(who)}" hide-label placeholder="Grant a perk" value="" size="lg">${opts}</cds-select>
+      ${pb && pb.left > 0 ? `<cds-select class="perk-select" label-text="Grant a perk to ${escapeHtml(who)}" hide-label placeholder="Grant a perk" value="" size="lg">${opts}</cds-select>` : ""}
     </div>`;
 }
 
@@ -451,7 +449,11 @@ function outfitTab(o: SavedOutfit): string {
         <cds-progress-bar class="solo-budget" label="Budget ${over ? `¢${-remaining}k over ¢${budgetK(o)}k` : `¢${cost}k of ¢${budgetK(o)}k`}" max="${budgetK(o)}" value="${Math.min(cost, budgetK(o))}" ${over ? 'status="error"' : ""}></cds-progress-bar>
         ${/* p.212, verbatim. The old one-line paraphrase dropped the
               one-Perk-per-pilot-per-game limit and the D12 roll. */ ""}
-        <p class="panel-note">For each ¢1k you earned during this game, choose one of your surviving pilots to gain a Perk. Each pilot can only gain a maximum of one Perk after each game. When you gain a Perk, roll a D12. If you roll a Perk you already have, you can select and gain another Perk from your class list.</p>
+        ${/* Post-game rule, shown only while there are perks to grant: every
+              pilot starts with their class's Starting Perk (p.202), and the
+              D12 perks only come after a game (Jet: "do you start out with
+              perks?"). */ ""}
+        ${o.perkBudget && o.perkBudget.left > 0 ? `<p class="panel-note">For each ¢1k you earned during this game, choose one of your surviving pilots to gain a Perk. Each pilot can only gain a maximum of one Perk after each game. When you gain a Perk, roll a D12. If you roll a Perk you already have, you can select and gain another Perk from your class list.</p>` : ""}
         ${shipRows || ""}
         ${over ? '<div class="inspection fail"><p class="issue-error">Over budget by ' + ck(-remaining) + ".</p></div>" : ""}
         <div class="roster-actions">
@@ -464,20 +466,6 @@ function outfitTab(o: SavedOutfit): string {
 
 // --- Play tab ---------------------------------------------------------------
 
-// The Alert Level counted out in ten squares rather than drawn as a percentage
-// bar. It is a 1-to-10 integer that ends the game the moment it lands on 10, so
-// what you need off it is "how many are left", and a 500px-wide fill bar cannot
-// answer that without you measuring it against its own end. Squares can, at a
-// glance, from across a table - which is the same argument (and the same shape)
-// as the campaign clock in gameTicks above.
-function alertPips(level: number): string {
-  const on = Math.max(0, Math.min(10, level));
-  const pips = Array.from(
-    { length: 10 },
-    (_, i) => `<span class="alert-pip ${i < on ? "is-on" : ""}"></span>`,
-  ).join("");
-  return `<div class="alert-pips" role="img" aria-label="Alert Level ${on} of 10">${pips}</div>`;
-}
 
 // No dice roller here any more.
 //
@@ -588,48 +576,18 @@ function initiativeDice(o: SavedOutfit, shipId: string): number {
  * modal footer's has-three-buttons.
  */
 function playTab(state: AppState, o: SavedOutfit): string {
-  const alert = o.alertLevel;
-  // Why this game is harder than the last one. The starting Alert Level climbs
-  // as the debt comes down (p.195), and without saying so the player just sees
-  // a number that used to be 1 and now isn't.
-  const startsAt = startingAlertLevel(o.debtK);
-  const startNote =
-    startsAt > ALERT_START
-      ? `<p class="alert-start-note">${
-          o.debtK <= 0
-            ? `No Debt left, so this game starts at ${startsAt}.`
-            : `Under ${ck(LOW_DEBT_THRESHOLD_K)} of Debt left, so this game starts at ${startsAt}.`
-        }</p>`
-      : "";
-  const phases = SOLO_PHASES.map((p) => `<li><strong>${escapeHtml(p.name)}.</strong> ${ruleText(p.text)}</li>`).join("");
+  // Three Carbon number inputs in one row, nothing else (Jet, 2 October 2026,
+  // of the Alert figure, ten pips, four event buttons, "the game ends at 10"
+  // and the starting-level note: "the fuck is all this?"). The 1-10 range of
+  // the Alert is the field's own min and max; the starting Alert still follows
+  // the Debt when a game is logged (p.195). Labels sit above, Carbon's default.
+  const num = (label: string, action: string, value: number, min: number, max?: number): string =>
+    `<cds-number-input type="number" pattern="[0-9]*" locale="en-US" input-mode="decimal" placeholder="" class="pb-field" label="${label}" min="${min}" max="${max ?? ""}" step="1" value="${value}" size="lg" data-action="${action}"></cds-number-input>`;
   return `
-  <section class="game-bar ${alert >= 8 ? "high" : ""}">
-    <div class="gb-alert">
-      <div class="gb-head">
-        <span class="control-label">Alert Level</span>
-        <span class="gb-note">the game ends at 10</span>
-      </div>
-      <div class="gb-read">
-        <span class="gb-figure">${alert}</span>
-        ${alertPips(alert)}
-      </div>
-      <div class="alert-controls">
-        <!-- What just happened on the table, then what it does to the Level.
-             The old labels led with the arithmetic ("+1 End Phase"), which is
-             the wrong way round: you press these because a thing happened. -->
-        <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="alert-adjust" data-delta="1" data-end-phase="1">End Phase <b class="alert-delta">+1</b>${icon("plus", 13).replace("<svg ", '<svg slot="icon" ')}</cds-button>
-        <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="alert-adjust" data-delta="1">Reveal Mass 2-3 <b class="alert-delta">+1</b>${icon("plus", 13).replace("<svg ", '<svg slot="icon" ')}</cds-button>
-        <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="alert-adjust" data-delta="-2">Destroy Mass 2-3 <b class="alert-delta">&minus;2</b>${icon("minus", 13).replace("<svg ", '<svg slot="icon" ')}</cds-button>
-        <cds-button has-main-content kind="tertiary" size="lg" class="btn" data-action="alert-adjust" data-delta="-1">Take one back <b class="alert-delta">&minus;1</b>${icon("minus", 13).replace("<svg ", '<svg slot="icon" ')}</cds-button>
-      </div>
-      ${startNote}
-    </div>
-    <div class="gb-round">
-      <span class="control-label">Round</span>
-      <cds-number-input type="number" pattern="[0-9]*" locale="en-US" input-mode="decimal" placeholder="" max="" class="round-input" label="Round" hide-label min="1" step="1" value="${o.round}" size="lg" data-action="round-set"></cds-number-input>
-      <span class="control-label">CMD tokens</span>
-      <cds-number-input type="number" pattern="[0-9]*" locale="en-US" input-mode="decimal" placeholder="" max="" class="round-input" label="CMD tokens" hide-label min="0" step="1" value="${o.cmd ?? cmdGain(o)}" size="lg" data-action="cmd-set"></cds-number-input>
-    </div>
+  <section class="play-bar">
+    ${num("Alert Level", "alert-set", o.alertLevel, 1, 10)}
+    ${num("Round", "round-set", o.round, 1)}
+    ${num("CMD tokens", "cmd-set", o.cmd ?? cmdGain(o), 0)}
   </section>
   ${blipsPanel(o)}
   ${soloRefTabs(state)}`;

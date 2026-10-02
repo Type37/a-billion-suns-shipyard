@@ -8912,3 +8912,60 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
 @media (max-width: 671px) { .ru-names { grid-template-columns: minmax(0, 1fr); } }
 .roster-unit-head .ru-class { flex: 1 1 auto; }
 cds-overflow-menu.glr-menu { border: none; }
+
+/* ---------------------------------------------- design critique, 2 Oct 2026
+   A fresh-eyes aesthetic review of the Solo screens: "palette and type are
+   good, but heavy black card borders, a flat heading hierarchy and stats that
+   don't line up make every screen feel like one undifferentiated grid of
+   boxes". Applied: */
+
+/* 1. Phone head: Print shares the tab row (it had a 96px row of its own and
+   the head took ~30% of the screen before any content). */
+@media (max-width: 671px) {
+  .solo-head { grid-template-columns: 48px minmax(0, 1fr) auto; }
+  .solo-head .solo-print { grid-column: 3; grid-row: 2; justify-self: end; align-self: center; }
+  .solo-head .solo-tabs { grid-column: 1 / 3; grid-row: 2; }
+}
+
+/* 2. Hierarchy: section heads one step above card titles (they were the same
+   size). Section 22 Archivo, card titles 18 semibold; 32 above a section, 16
+   below. */
+.solo-outfit .roster-section, .solo-outfit .catalog-title {
+  font: 600 22px/1.25 var(--display); margin: 32px 0 16px;
+}
+.solo-outfit .catalog-title, .solo-outfit .roster-sheet > .roster-section:first-of-type { margin-top: 24px; }
+.solo-outfit .ship-row .ship-name, .solo-outfit .ru-class { font: 600 18px/1.3 var(--display); }
+
+/* 3. Stock ship classes and Blips as Carbon tiles: grey layer, no outline.
+   Only the outfit's own ships keep an outline, so they read as yours. */
+.solo-outfit .ship-row { border: none; background: var(--ground); }
+.solo-outfit .blip { border: none; background: var(--ground); }
+.solo-outfit .blip.is-revealed { background: var(--paper); box-shadow: inset 0 0 0 1px var(--red); }
+
+/* 4. Stock card body runs the full inner width; Add sits in the top-right
+   corner, so the Recon's rules no longer stop at 60% of the card on a phone
+   and leave a dead column. */
+.solo-outfit .ship-row { display: block; position: relative; padding: 16px; }
+.solo-outfit .ship-row .add-cue { position: absolute; top: 16px; right: 16px; }
+.solo-outfit .ship-row .ship-row-head { padding-right: 96px; }
+.solo-outfit .ship-rule { font-size: 14px; line-height: 1.6; }
+
+/* 5. A face-up Blip readable from beside the board: name 16, stats and guns
+   13 (they were 13 and 11 next to 56px numerals). */
+.solo-outfit .blip-what { font-size: 16px; }
+.solo-outfit .blip-w { font-size: 13px; }
+
+/* 6. Campaign: the three top items top-aligned; the game log full width as a
+   structured list, menu flush right, the date under the amount. */
+.solo-outfit .debt-band { align-items: start; }
+.solo-outfit .solo-split-solo { grid-template-columns: minmax(0, 1fr); }
+.solo-outfit .game-log-row { padding: 12px 0; border-bottom: 1px solid var(--hair-soft); }
+.solo-outfit .glr-head { display: grid; grid-template-columns: auto auto; justify-content: start; column-gap: 8px; row-gap: 2px; }
+.solo-outfit .glr-date { grid-column: 1 / -1; margin-left: 0; font-size: 13px; }
+/* Add stays on the title line: 32px tall so it never reaches the stat rows
+   (at 48 it sat over the weapon column). The name field spans to the edge on
+   a phone now that Print lives in the tab row. */
+.solo-outfit .ship-row .add-cue { top: 12px; right: 12px; min-height: 32px; height: 32px; padding: 0 12px; }
+@media (max-width: 671px) { .solo-head .solo-name { grid-column: 2 / -1; } }
+/* The compact Add keeps a 44px touch target with an invisible hit area. */
+.solo-outfit .ship-row .add-cue::after { content: ""; position: absolute; inset: -6px; }

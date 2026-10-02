@@ -556,10 +556,6 @@ function blipsPanel(o: SavedOutfit): string {
     </section>`;
 }
 
-/** CMD tokens gained each Command Phase: 5 (p.205), +1 per Quarterback (p.213). */
-export function cmdGain(o: SavedOutfit): number {
-  return 5 + o.perks.filter((p) => p.perk === "Quarterback").length;
-}
 
 /** A pilot's Initiative Value in D6: 2 to start (p.202), +1 Slick, +2 Rogue (pp.212-213). */
 function initiativeDice(o: SavedOutfit, shipId: string): number {
@@ -576,19 +572,15 @@ function initiativeDice(o: SavedOutfit, shipId: string): number {
  * modal footer's has-three-buttons.
  */
 function playTab(state: AppState, o: SavedOutfit): string {
-  // Three Carbon number inputs in one row, nothing else (Jet, 2 October 2026,
-  // of the Alert figure, ten pips, four event buttons, "the game ends at 10"
-  // and the starting-level note: "the fuck is all this?"). The 1-10 range of
-  // the Alert is the field's own min and max; the starting Alert still follows
-  // the Debt when a game is logged (p.195). Labels sit above, Carbon's default.
-  const num = (label: string, action: string, value: number, min: number, max?: number): string =>
-    `<cds-number-input type="number" pattern="[0-9]*" locale="en-US" input-mode="decimal" placeholder="" class="pb-field" label="${label}" min="${min}" max="${max ?? ""}" step="1" value="${value}" size="lg" data-action="${action}"></cds-number-input>`;
+  // What a player wants from a phone at the table, and nothing else (Jet,
+  // 2 October 2026: "would a player want this with their phone?"): the Blip
+  // bag, for anyone playing with blank markers, and the rules they would
+  // otherwise flip the book for every activation. Alert Level, Round and CMD
+  // tokens were fields here; the table already holds all three (the book:
+  // "Track it with a D10"; CMD are tokens), so typing them in was a second
+  // copy of the game state. The starting Alert still follows the Debt when a
+  // game is logged (p.195).
   return `
-  <section class="play-bar">
-    ${num("Alert Level", "alert-set", o.alertLevel, 1, 10)}
-    ${num("Round", "round-set", o.round, 1)}
-    ${num("CMD tokens", "cmd-set", o.cmd ?? cmdGain(o), 0)}
-  </section>
   ${blipsPanel(o)}
   ${soloRefTabs(state)}`;
 }

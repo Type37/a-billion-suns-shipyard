@@ -8885,9 +8885,6 @@ cds-checkbox.phase-check.done { color: var(--ink-3); text-decoration: line-throu
 .blip-back { display: grid; place-items: center; }
 .blip-back .blip-slot { position: static; font: 800 56px/1 var(--display); color: var(--ink); }
 .ru-init { font-size: 14px; color: var(--ink-2); margin: 8px 0 0; }
-/* Solo Play's one row of fields: Alert Level, Round, CMD tokens. */
-.play-bar { display: grid; grid-template-columns: repeat(3, minmax(0, 12rem)); gap: 16px; padding: 16px 0 0; }
-@media (max-width: 671px) { .play-bar { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; } }
 /* Between phone and desktop (672-959) the head row ran out of room: emblem,
    a 28rem name, three tabs and Print overlapped, cut "Campaign" and scrolled
    the page sideways at 785px. There the tabs take their own row under the

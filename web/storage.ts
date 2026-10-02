@@ -385,8 +385,6 @@ export interface SavedOutfit {
    * number is decided before you get near it.
    */
   blips?: { n: number; revealed: boolean }[];
-  /** Live game: CMD tokens in hand this round (p.205: you gain 5; Quarterback adds 1). */
-  cmd?: number;
   /**
    * After the last logged game: perks still to grant (one per ¢1k earned)
    * and the pilots who have already taken one (p.212). Shown, not enforced.

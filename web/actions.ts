@@ -35,7 +35,6 @@ import {
 } from "./storage.ts";
 import type { SavedOutfit } from "./storage.ts";
 import { FleetSync } from "./fleet-sync.ts";
-import { cmdGain } from "./solo.ts";
 import {
   createList,
   createOutfit,
@@ -1956,7 +1955,6 @@ export function dispatchAction(target: HTMLElement): void {
           round: 1,
           // Perks to grant after this game: one per ¢1k earned (p.212).
           perkBudget: { game: o.gamesPlayed + 1, left: earnedK, given: [] },
-          cmd: undefined,
           // The markers belong to the game just finished; the next one gets a
           // fresh shuffle of the bag.
           blips: undefined,
@@ -2740,24 +2738,6 @@ function handleChange(e: Event): void {
         ...o,
         ships: o.ships.map((s) => (s.id === shipId ? { ...s, pilotName: inputValue } : s)),
       }));
-      break;
-    }
-    case "alert-set": {
-      const v = readNumber(inputValue);
-      if (v === null) return;
-      editOutfit((o) => ({ ...o, alertLevel: Math.max(1, Math.min(10, v)) }));
-      break;
-    }
-    case "cmd-set": {
-      const v = readNumber(inputValue);
-      if (v === null) return;
-      editOutfit((o) => ({ ...o, cmd: Math.max(0, v) }));
-      break;
-    }
-    case "round-set": {
-      const v = readNumber(inputValue);
-      if (v === null) return;
-      editOutfit((o) => ({ ...o, round: Math.max(1, v) }));
       break;
     }
     case "assign-perk": {

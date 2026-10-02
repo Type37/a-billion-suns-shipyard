@@ -649,7 +649,8 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       <article class="roster-unit" data-roster-key="${t.id}">
         <div class="roster-unit-head">
           ${n?``:`<span class="roster-unit-glyph">${M(`warning`,20)}</span>`}
-          <input class="unit-name-input" type="text" value="${N(t.shipName??``)}" placeholder="${N(n?.name??`Ship`)}" aria-label="${N(n?.name??`Ship`)}" data-action="outfit-ship-name" data-ship="${t.id}" />
+          
+          <h4 class="ru-class">${N(n?.name??`Ship`)}</h4>
           <span class="roster-unit-cost">${dd(n?.cost??0)}</span>
           <cds-button has-main-content kind="danger-ghost" size="lg" class="btn" data-action="outfit-remove-ship" data-ship="${t.id}">Remove${M(`trash`,14).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
         </div>
@@ -663,14 +664,21 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
           flying this" and "what are they called" and read as a different
           subject entirely. Same person, same row.
         -->
-        <p class="ru-init">Initiative ${Ed(e,t.id)}D6</p>
         <div class="roster-unit-tools">
           <div class="pilot-field">
+            
+            <div class="ru-names">
+              <label class="cf-f"><span class="cf-l">Ship name</span>
+                <input class="unit-name-input" type="text" value="${N(t.shipName??``)}" data-action="outfit-ship-name" data-ship="${t.id}" /></label>
+              <label class="cf-f"><span class="cf-l">Call sign</span>
+                <input class="pilot-name-input" type="text" value="${N(t.pilotName??``)}" data-action="outfit-pilot-name" data-ship="${t.id}" /></label>
+            </div>
             <div class="pilot-row">
               <div class="pilot-picker" role="group" aria-label="Pilot class">${r}</div>
-              <input class="pilot-name-input" type="text" value="${N(t.pilotName??``)}" placeholder="Call sign" aria-label="Pilot name" data-action="outfit-pilot-name" data-ship="${t.id}" />
             </div>
             <div class="pilot-abilities">${i}</div>
+            
+            <p class="ru-init">Initiative ${Ed(e,t.id)}D6</p>
             ${Cd(e,t)}
           </div>
         </div>
@@ -770,7 +778,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       <span class="control-label">Campaign clock</span>
       ${_d(e.gamesPlayed,hd(e))}
       
-      ${r?`<p class="issue-error">If, after ${hd(e)} games, you still have outstanding debt, some very unpleasant people pay a visit to your space dock and you lose the campaign (and your ships).</p>`:``}
+      ${r?`<cds-inline-notification kind="error" low-contrast hide-close-button class="gb-loss" title="Campaign lost" subtitle="If, after ${hd(e)} games, you still have outstanding debt, some very unpleasant people pay a visit to your space dock and you lose the campaign (and your ships)."></cds-inline-notification>`:``}
     </div>
     
     <div class="gb-act">
@@ -791,7 +799,13 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
                     </span>
                     ${e.note?`<span class="glr-note">${N(e.note)}</span>`:``}
                     
-                    <cds-button has-main-content kind="danger-ghost" size="sm" class="btn glr-remove" data-action="remove-game" data-game="${e.game}">Remove${M(`trash`,14).replace(`<svg `,`<svg slot="icon" `)}</cds-button>
+                    
+                    <cds-overflow-menu kind="ghost" class="card-menu glr-menu" label="Game ${e.game} actions" size="md" enable-v12-overflowmenu menu-alignment="bottom-end">
+                      ${M(`ix-context-menu`,16).replace(`<svg `,`<svg slot="icon" `)}
+                      <cds-menu>
+                        <cds-menu-item label="Remove" kind="danger" data-action="remove-game" data-game="${e.game}"></cds-menu-item>
+                      </cds-menu>
+                    </cds-overflow-menu>
                   </li>`).join(``)}</ol>`:``}
       </section>`:``}
       
